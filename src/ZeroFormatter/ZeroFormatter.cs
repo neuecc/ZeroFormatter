@@ -12,37 +12,34 @@ namespace ZeroFormatter
 {
     public static class ZeroFormatter
     {
-        const int InitialLength = 16;
-
         public static byte[] Serialize<T>(T obj)
         {
-            var formatter = Formatter<T>.Instance;
-
             byte[] result = null;
-            var size = formatter.Serialize(ref result, 0, obj);
-
-            if (result.Length != size)
-            {
-                Array.Resize(ref result, size);
-            }
-
+            Serialize(obj, ref result);
             return result;
         }
 
         public static void Serialize<T>(T obj, ref byte[] bytes)
         {
-            throw new NotImplementedException();
-        }
+            var formatter = Formatter<T>.Instance;
 
-        public static void Serialize<T>(T obj, MemoryStream memoryStream)
-        {
-            throw new NotImplementedException();
+            var size = formatter.Serialize(ref bytes, 0, obj);
+
+            if (bytes.Length != size)
+            {
+                BinaryUtil.FastResize(ref bytes, size);
+            }
         }
 
         public static T Deserialize<T>(byte[] bytes)
         {
+            return Deserialize<T>(bytes, 0);
+        }
+
+        public static T Deserialize<T>(byte[] bytes, int offset)
+        {
             var formatter = Formatter<T>.Instance;
-            return formatter.Deserialize(ref bytes, 0);
+            return formatter.Deserialize(ref bytes, offset);
         }
     }
 }

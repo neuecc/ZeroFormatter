@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 
@@ -25,11 +22,24 @@ namespace ZeroFormatter.Formatters
                 {
                     Instance = (Formatter<T>)(object)new StringFormatter();
                 }
+
+
+                else if (t == typeof(int[]))
+                {
+                    Instance = (Formatter<T>)(object)new IntArrayFormatter();
+                }
+
+
                 else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>))
                 {
                     var formatterType = typeof(ListFormatter<>).MakeGenericType(t.GetGenericArguments());
                     Instance = (Formatter<T>)Activator.CreateInstance(formatterType);
                 }
+
+                // TODO:....
+
+
+                // TODO:make enum, nullable enum, and enum array...
             }
             catch
             {
@@ -43,28 +53,7 @@ namespace ZeroFormatter.Formatters
         public abstract T Deserialize(ref byte[] bytes, int offset);
     }
 
-    // Layout: [4]
-    internal class IntFormatter : Formatter<int>
-    {
-        public override int? GetLength()
-        {
-            return 4;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, int value)
-        {
-            if (bytes == null) bytes = new byte[4];
-
-            return BinaryUtil.WriteInt32(ref bytes, offset, value);
-        }
-
-        public override int Deserialize(ref byte[] bytes, int offset)
-        {
-            return BinaryUtil.ReadInt32(ref bytes, offset);
-        }
-    }
-
-    // Layout: [size:int][utf8bytes...]
+    // Layout: [size:int][utf8bytes...], if size == -1 string is null.
     internal class StringFormatter : Formatter<string>
     {
         public override int? GetLength()
@@ -74,19 +63,22 @@ namespace ZeroFormatter.Formatters
 
         public override int Serialize(ref byte[] bytes, int offset, string value)
         {
-            var size = StringEncoding.UTF8.GetByteCount(value);
-            if (bytes == null)
+            if (value == null)
             {
-                bytes = new byte[size + 4];
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
             }
 
-            offset += BinaryUtil.WriteInt32(ref bytes, offset, size);
-            return BinaryUtil.WriteString(ref bytes, offset, value, size) + 4;
+            var stringSize = BinaryUtil.WriteString(ref bytes, offset + 4, value);
+            BinaryUtil.WriteInt32(ref bytes, offset, stringSize); // write size after encode.
+            return stringSize + 4;
         }
 
         public override string Deserialize(ref byte[] bytes, int offset)
         {
-            throw new NotImplementedException();
+            var length = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (length == -1) return null;
+            return StringEncoding.UTF8.GetString(bytes, offset + 4, length);
         }
     }
 

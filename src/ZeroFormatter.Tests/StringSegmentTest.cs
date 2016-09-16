@@ -1,0 +1,48 @@
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
+using System.Collections.Generic;
+using ZeroFormatter.Format;
+using System.Text;
+
+namespace ZeroFormatter.Tests
+{
+    [TestClass]
+    public class StringSegmentTest
+    {
+        // Fixed
+
+        [TestMethod]
+        public void String()
+        {
+            var _ = ZeroFormatter.Serialize<string>("");
+            var str = ZeroFormatter.Deserialize<string>(_);
+
+            var ms = new MemoryStream();
+            var bw = new BinaryWriter(ms);
+            bw.Write(Encoding.UTF8.GetByteCount("あいうえおかきくけこさしすえそなにぬねの"));
+            bw.Write("あいうえおかきくけこさしすえそなにぬねの");
+
+            var actual = ms.ToArray();
+
+            var segment = new StringSegment(new ArraySegment<byte>(actual));
+
+
+            segment.Value = "あいうえおかきくけこ";
+
+            byte[] result = new byte[0];
+            segment.Serialize(ref result, 0);
+
+            ZeroFormatter.Deserialize<string>(result).Is("あいうえおかきくけこ");
+
+
+
+            segment.Value = null;
+
+            segment.Serialize(ref result, 0);
+
+            ZeroFormatter.Deserialize<string>(result).Is("あいうえおかきくけこ");
+
+        }
+    }
+}

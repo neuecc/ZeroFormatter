@@ -38,5 +38,30 @@ namespace ZeroFormatter.Tests
                 ZeroFormatter.Deserialize<IList<int>>(ms.ToArray()).Is(10, 20, 30);
             }
         }
+
+        [TestMethod]
+        public void String()
+        {
+            var _ = ZeroFormatter.Serialize<string>("");
+            var str = ZeroFormatter.Deserialize<string>(_);
+
+            var _n = ZeroFormatter.Serialize<string>(null);
+            var str2 = ZeroFormatter.Deserialize<string>(_n);
+        }
+
+        [TestMethod]
+        public void IntArray()
+        {
+            var array = new[] { 1, 10, 999, 134114 ,5252};
+
+
+            var bytes = ZeroFormatter.Serialize(array);
+
+            var copyArray = ZeroFormatter.Deserialize<int[]>(bytes);
+
+
+            array.Is(copyArray);
+
+        }
     }
 }

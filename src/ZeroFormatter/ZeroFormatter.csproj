@@ -44,8 +44,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes.cs" />
+    <Compile Include="Collections\EnumEqualityComparer.cs" />
+    <Compile Include="Collections\SlimDictionary.cs" />
+    <Compile Include="Collections\SlimLookup.cs" />
     <Compile Include="Formatters\Formatter.cs" />
-    <Compile Include="Segments\DictionarySegment.cs" />
+    <Compile Include="Formatters\NullableFormatters.cs" />
+    <Compile Include="Formatters\PrimitiveArrayFormatter.cs" />
+    <Compile Include="Formatters\PrimitiveFormatters.cs" />
+    <Compile Include="Internal\HashHelper.cs" />
+    <Compile Include="Internal\PreserveAttribute.cs" />
+    <Compile Include="Internal\SerializableEqualityComparer.cs" />
+    <Compile Include="Internal\SR.cs" />
     <Compile Include="Internal\StringEncoding.cs" />
     <Compile Include="Segments\LookupSegment.cs" />
     <Compile Include="Segments\ListSegment.cs" />

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Text;
+using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Format
 {
+    // Layout: [size:int][utf8bytes...], if size == -1 string is null.
     public struct StringSegment
     {
         byte flag; // 0 = original, 1 = cached, 2 = dirty
@@ -24,7 +26,8 @@ namespace ZeroFormatter.Format
                 switch (flag)
                 {
                     case 0:
-                        this.cached = Encoding.UTF8.GetString(serializeBytes.Array, serializeBytes.Offset, serializeBytes.Count);
+                        var array = serializeBytes.Array;
+                        this.cached = Formatter<string>.Instance.Deserialize(ref array, serializeBytes.Offset);
                         this.flag = 1;
                         goto case 1;
                     case 1:
@@ -46,15 +49,20 @@ namespace ZeroFormatter.Format
 
             if (flag == 2)
             {
-                var getBytes = StringEncoding.UTF8.GetBytes(cached);
-                serializeBytes = new ArraySegment<byte>(getBytes, 0, getBytes.Length);
+                // TODO:GetByteCount is slow...
+
+                var size = StringEncoding.UTF8.GetByteCount(cached);
+                var newBytes = new byte[size + 4];
+                BinaryUtil.WriteInt32(ref newBytes, 0, size);
+
+                StringEncoding.UTF8.GetBytes(cached, 0, cached.Length, newBytes, 4);
+                serializeBytes = new ArraySegment<byte>(newBytes, 0, newBytes.Length);
                 flag = 1; // cached serialize bytes
             }
 
-            // TODO:Write header...
             if (targetBytes.Length < offset + serializeBytes.Count)
             {
-                Array.Resize(ref targetBytes, (offset + serializeBytes.Count)); // fill resize
+                BinaryUtil.FastResize(ref targetBytes, (offset + serializeBytes.Count)); // fill resize
             }
 
             Buffer.BlockCopy(serializeBytes.Array, serializeBytes.Offset, targetBytes, offset, serializeBytes.Count);
