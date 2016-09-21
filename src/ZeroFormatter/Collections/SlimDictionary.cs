@@ -46,12 +46,12 @@ namespace ZeroFormatter.Collections
         IEqualityComparer<TKey> comparer { get; set; }
 
         public SlimDictionary()
-            : this(SerializableEqualityComparer.GetDefault<TKey>())
+            : this(ZeroFormatterEqualityComparer.GetDefault<TKey>())
         {
         }
 
         public SlimDictionary(int initialCapacity)
-            : this(initialCapacity, SerializableEqualityComparer.GetDefault<TKey>())
+            : this(initialCapacity, ZeroFormatterEqualityComparer.GetDefault<TKey>())
         {
         }
 

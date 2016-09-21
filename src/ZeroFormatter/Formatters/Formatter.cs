@@ -16,17 +16,24 @@ namespace ZeroFormatter.Formatters
                 var t = typeof(T);
                 if (t == typeof(int))
                 {
-                    Instance = (Formatter<T>)(object)new IntFormatter();
+                    Instance = (Formatter<T>)(object)new Int32Formatter();
                 }
+                else if (t == typeof(float))
+                {
+                    Instance = (Formatter<T>)(object)new SingleFormatter();
+                }
+
                 else if (t == typeof(String))
                 {
                     Instance = (Formatter<T>)(object)new StringFormatter();
                 }
 
 
-                else if (t == typeof(int[]))
+
+
+                else if (t == typeof(byte[]))
                 {
-                    Instance = (Formatter<T>)(object)new IntArrayFormatter();
+                    Instance = (Formatter<T>)(object)new ByteArrayFormatter();
                 }
 
 

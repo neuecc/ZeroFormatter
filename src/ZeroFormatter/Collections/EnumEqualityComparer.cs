@@ -1,43 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Collections
 {
-    [Preserve]
+    // same impl of ZeroFormatterEqualityComparers
     internal static class EnumEqualityComparerHelper
     {
-        [Preserve]
-        static int ByteGetHashCode(byte x) { return x.GetHashCode(); }
-        [Preserve]
+        static int ByteGetHashCode(byte x) { return (int)x; }
+
         static bool ByteEquals(byte x, byte y) { return x == y; }
-        [Preserve]
-        static int SByteGetHashCode(sbyte x) { return x.GetHashCode(); }
-        [Preserve]
+
+        static int SByteGetHashCode(sbyte x) { return (int)x ^ (int)x << 8; }
+
         static bool SByteEquals(sbyte x, sbyte y) { return x == y; }
-        [Preserve]
-        static int ShortGetHashCode(short x) { return x.GetHashCode(); }
-        [Preserve]
+
+        static int ShortGetHashCode(short x) { return (int)((ushort)x) | (int)x << 16; }
+
         static bool ShortEquals(short x, short y) { return x == y; }
-        [Preserve]
-        static int UShortGetHashCode(ushort x) { return x.GetHashCode(); }
-        [Preserve]
+
+        static int UShortGetHashCode(ushort x) { return x; }
+
         static bool UShortEquals(ushort x, ushort y) { return x == y; }
-        [Preserve]
-        static int UIntGetHashCode(uint x) { return x.GetHashCode(); }
-        [Preserve]
+
+        static int UIntGetHashCode(uint x) { return (int)x; }
+
         static bool UIntEquals(uint x, uint y) { return x == y; }
-        [Preserve]
-        static int ULongGetHashCode(ulong x) { return x.GetHashCode(); }
-        [Preserve]
+
+        static int ULongGetHashCode(ulong x) { return (int)x ^ (int)(x >> 32); }
+
         static bool ULongEquals(ulong x, ulong y) { return x == y; }
-        [Preserve]
-        static int LongGetHashCode(long x) { return x.GetHashCode(); }
-        [Preserve]
+
+        static int LongGetHashCode(long x) { return (int)x ^ (int)(x >> 32); }
+
         static bool LongEquals(long x, long y) { return x == y; }
-        [Preserve]
-        static int IntGetHashCode(int x) { return x.GetHashCode(); }
-        [Preserve]
+
+        static int IntGetHashCode(int x) { return x; }
+
         static bool IntEquals(int x, int y) { return x == y; }
 
         public static class DelegateCache<T>

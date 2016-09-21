@@ -1,0 +1,77 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+
+    var types = new[]
+    {
+        Tuple.Create(typeof(int), 4),
+        Tuple.Create(typeof(float), 4),
+    };
+
+#>
+using System;
+using ZeroFormatter.Internal;
+
+namespace ZeroFormatter.Formatters
+{
+    // Layout: [fixedElementSize]
+    // Layout: [isNull:1][fixedElementSize]
+
+<# foreach(var tuple in types) { var t = tuple.Item1; #>
+
+    internal class <#= t.Name #>Formatter : Formatter<<#= t.Name #>>
+    {
+        public override int? GetLength()
+        {
+            return <#= tuple.Item2 #>;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, <#= t.Name #> value)
+        {
+            return BinaryUtil.Write<#= t.Name #>(ref bytes, offset, value);
+        }
+
+        public override <#= t.Name #> Deserialize(ref byte[] bytes, int offset)
+        {
+            return BinaryUtil.Read<#= t.Name #>(ref bytes, offset);
+        }
+    }
+
+    internal class Nullable<#= t.Name #>Formatter : Formatter<<#= t.Name #>?>
+    {
+        public override int? GetLength()
+        {
+            return <#= tuple.Item2 + 1 #>;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, <#= t.Name #>? value)
+        {
+            BinaryUtil.WriteBool(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.Write<#= t.Name #>(ref bytes, offset + 1, value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + <#= tuple.Item2 + 1 #>);
+            }
+
+            return <#= tuple.Item2 + 1 #>;
+        }
+
+        public override <#= t.Name #>? Deserialize(ref byte[] bytes, int offset)
+        {
+            var isNull = BinaryUtil.ReadBool(ref bytes, offset);
+            if (isNull) return default(<#= t.Name #>?);
+
+            return BinaryUtil.Read<#= t.Name #>(ref bytes, offset + 1);
+        }
+    }
+
+<# } #>
+
+}
