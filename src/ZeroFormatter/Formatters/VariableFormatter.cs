@@ -35,4 +35,26 @@ namespace ZeroFormatter.Formatters
             return StringEncoding.UTF8.GetString(bytes, offset + 4, length);
         }
     }
+
+    // Layout: [size:int][utf8bytes...]
+    internal class CharFormatter : Formatter<char>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, char value)
+        {
+            var charSize = BinaryUtil.WriteChar(ref bytes, offset + 4, value);
+            BinaryUtil.WriteInt32(ref bytes, offset, charSize); // write size after encode.
+            return charSize + 4;
+        }
+
+        public override char Deserialize(ref byte[] bytes, int offset)
+        {
+            var length = BinaryUtil.ReadInt32(ref bytes, offset);
+            return StringEncoding.UTF8.GetChars(bytes, offset + 4, length)[0];
+        }
+    }
 }
