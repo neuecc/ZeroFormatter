@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZeroFormatter</RootNamespace>
     <AssemblyName>ZeroFormatter</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>4</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,19 +53,26 @@
     <Compile Include="Collections\EnumEqualityComparer.cs" />
     <Compile Include="Formatters\Formatter.cs" />
     <Compile Include="Formatters\ByteArrayFormatter.cs" />
+    <Compile Include="Formatters\ListFormatter.cs" />
+    <Compile Include="Formatters\ObjectFormatter.cs" />
     <Compile Include="Formatters\PrimitiveFormatter.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>PrimitiveFormatter.tt</DependentUpon>
     </Compile>
+    <Compile Include="Formatters\VariableFormatter.cs" />
     <Compile Include="Internal\BinaryUtil.cs" />
     <Compile Include="Internal\HashHelper.cs" />
     <Compile Include="Collections\ZeroFormatterEqualityComparer.cs" />
     <Compile Include="Internal\SR.cs" />
     <Compile Include="Internal\StringEncoding.cs" />
+    <Compile Include="Segments\IDirectCopiable.cs" />
     <Compile Include="Segments\LookupSegment.cs" />
     <Compile Include="Segments\ListSegment.cs" />
     <Compile Include="Segments\NullableSegment.cs" />
+    <Compile Include="Segments\ObjectSegment.cs" />
+    <Compile Include="Segments\ObjectTracker.cs" />
+    <Compile Include="Segments\SegmentState.cs" />
     <Compile Include="Segments\StringSegment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZeroFormatter.cs" />

@@ -21,7 +21,7 @@ namespace ZeroFormatter.Segments
         public FixedListSegement(ArraySegment<byte> originalBytes)
         {
             this.originalBytes = originalBytes;
-            this.formatter = Formatters.Formatter<T>.Instance;
+            this.formatter = Formatters.Formatter<T>.Default;
 
             var length = formatter.GetLength();
             if (length == null) throw new InvalidOperationException("T should be fixed length. Type: " + typeof(T).Name);

@@ -5,12 +5,12 @@ namespace ZeroFormatter
     // We need to use Analyazer so can't use DataContractAttribute.
     // Analyzer detect attribtues by name.
 
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class ZeroFormattableAttribute : Attribute
     {
     }
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class IndexAttribute : Attribute
     {
         public int Index { get; private set; }
@@ -21,7 +21,7 @@ namespace ZeroFormatter
         }
     }
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class IgnoreFormat : Attribute
     {
     }

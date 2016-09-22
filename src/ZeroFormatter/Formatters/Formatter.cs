@@ -1,52 +1,140 @@
 ﻿using System;
 using System.Collections.Generic;
-using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
+using System.IO;
 
 namespace ZeroFormatter.Formatters
 {
-    internal abstract class Formatter<T>
+    // raw layer of serialization.
+
+    public abstract class Formatter<T>
     {
-        public static Formatter<T> Instance;
+        public static Formatter<T> Default;
 
         static Formatter()
         {
             try
             {
+                object formatter = null;
+
                 var t = typeof(T);
-                if (t == typeof(int))
+
+                // Primitive
+                if (t == typeof(Int16))
                 {
-                    Instance = (Formatter<T>)(object)new Int32Formatter();
+                    formatter = new Int16Formatter();
                 }
-                else if (t == typeof(float))
+                else if (t == typeof(Int32))
                 {
-                    Instance = (Formatter<T>)(object)new SingleFormatter();
+                    formatter = new Int32Formatter();
+                }
+                else if (t == typeof(Int64))
+                {
+                    formatter = new Int64Formatter();
+                }
+                else if (t == typeof(UInt16))
+                {
+                    formatter = new UInt16Formatter();
+                }
+                else if (t == typeof(UInt32))
+                {
+                    formatter = new UInt32Formatter();
+                }
+                else if (t == typeof(UInt64))
+                {
+                    formatter = new UInt64Formatter();
+                }
+                else if (t == typeof(Single))
+                {
+                    formatter = new SingleFormatter();
+                }
+                else if (t == typeof(Double))
+                {
+                    formatter = new DoubleFormatter();
+                }
+                else if (t == typeof(bool))
+                {
+                    formatter = new BooleanFormatter();
+                }
+                else if (t == typeof(byte))
+                {
+                    formatter = new ByteFormatter();
+                }
+                else if (t == typeof(sbyte))
+                {
+                    formatter = new SByteFormatter();
+                }
+                // Nulllable
+                else if (t == typeof(Nullable<Int16>))
+                {
+                    formatter = new NullableInt16Formatter();
+                }
+                else if (t == typeof(Nullable<Int32>))
+                {
+                    formatter = new NullableInt32Formatter();
+                }
+                else if (t == typeof(Nullable<Int64>))
+                {
+                    formatter = new NullableInt64Formatter();
+                }
+                else if (t == typeof(Nullable<UInt16>))
+                {
+                    formatter = new NullableUInt16Formatter();
+                }
+                else if (t == typeof(Nullable<UInt32>))
+                {
+                    formatter = new NullableUInt32Formatter();
+                }
+                else if (t == typeof(Nullable<UInt64>))
+                {
+                    formatter = new NullableUInt64Formatter();
+                }
+                else if (t == typeof(Nullable<Single>))
+                {
+                    formatter = new NullableSingleFormatter();
+                }
+                else if (t == typeof(Nullable<Double>))
+                {
+                    formatter = new NullableDoubleFormatter();
+                }
+                else if (t == typeof(Nullable<bool>))
+                {
+                    formatter = new NullableBooleanFormatter();
+                }
+                else if (t == typeof(Nullable<byte>))
+                {
+                    formatter = new NullableByteFormatter();
+                }
+                else if (t == typeof(Nullable<sbyte>))
+                {
+                    formatter = new NullableSByteFormatter();
                 }
 
+                // Others
                 else if (t == typeof(String))
                 {
-                    Instance = (Formatter<T>)(object)new StringFormatter();
+                    formatter = new StringFormatter();
                 }
-
-
-
-
                 else if (t == typeof(byte[]))
                 {
-                    Instance = (Formatter<T>)(object)new ByteArrayFormatter();
+                    formatter = new ByteArrayFormatter();
                 }
 
 
                 else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>))
                 {
                     var formatterType = typeof(ListFormatter<>).MakeGenericType(t.GetGenericArguments());
-                    Instance = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    Default = (Formatter<T>)Activator.CreateInstance(formatterType);
                 }
 
                 // TODO:....
 
+                // TODO:make the object formatter...
+
 
                 // TODO:make enum, nullable enum, and enum array...
+
+                Default = (Formatter<T>)formatter;
+
             }
             catch
             {
@@ -58,87 +146,5 @@ namespace ZeroFormatter.Formatters
 
         public abstract int Serialize(ref byte[] bytes, int offset, T value);
         public abstract T Deserialize(ref byte[] bytes, int offset);
-    }
-
-    // Layout: [size:int][utf8bytes...], if size == -1 string is null.
-    internal class StringFormatter : Formatter<string>
-    {
-        public override int? GetLength()
-        {
-            return null;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, string value)
-        {
-            if (value == null)
-            {
-                BinaryUtil.WriteInt32(ref bytes, offset, -1);
-                return 4;
-            }
-
-            var stringSize = BinaryUtil.WriteString(ref bytes, offset + 4, value);
-            BinaryUtil.WriteInt32(ref bytes, offset, stringSize); // write size after encode.
-            return stringSize + 4;
-        }
-
-        public override string Deserialize(ref byte[] bytes, int offset)
-        {
-            var length = BinaryUtil.ReadInt32(ref bytes, offset);
-            if (length == -1) return null;
-            return StringEncoding.UTF8.GetString(bytes, offset + 4, length);
-        }
-    }
-
-    // Layout: FixedSize -> [length:int][t format...]
-    // Layout: VariableSize -> [length:int][(index:int, size:int)...][t format...]
-    internal class ListFormatter<T> : Formatter<IList<T>>
-    {
-        public override int? GetLength()
-        {
-            return null;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, IList<T> value)
-        {
-            var formatter = Formatter<T>.Instance;
-            var length = formatter.GetLength();
-            if (length != null)
-            {
-                // FixedSize Array
-                var writeSize = value.Count * length.Value + 4;
-                if (bytes == null)
-                {
-                    bytes = new byte[writeSize];
-                }
-
-                offset += BinaryUtil.WriteInt32(ref bytes, offset, value.Count);
-                foreach (var item in value)
-                {
-                    offset += formatter.Serialize(ref bytes, offset, item);
-                }
-                return writeSize;
-            }
-            else
-            {
-                // TODO:Variable Size Array
-                throw new NotImplementedException();
-            }
-        }
-
-        public override IList<T> Deserialize(ref byte[] bytes, int offset)
-        {
-            var formatter = Formatter<T>.Instance;
-            var length = formatter.GetLength();
-            if (length != null)
-            {
-                var size = BinaryUtil.ReadInt32(ref bytes, offset);
-                return new FixedListSegement<T>(new ArraySegment<byte>(bytes, offset, size));
-            }
-            else
-            {
-                // TODO:Variable Size Array
-                throw new NotImplementedException();
-            }
-        }
     }
 }

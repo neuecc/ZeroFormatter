@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZeroFormatter.Format;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter
 {
@@ -21,7 +17,7 @@ namespace ZeroFormatter
 
         public static void Serialize<T>(T obj, ref byte[] bytes)
         {
-            var formatter = Formatter<T>.Instance;
+            var formatter = Formatter<T>.Default;
 
             var size = formatter.Serialize(ref bytes, 0, obj);
 
@@ -31,15 +27,91 @@ namespace ZeroFormatter
             }
         }
 
-        public static T Deserialize<T>(byte[] bytes)
+        public static void Serialize<T>(T obj, Stream stream)
         {
-            return Deserialize<T>(bytes, 0);
+            // optimized path
+            // TryGetBuffer does not supports before .NET 4.6
+            // MEMO: If allowgetbuffer = false, throws Exception...
+
+            var ms = stream as MemoryStream;
+            if (ms != null && ms.Position == 0)
+            {
+                var zeroFormatterObj = obj as IZeroFormatterSegment;
+                if (zeroFormatterObj != null && zeroFormatterObj.CanDirectCopy())
+                {
+                    var bufferRef = zeroFormatterObj.GetBufferReference();
+
+                    ms.SetLength(bufferRef.Count);
+                    var dest = ms.GetBuffer();
+                    Buffer.BlockCopy(bufferRef.Array, bufferRef.Offset, dest, 0, bufferRef.Count);
+                }
+            }
+            else
+            {
+                var buffer = Serialize<T>(obj);
+                stream.Write(buffer, 0, buffer.Length);
+            }
         }
 
-        public static T Deserialize<T>(byte[] bytes, int offset)
+        public static T Deserialize<T>(byte[] bytes)
         {
-            var formatter = Formatter<T>.Instance;
-            return formatter.Deserialize(ref bytes, offset);
+            var formatter = Formatter<T>.Default;
+            return formatter.Deserialize(ref bytes, 0);
+        }
+
+        public static T Deserialize<T>(Stream stream)
+        {
+            var ms = stream as MemoryStream;
+            if (ms != null)
+            {
+                var buffer = ms.GetBuffer();
+                var formatter = Formatter<T>.Default;
+                return formatter.Deserialize(ref buffer, (int)ms.Position);
+            }
+            else
+            {
+                var buffer = FillFromStream(stream);
+                var array = buffer.Array;
+
+                var formatter = Formatter<T>.Default;
+                return formatter.Deserialize(ref array, buffer.Offset);
+            }
+        }
+
+        public static T Convert<T>(T obj)
+        {
+            var wrapper = obj as IZeroFormatterSegment;
+            if (wrapper != null && wrapper.CanDirectCopy())
+            {
+                return obj;
+            }
+
+            return Deserialize<T>(Serialize(obj));
+        }
+
+        public static bool IsFormattedObject<T>(T obj)
+        {
+            return obj is IZeroFormatterSegment;
+        }
+
+        // copy to does not supports before .NET 4
+        // Note:better to use System.Buffers.ArrayPool
+        static ArraySegment<byte> FillFromStream(Stream input)
+        {
+            var buffer = new byte[input.CanSeek ? input.Length : 16];
+
+            int length = 0;
+            int read;
+            while ((read = input.Read(buffer, length, buffer.Length - length)) > 0)
+            {
+                length += read;
+                if (length == buffer.Length)
+                {
+                    BinaryUtil.FastResize(ref buffer, length * 2);
+                }
+            }
+
+            return new ArraySegment<byte>(buffer, 0, length);
         }
     }
 }

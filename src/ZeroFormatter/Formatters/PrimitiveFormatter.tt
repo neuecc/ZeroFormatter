@@ -8,8 +8,17 @@
 
     var types = new[]
     {
-        Tuple.Create(typeof(int), 4),
-        Tuple.Create(typeof(float), 4),
+        Tuple.Create(typeof(Int16), 2),
+        Tuple.Create(typeof(Int32), 4),
+        Tuple.Create(typeof(Int64), 8),
+        Tuple.Create(typeof(UInt16), 2),
+        Tuple.Create(typeof(UInt32), 4),
+        Tuple.Create(typeof(UInt64), 8),
+        Tuple.Create(typeof(Single), 4),
+        Tuple.Create(typeof(Double), 8),
+        Tuple.Create(typeof(bool), 1),
+        Tuple.Create(typeof(byte), 1),
+        Tuple.Create(typeof(sbyte), 1),
     };
 
 #>
@@ -50,7 +59,7 @@ namespace ZeroFormatter.Formatters
 
         public override int Serialize(ref byte[] bytes, int offset, <#= t.Name #>? value)
         {
-            BinaryUtil.WriteBool(ref bytes, offset, value.HasValue);
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
                 BinaryUtil.Write<#= t.Name #>(ref bytes, offset + 1, value.Value);
@@ -65,7 +74,7 @@ namespace ZeroFormatter.Formatters
 
         public override <#= t.Name #>? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBool(ref bytes, offset);
+            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
             if (isNull) return default(<#= t.Name #>?);
 
             return BinaryUtil.Read<#= t.Name #>(ref bytes, offset + 1);

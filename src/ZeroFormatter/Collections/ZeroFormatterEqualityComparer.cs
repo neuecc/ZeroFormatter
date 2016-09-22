@@ -6,7 +6,6 @@ namespace ZeroFormatter.Collections
 {
     public static class ZeroFormatterEqualityComparer
     {
-        // static readonly System.RuntimeTypeHandle StringTypeHandle = typeof(string).TypeHandle;
 
         static readonly ConcurrentDictionary<Type, object> comparers = new ConcurrentDictionary<Type, object>();
 

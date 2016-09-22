@@ -20,12 +20,12 @@ namespace ZeroFormatter.Format
             get
             {
                 var array = originalBytes.Array;
-                return Formatters.Formatter<Nullable<T>>.Instance.Deserialize(ref array, originalBytes.Offset);
+                return Formatters.Formatter<Nullable<T>>.Default.Deserialize(ref array, originalBytes.Offset);
             }
             set
             {
                 var array = originalBytes.Array;
-                Formatters.Formatter<Nullable<T>>.Instance.Serialize(ref array, originalBytes.Offset, value);
+                Formatters.Formatter<Nullable<T>>.Default.Serialize(ref array, originalBytes.Offset, value);
             }
         }
     }

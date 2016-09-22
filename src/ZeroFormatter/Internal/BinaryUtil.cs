@@ -5,8 +5,8 @@ namespace ZeroFormatter.Internal
     // does not use BinaryWriter/Reader for save memory allocation
     // like MemoryStream, auto ensure capacity writer
 
-    // Primitive: bool, byte, sbyte, char, float, double, short, ushort, int uint, long, ulong
-    // Built-in: decimal, string, Guid
+    // Primitive: bool, byte, sbyte, float, double, short, ushort, int uint, long, ulong
+    // Built-in: char, decimal, string
     // DateTime, DateTimeOffset as Timestamp(protobuf), long seconds + int nanos
     // TimeSpan as Duration(protobuf), long seconds + int nanos
 
@@ -67,7 +67,7 @@ namespace ZeroFormatter.Internal
             }
         }
 
-        public static int WriteBool(ref byte[] bytes, int offset, bool value)
+        public static int WriteBoolean(ref byte[] bytes, int offset, bool value)
         {
             EnsureCapacity(ref bytes, offset, 1);
 
@@ -75,7 +75,7 @@ namespace ZeroFormatter.Internal
             return 1;
         }
 
-        public static bool ReadBool(ref byte[] bytes, int offset)
+        public static bool ReadBoolean(ref byte[] bytes, int offset)
         {
             return (bytes[offset] == 0) ? false : false;
         }
@@ -106,83 +106,47 @@ namespace ZeroFormatter.Internal
             return (sbyte)bytes[offset];
         }
 
-        [ThreadStatic]
-        static float[] floatBuffer = new float[1];
-
-        public static int WriteSingle(ref byte[] bytes, int offset, float value)
+        public static unsafe int WriteSingle(ref byte[] bytes, int offset, float value)
         {
             EnsureCapacity(ref bytes, offset, 4);
 
-#if ALLOW_UNSAFE
-            unsafe
-            {
-                uint num = *(uint*)(&value);
-                bytes[offset] = (byte)num;
-                bytes[offset + 1] = (byte)(num >> 8);
-                bytes[offset + 2] = (byte)(num >> 16);
-                bytes[offset + 3] = (byte)(num >> 24);
-            }
-#else
-            floatBuffer[0] = value;
-            Buffer.BlockCopy(floatBuffer, 0, bytes, offset, 4);
-#endif
+            uint num = *(uint*)(&value);
+            bytes[offset] = (byte)num;
+            bytes[offset + 1] = (byte)(num >> 8);
+            bytes[offset + 2] = (byte)(num >> 16);
+            bytes[offset + 3] = (byte)(num >> 24);
 
             return 4;
         }
 
-        public static float ReadSingle(ref byte[] bytes, int offset)
+        public static unsafe float ReadSingle(ref byte[] bytes, int offset)
         {
-#if ALLOW_UNSAFE
-            unsafe
-            {
-                uint num = (uint)((int)bytes[0] | (int)bytes[1] << 8 | (int)bytes[2] << 16 | (int)bytes[3] << 24);
-                return *(float*)(&num);
-            }
-#else
-            return BitConverter.ToSingle(bytes, offset);
-#endif
+            uint num = (uint)((int)bytes[0] | (int)bytes[1] << 8 | (int)bytes[2] << 16 | (int)bytes[3] << 24);
+            return *(float*)(&num);
         }
 
-        [ThreadStatic]
-        static double[] doubleBuffer = new double[1];
-
-        public static int WriteDouble(ref byte[] bytes, int offset, double value)
+        public static unsafe int WriteDouble(ref byte[] bytes, int offset, double value)
         {
             EnsureCapacity(ref bytes, offset, 8);
 
-#if ALLOW_UNSAFE
-            unsafe
-            {
-                ulong num = (ulong)(*(long*)(&value));
-                bytes[offset] = (byte)num;
-                bytes[offset + 1] = (byte)(num >> 8);
-                bytes[offset + 2] = (byte)(num >> 16);
-                bytes[offset + 3] = (byte)(num >> 24);
-                bytes[offset + 4] = (byte)(num >> 32);
-                bytes[offset + 5] = (byte)(num >> 40);
-                bytes[offset + 6] = (byte)(num >> 48);
-                bytes[offset + 7] = (byte)(num >> 56);
-            }
-#else
-            doubleBuffer[0] = value;
-            Buffer.BlockCopy(doubleBuffer, 0, bytes, offset, 8);
-#endif
+            ulong num = (ulong)(*(long*)(&value));
+            bytes[offset] = (byte)num;
+            bytes[offset + 1] = (byte)(num >> 8);
+            bytes[offset + 2] = (byte)(num >> 16);
+            bytes[offset + 3] = (byte)(num >> 24);
+            bytes[offset + 4] = (byte)(num >> 32);
+            bytes[offset + 5] = (byte)(num >> 40);
+            bytes[offset + 6] = (byte)(num >> 48);
+            bytes[offset + 7] = (byte)(num >> 56);
 
             return 8;
         }
 
-        public static double ReadDouble(ref byte[] bytes, int offset)
+        public static unsafe double ReadDouble(ref byte[] bytes, int offset)
         {
-#if ALLOW_UNSAFE
-            unsafe
-            {
-                uint num = (uint)((int)bytes[0] | (int)bytes[1] << 8 | (int)bytes[2] << 16 | (int)bytes[3] << 24);
-                ulong num2 = (ulong)((int)bytes[4] | (int)bytes[5] << 8 | (int)bytes[6] << 16 | (int)bytes[7] << 24) << 32 | (ulong)num;
-                return *(double*)(&num2);
-            }
-#else
-            return BitConverter.ToDouble(bytes, offset);
-#endif
+            uint num = (uint)((int)bytes[0] | (int)bytes[1] << 8 | (int)bytes[2] << 16 | (int)bytes[3] << 24);
+            ulong num2 = (ulong)((int)bytes[4] | (int)bytes[5] << 8 | (int)bytes[6] << 16 | (int)bytes[7] << 24) << 32 | (ulong)num;
+            return *(double*)(&num2);
         }
 
         public static short WriteInt16(ref byte[] bytes, int offset, short value)
@@ -301,12 +265,16 @@ namespace ZeroFormatter.Internal
             return (ulong)((int)bytes[4] | (int)bytes[5] << 8 | (int)bytes[6] << 16 | (int)bytes[7] << 24) << 32 | (ulong)num;
         }
 
+        [ThreadStatic]
+        static char[] charPool = new char[1];
+
         public static int WriteChar(ref byte[] bytes, int offset, char value)
         {
             var ensureSize = StringEncoding.UTF8.GetMaxByteCount(1);
             EnsureCapacity(ref bytes, offset, ensureSize);
 
-            return StringEncoding.UTF8.GetBytes(new[] { value }, 0, 1, bytes, 0);
+            charPool[0] = value;
+            return StringEncoding.UTF8.GetBytes(charPool, 0, 1, bytes, 0);
         }
 
         public static char ReadChar(ref byte[] bytes, int offset, int count)
@@ -366,39 +334,6 @@ namespace ZeroFormatter.Internal
 
             return new decimal(new[] { lo, mid, hi, flags });
         }
-
-        public static int WriteGuid(ref byte[] bytes, int offset, Guid guid)
-        {
-            EnsureCapacity(ref bytes, offset, 16);
-            Buffer.BlockCopy(guid.ToByteArray(), 0, bytes, offset, 16);
-            return 16;
-        }
-
-        public static Guid ReadGuid(ref byte[] bytes, int offset)
-        {
-            var guidArray = new byte[]
-            {
-                bytes[offset],
-                bytes[offset + 1],
-                bytes[offset + 2],
-                bytes[offset + 3],
-                bytes[offset + 4],
-                bytes[offset + 5],
-                bytes[offset + 6],
-                bytes[offset + 7],
-                bytes[offset + 8],
-                bytes[offset + 9],
-                bytes[offset + 10],
-                bytes[offset + 11],
-                bytes[offset + 12],
-                bytes[offset + 13],
-                bytes[offset + 14],
-                bytes[offset + 15],
-            };
-
-            return new Guid(guidArray);
-        }
-
 
         #region Timestamp/Duration
 

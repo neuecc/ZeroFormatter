@@ -3,19 +3,21 @@ using System.Text;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 
-namespace ZeroFormatter.Format
+namespace ZeroFormatter.Segments
 {
     // Layout: [size:int][utf8bytes...], if size == -1 string is null.
-    public struct StringSegment
+    public class StringSegment : IZeroFormatterSegment
     {
-        byte flag; // 0 = original, 1 = cached, 2 = dirty
-        ArraySegment<byte> serializeBytes;
+        readonly DirtyTracker tracker;
+        SegmentState state;
+        ArraySegment<byte> serializedBytes;
         string cached;
 
-        public StringSegment(ArraySegment<byte> originalBytes)
+        public StringSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
         {
-            this.flag = 0;
-            this.serializeBytes = originalBytes;
+            this.tracker = tracker;
+            this.state = SegmentState.Original;
+            this.serializedBytes = originalBytes;
             this.cached = null;
         }
 
@@ -23,50 +25,52 @@ namespace ZeroFormatter.Format
         {
             get
             {
-                switch (flag)
+                switch (state)
                 {
-                    case 0:
-                        var array = serializeBytes.Array;
-                        this.cached = Formatter<string>.Instance.Deserialize(ref array, serializeBytes.Offset);
-                        this.flag = 1;
-                        goto case 1;
-                    case 1:
-                    case 2:
+                    case SegmentState.Original:
+                        var array = serializedBytes.Array;
+                        this.cached = Formatter<string>.Default.Deserialize(ref array, serializedBytes.Offset);
+                        this.state = SegmentState.Cached;
+                        return cached;
                     default:
                         return cached;
                 }
             }
             set
             {
+                this.tracker.Dirty();
+                this.state = SegmentState.Dirty;
                 this.cached = value;
-                this.flag = 2;
             }
+        }
+
+        public bool CanDirectCopy()
+        {
+            return (state == SegmentState.Original) || (state == SegmentState.Cached);
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return serializedBytes;
         }
 
         public int Serialize(ref byte[] targetBytes, int offset)
         {
             if (targetBytes == null) throw new ArgumentNullException("targetBytes");
 
-            if (flag == 2)
+            if (state == SegmentState.Dirty) // dirty
             {
-                // TODO:GetByteCount is slow...
+                var formatter = Formatter<String>.Default;
 
-                var size = StringEncoding.UTF8.GetByteCount(cached);
-                var newBytes = new byte[size + 4];
-                BinaryUtil.WriteInt32(ref newBytes, 0, size);
-
-                StringEncoding.UTF8.GetBytes(cached, 0, cached.Length, newBytes, 4);
-                serializeBytes = new ArraySegment<byte>(newBytes, 0, newBytes.Length);
-                flag = 1; // cached serialize bytes
+                byte[] newBytes = null;
+                var length = formatter.Serialize(ref newBytes, 0, cached);
+                serializedBytes = new ArraySegment<byte>(newBytes, 0, newBytes.Length);
+                state = SegmentState.Cached;
             }
 
-            if (targetBytes.Length < offset + serializeBytes.Count)
-            {
-                BinaryUtil.FastResize(ref targetBytes, (offset + serializeBytes.Count)); // fill resize
-            }
-
-            Buffer.BlockCopy(serializeBytes.Array, serializeBytes.Offset, targetBytes, offset, serializeBytes.Count);
-            return serializeBytes.Count;
+            BinaryUtil.EnsureCapacity(ref targetBytes, offset, serializedBytes.Count);
+            Buffer.BlockCopy(serializedBytes.Array, serializedBytes.Offset, targetBytes, offset, serializedBytes.Count);
+            return serializedBytes.Count;
         }
     }
 }
