@@ -10,8 +10,8 @@ namespace ZeroFormatter.Formatters
 {
     // TODO:not yet done.
 
-    // Layout: FixedSize -> [length:int][t format...]
-    // Layout: VariableSize -> [length:int][(index:int, size:int)...][t format...]
+    // Layout: FixedSize -> [count:int][t format...]
+    // Layout: VariableSize -> [count:int][elementOffset:int...][t format...]
     internal class ListFormatter<T> : Formatter<IList<T>>
     {
         public override int? GetLength()
@@ -41,8 +41,20 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                // TODO:Variable Size Array
-                throw new NotImplementedException();
+                var startoffset = offset;
+
+                var count = 0;
+                offset = (startoffset + 4) + (value.Count * 4);
+                foreach (var item in value)
+                {
+                    var size = formatter.Serialize(ref bytes, offset, item);
+                    BinaryUtil.WriteInt32(ref bytes, (startoffset + 4) + count * 4, offset);
+                    offset += size;
+                    count++;
+                }
+                BinaryUtil.WriteInt32(ref bytes, startoffset, value.Count);
+
+                return offset - startoffset;
             }
         }
 
@@ -52,13 +64,11 @@ namespace ZeroFormatter.Formatters
             var length = formatter.GetLength();
             if (length != null)
             {
-                var size = BinaryUtil.ReadInt32(ref bytes, offset);
-                return new FixedListSegement<T>(new ArraySegment<byte>(bytes, offset, size));
+                return new FixedListSegement<T>(new ArraySegment<byte>(bytes, offset, 0));
             }
             else
             {
-                // TODO:Variable Size Array
-                throw new NotImplementedException();
+                return new VariableListSegment<T>(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0));
             }
         }
     }

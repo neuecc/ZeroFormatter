@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="ChainingAssertion.MSTest.cs" />
     <Compile Include="FormatterTest.cs" />
+    <Compile Include="ListFormatterTest.cs" />
     <Compile Include="StringSegmentTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

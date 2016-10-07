@@ -6,34 +6,36 @@ using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Segments
 {
-    // Layout: FixedSize -> [length:int][t format...]
+    // TODO: /* IReadOnlyList??? */
+
+    // Layout: FixedSize -> [count:int][t format...]
     public class FixedListSegement<T> : IList<T>
     {
-        ArraySegment<byte> originalBytes;
+        readonly ArraySegment<byte> originalBytes; // ArraySegment.Count must not use...
+        readonly int length;
         readonly int elementSize;
         readonly Formatter<T> formatter;
-
-        // originalBytes and if append, use appendableArray
-
-        T[] appendArray;
-        int appendedSize;
 
         public FixedListSegement(ArraySegment<byte> originalBytes)
         {
             this.originalBytes = originalBytes;
             this.formatter = Formatters.Formatter<T>.Default;
+            var formatterLength = formatter.GetLength();
+            if (formatterLength == null) throw new InvalidOperationException("T should be fixed length. Type: " + typeof(T).Name);
+            elementSize = formatterLength.Value;
 
-            var length = formatter.GetLength();
-            if (length == null) throw new InvalidOperationException("T should be fixed length. Type: " + typeof(T).Name);
-            elementSize = length.Value;
+            var array = originalBytes.Array;
+            this.length = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
         }
 
         public T this[int index]
         {
             get
             {
-                // TODO:out-of-range exception?
-                // TODO:calc appendable? or original?
+                if (index > length)
+                {
+                    throw new ArgumentOutOfRangeException("index > Count");
+                }
 
                 var array = originalBytes.Array;
                 var offset = 4 + (elementSize * index);
@@ -41,9 +43,13 @@ namespace ZeroFormatter.Segments
             }
             set
             {
-                // TODO:out-of-range exception?
-                var offset = 4 + (elementSize * index);
+                if (index > Count)
+                {
+                    throw new ArgumentOutOfRangeException("index > Count");
+                }
+
                 var array = originalBytes.Array;
+                var offset = 4 + (elementSize * index);
                 formatter.Serialize(ref array, originalBytes.Offset + offset, value);
             }
         }
@@ -52,9 +58,7 @@ namespace ZeroFormatter.Segments
         {
             get
             {
-                var array = originalBytes.Array;
-                if (array == null) return appendedSize;
-                return BinaryUtil.ReadInt32(ref array, originalBytes.Offset) + appendedSize;
+                return length;
             }
         }
 
@@ -66,43 +70,27 @@ namespace ZeroFormatter.Segments
             }
         }
 
-        public void Add(T item)
-        {
-            if (appendArray == null)
-            {
-                appendArray = new T[4];
-            }
-            else if (appendArray.Length == appendedSize)
-            {
-                Array.Resize(ref appendArray, appendedSize * 2);
-            }
-
-            appendArray[appendedSize++] = item;
-        }
-
-        public void Clear()
-        {
-            originalBytes = default(ArraySegment<byte>);
-            appendArray = null;
-            appendedSize = 0;
-        }
-
         public bool Contains(T item)
         {
-             throw new NotImplementedException();
+            return IndexOf(item) != -1;
+        }
 
-            
-
-
-
-
+        public int IndexOf(T item)
+        {
+            var comparer = EqualityComparer<T>.Default;
+            for (int i = 0; i < length; i++)
+            {
+                if (comparer.Equals(this[i], item)) return i;
+            }
+            return -1;
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
-
-
+            for (int i = arrayIndex; i < length; i++)
+            {
+                array[i] = this[i];
+            }
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -113,51 +101,107 @@ namespace ZeroFormatter.Segments
             }
         }
 
-        public int IndexOf(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Insert(int index, T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Remove(T item)
-        {
-            //
-
-            throw new NotImplementedException();
-        }
-
-        public void RemoveAt(int index)
-        {
-            throw new NotImplementedException();
-        }
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
+
+        public void Add(T item)
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
+        }
+
+        public void Clear()
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
+        }
+
+        public void Insert(int index, T item)
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
+        }
+
+        public bool Remove(T item)
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
+        }
     }
 
-    // Layout: VriableSize -> [length:int][elementSize...][t format...]
+    // TODO: /* IReadOnlyList??? */
+
+    // Layout: VariableSize -> [count:int][elementOffset:int...][t format...]
     public class VariableListSegment<T> : IList<T>
     {
-        int count;
+        readonly ArraySegment<byte> originalBytes;
+        readonly int length;
+        readonly Formatter<T> formatter;
 
-        Dictionary<int, T> cached;
+        DirtyTracker tracker;
+        SegmentState state;
+
+        bool[] isCached;
+        T[] cache;
+
+        public VariableListSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
+        {
+            this.originalBytes = originalBytes;
+            this.formatter = Formatters.Formatter<T>.Default;
+            var formatterLength = formatter.GetLength();
+            if (formatterLength != null) throw new InvalidOperationException("T has fixed length, use FixedListSegement instead. Type: " + typeof(T).Name);
+
+            var array = originalBytes.Array;
+            this.length = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
+
+            this.tracker = tracker;
+            this.state = SegmentState.Original;
+        }
+
+        void CreateCacheWhenNotYet()
+        {
+            if (cache == null)
+            {
+                cache = new T[length];
+                isCached = new bool[length];
+            }
+        }
 
         public T this[int index]
         {
             get
             {
-                throw new NotImplementedException();
-            }
+                if (index > length)
+                {
+                    throw new ArgumentOutOfRangeException("index > Count");
+                }
+                CreateCacheWhenNotYet();
 
+                if (!isCached[index])
+                {
+                    var array = originalBytes.Array;
+                    var offset = BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4 + (4 * index));
+                    cache[index] = formatter.Deserialize(ref array, offset);
+                    isCached[index] = true;
+                }
+
+                state = SegmentState.Cached;
+                return cache[index];
+            }
             set
             {
-                throw new NotImplementedException();
+                if (index > Count)
+                {
+                    throw new ArgumentOutOfRangeException("index > Count");
+                }
+                CreateCacheWhenNotYet();
+
+                cache[index] = value;
+                isCached[index] = true;
+                state = SegmentState.Dirty;
             }
         }
 
@@ -165,7 +209,7 @@ namespace ZeroFormatter.Segments
         {
             get
             {
-                throw new NotImplementedException();
+                return length;
             }
         }
 
@@ -173,58 +217,69 @@ namespace ZeroFormatter.Segments
         {
             get
             {
-                throw new NotImplementedException();
+                return false;
             }
-        }
-
-        public void Add(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear()
-        {
-            throw new NotImplementedException();
         }
 
         public bool Contains(T item)
         {
-            throw new NotImplementedException();
-        }
-
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            throw new NotImplementedException();
+            return IndexOf(item) != -1;
         }
 
         public int IndexOf(T item)
         {
-            throw new NotImplementedException();
+            var comparer = EqualityComparer<T>.Default;
+            for (int i = 0; i < length; i++)
+            {
+                if (comparer.Equals(this[i], item)) return i;
+            }
+            return -1;
         }
 
-        public void Insert(int index, T item)
+        public void CopyTo(T[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            for (int i = arrayIndex; i < length; i++)
+            {
+                array[i] = this[i];
+            }
         }
 
-        public bool Remove(T item)
+        public IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveAt(int index)
-        {
-            throw new NotImplementedException();
+            for (int i = 0; i < this.Count; i++)
+            {
+                yield return this[i];
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
+        }
+
+        public void Add(T item)
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
+        }
+
+        public void Clear()
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
+        }
+
+        public void Insert(int index, T item)
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
+        }
+
+        public bool Remove(T item)
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotSupportedException("ListSegment only supports read and set.");
         }
     }
 }

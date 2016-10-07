@@ -25,7 +25,7 @@ namespace ZeroFormatter.Internal
 
             // like MemoryStream.EnsureCapacity
             var current = bytes.Length;
-            var newLength = offset + current + appendLength;
+            var newLength = offset + appendLength;
 
             if (newLength > current)
             {
