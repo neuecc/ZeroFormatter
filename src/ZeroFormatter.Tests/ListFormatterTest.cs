@@ -25,7 +25,11 @@ namespace ZeroFormatter.Tests
                 var result = ZeroFormatter.Serialize(xs);
                 ZeroFormatter.Deserialize<IList<int>>(result).Is(12, 431, 426, 76, 373, 7, 53, 563, 563);
             }
-
+            {
+                var xs = new[] { 1, 2, 3, 4, 5 };
+                var result = ZeroFormatter.Serialize(xs);
+                ZeroFormatter.Deserialize<IList<int>>(result).Is(12, 431, 426, 76, 373, 7, 53, 563, 563);
+            }
             {
                 IList<int?> xs = new int?[] { 12, 431, 426, null, 76, 373, 7, 53, 563, 563 };
                 var result = ZeroFormatter.Serialize(xs);

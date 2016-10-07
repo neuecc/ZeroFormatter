@@ -8,7 +8,7 @@ using ZeroFormatter.Formatters;
 namespace ZeroFormatter.Collections
 {
     /*
-       this.buckets = newDict.buckets;
+        this.buckets = newDict.buckets;
         this.count = newDict.count;
         this.entriesHashCode = newDict.entriesHashCode;
         this.entriesKey = newDict.entriesKey;
@@ -40,8 +40,6 @@ namespace ZeroFormatter.Collections
         // does not serialize!
 
         int version; // version does not serialize
-
-        object _syncRoot;
 
         IEqualityComparer<TKey> comparer { get; set; }
 
@@ -436,35 +434,51 @@ namespace ZeroFormatter.Collections
             this.freeList = newDict.freeList;
         }
 
-        // TODO:not implemented yet
-        public void Serialize()
+        public int Serialize(ref byte[] bytes, int offset)
         {
-            /*
-             *         int[] buckets; // link index of first entry. empty is -1.
-        int count;
+            // [int count]
+            // [offset of buckets][offset of entriesHashCode][offset of entriesNext][offset of entriesKey][offset of entriesValue]
+            // [IList<int> buckets][List<int> entriesHashCode][IList<int> entriesNext][IList<TKey> entriesKey][IList<TValue> entriesValue]
 
-        // 
-        int[] entriesHashCode;
-        int[] entriesNext;
-        TKey[] entriesKey;
-        TValue[] entriesValue;
+            TrimExcess();
 
-        // when remove, mark slot to free
-        int freeCount;
-        int freeList;
-        */
+            var intListFormatter = Formatter<IList<int>>.Default;
+            var keyListFormatter = Formatter<IList<TKey>>.Default;
+            var valueListFormatter = Formatter<IList<TValue>>.Default;
 
-            // use memorystreasm?
+            var startOffset = offset;
 
-            //byte[] b = null;
-            //var offset = Formatter<IList<int>>.Instance.Serialize(ref b, 0, entriesHashCode);
+            offset += BinaryUtil.WriteInt32(ref bytes, offset, count);
 
+            offset += (5 * 4); // index size
 
-            //ZeroFormatter.Serialize(
+            {
+                var bucketsSize = intListFormatter.Serialize(ref bytes, offset, buckets);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 1), bucketsSize);
+                offset += bucketsSize;
+            }
+            {
+                var entriesHashCodeSize = intListFormatter.Serialize(ref bytes, offset, entriesHashCode);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 2), entriesHashCodeSize);
+                offset += entriesHashCodeSize;
+            }
+            {
+                var entriesNextSize = intListFormatter.Serialize(ref bytes, offset, entriesNext);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 3), entriesNextSize);
+                offset += entriesNextSize;
+            }
+            {
+                var entriesKeySizes = keyListFormatter.Serialize(ref bytes, offset, entriesKey);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 4), entriesKeySizes);
+                offset += entriesKeySizes;
+            }
+            {
+                var entriesValueSize = valueListFormatter.Serialize(ref bytes, offset, entriesValue);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 5), entriesValueSize);
+                offset += entriesValueSize;
+            }
 
-
-
-
+            return offset - startOffset;
         }
 
         public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>

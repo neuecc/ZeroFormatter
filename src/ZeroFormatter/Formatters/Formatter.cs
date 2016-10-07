@@ -157,7 +157,6 @@ namespace ZeroFormatter.Formatters
                 formatter = new ByteArrayFormatter();
             }
 
-
             else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>))
             {
                 var formatterType = typeof(ListFormatter<>).MakeGenericType(t.GetGenericArguments());
@@ -166,15 +165,105 @@ namespace ZeroFormatter.Formatters
 
             else if (t.IsEnum)
             {
-                formatter = new Int32Formatter();
+                var underlyingType = Enum.GetUnderlyingType(t);
+                switch (Type.GetTypeCode(underlyingType))
+                {
+                    case TypeCode.SByte:
+                        formatter = new SByteEnumFormatter<T>();
+                        break;
+                    case TypeCode.Byte:
+                        formatter = new ByteEnumFormatter<T>();
+                        break;
+                    case TypeCode.Int16:
+                        formatter = new Int16EnumFormatter<T>();
+                        break;
+                    case TypeCode.UInt16:
+                        formatter = new UInt16EnumFormatter<T>();
+                        break;
+                    case TypeCode.Int32:
+                        formatter = new Int32EnumFormatter<T>();
+                        break;
+                    case TypeCode.UInt32:
+                        formatter = new UInt32EnumFormatter<T>();
+                        break;
+                    case TypeCode.Int64:
+                        formatter = new Int64EnumFormatter<T>();
+                        break;
+                    case TypeCode.UInt64:
+                        formatter = new UInt64EnumFormatter<T>();
+                        break;
+                    default:
+                        throw new Exception();
+                }
             }
 
-            // TODO:....
+            else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>) && t.GetGenericArguments()[0].IsEnum)
+            {
+                var underlyingType = Enum.GetUnderlyingType(t.GetGenericArguments()[0]);
+                switch (Type.GetTypeCode(underlyingType))
+                {
+                    case TypeCode.SByte:
+                        {
+                            var formatterType = typeof(NullableSByteEnumFormatter<>).MakeGenericType(t.GetGenericArguments()[0]);
+                            formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        }
+                        break;
+                    case TypeCode.Byte:
+                        {
+                            var formatterType = typeof(NullableByteEnumFormatter<>).MakeGenericType(t.GetGenericArguments()[0]);
+                            formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        }
+                        break;
+                    case TypeCode.Int16:
+                        {
+                            var formatterType = typeof(NullableInt16EnumFormatter<>).MakeGenericType(t.GetGenericArguments()[0]);
+                            formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        }
+                        break;
+                    case TypeCode.UInt16:
+                        {
+                            var formatterType = typeof(NullableUInt16EnumFormatter<>).MakeGenericType(t.GetGenericArguments()[0]);
+                            formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        }
+                        break;
+                    case TypeCode.Int32:
+                        {
+                            var formatterType = typeof(NullableInt32EnumFormatter<>).MakeGenericType(t.GetGenericArguments()[0]);
+                            formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        }
+                        break;
+                    case TypeCode.UInt32:
+                        {
+                            var formatterType = typeof(NullableUInt32EnumFormatter<>).MakeGenericType(t.GetGenericArguments()[0]);
+                            formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        }
+                        break;
+                    case TypeCode.Int64:
+                        {
+                            var formatterType = typeof(NullableInt64EnumFormatter<>).MakeGenericType(t.GetGenericArguments()[0]);
+                            formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        }
+                        break;
+                    case TypeCode.UInt64:
+                        {
+                            var formatterType = typeof(NullableUInt64EnumFormatter<>).MakeGenericType(t.GetGenericArguments()[0]);
+                            formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        }
+                        break;
+                    default:
+                        throw new Exception();
+                }
+            }
+
+            // TODO:Dictionary, Lookup, KeyTuple...
+
+            else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            {
+                var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+            }
 
             // TODO:make the object formatter...
-
-
-            // TODO:make enum, nullable enum, and enum array...
 
             else if (t.IsArray)
             {

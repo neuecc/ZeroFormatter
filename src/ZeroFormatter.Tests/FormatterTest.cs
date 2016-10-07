@@ -334,11 +334,138 @@ namespace ZeroFormatter.Tests
         [TestMethod]
         public void EnumFormatTest()
         {
-            ZeroFormatter.Serialize<MyEnum>(MyEnum.Apple);
+            {
+                var r = ZeroFormatter.Serialize<IntEnum>(IntEnum.Apple);
+                ZeroFormatter.Deserialize<IntEnum>(r).Is(IntEnum.Apple);
+
+
+                ZeroFormatter.Serialize<IntEnum>(IntEnum.Orange);
+            }
+            {
+                var r = ZeroFormatter.Serialize<IntEnum?>(null);
+                ZeroFormatter.Deserialize<IntEnum?>(r).IsNull();
+            }
+            {
+                var r = ZeroFormatter.Serialize<IntEnum?>(IntEnum.Apple);
+                ZeroFormatter.Deserialize<IntEnum?>(r).Is(IntEnum.Apple);
+            }
+            {
+                var r = ZeroFormatter.Serialize<UIntEnum>(UIntEnum.Apple);
+                ZeroFormatter.Deserialize<UIntEnum>(r).Is(UIntEnum.Apple);
+            }
+            {
+                var r = ZeroFormatter.Serialize<UIntEnum?>(null);
+                ZeroFormatter.Deserialize<UIntEnum?>(r).IsNull();
+            }
+            {
+                var r = ZeroFormatter.Serialize<UIntEnum?>(UIntEnum.Apple);
+                ZeroFormatter.Deserialize<UIntEnum?>(r).Is(UIntEnum.Apple);
+            }
+            {
+                var r = ZeroFormatter.Serialize<UShortEnum>(UShortEnum.Apple);
+                ZeroFormatter.Deserialize<UShortEnum>(r).Is(UShortEnum.Apple);
+            }
+            {
+                var r = ZeroFormatter.Serialize<UShortEnum?>(null);
+                ZeroFormatter.Deserialize<UShortEnum?>(r).IsNull();
+            }
+            {
+                var r = ZeroFormatter.Serialize<UShortEnum?>(UShortEnum.Apple);
+                ZeroFormatter.Deserialize<UShortEnum?>(r).Is(UShortEnum.Apple);
+            }
+            {
+                var r = ZeroFormatter.Serialize<ByteEnum>(ByteEnum.Apple);
+                ZeroFormatter.Deserialize<ByteEnum>(r).Is(ByteEnum.Apple);
+            }
+            {
+                var r = ZeroFormatter.Serialize<ByteEnum?>(null);
+                ZeroFormatter.Deserialize<ByteEnum?>(r).IsNull();
+            }
+            {
+                var r = ZeroFormatter.Serialize<ByteEnum?>(ByteEnum.Apple);
+                ZeroFormatter.Deserialize<ByteEnum?>(r).Is(ByteEnum.Apple);
+            }
+
+
+            {
+                var r = ZeroFormatter.Serialize<SByteEnum>(SByteEnum.Apple);
+                ZeroFormatter.Deserialize<SByteEnum>(r).Is(SByteEnum.Apple);
+            }
+            {
+                var r = ZeroFormatter.Serialize<SByteEnum?>(null);
+                ZeroFormatter.Deserialize<SByteEnum?>(r).IsNull();
+            }
+            {
+                var r = ZeroFormatter.Serialize<SByteEnum?>(SByteEnum.Apple);
+                ZeroFormatter.Deserialize<SByteEnum?>(r).Is(SByteEnum.Apple);
+            }
+
+
+            {
+                var r = ZeroFormatter.Serialize<LongEnum>(LongEnum.Apple);
+                ZeroFormatter.Deserialize<LongEnum>(r).Is(LongEnum.Apple);
+            }
+            {
+                var r = ZeroFormatter.Serialize<LongEnum?>(null);
+                ZeroFormatter.Deserialize<LongEnum?>(r).IsNull();
+            }
+            {
+                var r = ZeroFormatter.Serialize<LongEnum?>(LongEnum.Apple);
+                ZeroFormatter.Deserialize<LongEnum?>(r).Is(LongEnum.Apple);
+            }
+
+
+            {
+                var r = ZeroFormatter.Serialize<ULongEnum>(ULongEnum.Apple);
+                ZeroFormatter.Deserialize<ULongEnum>(r).Is(ULongEnum.Apple);
+            }
+            {
+                var r = ZeroFormatter.Serialize<ULongEnum?>(null);
+                ZeroFormatter.Deserialize<ULongEnum?>(r).IsNull();
+            }
+            {
+                var r = ZeroFormatter.Serialize<ULongEnum?>(ULongEnum.Apple);
+                ZeroFormatter.Deserialize<ULongEnum?>(r).Is(ULongEnum.Apple);
+            }
         }
     }
 
-    public enum MyEnum
+    public enum IntEnum : int
+    {
+        Orange, Apple, Grape
+    }
+
+    public enum UIntEnum : uint
+    {
+        Orange, Apple, Grape
+    }
+
+    public enum ShortEnum : short
+    {
+        Orange, Apple, Grape
+    }
+
+    public enum UShortEnum : ushort
+    {
+        Orange, Apple, Grape
+    }
+
+    public enum ByteEnum : byte
+    {
+        Orange, Apple, Grape
+    }
+
+    public enum SByteEnum : sbyte
+    {
+        Orange, Apple, Grape
+    }
+
+    public enum LongEnum : long
+    {
+        Orange, Apple, Grape
+    }
+
+    public enum ULongEnum : ulong
     {
         Orange, Apple, Grape
     }

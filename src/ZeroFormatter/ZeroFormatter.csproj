@@ -51,14 +51,14 @@
     <Compile Include="Collections\SlimDictionary.cs" />
     <Compile Include="Collections\SlimLookup.cs" />
     <Compile Include="Collections\EnumEqualityComparer.cs" />
-    <Compile Include="Formatters\EnumFormatter.cs" />
-    <Compile Include="Formatters\EnumFormatter1.cs">
+    <Compile Include="Formatters\EnumFormatter.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EnumFormatter.tt</DependentUpon>
     </Compile>
     <Compile Include="Formatters\Formatter.cs" />
     <Compile Include="Formatters\ByteArrayFormatter.cs" />
+    <Compile Include="Formatters\DictionaryFormatter.cs" />
     <Compile Include="Formatters\ListFormatter.cs" />
     <Compile Include="Formatters\ObjectFormatter.cs" />
     <Compile Include="Formatters\PrimitiveFormatter.cs">
@@ -73,6 +73,7 @@
     <Compile Include="Internal\SR.cs" />
     <Compile Include="Internal\StringEncoding.cs" />
     <Compile Include="Segments\IZeroFormatterSegment.cs" />
+    <Compile Include="Segments\DictionarySegment.cs" />
     <Compile Include="Segments\LookupSegment.cs" />
     <Compile Include="Segments\ListSegment.cs" />
     <Compile Include="Segments\NullableSegment.cs" />
@@ -86,7 +87,7 @@
   <ItemGroup>
     <Content Include="Formatters\EnumFormatter.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>EnumFormatter1.cs</LastGenOutput>
+      <LastGenOutput>EnumFormatter.cs</LastGenOutput>
     </Content>
     <Content Include="Formatters\PrimitiveFormatter.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
