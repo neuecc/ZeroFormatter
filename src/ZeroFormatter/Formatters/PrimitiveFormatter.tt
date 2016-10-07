@@ -19,6 +19,10 @@
         Tuple.Create(typeof(bool), 1),
         Tuple.Create(typeof(byte), 1),
         Tuple.Create(typeof(sbyte), 1),
+        Tuple.Create(typeof(decimal), 16),
+        Tuple.Create(typeof(TimeSpan), 12),
+        Tuple.Create(typeof(DateTime), 12),
+        Tuple.Create(typeof(DateTimeOffset), 12),
     };
 
 #>
@@ -74,8 +78,8 @@ namespace ZeroFormatter.Formatters
 
         public override <#= t.Name #>? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(<#= t.Name #>?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(<#= t.Name #>?);
 
             return BinaryUtil.Read<#= t.Name #>(ref bytes, offset + 1);
         }

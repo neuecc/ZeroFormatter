@@ -77,7 +77,7 @@ namespace ZeroFormatter.Internal
 
         public static bool ReadBoolean(ref byte[] bytes, int offset)
         {
-            return (bytes[offset] == 0) ? false : false;
+            return (bytes[offset] == 0) ? false : true;
         }
 
         public static int WriteByte(ref byte[] bytes, int offset, byte value)
@@ -121,7 +121,7 @@ namespace ZeroFormatter.Internal
 
         public static unsafe float ReadSingle(ref byte[] bytes, int offset)
         {
-            uint num = (uint)((int)bytes[0] | (int)bytes[1] << 8 | (int)bytes[2] << 16 | (int)bytes[3] << 24);
+            uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
             return *(float*)(&num);
         }
 
@@ -144,8 +144,8 @@ namespace ZeroFormatter.Internal
 
         public static unsafe double ReadDouble(ref byte[] bytes, int offset)
         {
-            uint num = (uint)((int)bytes[0] | (int)bytes[1] << 8 | (int)bytes[2] << 16 | (int)bytes[3] << 24);
-            ulong num2 = (ulong)((int)bytes[4] | (int)bytes[5] << 8 | (int)bytes[6] << 16 | (int)bytes[7] << 24) << 32 | (ulong)num;
+            uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
+            ulong num2 = (ulong)((int)bytes[offset + 4] | (int)bytes[offset + 5] << 8 | (int)bytes[offset + 6] << 16 | (int)bytes[offset + 7] << 24) << 32 | (ulong)num;
             return *(double*)(&num2);
         }
 
@@ -203,8 +203,8 @@ namespace ZeroFormatter.Internal
 
         public static long ReadInt64(ref byte[] bytes, int offset)
         {
-            uint num = (uint)((int)bytes[0] | (int)bytes[1] << 8 | (int)bytes[2] << 16 | (int)bytes[3] << 24);
-            return (long)((ulong)((int)bytes[4] | (int)bytes[5] << 8 | (int)bytes[6] << 16 | (int)bytes[7] << 24) << 32 | (ulong)num);
+            uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
+            return (long)((ulong)((int)bytes[offset + 4] | (int)bytes[offset + 5] << 8 | (int)bytes[offset + 6] << 16 | (int)bytes[offset + 7] << 24) << 32 | (ulong)num);
         }
 
         public static short WriteUInt16(ref byte[] bytes, int offset, ushort value)
@@ -261,8 +261,8 @@ namespace ZeroFormatter.Internal
 
         public static ulong ReadUInt64(ref byte[] bytes, int offset)
         {
-            uint num = (uint)((int)bytes[0] | (int)bytes[1] << 8 | (int)bytes[2] << 16 | (int)bytes[3] << 24);
-            return (ulong)((int)bytes[4] | (int)bytes[5] << 8 | (int)bytes[6] << 16 | (int)bytes[7] << 24) << 32 | (ulong)num;
+            uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
+            return (ulong)((int)bytes[offset + 4] | (int)bytes[offset + 5] << 8 | (int)bytes[offset + 6] << 16 | (int)bytes[offset + 7] << 24) << 32 | (ulong)num;
         }
 
         [ThreadStatic]
@@ -274,7 +274,7 @@ namespace ZeroFormatter.Internal
             EnsureCapacity(ref bytes, offset, ensureSize);
 
             charPool[0] = value;
-            return StringEncoding.UTF8.GetBytes(charPool, 0, 1, bytes, 0);
+            return StringEncoding.UTF8.GetBytes(charPool, 0, 1, bytes, offset);
         }
 
         public static char ReadChar(ref byte[] bytes, int offset, int count)

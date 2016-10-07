@@ -18,6 +18,7 @@ namespace ZeroFormatter
         public static void Serialize<T>(T obj, ref byte[] bytes)
         {
             var formatter = Formatter<T>.Default;
+            if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
 
             var size = formatter.Serialize(ref bytes, 0, obj);
 
@@ -56,6 +57,8 @@ namespace ZeroFormatter
         public static T Deserialize<T>(byte[] bytes)
         {
             var formatter = Formatter<T>.Default;
+            if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
+
             return formatter.Deserialize(ref bytes, 0);
         }
 

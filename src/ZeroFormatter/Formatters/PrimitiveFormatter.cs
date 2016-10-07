@@ -49,8 +49,8 @@ namespace ZeroFormatter.Formatters
 
         public override Int16? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(Int16?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Int16?);
 
             return BinaryUtil.ReadInt16(ref bytes, offset + 1);
         }
@@ -99,8 +99,8 @@ namespace ZeroFormatter.Formatters
 
         public override Int32? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(Int32?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Int32?);
 
             return BinaryUtil.ReadInt32(ref bytes, offset + 1);
         }
@@ -149,8 +149,8 @@ namespace ZeroFormatter.Formatters
 
         public override Int64? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(Int64?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Int64?);
 
             return BinaryUtil.ReadInt64(ref bytes, offset + 1);
         }
@@ -199,8 +199,8 @@ namespace ZeroFormatter.Formatters
 
         public override UInt16? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(UInt16?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(UInt16?);
 
             return BinaryUtil.ReadUInt16(ref bytes, offset + 1);
         }
@@ -249,8 +249,8 @@ namespace ZeroFormatter.Formatters
 
         public override UInt32? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(UInt32?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(UInt32?);
 
             return BinaryUtil.ReadUInt32(ref bytes, offset + 1);
         }
@@ -299,8 +299,8 @@ namespace ZeroFormatter.Formatters
 
         public override UInt64? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(UInt64?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(UInt64?);
 
             return BinaryUtil.ReadUInt64(ref bytes, offset + 1);
         }
@@ -349,8 +349,8 @@ namespace ZeroFormatter.Formatters
 
         public override Single? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(Single?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Single?);
 
             return BinaryUtil.ReadSingle(ref bytes, offset + 1);
         }
@@ -399,8 +399,8 @@ namespace ZeroFormatter.Formatters
 
         public override Double? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(Double?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Double?);
 
             return BinaryUtil.ReadDouble(ref bytes, offset + 1);
         }
@@ -449,8 +449,8 @@ namespace ZeroFormatter.Formatters
 
         public override Boolean? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(Boolean?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Boolean?);
 
             return BinaryUtil.ReadBoolean(ref bytes, offset + 1);
         }
@@ -499,8 +499,8 @@ namespace ZeroFormatter.Formatters
 
         public override Byte? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(Byte?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Byte?);
 
             return BinaryUtil.ReadByte(ref bytes, offset + 1);
         }
@@ -549,10 +549,210 @@ namespace ZeroFormatter.Formatters
 
         public override SByte? Deserialize(ref byte[] bytes, int offset)
         {
-            var isNull = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (isNull) return default(SByte?);
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(SByte?);
 
             return BinaryUtil.ReadSByte(ref bytes, offset + 1);
+        }
+    }
+
+
+    internal class DecimalFormatter : Formatter<Decimal>
+    {
+        public override int? GetLength()
+        {
+            return 16;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, Decimal value)
+        {
+            return BinaryUtil.WriteDecimal(ref bytes, offset, value);
+        }
+
+        public override Decimal Deserialize(ref byte[] bytes, int offset)
+        {
+            return BinaryUtil.ReadDecimal(ref bytes, offset);
+        }
+    }
+
+    internal class NullableDecimalFormatter : Formatter<Decimal?>
+    {
+        public override int? GetLength()
+        {
+            return 17;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, Decimal? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteDecimal(ref bytes, offset + 1, value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 17);
+            }
+
+            return 17;
+        }
+
+        public override Decimal? Deserialize(ref byte[] bytes, int offset)
+        {
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Decimal?);
+
+            return BinaryUtil.ReadDecimal(ref bytes, offset + 1);
+        }
+    }
+
+
+    internal class TimeSpanFormatter : Formatter<TimeSpan>
+    {
+        public override int? GetLength()
+        {
+            return 12;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, TimeSpan value)
+        {
+            return BinaryUtil.WriteTimeSpan(ref bytes, offset, value);
+        }
+
+        public override TimeSpan Deserialize(ref byte[] bytes, int offset)
+        {
+            return BinaryUtil.ReadTimeSpan(ref bytes, offset);
+        }
+    }
+
+    internal class NullableTimeSpanFormatter : Formatter<TimeSpan?>
+    {
+        public override int? GetLength()
+        {
+            return 13;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, TimeSpan? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteTimeSpan(ref bytes, offset + 1, value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 13);
+            }
+
+            return 13;
+        }
+
+        public override TimeSpan? Deserialize(ref byte[] bytes, int offset)
+        {
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(TimeSpan?);
+
+            return BinaryUtil.ReadTimeSpan(ref bytes, offset + 1);
+        }
+    }
+
+
+    internal class DateTimeFormatter : Formatter<DateTime>
+    {
+        public override int? GetLength()
+        {
+            return 12;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, DateTime value)
+        {
+            return BinaryUtil.WriteDateTime(ref bytes, offset, value);
+        }
+
+        public override DateTime Deserialize(ref byte[] bytes, int offset)
+        {
+            return BinaryUtil.ReadDateTime(ref bytes, offset);
+        }
+    }
+
+    internal class NullableDateTimeFormatter : Formatter<DateTime?>
+    {
+        public override int? GetLength()
+        {
+            return 13;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, DateTime? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteDateTime(ref bytes, offset + 1, value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 13);
+            }
+
+            return 13;
+        }
+
+        public override DateTime? Deserialize(ref byte[] bytes, int offset)
+        {
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(DateTime?);
+
+            return BinaryUtil.ReadDateTime(ref bytes, offset + 1);
+        }
+    }
+
+
+    internal class DateTimeOffsetFormatter : Formatter<DateTimeOffset>
+    {
+        public override int? GetLength()
+        {
+            return 12;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, DateTimeOffset value)
+        {
+            return BinaryUtil.WriteDateTimeOffset(ref bytes, offset, value);
+        }
+
+        public override DateTimeOffset Deserialize(ref byte[] bytes, int offset)
+        {
+            return BinaryUtil.ReadDateTimeOffset(ref bytes, offset);
+        }
+    }
+
+    internal class NullableDateTimeOffsetFormatter : Formatter<DateTimeOffset?>
+    {
+        public override int? GetLength()
+        {
+            return 13;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, DateTimeOffset? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteDateTimeOffset(ref bytes, offset + 1, value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 13);
+            }
+
+            return 13;
+        }
+
+        public override DateTimeOffset? Deserialize(ref byte[] bytes, int offset)
+        {
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(DateTimeOffset?);
+
+            return BinaryUtil.ReadDateTimeOffset(ref bytes, offset + 1);
         }
     }
 

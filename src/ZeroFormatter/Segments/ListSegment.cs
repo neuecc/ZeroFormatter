@@ -89,7 +89,10 @@ namespace ZeroFormatter.Segments
 
         public bool Contains(T item)
         {
-            throw new NotImplementedException();
+             throw new NotImplementedException();
+
+            
+
 
 
 
@@ -137,7 +140,6 @@ namespace ZeroFormatter.Segments
             return GetEnumerator();
         }
     }
-
 
     // Layout: VriableSize -> [length:int][elementSize...][t format...]
     public class VariableListSegment<T> : IList<T>

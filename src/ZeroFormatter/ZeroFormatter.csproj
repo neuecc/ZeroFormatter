@@ -60,7 +60,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PrimitiveFormatter.tt</DependentUpon>
     </Compile>
-    <Compile Include="Formatters\VariableFormatter.cs" />
+    <Compile Include="Formatters\VariousFormatter.cs" />
     <Compile Include="Internal\BinaryUtil.cs" />
     <Compile Include="Internal\HashHelper.cs" />
     <Compile Include="Collections\ZeroFormatterEqualityComparer.cs" />

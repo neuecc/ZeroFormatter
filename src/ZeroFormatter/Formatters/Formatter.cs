@@ -63,6 +63,22 @@ namespace ZeroFormatter.Formatters
                 {
                     formatter = new SByteFormatter();
                 }
+                else if (t == typeof(decimal))
+                {
+                    formatter = new DecimalFormatter();
+                }
+                else if (t == typeof(TimeSpan))
+                {
+                    formatter = new TimeSpanFormatter();
+                }
+                else if (t == typeof(DateTime))
+                {
+                    formatter = new DateTimeFormatter();
+                }
+                else if (t == typeof(DateTimeOffset))
+                {
+                    formatter = new DateTimeOffsetFormatter();
+                }
                 // Nulllable
                 else if (t == typeof(Nullable<Int16>))
                 {
@@ -108,11 +124,35 @@ namespace ZeroFormatter.Formatters
                 {
                     formatter = new NullableSByteFormatter();
                 }
+                else if (t == typeof(Nullable<decimal>))
+                {
+                    formatter = new NullableDecimalFormatter();
+                }
+                else if (t == typeof(Nullable<TimeSpan>))
+                {
+                    formatter = new NullableTimeSpanFormatter();
+                }
+                else if (t == typeof(Nullable<DateTime>))
+                {
+                    formatter = new NullableDateTimeFormatter();
+                }
+                else if (t == typeof(Nullable<DateTimeOffset>))
+                {
+                    formatter = new NullableDateTimeOffsetFormatter();
+                }
 
                 // Others
                 else if (t == typeof(String))
                 {
                     formatter = new StringFormatter();
+                }
+                else if (t == typeof(Char))
+                {
+                    formatter = new CharFormatter();
+                }
+                else if (t == typeof(Char?))
+                {
+                    formatter = new NullableCharFormatter();
                 }
                 else if (t == typeof(byte[]))
                 {

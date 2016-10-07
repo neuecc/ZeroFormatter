@@ -34,7 +34,7 @@ namespace ZeroFormatter.Formatters
             if (length == -1) return null;
 
             var result = new byte[length];
-            Buffer.BlockCopy(bytes, offset, result, 0, length);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, length);
 
             return result;
         }

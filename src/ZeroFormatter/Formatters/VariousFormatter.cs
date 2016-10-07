@@ -32,7 +32,8 @@ namespace ZeroFormatter.Formatters
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1) return null;
-            return StringEncoding.UTF8.GetString(bytes, offset + 4, length);
+
+            return BinaryUtil.ReadString(ref bytes, offset + 4, length);
         }
     }
 
@@ -54,7 +55,38 @@ namespace ZeroFormatter.Formatters
         public override char Deserialize(ref byte[] bytes, int offset)
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
-            return StringEncoding.UTF8.GetChars(bytes, offset + 4, length)[0];
+            return BinaryUtil.ReadChar(ref bytes, offset + 4, length);
         }
     }
+
+    // Layout: [size:int][utf8bytes...], if size == -1 char is null.
+    internal class NullableCharFormatter : Formatter<char?>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, char? value)
+        {
+            if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+
+            var charSize = BinaryUtil.WriteChar(ref bytes, offset + 4, value.Value);
+            BinaryUtil.WriteInt32(ref bytes, offset, charSize); // write size after encode.
+            return charSize + 4;
+        }
+
+        public override char? Deserialize(ref byte[] bytes, int offset)
+        {
+            var length = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (length == -1) return null;
+            return BinaryUtil.ReadChar(ref bytes, offset + 4, length);
+        }
+    }
+
+
 }

@@ -4,14 +4,13 @@ using System.IO;
 using System.Collections.Generic;
 using ZeroFormatter.Format;
 using System.Text;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Tests
 {
     [TestClass]
     public class StringSegmentTest
     {
-        // Fixed
-
         [TestMethod]
         public void String()
         {
@@ -24,11 +23,12 @@ namespace ZeroFormatter.Tests
             bw.Write("あいうえおかきくけこさしすえそなにぬねの");
 
             var actual = ms.ToArray();
-
-            var segment = new StringSegment(new ArraySegment<byte>(actual));
-
+            var tracker = new DirtyTracker();
+            tracker.IsDirty.IsFalse();
+            var segment = new StringSegment(tracker, new ArraySegment<byte>(actual));
 
             segment.Value = "あいうえおかきくけこ";
+            tracker.IsDirty.IsTrue();
 
             byte[] result = new byte[0];
             segment.Serialize(ref result, 0);
@@ -36,13 +36,11 @@ namespace ZeroFormatter.Tests
             ZeroFormatter.Deserialize<string>(result).Is("あいうえおかきくけこ");
 
 
-
             segment.Value = null;
 
             segment.Serialize(ref result, 0);
 
-            ZeroFormatter.Deserialize<string>(result).Is("あいうえおかきくけこ");
-
+            ZeroFormatter.Deserialize<string>(result).IsNull();
         }
     }
 }
