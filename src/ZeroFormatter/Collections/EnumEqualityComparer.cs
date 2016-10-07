@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace ZeroFormatter.Collections
 {
+    // Note:This hack does not work in UnityEditor.
+
     // same impl of ZeroFormatterEqualityComparers
     internal static class EnumEqualityComparerHelper
     {

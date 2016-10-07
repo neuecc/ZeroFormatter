@@ -6,11 +6,13 @@ namespace ZeroFormatter.Collections
 {
     public static class ZeroFormatterEqualityComparer
     {
-
+        // TODO:Concurrent not supported platform
         static readonly ConcurrentDictionary<Type, object> comparers = new ConcurrentDictionary<Type, object>();
 
         static ZeroFormatterEqualityComparer()
         {
+            // TODO:More formatters
+
             comparers[typeof(short)] = new Int16EqualityComparer();
             comparers[typeof(ushort)] = new UInt16EqualityComparer();
             comparers[typeof(int)] = new Int32EqualityComparer();

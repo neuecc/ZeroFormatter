@@ -8,8 +8,6 @@ using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
-    // TODO:not yet done.
-
     // Layout: FixedSize -> [count:int][t format...]
     // Layout: VariableSize -> [count:int][elementOffset:int...][t format...]
     internal class ListFormatter<T> : Formatter<IList<T>>

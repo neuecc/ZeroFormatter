@@ -321,7 +321,7 @@ namespace ZeroFormatter.Tests
                 ZeroFormatter.Deserialize<byte[]>(r).Is(bytes);
             }
             {
-                var bytes = new byte[0] { } ;
+                var bytes = new byte[0] { };
                 var r = ZeroFormatter.Serialize(bytes);
                 ZeroFormatter.Deserialize<byte[]>(r).Is(bytes);
             }
@@ -330,5 +330,16 @@ namespace ZeroFormatter.Tests
                 ZeroFormatter.Deserialize<byte[]>(r).IsNull();
             }
         }
+
+        [TestMethod]
+        public void EnumFormatTest()
+        {
+            ZeroFormatter.Serialize<MyEnum>(MyEnum.Apple);
+        }
+    }
+
+    public enum MyEnum
+    {
+        Orange, Apple, Grape
     }
 }

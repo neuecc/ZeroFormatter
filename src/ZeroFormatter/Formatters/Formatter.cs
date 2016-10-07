@@ -164,6 +164,11 @@ namespace ZeroFormatter.Formatters
                 formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
             }
 
+            else if (t.IsEnum)
+            {
+                formatter = new Int32Formatter();
+            }
+
             // TODO:....
 
             // TODO:make the object formatter...
@@ -175,9 +180,13 @@ namespace ZeroFormatter.Formatters
             {
                 throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[].");
             }
+            else
+            {
+                // TODO:more details exception message.
+                throw new InvalidOperationException("Type is not supported, please register,");
+            }
 
             Default = (Formatter<T>)formatter;
-
         }
 
         public abstract int? GetLength();
