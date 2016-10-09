@@ -62,7 +62,7 @@ namespace ZeroFormatter.Formatters
             var length = formatter.GetLength();
             if (length != null)
             {
-                return new FixedListSegement<T>(new ArraySegment<byte>(bytes, offset, 0));
+                return new FixedListSegment<T>(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0));
             }
             else
             {

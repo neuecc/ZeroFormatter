@@ -18,13 +18,10 @@ namespace ZeroFormatter.Formatters
 
         public override int Serialize(ref byte[] bytes, int offset, IDictionary<TKey, TValue> value)
         {
-            var dictionary = value as SlimDictionary<TKey, TValue>;
-            if (dictionary != null)
+            var dictionary = value as DictionarySegment<TKey, TValue>;
+            if (dictionary == null)
             {
-                dictionary.TrimExcess();
-            }
-            else
-            {
+                dictionary = new DictionarySegment<TKey, TValue>(new DirtyTracker());
                 foreach (var item in value)
                 {
                     dictionary.Add(item.Key, item.Value);
@@ -36,7 +33,7 @@ namespace ZeroFormatter.Formatters
 
         public override IDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset)
         {
-            return new DictionarySegment<TKey, TValue>(new ArraySegment<byte>(bytes, offset, 0));
+            return new DictionarySegment<TKey, TValue>(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0));
         }
     }
 }

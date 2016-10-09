@@ -257,7 +257,7 @@ namespace ZeroFormatter.Formatters
 
             // TODO:Dictionary, Lookup, KeyTuple...
 
-            else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            else if (t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
             {
                 var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(t.GetGenericArguments());
                 formatter = (Formatter<T>)Activator.CreateInstance(formatterType);

@@ -3,7 +3,7 @@
     /// <summary>
     /// Mutable Segment State
     /// </summary>
-    internal enum SegmentState
+    public enum SegmentState
     {
         Original = 0,
         Cached = 1,

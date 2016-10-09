@@ -26,10 +26,22 @@ namespace ZeroFormatter.Segments
 
         #endregion
 
+        int freeCount;
+        int freeList;
+        int version;
+
+        DirtyTracker tracker;
         IEqualityComparer<TKey> comparer;
 
-        public DictionarySegment(ArraySegment<byte> originalBytes)
+        internal DictionarySegment(DirtyTracker tracker)
+            : this(tracker, new ArraySegment<byte>(new byte[24], 0, 24))
         {
+        }
+
+        public DictionarySegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
+        {
+            this.tracker = tracker;
+
             var bytes = originalBytes.Array;
             this.count = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset);
 
@@ -49,7 +61,17 @@ namespace ZeroFormatter.Segments
             this.entriesKey = keyListFormatter.Deserialize(ref bytes, keyOffset);
             this.entriesValue = valueListFormatter.Deserialize(ref bytes, entriesOffset);
 
+            // new size, note:needs to improve performance...
+            if (buckets.Count == 0)
+            {
+                var size = HashHelpers.GetPrime(0);
+                Resize(size, true);
+            }
+
             this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
+
+            this.freeList = -1;
+            this.freeCount = 0;
         }
 
         public int Count
@@ -83,18 +105,18 @@ namespace ZeroFormatter.Segments
             }
             set
             {
-                throw new NotSupportedException("DictionarySegment only supports read.");
+                Insert(key, value, false);
             }
         }
 
         public void Add(TKey key, TValue value)
         {
-            throw new NotSupportedException("DictionarySegment only supports read.");
+            Insert(key, value, true);
         }
 
         void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> keyValuePair)
         {
-            throw new NotSupportedException("DictionarySegment only supports read.");
+            Add(keyValuePair.Key, keyValuePair.Value);
         }
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)
@@ -109,12 +131,30 @@ namespace ZeroFormatter.Segments
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> keyValuePair)
         {
-            throw new NotSupportedException("DictionarySegment only supports read.");
+            int i = FindEntry(keyValuePair.Key);
+            if (i >= 0 && EqualityComparer<TValue>.Default.Equals(entriesValue[i], keyValuePair.Value))
+            {
+                Remove(keyValuePair.Key);
+                return true;
+            }
+            return false;
         }
 
         public void Clear()
         {
-            throw new NotSupportedException("DictionarySegment only supports read.");
+            if (count > 0)
+            {
+                for (int i = 0; i < buckets.Count; i++) buckets[i] = -1;
+                entriesHashCode.Clear();
+                entriesKey.Clear();
+                entriesNext.Clear();
+                entriesValue.Clear();
+
+                freeList = -1;
+                count = 0;
+                freeCount = 0;
+                version++;
+            }
         }
 
         public bool ContainsKey(TKey key)
@@ -187,7 +227,37 @@ namespace ZeroFormatter.Segments
 
         public bool Remove(TKey key)
         {
-            throw new NotSupportedException("DictionarySegment only supports read.");
+            if (key == null) throw new ArgumentNullException("key");
+
+            if (buckets != null)
+            {
+                int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
+                int bucket = hashCode % buckets.Count;
+                int last = -1;
+                for (int i = buckets[bucket]; i >= 0; last = i, i = entriesNext[i])
+                {
+                    if (entriesHashCode[i] == hashCode && comparer.Equals(entriesKey[i], key))
+                    {
+                        if (last < 0)
+                        {
+                            buckets[bucket] = entriesNext[i];
+                        }
+                        else
+                        {
+                            entriesNext[last] = entriesNext[i];
+                        }
+                        entriesHashCode[i] = -1;
+                        entriesNext[i] = freeList;
+                        entriesKey[i] = default(TKey);
+                        entriesValue[i] = default(TValue);
+                        freeList = i;
+                        freeCount++;
+                        version++;
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public bool TryGetValue(TKey key, out TValue value)
@@ -212,11 +282,21 @@ namespace ZeroFormatter.Segments
             CopyTo(array, index);
         }
 
-
         IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            // TODO:Not Implemented
-            throw new NotImplementedException();
+            var index = 0;
+            while ((uint)index < (uint)count)
+            {
+                if (entriesHashCode[index] >= 0)
+                {
+                    yield return new KeyValuePair<TKey, TValue>(entriesKey[index], entriesValue[index]);
+                    index++;
+                }
+                else
+                {
+                    index++;
+                }
+            }
         }
 
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
@@ -227,6 +307,175 @@ namespace ZeroFormatter.Segments
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        // mutate impl
+
+        void Insert(TKey key, TValue value, bool add)
+        {
+            if (key == null) throw new ArgumentNullException("key");
+
+            int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
+            int targetBucket = hashCode % buckets.Count;
+
+            for (int i = buckets[targetBucket]; i >= 0; i = entriesNext[i])
+            {
+                if (entriesHashCode[i] == hashCode && comparer.Equals(entriesKey[i], key))
+                {
+                    if (add)
+                    {
+                        throw new ArgumentException(SR.Format(SR.Argument_AddingDuplicate, key));
+                    }
+                    entriesValue[i] = value;
+                    version++;
+                    return;
+                }
+            }
+
+            int index;
+
+            if (freeCount > 0)
+            {
+                index = freeList;
+                freeList = entriesNext[index];
+                freeCount--;
+            }
+            else
+            {
+                if (count == entriesHashCode.Count)
+                {
+                    Resize();
+                    targetBucket = hashCode % buckets.Count;
+                }
+                index = count;
+                count++;
+            }
+
+            entriesHashCode[index] = hashCode;
+            entriesNext[index] = buckets[targetBucket];
+            entriesKey[index] = key;
+            entriesValue[index] = value;
+            buckets[targetBucket] = index;
+            version++;
+        }
+
+        void Resize()
+        {
+            Resize(HashHelpers.ExpandPrime(count), false);
+        }
+
+        void Resize(int newSize, bool forceNewHashCodes)
+        {
+            IList<int> newBuckets = new FixedListSegment<int>(tracker, newSize);
+            for (int i = 0; i < newBuckets.Count; i++) newBuckets[i] = -1;
+
+            var newEntriesKey = (entriesKey as ListSegment<TKey>).Clone(tracker, newSize);
+            var newEntriesValue = (entriesValue as ListSegment<TValue>).Clone(tracker, newSize);
+            var newEntriesHashCode = (entriesHashCode as ListSegment<int>).Clone(tracker, newSize);
+            var newEntriesNext = (entriesNext as ListSegment<int>).Clone(tracker, newSize);
+
+            if (forceNewHashCodes)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    if (newEntriesHashCode[i] != -1)
+                    {
+                        newEntriesHashCode[i] = (comparer.GetHashCode(newEntriesKey[i]) & 0x7FFFFFFF);
+                    }
+                }
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                if (newEntriesHashCode[i] >= 0)
+                {
+                    int bucket = newEntriesHashCode[i] % newSize;
+                    newEntriesNext[i] = newBuckets[bucket];
+                    newBuckets[bucket] = i;
+                }
+            }
+
+            buckets = newBuckets;
+
+            entriesKey = newEntriesKey;
+            entriesValue = newEntriesValue;
+            entriesHashCode = newEntriesHashCode;
+            entriesNext = newEntriesNext;
+        }
+
+
+        public void TrimExcess()
+        {
+            var newDict = new DictionarySegment<TKey, TValue>(tracker);
+
+            // fast copy
+            for (int i = 0; i < count; i++)
+            {
+                if (entriesHashCode[i] >= 0)
+                {
+                    newDict.Add(entriesKey[i], entriesValue[i]);
+                }
+            }
+
+            // copy internal field to this
+            this.buckets = newDict.buckets;
+            this.count = newDict.count;
+            this.entriesHashCode = newDict.entriesHashCode;
+            this.entriesKey = newDict.entriesKey;
+            this.entriesNext = newDict.entriesNext;
+            this.entriesValue = newDict.entriesValue;
+            this.freeCount = newDict.freeCount;
+            this.freeList = newDict.freeList;
+        }
+
+        public int Serialize(ref byte[] bytes, int offset)
+        {
+            // [int count]
+            // [offset of buckets][offset of entriesHashCode][offset of entriesNext][offset of entriesKey][offset of entriesValue]
+            // [IList<int> buckets][List<int> entriesHashCode][IList<int> entriesNext][IList<TKey> entriesKey][IList<TValue> entriesValue]
+
+            if (freeCount != 0)
+            {
+                TrimExcess();
+            }
+
+            var intListFormatter = Formatter<IList<int>>.Default;
+            var keyListFormatter = Formatter<IList<TKey>>.Default;
+            var valueListFormatter = Formatter<IList<TValue>>.Default;
+
+            var startOffset = offset;
+
+            offset += BinaryUtil.WriteInt32(ref bytes, offset, count);
+
+            offset += (5 * 4); // index size
+
+            {
+                var bucketsSize = intListFormatter.Serialize(ref bytes, offset, buckets);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 0), offset);
+                offset += bucketsSize;
+            }
+            {
+                var entriesHashCodeSize = intListFormatter.Serialize(ref bytes, offset, entriesHashCode);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 1), offset);
+                offset += entriesHashCodeSize;
+            }
+            {
+                var entriesNextSize = intListFormatter.Serialize(ref bytes, offset, entriesNext);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 2), offset);
+                offset += entriesNextSize;
+            }
+            {
+                var entriesKeySizes = keyListFormatter.Serialize(ref bytes, offset, entriesKey);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 3), offset);
+                offset += entriesKeySizes;
+            }
+            {
+                var entriesValueSize = valueListFormatter.Serialize(ref bytes, offset, entriesValue);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 4), offset);
+                offset += entriesValueSize;
+            }
+
+            return offset - startOffset;
         }
     }
 }
