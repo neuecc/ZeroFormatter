@@ -21,7 +21,7 @@ namespace ZeroFormatter.Formatters
             var dictionary = value as DictionarySegment<TKey, TValue>;
             if (dictionary == null)
             {
-                dictionary = new DictionarySegment<TKey, TValue>(new DirtyTracker());
+                dictionary = new DictionarySegment<TKey, TValue>(new DirtyTracker(), value.Count);
                 foreach (var item in value)
                 {
                     dictionary.Add(item.Key, item.Value);

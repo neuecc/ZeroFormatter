@@ -28,14 +28,37 @@ namespace ZeroFormatter.Segments
 
         int freeCount;
         int freeList;
-        int version;
 
         DirtyTracker tracker;
         IEqualityComparer<TKey> comparer;
 
-        internal DictionarySegment(DirtyTracker tracker)
-            : this(tracker, new ArraySegment<byte>(new byte[24], 0, 24))
+        internal DictionarySegment(DirtyTracker tracker, int size)
         {
+            this.tracker = tracker;
+
+            this.count = 0;
+
+            if (size == 0)
+            {
+                size = HashHelpers.GetPrime(size);
+            }
+
+            this.buckets = new FixedListSegment<int>(tracker, size);
+            for (int i = 0; i < buckets.Count; i++) buckets[i] = -1;
+
+            this.entriesHashCode = new FixedListSegment<int>(tracker, size);
+            this.entriesNext = new FixedListSegment<int>(tracker, size);
+            this.entriesKey = (Formatter<TKey>.Default.GetLength() == null)
+                ? (IList<TKey>)new VariableListSegment<TKey>(tracker, size)
+                : (IList<TKey>)new FixedListSegment<TKey>(tracker, size);
+            this.entriesValue = (Formatter<TValue>.Default.GetLength() == null)
+                ? (IList<TValue>)new VariableListSegment<TValue>(tracker, size)
+                : (IList<TValue>)new FixedListSegment<TValue>(tracker, size);
+
+            this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
+
+            this.freeList = -1;
+            this.freeCount = 0;
         }
 
         public DictionarySegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
@@ -61,11 +84,11 @@ namespace ZeroFormatter.Segments
             this.entriesKey = keyListFormatter.Deserialize(ref bytes, keyOffset);
             this.entriesValue = valueListFormatter.Deserialize(ref bytes, entriesOffset);
 
-            // new size, note:needs to improve performance...
+            // new size
             if (buckets.Count == 0)
             {
                 var size = HashHelpers.GetPrime(0);
-                Resize(size, true);
+                Resize(size);
             }
 
             this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
@@ -76,7 +99,7 @@ namespace ZeroFormatter.Segments
 
         public int Count
         {
-            get { return count; }
+            get { return count - freeCount; }
         }
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys
@@ -153,7 +176,6 @@ namespace ZeroFormatter.Segments
                 freeList = -1;
                 count = 0;
                 freeCount = 0;
-                version++;
             }
         }
 
@@ -252,7 +274,6 @@ namespace ZeroFormatter.Segments
                         entriesValue[i] = default(TValue);
                         freeList = i;
                         freeCount++;
-                        version++;
                         return true;
                     }
                 }
@@ -282,7 +303,7 @@ namespace ZeroFormatter.Segments
             CopyTo(array, index);
         }
 
-        IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             var index = 0;
             while ((uint)index < (uint)count)
@@ -327,7 +348,6 @@ namespace ZeroFormatter.Segments
                         throw new ArgumentException(SR.Format(SR.Argument_AddingDuplicate, key));
                     }
                     entriesValue[i] = value;
-                    version++;
                     return;
                 }
             }
@@ -356,15 +376,14 @@ namespace ZeroFormatter.Segments
             entriesKey[index] = key;
             entriesValue[index] = value;
             buckets[targetBucket] = index;
-            version++;
         }
 
         void Resize()
         {
-            Resize(HashHelpers.ExpandPrime(count), false);
+            Resize(HashHelpers.ExpandPrime(count));
         }
 
-        void Resize(int newSize, bool forceNewHashCodes)
+        void Resize(int newSize)
         {
             IList<int> newBuckets = new FixedListSegment<int>(tracker, newSize);
             for (int i = 0; i < newBuckets.Count; i++) newBuckets[i] = -1;
@@ -373,17 +392,6 @@ namespace ZeroFormatter.Segments
             var newEntriesValue = (entriesValue as ListSegment<TValue>).Clone(tracker, newSize);
             var newEntriesHashCode = (entriesHashCode as ListSegment<int>).Clone(tracker, newSize);
             var newEntriesNext = (entriesNext as ListSegment<int>).Clone(tracker, newSize);
-
-            if (forceNewHashCodes)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    if (newEntriesHashCode[i] != -1)
-                    {
-                        newEntriesHashCode[i] = (comparer.GetHashCode(newEntriesKey[i]) & 0x7FFFFFFF);
-                    }
-                }
-            }
 
             for (int i = 0; i < count; i++)
             {
@@ -403,41 +411,9 @@ namespace ZeroFormatter.Segments
             entriesNext = newEntriesNext;
         }
 
-
-        public void TrimExcess()
-        {
-            var newDict = new DictionarySegment<TKey, TValue>(tracker);
-
-            // fast copy
-            for (int i = 0; i < count; i++)
-            {
-                if (entriesHashCode[i] >= 0)
-                {
-                    newDict.Add(entriesKey[i], entriesValue[i]);
-                }
-            }
-
-            // copy internal field to this
-            this.buckets = newDict.buckets;
-            this.count = newDict.count;
-            this.entriesHashCode = newDict.entriesHashCode;
-            this.entriesKey = newDict.entriesKey;
-            this.entriesNext = newDict.entriesNext;
-            this.entriesValue = newDict.entriesValue;
-            this.freeCount = newDict.freeCount;
-            this.freeList = newDict.freeList;
-        }
-
         public int Serialize(ref byte[] bytes, int offset)
         {
-            // [int count]
-            // [offset of buckets][offset of entriesHashCode][offset of entriesNext][offset of entriesKey][offset of entriesValue]
-            // [IList<int> buckets][List<int> entriesHashCode][IList<int> entriesNext][IList<TKey> entriesKey][IList<TValue> entriesValue]
-
-            if (freeCount != 0)
-            {
-                TrimExcess();
-            }
+            Resize(count);
 
             var intListFormatter = Formatter<IList<int>>.Default;
             var keyListFormatter = Formatter<IList<TKey>>.Default;

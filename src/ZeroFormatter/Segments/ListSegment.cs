@@ -227,8 +227,8 @@ namespace ZeroFormatter.Segments
                 clone = new FixedListSegment<T>(tracker, newLength);
             }
 
-            CreateCacheWhenNotYet();
-            Array.Copy(this.cache, 0, clone.cache, 0, length); // copy currentLength
+            CacheAllWhenNotYet();
+            Array.Copy(this.cache, 0, clone.cache, 0, Math.Min(length, newLength));
             return clone;
         }
     }
@@ -258,7 +258,7 @@ namespace ZeroFormatter.Segments
 
         protected override int GetOffset(int index)
         {
-            return 4 + (elementSize * index);
+            return originalBytes.Offset + 4 + (elementSize * index);
         }
 
         public override T this[int index]
@@ -274,7 +274,7 @@ namespace ZeroFormatter.Segments
                 {
                     var array = originalBytes.Array;
                     var offset = GetOffset(index);
-                    return formatter.Deserialize(ref array, originalBytes.Offset + offset);
+                    return formatter.Deserialize(ref array, offset);
                 }
                 else
                 {
