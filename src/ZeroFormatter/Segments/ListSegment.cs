@@ -60,8 +60,8 @@ namespace ZeroFormatter.Segments
                 {
                     if (!isCached[i])
                     {
-                        var offset = BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4 + (4 * i));
-                        cache[offset] = formatter.Deserialize(ref array, offset);
+                        var offset = GetOffset(i);
+                        cache[i] = formatter.Deserialize(ref array, offset);
                         isCached[i] = true;
                     }
                 }
@@ -70,6 +70,8 @@ namespace ZeroFormatter.Segments
         }
 
         public abstract T this[int index] { get; set; }
+
+        protected abstract int GetOffset(int index);
 
         public int Count
         {
@@ -138,7 +140,7 @@ namespace ZeroFormatter.Segments
 
             if (cache.Length == length)
             {
-                Array.Resize(ref cache, length * 2);
+                Array.Resize(ref cache, (length == 0) ? 4 : length * 2);
             }
             cache[length] = item;
             length++;
@@ -148,18 +150,30 @@ namespace ZeroFormatter.Segments
         public void Clear()
         {
             isAllCached = true; // cached:)
-            Array.Clear(cache, 0, cache.Length);
+            if (cache != null)
+            {
+                Array.Clear(cache, 0, cache.Length);
+            }
+            else
+            {
+                cache = new T[0];
+            }
             length = 0;
             state = SegmentState.Dirty;
         }
 
         public void Insert(int index, T item)
         {
+            if (index > this.length)
+            {
+                throw new ArgumentOutOfRangeException("index is out of range:" + index);
+            }
+
             CacheAllWhenNotYet();
 
             if (cache.Length == length)
             {
-                Array.Resize(ref cache, length * 2);
+                Array.Resize(ref cache, (length == 0) ? 4 : length * 2);
             }
 
             if (index < this.length)
@@ -167,6 +181,7 @@ namespace ZeroFormatter.Segments
                 Array.Copy(this.cache, index, this.cache, index + 1, this.length - index);
             }
             cache[index] = item;
+            length++;
             state = SegmentState.Dirty;
         }
 
@@ -185,6 +200,10 @@ namespace ZeroFormatter.Segments
 
         public void RemoveAt(int index)
         {
+            if (index >= this.length)
+            {
+                throw new ArgumentOutOfRangeException("index is out of range:" + index);
+            }
             CacheAllWhenNotYet();
 
             this.length--;
@@ -237,6 +256,11 @@ namespace ZeroFormatter.Segments
             elementSize = formatterLength.Value;
         }
 
+        protected override int GetOffset(int index)
+        {
+            return 4 + (elementSize * index);
+        }
+
         public override T this[int index]
         {
             get
@@ -249,7 +273,7 @@ namespace ZeroFormatter.Segments
                 if (!isAllCached)
                 {
                     var array = originalBytes.Array;
-                    var offset = 4 + (elementSize * index);
+                    var offset = GetOffset(index);
                     return formatter.Deserialize(ref array, originalBytes.Offset + offset);
                 }
                 else
@@ -297,6 +321,12 @@ namespace ZeroFormatter.Segments
             if (formatterLength != null) throw new InvalidOperationException("T has fixed length, use FixedListSegement instead. Type: " + typeof(T).Name);
         }
 
+        protected override int GetOffset(int index)
+        {
+            var array = originalBytes.Array;
+            return BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4 + (4 * index));
+        }
+
         public override T this[int index]
         {
             get
@@ -310,7 +340,7 @@ namespace ZeroFormatter.Segments
                 if (!isAllCached && !isCached[index])
                 {
                     var array = originalBytes.Array;
-                    var offset = BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4 + (4 * index));
+                    var offset = GetOffset(index);
                     cache[index] = formatter.Deserialize(ref array, offset);
                     isCached[index] = true;
                 }

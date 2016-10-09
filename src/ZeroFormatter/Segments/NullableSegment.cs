@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZeroFormatter.Format
+namespace ZeroFormatter.Segments
 {
     // is this needs?
 
