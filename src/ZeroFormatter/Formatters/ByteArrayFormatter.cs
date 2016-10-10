@@ -28,10 +28,18 @@ namespace ZeroFormatter.Formatters
             return writeSize + 4;
         }
 
-        public override byte[] Deserialize(ref byte[] bytes, int offset)
+        public override byte[] Deserialize(ref byte[] bytes, int offset, out int byteSize)
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
-            if (length == -1) return null;
+            if (length == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            else
+            {
+                byteSize = length + 4;
+            }
 
             var result = new byte[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length);

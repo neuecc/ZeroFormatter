@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -263,6 +265,19 @@ namespace ZeroFormatter.Formatters
                 formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
             }
 
+            else if (t.GetGenericTypeDefinition() == typeof(ILookup<,>))
+            {
+                var formatterType = typeof(LookupFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+
+            }
+
+            else if (t.GetGenericTypeDefinition() == typeof(GroupingSegment<,>))
+            {
+                var formatterType = typeof(GroupingSegmentFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+            }
+
             // TODO:make the object formatter...
 
             else if (t.IsArray)
@@ -272,7 +287,7 @@ namespace ZeroFormatter.Formatters
             else
             {
                 // TODO:more details exception message.
-                throw new InvalidOperationException("Type is not supported, please register,");
+                throw new InvalidOperationException("Type is not supported, please register,:" + t.Name);
             }
 
             Default = (Formatter<T>)formatter;
@@ -281,6 +296,6 @@ namespace ZeroFormatter.Formatters
         public abstract int? GetLength();
 
         public abstract int Serialize(ref byte[] bytes, int offset, T value);
-        public abstract T Deserialize(ref byte[] bytes, int offset);
+        public abstract T Deserialize(ref byte[] bytes, int offset, out int byteSize);
     }
 }

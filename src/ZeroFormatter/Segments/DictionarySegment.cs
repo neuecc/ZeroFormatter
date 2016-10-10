@@ -7,8 +7,7 @@ using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Segments
 {
-    // [int count]
-    // [offset of buckets][offset of entriesHashCode][offset of entriesNext][offset of entriesKey][offset of entriesValue]
+    // [int byteSize][int count]
     // [IList<int> buckets][List<int> entriesHashCode][IList<int> entriesNext][IList<TKey> entriesKey][IList<TValue> entriesValue]
 
     // TODO:ReadOnlyDictionary?
@@ -61,34 +60,47 @@ namespace ZeroFormatter.Segments
             this.freeCount = 0;
         }
 
-        public DictionarySegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
+        internal static DictionarySegment<TKey, TValue> Create(DirtyTracker tracker, ArraySegment<byte> originalBytes, out int byteSize)
+        {
+            var array = originalBytes.Array;
+            byteSize = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
+            return new DictionarySegment<TKey, TValue>(tracker, originalBytes);
+        }
+
+        DictionarySegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
         {
             this.tracker = tracker;
 
             var bytes = originalBytes.Array;
-            this.count = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset);
-
-            var bucketOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 4);
-            var hashOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 8);
-            var nextOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 12);
-            var keyOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 16);
-            var entriesOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 20);
+            var offset = originalBytes.Offset + 4;
+            this.count = BinaryUtil.ReadInt32(ref bytes, offset);
+            offset += 4;
 
             var intListFormatter = Formatter<IList<int>>.Default;
             var keyListFormatter = Formatter<IList<TKey>>.Default;
             var valueListFormatter = Formatter<IList<TValue>>.Default;
 
-            this.buckets = intListFormatter.Deserialize(ref bytes, bucketOffset);
-            this.entriesHashCode = intListFormatter.Deserialize(ref bytes, hashOffset);
-            this.entriesNext = intListFormatter.Deserialize(ref bytes, nextOffset);
-            this.entriesKey = keyListFormatter.Deserialize(ref bytes, keyOffset);
-            this.entriesValue = valueListFormatter.Deserialize(ref bytes, entriesOffset);
+            int size;
+            this.buckets = intListFormatter.Deserialize(ref bytes, offset, out size);
+            offset += size;
+
+            this.entriesHashCode = intListFormatter.Deserialize(ref bytes, offset, out size);
+            offset += size;
+
+            this.entriesNext = intListFormatter.Deserialize(ref bytes, offset, out size);
+            offset += size;
+
+            this.entriesKey = keyListFormatter.Deserialize(ref bytes, offset, out size);
+            offset += size;
+
+            this.entriesValue = valueListFormatter.Deserialize(ref bytes, offset, out size);
+            offset += size;
 
             // new size
             if (buckets.Count == 0)
             {
-                var size = HashHelpers.GetPrime(0);
-                Resize(size);
+                var capacity = HashHelpers.GetPrime(0);
+                Resize(capacity);
             }
 
             this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
@@ -413,6 +425,7 @@ namespace ZeroFormatter.Segments
 
         public int Serialize(ref byte[] bytes, int offset)
         {
+            // TODO:If do not needs resize, don't resize:)
             Resize(count);
 
             var intListFormatter = Formatter<IList<int>>.Default;
@@ -421,37 +434,20 @@ namespace ZeroFormatter.Segments
 
             var startOffset = offset;
 
-            offset += BinaryUtil.WriteInt32(ref bytes, offset, count);
+            offset += 4;
+            BinaryUtil.WriteInt32(ref bytes, offset, count);
+            offset += 4;
 
-            offset += (5 * 4); // index size
+            offset += intListFormatter.Serialize(ref bytes, offset, buckets);
+            offset += intListFormatter.Serialize(ref bytes, offset, entriesHashCode);
+            offset += intListFormatter.Serialize(ref bytes, offset, entriesNext);
+            offset += keyListFormatter.Serialize(ref bytes, offset, entriesKey);
+            offset += valueListFormatter.Serialize(ref bytes, offset, entriesValue);
 
-            {
-                var bucketsSize = intListFormatter.Serialize(ref bytes, offset, buckets);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 0), offset);
-                offset += bucketsSize;
-            }
-            {
-                var entriesHashCodeSize = intListFormatter.Serialize(ref bytes, offset, entriesHashCode);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 1), offset);
-                offset += entriesHashCodeSize;
-            }
-            {
-                var entriesNextSize = intListFormatter.Serialize(ref bytes, offset, entriesNext);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 2), offset);
-                offset += entriesNextSize;
-            }
-            {
-                var entriesKeySizes = keyListFormatter.Serialize(ref bytes, offset, entriesKey);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 3), offset);
-                offset += entriesKeySizes;
-            }
-            {
-                var entriesValueSize = valueListFormatter.Serialize(ref bytes, offset, entriesValue);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 4), offset);
-                offset += entriesValueSize;
-            }
+            var totalBytes = offset - startOffset;
+            BinaryUtil.WriteInt32(ref bytes, startOffset, totalBytes);
 
-            return offset - startOffset;
+            return totalBytes;
         }
     }
 }

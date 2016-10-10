@@ -23,7 +23,8 @@ namespace ZeroFormatter.Tests
             };
             var bytes = ZeroFormatter.Serialize(sampleDict);
 
-            return new DictionarySegment<int, string>(new DirtyTracker(), new ArraySegment<byte>(bytes, 0, bytes.Length));
+            int _;
+            return DictionarySegment<int, string>.Create(new DirtyTracker(), new ArraySegment<byte>(bytes, 0, bytes.Length), out _);
         }
 
         [TestMethod]

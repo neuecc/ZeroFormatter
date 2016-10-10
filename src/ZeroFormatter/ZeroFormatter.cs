@@ -59,7 +59,8 @@ namespace ZeroFormatter
             var formatter = Formatter<T>.Default;
             if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
 
-            return formatter.Deserialize(ref bytes, 0);
+            int _;
+            return formatter.Deserialize(ref bytes, 0, out _);
         }
 
         public static T Deserialize<T>(Stream stream)
@@ -69,7 +70,8 @@ namespace ZeroFormatter
             {
                 var buffer = ms.GetBuffer();
                 var formatter = Formatter<T>.Default;
-                return formatter.Deserialize(ref buffer, (int)ms.Position);
+                int _;
+                return formatter.Deserialize(ref buffer, (int)ms.Position, out _);
             }
             else
             {
@@ -77,7 +79,8 @@ namespace ZeroFormatter
                 var array = buffer.Array;
 
                 var formatter = Formatter<T>.Default;
-                return formatter.Deserialize(ref array, buffer.Offset);
+                int _;
+                return formatter.Deserialize(ref array, buffer.Offset, out _);
             }
         }
 

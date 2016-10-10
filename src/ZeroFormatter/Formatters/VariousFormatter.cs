@@ -28,10 +28,18 @@ namespace ZeroFormatter.Formatters
             return stringSize + 4;
         }
 
-        public override string Deserialize(ref byte[] bytes, int offset)
+        public override string Deserialize(ref byte[] bytes, int offset, out int byteSize)
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
-            if (length == -1) return null;
+            if (length == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            else
+            {
+                byteSize = length + 4;
+            }
 
             return BinaryUtil.ReadString(ref bytes, offset + 4, length);
         }
@@ -52,9 +60,10 @@ namespace ZeroFormatter.Formatters
             return charSize + 4;
         }
 
-        public override char Deserialize(ref byte[] bytes, int offset)
+        public override char Deserialize(ref byte[] bytes, int offset, out int byteSize)
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
+            byteSize = length;
             return BinaryUtil.ReadChar(ref bytes, offset + 4, length);
         }
     }
@@ -80,13 +89,21 @@ namespace ZeroFormatter.Formatters
             return charSize + 4;
         }
 
-        public override char? Deserialize(ref byte[] bytes, int offset)
+        public override char? Deserialize(ref byte[] bytes, int offset, out int byteSize)
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
-            if (length == -1) return null;
+            if (length == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            else
+            {
+                byteSize = length + 4;
+            }
+
+
             return BinaryUtil.ReadChar(ref bytes, offset + 4, length);
         }
     }
-
-
 }

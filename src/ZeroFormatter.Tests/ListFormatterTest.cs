@@ -56,7 +56,8 @@ namespace ZeroFormatter.Tests
             {
                 IList<string> xs = new[] { "aaa", "あいうえお", "hogehoge", "hugahugahugahugahuga" };
                 var result = ZeroFormatter.Serialize(xs);
-                ZeroFormatter.Deserialize<IList<string>>(result).Is("aaa", "あいうえお", "hogehoge", "hugahugahugahugahuga");
+                var ds = ZeroFormatter.Deserialize<IList<string>>(result);
+                ds.Is("aaa", "あいうえお", "hogehoge", "hugahugahugahugahuga");
             }
             {
                 IList<string> xs = new[] { "aaa", "あいうえお", "hogehoge", null, "hugahugahugahugahuga" };

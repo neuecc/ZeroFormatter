@@ -42,31 +42,34 @@ namespace ZeroFormatter.Formatters
                 var startoffset = offset;
 
                 var count = 0;
-                offset = (startoffset + 4) + (value.Count * 4);
+                offset = (startoffset + 8) + (value.Count * 4);
                 foreach (var item in value)
                 {
                     var size = formatter.Serialize(ref bytes, offset, item);
-                    BinaryUtil.WriteInt32(ref bytes, (startoffset + 4) + count * 4, offset);
+                    BinaryUtil.WriteInt32(ref bytes, (startoffset + 8) + count * 4, offset);
                     offset += size;
                     count++;
                 }
-                BinaryUtil.WriteInt32(ref bytes, startoffset, value.Count);
+                BinaryUtil.WriteInt32(ref bytes, startoffset + 4, value.Count);
 
-                return offset - startoffset;
+                var totalBytes = offset - startoffset;
+                BinaryUtil.WriteInt32(ref bytes, startoffset, totalBytes);
+
+                return totalBytes;
             }
         }
 
-        public override IList<T> Deserialize(ref byte[] bytes, int offset)
+        public override IList<T> Deserialize(ref byte[] bytes, int offset, out int byteSize)
         {
             var formatter = Formatter<T>.Default;
             var length = formatter.GetLength();
             if (length != null)
             {
-                return new FixedListSegment<T>(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0));
+                return FixedListSegment<T>.Create(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0), out byteSize);
             }
             else
             {
-                return new VariableListSegment<T>(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0));
+                return VariableListSegment<T>.Create(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0), out byteSize);
             }
         }
     }

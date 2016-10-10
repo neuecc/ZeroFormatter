@@ -29,13 +29,15 @@ namespace ZeroFormatter.Segments
             this.formatter = Formatters.Formatter<T>.Default;
         }
 
-        public ListSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
+        public ListSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes, bool isFixed)
         {
             this.originalBytes = originalBytes;
             this.formatter = Formatters.Formatter<T>.Default;
 
             var array = originalBytes.Array;
-            this.length = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
+            this.length = isFixed
+                ? BinaryUtil.ReadInt32(ref array, originalBytes.Offset)
+                : BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4);
 
             this.tracker = tracker;
             this.state = SegmentState.Original;
@@ -61,7 +63,8 @@ namespace ZeroFormatter.Segments
                     if (!isCached[i])
                     {
                         var offset = GetOffset(i);
-                        cache[i] = formatter.Deserialize(ref array, offset);
+                        int _;
+                        cache[i] = formatter.Deserialize(ref array, offset, out _);
                         isCached[i] = true;
                     }
                 }
@@ -247,8 +250,15 @@ namespace ZeroFormatter.Segments
             elementSize = formatterLength.Value;
         }
 
+        internal static FixedListSegment<T> Create(DirtyTracker tracker, ArraySegment<byte> originalBytes, out int byteSize)
+        {
+            var list = new FixedListSegment<T>(tracker, originalBytes);
+            byteSize = list.elementSize * list.length + 4;
+            return list;
+        }
+
         public FixedListSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
-            : base(tracker, originalBytes)
+            : base(tracker, originalBytes, true)
         {
             var formatterLength = formatter.GetLength();
             if (formatterLength == null) throw new InvalidOperationException("T should be fixed length. Type: " + typeof(T).Name);
@@ -274,7 +284,8 @@ namespace ZeroFormatter.Segments
                 {
                     var array = originalBytes.Array;
                     var offset = GetOffset(index);
-                    return formatter.Deserialize(ref array, offset);
+                    int _;
+                    return formatter.Deserialize(ref array, offset, out _);
                 }
                 else
                 {
@@ -304,9 +315,17 @@ namespace ZeroFormatter.Segments
         }
     }
 
-    // Layout: VariableSize -> [count:int][elementOffset:int...][t format...]
+    // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...]
     public class VariableListSegment<T> : ListSegment<T>
     {
+        internal static VariableListSegment<T> Create(DirtyTracker tracker, ArraySegment<byte> originalBytes, out int byteSize)
+        {
+            var list = new VariableListSegment<T>(tracker, originalBytes);
+            var array = originalBytes.Array;
+            byteSize = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
+            return list;
+        }
+
         internal VariableListSegment(DirtyTracker tracker, int length)
             : base(tracker, length)
         {
@@ -315,7 +334,7 @@ namespace ZeroFormatter.Segments
         }
 
         public VariableListSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
-            : base(tracker, originalBytes)
+            : base(tracker, originalBytes, false)
         {
             var formatterLength = formatter.GetLength();
             if (formatterLength != null) throw new InvalidOperationException("T has fixed length, use FixedListSegement instead. Type: " + typeof(T).Name);
@@ -324,7 +343,7 @@ namespace ZeroFormatter.Segments
         protected override int GetOffset(int index)
         {
             var array = originalBytes.Array;
-            return BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4 + (4 * index));
+            return BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + (4 * index));
         }
 
         public override T this[int index]
@@ -341,7 +360,8 @@ namespace ZeroFormatter.Segments
                 {
                     var array = originalBytes.Array;
                     var offset = GetOffset(index);
-                    cache[index] = formatter.Deserialize(ref array, offset);
+                    int _;
+                    cache[index] = formatter.Deserialize(ref array, offset, out _);
                     isCached[index] = true;
                 }
 

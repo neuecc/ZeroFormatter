@@ -8,89 +8,58 @@ using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Segments
 {
+    // Lookup gurantees element order, key order is not guranteed.
+
+    // [int byteSize]
     // [int count]
-    // [offset of buckets][offset of entriesHashCode][offset of entriesNext][offset of entriesKey][offset of entriesValue]
-    // [IList<int> buckets][List<int> entriesHashCode][IList<int> entriesNext][IList<TKey> entriesKey][IList<TValue> entriesValue]
-
-    public sealed class LookupSegment<TKey, TElement> : ILookup<TKey, TElement>
+    // [IList<IList<GroupingSemengt>>]
+    public class LookupSegment<TKey, TElement> : ILookup<TKey, TElement>
     {
-        #region SerializableStates
+        static TElement[] EmptyArray = new TElement[0];
+        readonly IEqualityComparer<TKey> comparer;
 
+        // serialize
         int count;
-        IList<int> buckets; // link index of first entry. empty is -1.
+        IList<IList<GroupingSegment<TKey, TElement>>> groupings;
 
-        IList<int> entriesHashCode;
-        IList<int> entriesNext;
-        IList<TKey> entriesKey;
-        IList<TElement> entriesValue;
-
-        #endregion
-
-        DirtyTracker tracker;
-        IEqualityComparer<TKey> comparer;
-
-        internal LookupSegment(DirtyTracker tracker, int size)
+        public LookupSegment(ILookup<TKey, TElement> source)
         {
-            this.tracker = tracker;
-
-            this.count = 0;
-
-            if (size == 0)
-            {
-                size = HashHelpers.GetPrime(size);
-            }
-
-            this.buckets = new FixedListSegment<int>(tracker, size);
-
-            this.entriesHashCode = new FixedListSegment<int>(tracker, size);
-            this.entriesNext = new FixedListSegment<int>(tracker, size);
-            this.entriesKey = (Formatter<TKey>.Default.GetLength() == null)
-                ? (IList<TKey>)new VariableListSegment<TKey>(tracker, size)
-                : (IList<TKey>)new FixedListSegment<TKey>(tracker, size);
-            this.entriesValue = (Formatter<TElement>.Default.GetLength() == null)
-                ? (IList<TElement>)new VariableListSegment<TElement>(tracker, size)
-                : (IList<TElement>)new FixedListSegment<TElement>(tracker, size);
-
             this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
-
-            for (int i = 0; i < buckets.Count; i++)
+            this.groupings = new List<IList<GroupingSegment<TKey, TElement>>>(source.Count);
+            for (int i = 0; i < source.Count; i++)
             {
-                buckets[i] = -1;
-                entriesNext[i] = -1;
+                groupings.Add(null); // null clear
             }
 
+            foreach (var g in source)
+            {
+                foreach (var item in g)
+                {
+                    GetGrouping(g.Key, true).Add(item);
+                }
+            }
+
+            this.count = source.Count;
         }
 
-        public LookupSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
+        internal static LookupSegment<TKey, TElement> Create(ArraySegment<byte> originalBytes, out int byteSize)
         {
-            this.tracker = tracker;
+            var segment = new LookupSegment<TKey, TElement>();
 
-            var bytes = originalBytes.Array;
-            this.count = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset);
+            var array = originalBytes.Array;
 
-            var bucketOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 4);
-            var hashOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 8);
-            var nextOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 12);
-            var keyOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 16);
-            var entriesOffset = BinaryUtil.ReadInt32(ref bytes, originalBytes.Offset + 20);
+            byteSize = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
+            segment.count = BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4);
 
-            var intListFormatter = Formatter<IList<int>>.Default;
-            var keyListFormatter = Formatter<IList<TKey>>.Default;
-            var valueListFormatter = Formatter<IList<TElement>>.Default;
+            var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
+            int _;
+            segment.groupings = formatter.Deserialize(ref array, originalBytes.Offset + 8, out _);
 
-            this.buckets = intListFormatter.Deserialize(ref bytes, bucketOffset);
-            this.entriesHashCode = intListFormatter.Deserialize(ref bytes, hashOffset);
-            this.entriesNext = intListFormatter.Deserialize(ref bytes, nextOffset);
-            this.entriesKey = keyListFormatter.Deserialize(ref bytes, keyOffset);
-            this.entriesValue = valueListFormatter.Deserialize(ref bytes, entriesOffset);
+            return segment;
+        }
 
-            // new size
-            if (buckets.Count == 0)
-            {
-                var size = HashHelpers.GetPrime(0);
-                Resize(size);
-            }
-
+        LookupSegment()
+        {
             this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
         }
 
@@ -103,143 +72,33 @@ namespace ZeroFormatter.Segments
         {
             get
             {
-                return new LookupCollection(this, key);
-            }
-        }
+                GroupingSegment<TKey, TElement> grouping = GetGrouping(key, create: false);
+                if (grouping != null)
+                {
+                    return grouping;
+                }
 
-        public void Add(TKey key, TElement value)
-        {
-            Insert(key, value);
-        }
-
-        public void Clear()
-        {
-            if (count > 0)
-            {
-                for (int i = 0; i < buckets.Count; i++) buckets[i] = -1;
-                entriesHashCode.Clear();
-                entriesKey.Clear();
-                entriesNext.Clear();
-                entriesValue.Clear();
-
-                count = 0;
+                return EmptyArray;
             }
         }
 
         public bool Contains(TKey key)
         {
-            return FindEntry(key) >= 0;
-        }
-
-        int FindEntry(TKey key)
-        {
-            if (key == null) throw new ArgumentNullException("key");
-
-            if (buckets != null)
-            {
-                int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
-                for (int i = buckets[hashCode % buckets.Count]; i >= 0; i = entriesNext[i])
-                {
-                    if (entriesHashCode[i] == hashCode && comparer.Equals(entriesKey[i], key)) return i;
-                }
-            }
-
-            return -1;
-        }
-
-        IEnumerable<int> FindEntries(TKey key)
-        {
-            if (key == null) throw new ArgumentNullException("key");
-
-            if (buckets != null)
-            {
-                int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
-                for (int i = buckets[hashCode % buckets.Count]; i >= 0; i = entriesNext[i])
-                {
-                    if (entriesHashCode[i] == hashCode && comparer.Equals(entriesKey[i], key))
-                    {
-                        yield return i;
-                    }
-                }
-            }
-        }
-
-
-        // mutate impl
-
-        void Insert(TKey key, TElement value)
-        {
-            if (key == null) throw new ArgumentNullException("key");
-
-            int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
-            int targetBucket = hashCode % buckets.Count;
-
-            int index;
-            if (count == entriesHashCode.Count)
-            {
-                Resize();
-                targetBucket = hashCode % buckets.Count;
-            }
-            index = count;
-            count++;
-
-            entriesHashCode[index] = hashCode;
-            entriesNext[index] = buckets[targetBucket];
-            entriesKey[index] = key;
-            entriesValue[index] = value;
-            buckets[targetBucket] = index;
-        }
-
-        void Resize()
-        {
-            Resize(HashHelpers.ExpandPrime(count));
-        }
-
-        void Resize(int newSize)
-        {
-            IList<int> newBuckets = new FixedListSegment<int>(tracker, newSize);
-            for (int i = 0; i < newBuckets.Count; i++) newBuckets[i] = -1;
-
-            var newEntriesKey = (entriesKey as ListSegment<TKey>).Clone(tracker, newSize);
-            var newEntriesValue = (entriesValue as ListSegment<TElement>).Clone(tracker, newSize);
-            var newEntriesHashCode = (entriesHashCode as ListSegment<int>).Clone(tracker, newSize);
-            var newEntriesNext = (entriesNext as ListSegment<int>).Clone(tracker, newSize);
-
-            for (int i = 0; i < count; i++)
-            {
-                if (newEntriesHashCode[i] >= 0)
-                {
-                    int bucket = newEntriesHashCode[i] % newSize;
-                    newEntriesNext[i] = newBuckets[bucket];
-                    newBuckets[bucket] = i;
-                }
-            }
-
-            buckets = newBuckets;
-
-            entriesKey = newEntriesKey;
-            entriesValue = newEntriesValue;
-            entriesHashCode = newEntriesHashCode;
-            entriesNext = newEntriesNext;
-        }
-
-        public bool TryGetValue(TKey key, out TElement value)
-        {
-            int i = FindEntry(key);
-            if (i >= 0)
-            {
-                value = entriesValue[i];
-                return true;
-            }
-            value = default(TElement);
-            return false;
+            return GetGrouping(key, create: false) != null;
         }
 
         public IEnumerator<IGrouping<TKey, TElement>> GetEnumerator()
         {
-            foreach (var key in entriesKey.Distinct(comparer))
+            for (int i = 0; i < groupings.Count; i++)
             {
-                yield return new Grouping(this, key);
+                var g = groupings[i];
+                if (g != null)
+                {
+                    foreach (var item in g)
+                    {
+                        yield return item;
+                    }
+                }
             }
         }
 
@@ -248,156 +107,200 @@ namespace ZeroFormatter.Segments
             return GetEnumerator();
         }
 
+        GroupingSegment<TKey, TElement> GetGrouping(TKey key, bool create)
+        {
+            int hashCode = (key == null) ? 0 : comparer.GetHashCode(key) & 0x7FFFFFFF;
+
+            IList<GroupingSegment<TKey, TElement>> groupList = groupings[hashCode % groupings.Count];
+            if (groupList != null)
+            {
+                for (int i = 0; i < groupList.Count; i++)
+                {
+                    var g = groupList[i];
+                    if (g.hashCode == hashCode && comparer.Equals(g.key, key))
+                    {
+                        return g;
+                    }
+                }
+            }
+
+            if (create)
+            {
+                int index = hashCode % groupings.Count;
+                var g = new GroupingSegment<TKey, TElement>(key, hashCode);
+
+                var list = groupings[index];
+                if (list == null)
+                {
+                    list = groupings[index] = new List<GroupingSegment<TKey, TElement>>();
+                }
+                list.Add(g);
+
+                count++;
+                return g;
+            }
+
+            return null;
+        }
 
         public int Serialize(ref byte[] bytes, int offset)
         {
-            Resize(count);
+            var totalSize = 4;
+            totalSize += BinaryUtil.WriteInt32(ref bytes, offset + 4, count);
+            var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
+            totalSize += formatter.Serialize(ref bytes, offset + 8, groupings);
+            BinaryUtil.WriteInt32(ref bytes, offset, totalSize);
 
-            var intListFormatter = Formatter<IList<int>>.Default;
-            var keyListFormatter = Formatter<IList<TKey>>.Default;
-            var valueListFormatter = Formatter<IList<TElement>>.Default;
+            return totalSize;
+        }
+    }
 
-            var startOffset = offset;
 
-            offset += BinaryUtil.WriteInt32(ref bytes, offset, count);
+    // [TKey key]
+    // [int hashCode]
+    // [IList<TElement> elements]
+    public class GroupingSegment<TKey, TElement> : IGrouping<TKey, TElement>, IList<TElement>
+    {
+        internal TKey key;
+        internal int hashCode;
+        internal IList<TElement> elements;
 
-            offset += (5 * 4); // index size
+        internal static GroupingSegment<TKey, TElement> Create(ArraySegment<byte> originalBytes, out int byteSize)
+        {
+            var segment = new GroupingSegment<TKey, TElement>();
 
-            {
-                var bucketsSize = intListFormatter.Serialize(ref bytes, offset, buckets);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 0), offset);
-                offset += bucketsSize;
-            }
-            {
-                var entriesHashCodeSize = intListFormatter.Serialize(ref bytes, offset, entriesHashCode);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 1), offset);
-                offset += entriesHashCodeSize;
-            }
-            {
-                var entriesNextSize = intListFormatter.Serialize(ref bytes, offset, entriesNext);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 2), offset);
-                offset += entriesNextSize;
-            }
-            {
-                var entriesKeySizes = keyListFormatter.Serialize(ref bytes, offset, entriesKey);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 3), offset);
-                offset += entriesKeySizes;
-            }
-            {
-                var entriesValueSize = valueListFormatter.Serialize(ref bytes, offset, entriesValue);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4 + (4 * 4), offset);
-                offset += entriesValueSize;
-            }
+            var array = originalBytes.Array;
+            var offset = originalBytes.Offset;
 
-            return offset - startOffset;
+            var keyFormatter = Formatter<TKey>.Default;
+            var listFormatter = Formatter<IList<TElement>>.Default;
+
+            int keySize;
+            segment.key = keyFormatter.Deserialize(ref array, offset, out keySize);
+
+            segment.hashCode = BinaryUtil.ReadInt32(ref array, offset + keySize);
+
+            int listSize;
+            segment.elements = listFormatter.Deserialize(ref array, offset + keySize + 4, out listSize);
+
+            byteSize = keySize + 4 + listSize;
+            return segment;
         }
 
-        class Grouping : IGrouping<TKey, TElement>
+        GroupingSegment()
         {
-            readonly LookupSegment<TKey, TElement> lookup;
-            public TKey Key { get; private set; }
+        }
 
-            public Grouping(LookupSegment<TKey, TElement> lookup, TKey key)
+        internal GroupingSegment(TKey key, int hashCode)
+        {
+            this.key = key;
+            this.hashCode = hashCode;
+            this.elements = new List<TElement>();
+        }
+
+        internal void Add(TElement element)
+        {
+            elements.Add(element);
+        }
+
+        public IEnumerator<TElement> GetEnumerator()
+        {
+            return elements.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public TKey Key
+        {
+            get { return key; }
+        }
+
+        int ICollection<TElement>.Count
+        {
+            get { return elements.Count; }
+        }
+
+        bool ICollection<TElement>.IsReadOnly
+        {
+            get { return true; }
+        }
+
+        void ICollection<TElement>.Add(TElement item)
+        {
+            throw new NotSupportedException();
+        }
+
+        void ICollection<TElement>.Clear()
+        {
+            throw new NotSupportedException();
+        }
+
+        bool ICollection<TElement>.Contains(TElement item)
+        {
+            return elements.Contains(item);
+        }
+
+        void ICollection<TElement>.CopyTo(TElement[] array, int arrayIndex)
+        {
+            elements.CopyTo(array, arrayIndex);
+        }
+
+        bool ICollection<TElement>.Remove(TElement item)
+        {
+            throw new NotSupportedException();
+        }
+
+        int IList<TElement>.IndexOf(TElement item)
+        {
+            return elements.IndexOf(item);
+        }
+
+        void IList<TElement>.Insert(int index, TElement item)
+        {
+            throw new NotSupportedException();
+        }
+
+        void IList<TElement>.RemoveAt(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        TElement IList<TElement>.this[int index]
+        {
+            get
             {
-                this.lookup = lookup;
-                this.Key = key;
+                if (index < 0 || index >= elements.Count)
+                {
+                    throw new ArgumentOutOfRangeException("index");
+                }
+
+                return elements[index];
             }
 
-            public IEnumerator<TElement> GetEnumerator()
+            set
             {
-                return lookup[Key].GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
+                throw new NotSupportedException();
             }
         }
 
-        class LookupCollection : ICollection<TElement>
+        internal int Serialize(ref byte[] bytes, int offset)
         {
-            readonly LookupSegment<TKey, TElement> lookup;
-            readonly int version;
-            readonly List<int> indexes;
+            var keyFormatter = Formatter<TKey>.Default;
+            var listFormatter = Formatter<IList<TElement>>.Default;
 
-            // TODO:this implements is very naive...
-            public LookupCollection(LookupSegment<TKey, TElement> lookup, TKey key)
-            {
-                var indexes = new List<int>();
-                foreach (var i in lookup.FindEntries(key))
-                {
-                    indexes.Add(i);
-                }
-                indexes.Reverse();
+            var initialOffset = offset;
 
-                this.indexes = indexes;
-                this.lookup = lookup;
-            }
+            offset += keyFormatter.Serialize(ref bytes, offset, key);
 
-            public int Count
-            {
-                get
-                {
-                    return indexes.Count;
-                }
-            }
+            BinaryUtil.WriteInt32(ref bytes, offset, hashCode);
+            offset += 4;
 
-            public bool IsReadOnly
-            {
-                get
-                {
-                    return true;
-                }
-            }
+            offset += listFormatter.Serialize(ref bytes, offset, elements);
 
-            public void Add(TElement item)
-            {
-                throw new NotSupportedException();
-            }
-
-            public void Clear()
-            {
-                throw new NotSupportedException();
-            }
-
-            public bool Contains(TElement item)
-            {
-                var comparer = EqualityComparer<TElement>.Default;
-                using (var e = this.GetEnumerator())
-                {
-                    while (e.MoveNext())
-                    {
-                        if (comparer.Equals(e.Current, item)) return true;
-                    }
-                }
-                return false;
-            }
-
-            public void CopyTo(TElement[] array, int arrayIndex)
-            {
-                for (int i = arrayIndex; i < indexes.Count; i++)
-                {
-                    array[i] = lookup.entriesValue[indexes[i]];
-                }
-            }
-
-            public IEnumerator<TElement> GetEnumerator()
-            {
-                for (int i = 0; i < indexes.Count; i++)
-                {
-                    yield return lookup.entriesValue[indexes[i]];
-                }
-            }
-
-            public bool Remove(TElement item)
-            {
-                throw new NotSupportedException();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            return offset - initialOffset;
         }
     }
 }

@@ -20,7 +20,8 @@ namespace ZeroFormatter.Segments
             get
             {
                 var array = originalBytes.Array;
-                return Formatters.Formatter<Nullable<T>>.Default.Deserialize(ref array, originalBytes.Offset);
+                int _;
+                return Formatters.Formatter<Nullable<T>>.Default.Deserialize(ref array, originalBytes.Offset, out _);
             }
             set
             {

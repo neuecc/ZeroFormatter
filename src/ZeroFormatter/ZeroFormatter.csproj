@@ -49,6 +49,7 @@
     <Compile Include="Collections\KeyTuple.cs" />
     <Compile Include="Collections\SlimLookup.cs" />
     <Compile Include="Collections\EnumEqualityComparer.cs" />
+    <Compile Include="Formatters\LookupFormatter.cs" />
     <Compile Include="Formatters\EnumFormatter.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

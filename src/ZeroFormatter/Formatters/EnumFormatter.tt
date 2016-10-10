@@ -53,8 +53,9 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.Write<#= t.Name #>(ref bytes, offset, serializeCast(value));
         }
 
-        public override T Deserialize(ref byte[] bytes, int offset)
+        public override T Deserialize(ref byte[] bytes, int offset, out int byteSize)
         {
+            byteSize = <#= tuple.Item2 #>;
             return deserializeCast(BinaryUtil.Read<#= t.Name #>(ref bytes, offset));
         }
     }
@@ -94,8 +95,9 @@ namespace ZeroFormatter.Formatters
             return <#= tuple.Item2 + 1 #>;
         }
 
-        public override T? Deserialize(ref byte[] bytes, int offset)
+        public override T? Deserialize(ref byte[] bytes, int offset, out int byteSize)
         {
+            byteSize = <#= tuple.Item2 + 1 #>;
             var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
             if (!hasValue) return null;
 

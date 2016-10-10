@@ -31,9 +31,9 @@ namespace ZeroFormatter.Formatters
             return dictionary.Serialize(ref bytes, offset);
         }
 
-        public override IDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset)
+        public override IDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, out int byteSize)
         {
-            return new DictionarySegment<TKey, TValue>(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0));
+            return DictionarySegment<TKey, TValue>.Create(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0), out byteSize);
         }
     }
 }
