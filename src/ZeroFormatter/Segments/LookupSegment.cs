@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ZeroFormatter.Collections;
+using ZeroFormatter.Comparers;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 

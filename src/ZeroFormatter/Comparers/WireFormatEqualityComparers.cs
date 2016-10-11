@@ -2,7 +2,7 @@
 using ZeroFormatter.Internal;
 using System.Collections.Generic;
 
-namespace ZeroFormatter.Collections
+namespace ZeroFormatter.Comparers
 {
     internal class BoolEqualityComparer : IEqualityComparer<bool>
     {

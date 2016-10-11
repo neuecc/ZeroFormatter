@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ZeroFormatter.Collections;
+using ZeroFormatter.Comparers;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 

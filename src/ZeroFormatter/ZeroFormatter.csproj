@@ -45,10 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes.cs" />
-    <Compile Include="Collections\WireFormatEqualityComparers.cs" />
-    <Compile Include="Collections\KeyTuple.cs" />
-    <Compile Include="Collections\SlimLookup.cs" />
-    <Compile Include="Collections\EnumEqualityComparer.cs" />
+    <Compile Include="Comparers\WireFormatEqualityComparers.cs" />
+    <Compile Include="KeyTuple.cs" />
+    <Compile Include="Comparers\EnumEqualityComparer.cs" />
     <Compile Include="Formatters\LookupFormatter.cs" />
     <Compile Include="Formatters\EnumFormatter.cs">
       <AutoGen>True</AutoGen>
@@ -68,7 +67,7 @@
     <Compile Include="Formatters\VariousFormatter.cs" />
     <Compile Include="Internal\BinaryUtil.cs" />
     <Compile Include="Internal\HashHelper.cs" />
-    <Compile Include="Collections\ZeroFormatterEqualityComparer.cs" />
+    <Compile Include="Comparers\ZeroFormatterEqualityComparer.cs" />
     <Compile Include="Internal\SR.cs" />
     <Compile Include="Internal\StringEncoding.cs" />
     <Compile Include="Segments\IZeroFormatterSegment.cs" />

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using ZeroFormatter.Collections;
+using ZeroFormatter.Comparers;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 

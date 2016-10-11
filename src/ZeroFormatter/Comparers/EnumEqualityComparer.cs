@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ZeroFormatter.Collections
+namespace ZeroFormatter.Comparers
 {
     // Note:This hack does not work in UnityEditor.
 

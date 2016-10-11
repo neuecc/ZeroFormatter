@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace ZeroFormatter.Collections
+namespace ZeroFormatter.Comparers
 {
     public static class ZeroFormatterEqualityComparer<T>
     {
