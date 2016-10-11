@@ -5,6 +5,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using ZeroFormatter.Collections;
+using ZeroFormatter.Formatters;
+using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Tests
@@ -82,6 +84,68 @@ namespace ZeroFormatter.Tests
             dict.OrderBy(x => x.Key).Select(x => Tuple.Create(x.Key, x.Value)).Is(
                 Tuple.Create(-1, "mainus one"),
                 Tuple.Create(9991, "hogehoge one"));
+        }
+
+        [TestMethod]
+        public void CollisionCheck()
+        {
+            Formatter<HashCollision>.Register(new TestFormatter());
+            ZeroFormatterEqualityComparer<HashCollision>.Register(new HashCollisionEqualityComparer());
+
+            var dict = new DictionarySegment<HashCollision, int>(new DirtyTracker(), 5);
+            dict.Add(new HashCollision(10, 999), 6);
+            dict.Add(new HashCollision(99, 999), 9);
+
+            dict[new HashCollision(10, 999)].Is(6);
+            dict[new HashCollision(99, 999)].Is(9);
+        }
+    }
+
+    public class HashCollision
+    {
+        public readonly int identifier;
+        public readonly int hashCode;
+
+        public HashCollision(int identifier, int hashCode)
+        {
+            this.identifier = identifier;
+            this.hashCode = hashCode;
+        }
+    }
+
+    public class TestFormatter : Formatter<HashCollision>
+    {
+        public override HashCollision Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        {
+            var a = BinaryUtil.ReadInt32(ref bytes, offset);
+            var b = BinaryUtil.ReadInt32(ref bytes, offset + 4);
+            byteSize = 8;
+            return new HashCollision(a, b);
+        }
+
+        public override int? GetLength()
+        {
+            return 8;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, HashCollision value)
+        {
+            BinaryUtil.WriteInt32(ref bytes, offset, value.identifier);
+            BinaryUtil.WriteInt32(ref bytes, offset, value.hashCode);
+            return 8;
+        }
+    }
+
+    public class HashCollisionEqualityComparer : IEqualityComparer<HashCollision>
+    {
+        public bool Equals(HashCollision x, HashCollision y)
+        {
+            return x.identifier.Equals(y.identifier);
+        }
+
+        public int GetHashCode(HashCollision obj)
+        {
+            return obj.hashCode.GetHashCode();
         }
     }
 }

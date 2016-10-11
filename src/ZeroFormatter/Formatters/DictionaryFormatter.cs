@@ -36,4 +36,23 @@ namespace ZeroFormatter.Formatters
             return DictionarySegment<TKey, TValue>.Create(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0), out byteSize);
         }
     }
+
+    internal class DictionaryEntryFormatter<TKey, TValue> : Formatter<DictionaryEntry<TKey, TValue>>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, DictionaryEntry<TKey, TValue> value)
+        {
+            return value.Serialize(ref bytes, offset);
+        }
+
+        public override DictionaryEntry<TKey, TValue> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        {
+            return DictionaryEntry.Create<TKey, TValue>(new ArraySegment<byte>(bytes, offset, 0), out byteSize);
+        }
+
+    }
 }

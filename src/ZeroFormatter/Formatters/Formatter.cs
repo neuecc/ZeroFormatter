@@ -10,7 +10,18 @@ namespace ZeroFormatter.Formatters
 
     public abstract class Formatter<T>
     {
-        public static Formatter<T> Default;
+        static Formatter<T> defaultFormatter;
+        public static Formatter<T> Default
+        {
+            get
+            {
+                return defaultFormatter;
+            }
+            private set
+            {
+                defaultFormatter = value;
+            }
+        }
 
         static Formatter()
         {
@@ -258,24 +269,32 @@ namespace ZeroFormatter.Formatters
             }
 
             // TODO:Dictionary, Lookup, KeyTuple...
-
-            else if (t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            else if (t.IsGenericType)
             {
-                var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(t.GetGenericArguments());
-                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
-            }
+                if (t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+                {
+                    var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                    formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                }
 
-            else if (t.GetGenericTypeDefinition() == typeof(ILookup<,>))
-            {
-                var formatterType = typeof(LookupFormatter<,>).MakeGenericType(t.GetGenericArguments());
-                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                else if (t.GetGenericTypeDefinition() == typeof(DictionaryEntry<,>))
+                {
+                    var formatterType = typeof(DictionaryEntryFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                    formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                }
 
-            }
+                else if (t.GetGenericTypeDefinition() == typeof(ILookup<,>))
+                {
+                    var formatterType = typeof(LookupFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                    formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
 
-            else if (t.GetGenericTypeDefinition() == typeof(GroupingSegment<,>))
-            {
-                var formatterType = typeof(GroupingSegmentFormatter<,>).MakeGenericType(t.GetGenericArguments());
-                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                }
+
+                else if (t.GetGenericTypeDefinition() == typeof(GroupingSegment<,>))
+                {
+                    var formatterType = typeof(GroupingSegmentFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                    formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                }
             }
 
             // TODO:make the object formatter...
@@ -284,18 +303,57 @@ namespace ZeroFormatter.Formatters
             {
                 throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[].");
             }
+
+
+
+
+
+
+
             else
             {
-                // TODO:more details exception message.
-                throw new InvalidOperationException("Type is not supported, please register,:" + t.Name);
+                formatter = new ErrorFormatter<T>();
             }
 
+
+
+
             Default = (Formatter<T>)formatter;
+        }
+
+        public static void Register(Formatter<T> formatter)
+        {
+            defaultFormatter = formatter;
         }
 
         public abstract int? GetLength();
 
         public abstract int Serialize(ref byte[] bytes, int offset, T value);
         public abstract T Deserialize(ref byte[] bytes, int offset, out int byteSize);
+    }
+
+    internal class ErrorFormatter<T> : Formatter<T>
+    {
+        readonly Exception exception;
+
+        public ErrorFormatter()
+        {
+            this.exception = new InvalidOperationException("Type is not supported, please register,:" + typeof(T).Name);
+        }
+
+        public override T Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        {
+            throw exception;
+        }
+
+        public override int? GetLength()
+        {
+            throw exception;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, T value)
+        {
+            throw exception;
+        }
     }
 }

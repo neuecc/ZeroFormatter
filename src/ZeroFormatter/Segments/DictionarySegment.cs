@@ -8,7 +8,7 @@ using ZeroFormatter.Internal;
 namespace ZeroFormatter.Segments
 {
     // [int byteSize][int count]
-    // [IList<int> buckets][List<int> entriesHashCode][IList<int> entriesNext][IList<TKey> entriesKey][IList<TValue> entriesValue]
+    // [IList<int> buckets][List<DictionaryEntry> entries]
 
     // TODO:ReadOnlyDictionary?
     public sealed class DictionarySegment<TKey, TValue> : IDictionary<TKey, TValue>
@@ -17,11 +17,7 @@ namespace ZeroFormatter.Segments
 
         int count;
         IList<int> buckets; // link index of first entry. empty is -1.
-
-        IList<int> entriesHashCode;
-        IList<int> entriesNext;
-        IList<TKey> entriesKey;
-        IList<TValue> entriesValue;
+        IList<DictionaryEntry<TKey, TValue>> entries;
 
         #endregion
 
@@ -45,16 +41,8 @@ namespace ZeroFormatter.Segments
             this.buckets = new FixedListSegment<int>(tracker, size);
             for (int i = 0; i < buckets.Count; i++) buckets[i] = -1;
 
-            this.entriesHashCode = new FixedListSegment<int>(tracker, size);
-            this.entriesNext = new FixedListSegment<int>(tracker, size);
-            this.entriesKey = (Formatter<TKey>.Default.GetLength() == null)
-                ? (IList<TKey>)new VariableListSegment<TKey>(tracker, size)
-                : (IList<TKey>)new FixedListSegment<TKey>(tracker, size);
-            this.entriesValue = (Formatter<TValue>.Default.GetLength() == null)
-                ? (IList<TValue>)new VariableListSegment<TValue>(tracker, size)
-                : (IList<TValue>)new FixedListSegment<TValue>(tracker, size);
-
-            this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
+            this.entries = new VariableListSegment<DictionaryEntry<TKey, TValue>>(tracker, size);
+            this.comparer = ZeroFormatterEqualityComparer<TKey>.Default;
 
             this.freeList = -1;
             this.freeCount = 0;
@@ -77,23 +65,13 @@ namespace ZeroFormatter.Segments
             offset += 4;
 
             var intListFormatter = Formatter<IList<int>>.Default;
-            var keyListFormatter = Formatter<IList<TKey>>.Default;
-            var valueListFormatter = Formatter<IList<TValue>>.Default;
+            var entryListFormatter = Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default;
 
             int size;
             this.buckets = intListFormatter.Deserialize(ref bytes, offset, out size);
             offset += size;
 
-            this.entriesHashCode = intListFormatter.Deserialize(ref bytes, offset, out size);
-            offset += size;
-
-            this.entriesNext = intListFormatter.Deserialize(ref bytes, offset, out size);
-            offset += size;
-
-            this.entriesKey = keyListFormatter.Deserialize(ref bytes, offset, out size);
-            offset += size;
-
-            this.entriesValue = valueListFormatter.Deserialize(ref bytes, offset, out size);
+            this.entries = entryListFormatter.Deserialize(ref bytes, offset, out size);
             offset += size;
 
             // new size
@@ -103,7 +81,7 @@ namespace ZeroFormatter.Segments
                 Resize(capacity);
             }
 
-            this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
+            this.comparer = ZeroFormatterEqualityComparer<TKey>.Default;
 
             this.freeList = -1;
             this.freeCount = 0;
@@ -135,7 +113,7 @@ namespace ZeroFormatter.Segments
             get
             {
                 int i = FindEntry(key);
-                if (i >= 0) return entriesValue[i];
+                if (i >= 0) return entries[i].Value;
                 throw new KeyNotFoundException();
             }
             set
@@ -157,7 +135,7 @@ namespace ZeroFormatter.Segments
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)
         {
             int i = FindEntry(keyValuePair.Key);
-            if (i >= 0 && EqualityComparer<TValue>.Default.Equals(entriesValue[i], keyValuePair.Value))
+            if (i >= 0 && EqualityComparer<TValue>.Default.Equals(entries[i].Value, keyValuePair.Value))
             {
                 return true;
             }
@@ -167,7 +145,7 @@ namespace ZeroFormatter.Segments
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> keyValuePair)
         {
             int i = FindEntry(keyValuePair.Key);
-            if (i >= 0 && EqualityComparer<TValue>.Default.Equals(entriesValue[i], keyValuePair.Value))
+            if (i >= 0 && EqualityComparer<TValue>.Default.Equals(entries[i].Value, keyValuePair.Value))
             {
                 Remove(keyValuePair.Key);
                 return true;
@@ -180,10 +158,7 @@ namespace ZeroFormatter.Segments
             if (count > 0)
             {
                 for (int i = 0; i < buckets.Count; i++) buckets[i] = -1;
-                entriesHashCode.Clear();
-                entriesKey.Clear();
-                entriesNext.Clear();
-                entriesValue.Clear();
+                entries.Clear();
 
                 freeList = -1;
                 count = 0;
@@ -202,7 +177,7 @@ namespace ZeroFormatter.Segments
             {
                 for (int i = 0; i < count; i++)
                 {
-                    if (entriesHashCode[i] >= 0 && entriesValue[i] == null) return true;
+                    if (entries[i].HashCode >= 0 && entries[i].Value == null) return true;
                 }
             }
             else
@@ -210,7 +185,7 @@ namespace ZeroFormatter.Segments
                 EqualityComparer<TValue> c = EqualityComparer<TValue>.Default;
                 for (int i = 0; i < count; i++)
                 {
-                    if (entriesHashCode[i] >= 0 && c.Equals(entriesValue[i], value)) return true;
+                    if (entries[i].HashCode >= 0 && c.Equals(entries[i].Value, value)) return true;
                 }
             }
             return false;
@@ -236,9 +211,9 @@ namespace ZeroFormatter.Segments
             int count = this.count;
             for (int i = 0; i < count; i++)
             {
-                if (entriesHashCode[i] >= 0)
+                if (entries[i].HashCode >= 0)
                 {
-                    array[index++] = new KeyValuePair<TKey, TValue>(entriesKey[i], entriesValue[i]);
+                    array[index++] = new KeyValuePair<TKey, TValue>(entries[i].Key, entries[i].Value);
                 }
             }
         }
@@ -250,9 +225,9 @@ namespace ZeroFormatter.Segments
             if (buckets != null)
             {
                 int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
-                for (int i = buckets[hashCode % buckets.Count]; i >= 0; i = entriesNext[i])
+                for (int i = buckets[hashCode % buckets.Count]; i >= 0; i = entries[i].Next)
                 {
-                    if (entriesHashCode[i] == hashCode && comparer.Equals(entriesKey[i], key)) return i;
+                    if (entries[i].HashCode == hashCode && comparer.Equals(entries[i].Key, key)) return i;
                 }
             }
 
@@ -268,22 +243,21 @@ namespace ZeroFormatter.Segments
                 int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
                 int bucket = hashCode % buckets.Count;
                 int last = -1;
-                for (int i = buckets[bucket]; i >= 0; last = i, i = entriesNext[i])
+                for (int i = buckets[bucket]; i >= 0; last = i, i = entries[i].Next)
                 {
-                    if (entriesHashCode[i] == hashCode && comparer.Equals(entriesKey[i], key))
+                    if (entries[i].HashCode == hashCode && comparer.Equals(entries[i].Key, key))
                     {
                         if (last < 0)
                         {
-                            buckets[bucket] = entriesNext[i];
+                            buckets[bucket] = entries[i].Next;
                         }
                         else
                         {
-                            entriesNext[last] = entriesNext[i];
+                            // entries[last].next = entries[i].next;
+                            entries[last] = entries[last].WithNext(entries[i].Next);
                         }
-                        entriesHashCode[i] = -1;
-                        entriesNext[i] = freeList;
-                        entriesKey[i] = default(TKey);
-                        entriesValue[i] = default(TValue);
+
+                        entries[i] = new DictionaryEntry<TKey, TValue>(-1, freeList, default(TKey), default(TValue));
                         freeList = i;
                         freeCount++;
                         return true;
@@ -298,7 +272,7 @@ namespace ZeroFormatter.Segments
             int i = FindEntry(key);
             if (i >= 0)
             {
-                value = entriesValue[i];
+                value = entries[i].Value;
                 return true;
             }
             value = default(TValue);
@@ -320,9 +294,9 @@ namespace ZeroFormatter.Segments
             var index = 0;
             while ((uint)index < (uint)count)
             {
-                if (entriesHashCode[index] >= 0)
+                if (entries[index].HashCode >= 0)
                 {
-                    yield return new KeyValuePair<TKey, TValue>(entriesKey[index], entriesValue[index]);
+                    yield return new KeyValuePair<TKey, TValue>(entries[index].Key, entries[index].Value);
                     index++;
                 }
                 else
@@ -351,15 +325,16 @@ namespace ZeroFormatter.Segments
             int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
             int targetBucket = hashCode % buckets.Count;
 
-            for (int i = buckets[targetBucket]; i >= 0; i = entriesNext[i])
+            for (int i = buckets[targetBucket]; i >= 0; i = entries[i].Next)
             {
-                if (entriesHashCode[i] == hashCode && comparer.Equals(entriesKey[i], key))
+                if (entries[i].HashCode == hashCode && comparer.Equals(entries[i].Key, key))
                 {
                     if (add)
                     {
                         throw new ArgumentException(SR.Format(SR.Argument_AddingDuplicate, key));
                     }
-                    entriesValue[i] = value;
+                    // entries[i].Value = value;
+                    entries[i] = entries[i].WithValue(value);
                     return;
                 }
             }
@@ -369,12 +344,12 @@ namespace ZeroFormatter.Segments
             if (freeCount > 0)
             {
                 index = freeList;
-                freeList = entriesNext[index];
+                freeList = entries[index].Next;
                 freeCount--;
             }
             else
             {
-                if (count == entriesHashCode.Count)
+                if (count == entries.Count)
                 {
                     Resize();
                     targetBucket = hashCode % buckets.Count;
@@ -383,10 +358,7 @@ namespace ZeroFormatter.Segments
                 count++;
             }
 
-            entriesHashCode[index] = hashCode;
-            entriesNext[index] = buckets[targetBucket];
-            entriesKey[index] = key;
-            entriesValue[index] = value;
+            entries[index] = new DictionaryEntry<TKey, TValue>(hashCode, buckets[targetBucket], key, value);
             buckets[targetBucket] = index;
         }
 
@@ -400,27 +372,21 @@ namespace ZeroFormatter.Segments
             IList<int> newBuckets = new FixedListSegment<int>(tracker, newSize);
             for (int i = 0; i < newBuckets.Count; i++) newBuckets[i] = -1;
 
-            var newEntriesKey = (entriesKey as ListSegment<TKey>).Clone(tracker, newSize);
-            var newEntriesValue = (entriesValue as ListSegment<TValue>).Clone(tracker, newSize);
-            var newEntriesHashCode = (entriesHashCode as ListSegment<int>).Clone(tracker, newSize);
-            var newEntriesNext = (entriesNext as ListSegment<int>).Clone(tracker, newSize);
+            var newEntries = (entries as ListSegment<DictionaryEntry<TKey, TValue>>).Clone(tracker, newSize);
 
             for (int i = 0; i < count; i++)
             {
-                if (newEntriesHashCode[i] >= 0)
+                if (newEntries[i].HashCode >= 0)
                 {
-                    int bucket = newEntriesHashCode[i] % newSize;
-                    newEntriesNext[i] = newBuckets[bucket];
+                    int bucket = newEntries[i].HashCode % newSize;
+                    // newEntries[i].Next = newBuckets[bucket];
+                    newEntries[i] = newEntries[i].WithNext(newBuckets[bucket]);
                     newBuckets[bucket] = i;
                 }
             }
 
             buckets = newBuckets;
-
-            entriesKey = newEntriesKey;
-            entriesValue = newEntriesValue;
-            entriesHashCode = newEntriesHashCode;
-            entriesNext = newEntriesNext;
+            entries = newEntries;
         }
 
         public int Serialize(ref byte[] bytes, int offset)
@@ -429,8 +395,7 @@ namespace ZeroFormatter.Segments
             Resize(count);
 
             var intListFormatter = Formatter<IList<int>>.Default;
-            var keyListFormatter = Formatter<IList<TKey>>.Default;
-            var valueListFormatter = Formatter<IList<TValue>>.Default;
+            var entryListFormatter = Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default;
 
             var startOffset = offset;
 
@@ -439,15 +404,77 @@ namespace ZeroFormatter.Segments
             offset += 4;
 
             offset += intListFormatter.Serialize(ref bytes, offset, buckets);
-            offset += intListFormatter.Serialize(ref bytes, offset, entriesHashCode);
-            offset += intListFormatter.Serialize(ref bytes, offset, entriesNext);
-            offset += keyListFormatter.Serialize(ref bytes, offset, entriesKey);
-            offset += valueListFormatter.Serialize(ref bytes, offset, entriesValue);
+            offset += entryListFormatter.Serialize(ref bytes, offset, entries);
 
             var totalBytes = offset - startOffset;
             BinaryUtil.WriteInt32(ref bytes, startOffset, totalBytes);
 
             return totalBytes;
+        }
+    }
+
+    public static class DictionaryEntry
+    {
+        // deserialize immediate:)
+        public static DictionaryEntry<TKey, TValue> Create<TKey, TValue>(ArraySegment<byte> bytes, out int byteSize)
+        {
+            var array = bytes.Array;
+            var offset = bytes.Offset;
+            byteSize = 0;
+
+            var hashCode = BinaryUtil.ReadInt32(ref array, offset);
+            offset += 4;
+            byteSize += 4;
+
+            var next = BinaryUtil.ReadInt32(ref array, offset);
+            offset += 4;
+            byteSize += 4;
+
+            int size;
+            var key = Formatter<TKey>.Default.Deserialize(ref array, offset, out size);
+            offset += size;
+            byteSize += size;
+
+            var value = Formatter<TValue>.Default.Deserialize(ref array, offset, out size);
+            byteSize += size;
+
+            return new DictionaryEntry<TKey, TValue>(hashCode, next, key, value);
+        }
+    }
+
+    public struct DictionaryEntry<TKey, TValue>
+    {
+        public readonly int HashCode;
+        public readonly int Next;
+        public readonly TKey Key;
+        public readonly TValue Value;
+
+        public DictionaryEntry(int hashCode, int next, TKey key, TValue value)
+        {
+            this.HashCode = hashCode;
+            this.Next = next;
+            this.Key = key;
+            this.Value = value;
+        }
+
+        public DictionaryEntry<TKey, TValue> WithNext(int next)
+        {
+            return new DictionaryEntry<TKey, TValue>(this.HashCode, next, this.Key, this.Value);
+        }
+
+        public DictionaryEntry<TKey, TValue> WithValue(TValue value)
+        {
+            return new DictionaryEntry<TKey, TValue>(this.HashCode, this.Next, this.Key, value);
+        }
+
+        public int Serialize(ref byte[] bytes, int offset)
+        {
+            var size = 0;
+            size += BinaryUtil.WriteInt32(ref bytes, offset, HashCode);
+            size += BinaryUtil.WriteInt32(ref bytes, offset + size, Next);
+            size += Formatter<TKey>.Default.Serialize(ref bytes, offset + size, Key);
+            size += Formatter<TValue>.Default.Serialize(ref bytes, offset + size, Value);
+            return size;
         }
     }
 }

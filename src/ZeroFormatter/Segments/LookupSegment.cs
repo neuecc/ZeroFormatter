@@ -24,7 +24,7 @@ namespace ZeroFormatter.Segments
 
         public LookupSegment(ILookup<TKey, TElement> source)
         {
-            this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
+            this.comparer = ZeroFormatterEqualityComparer<TKey>.Default;
             this.groupings = new List<IList<GroupingSegment<TKey, TElement>>>(source.Count);
             for (int i = 0; i < source.Count; i++)
             {
@@ -60,7 +60,7 @@ namespace ZeroFormatter.Segments
 
         LookupSegment()
         {
-            this.comparer = ZeroFormatterEqualityComparer.GetDefault<TKey>();
+            this.comparer = ZeroFormatterEqualityComparer<TKey>.Default;
         }
 
         public int Count
