@@ -268,7 +268,6 @@ namespace ZeroFormatter.Formatters
                 }
             }
 
-            // TODO:Dictionary, Lookup, KeyTuple...
             else if (t.IsGenericType)
             {
                 if (t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
@@ -295,6 +294,44 @@ namespace ZeroFormatter.Formatters
                     var formatterType = typeof(GroupingSegmentFormatter<,>).MakeGenericType(t.GetGenericArguments());
                     formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                 }
+
+                else if (t.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
+                {
+                    Type tupleFormatterType = null;
+                    switch (t.GetGenericArguments().Length)
+                    {
+                        case 1:
+                            tupleFormatterType = typeof(KeyTupleFormatter<>);
+                            break;
+                        case 2:
+                            tupleFormatterType = typeof(KeyTupleFormatter<,>);
+                            break;
+                        case 3:
+                            tupleFormatterType = typeof(KeyTupleFormatter<,,>);
+                            break;
+                        case 4:
+                            tupleFormatterType = typeof(KeyTupleFormatter<,,,>);
+                            break;
+                        case 5:
+                            tupleFormatterType = typeof(KeyTupleFormatter<,,,,>);
+                            break;
+                        case 6:
+                            tupleFormatterType = typeof(KeyTupleFormatter<,,,,,>);
+                            break;
+                        case 7:
+                            tupleFormatterType = typeof(KeyTupleFormatter<,,,,,,>);
+                            break;
+                        case 8:
+                            tupleFormatterType = typeof(KeyTupleFormatter<,,,,,,,>);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    var formatterType = tupleFormatterType.MakeGenericType(t.GetGenericArguments());
+                    formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                }
+
             }
 
             // TODO:make the object formatter...

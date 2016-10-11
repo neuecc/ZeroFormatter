@@ -55,6 +55,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ChainingAssertion.MSTest.cs" />
+    <Compile Include="KeyTupleFormatterTest.cs" />
     <Compile Include="DictionarySegmentTest.cs" />
     <Compile Include="FormatterTest.cs" />
     <Compile Include="DictionaryFormatterTest.cs" />

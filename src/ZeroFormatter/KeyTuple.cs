@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-
-// TODO:Repalce equality comparer
+using ZeroFormatter.Comparers;
 
 namespace ZeroFormatter
 {
@@ -98,24 +97,6 @@ namespace ZeroFormatter
         }
     }
 
-    public partial class KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>
-    {
-        public KeyTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, TRest rest)
-        {
-            this.item1 = item1;
-            this.item2 = item2;
-            this.item3 = item3;
-            this.item4 = item4;
-            this.item5 = item5;
-            this.item6 = item6;
-            this.item7 = item7;
-            this.rest = rest;
-
-            if (!(rest is IKeyTuple))
-                throw new ArgumentException("rest", "The last element of an eight element tuple must be a Tuple.");
-        }
-    }
-
     [Serializable]
     public struct KeyTuple<T1> : IStructuralEquatable, IStructuralComparable, IComparable, IKeyTuple, IEquatable<KeyTuple<T1>>
     {
@@ -163,7 +144,7 @@ namespace ZeroFormatter
 
         public override int GetHashCode()
         {
-            return EqualityComparer<T1>.Default.GetHashCode(item1);
+            return ZeroFormatterEqualityComparer<T1>.Default.GetHashCode(item1);
         }
 
         int IStructuralEquatable.GetHashCode(IEqualityComparer comparer)
@@ -183,7 +164,7 @@ namespace ZeroFormatter
 
         public bool Equals(KeyTuple<T1> other)
         {
-            return EqualityComparer<T1>.Default.Equals(item1, other.item1);
+            return ZeroFormatterEqualityComparer<T1>.Default.Equals(item1, other.item1);
         }
     }
 
@@ -245,8 +226,8 @@ namespace ZeroFormatter
 
         public override int GetHashCode()
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
 
             int h0;
             h0 = comparer1.GetHashCode(item1);
@@ -274,8 +255,8 @@ namespace ZeroFormatter
 
         public bool Equals(KeyTuple<T1, T2> other)
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
 
             return comparer1.Equals(item1, other.item1) &&
                 comparer2.Equals(item2, other.item2);
@@ -350,9 +331,9 @@ namespace ZeroFormatter
 
         public override int GetHashCode()
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
 
             int h0;
             h0 = comparer1.GetHashCode(item1);
@@ -382,9 +363,9 @@ namespace ZeroFormatter
 
         public bool Equals(KeyTuple<T1, T2, T3> other)
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
 
             return comparer1.Equals(item1, other.item1) &&
                 comparer2.Equals(item2, other.item2) &&
@@ -470,10 +451,10 @@ namespace ZeroFormatter
 
         public override int GetHashCode()
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
 
             int h0, h1;
             h0 = comparer1.GetHashCode(item1);
@@ -507,10 +488,10 @@ namespace ZeroFormatter
 
         public bool Equals(KeyTuple<T1, T2, T3, T4> other)
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
 
             return comparer1.Equals(item1, other.item1) &&
                 comparer2.Equals(item2, other.item2) &&
@@ -607,11 +588,11 @@ namespace ZeroFormatter
 
         public override int GetHashCode()
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
-            var comparer5 = EqualityComparer<T5>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
+            var comparer5 = ZeroFormatterEqualityComparer<T5>.Default;
 
             int h0, h1;
             h0 = comparer1.GetHashCode(item1);
@@ -647,11 +628,11 @@ namespace ZeroFormatter
 
         public bool Equals(KeyTuple<T1, T2, T3, T4, T5> other)
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
-            var comparer5 = EqualityComparer<T5>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
+            var comparer5 = ZeroFormatterEqualityComparer<T5>.Default;
 
             return comparer1.Equals(item1, other.Item1) &&
                 comparer2.Equals(item2, other.Item2) &&
@@ -759,12 +740,12 @@ namespace ZeroFormatter
 
         public override int GetHashCode()
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
-            var comparer5 = EqualityComparer<T5>.Default;
-            var comparer6 = EqualityComparer<T6>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
+            var comparer5 = ZeroFormatterEqualityComparer<T5>.Default;
+            var comparer6 = ZeroFormatterEqualityComparer<T6>.Default;
 
             int h0, h1;
             h0 = comparer1.GetHashCode(item1);
@@ -804,12 +785,12 @@ namespace ZeroFormatter
 
         public bool Equals(KeyTuple<T1, T2, T3, T4, T5, T6> other)
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
-            var comparer5 = EqualityComparer<T5>.Default;
-            var comparer6 = EqualityComparer<T6>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
+            var comparer5 = ZeroFormatterEqualityComparer<T5>.Default;
+            var comparer6 = ZeroFormatterEqualityComparer<T6>.Default;
 
             return comparer1.Equals(item1, other.Item1) &&
                 comparer2.Equals(item2, other.Item2) &&
@@ -928,13 +909,13 @@ namespace ZeroFormatter
 
         public override int GetHashCode()
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
-            var comparer5 = EqualityComparer<T5>.Default;
-            var comparer6 = EqualityComparer<T6>.Default;
-            var comparer7 = EqualityComparer<T7>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
+            var comparer5 = ZeroFormatterEqualityComparer<T5>.Default;
+            var comparer6 = ZeroFormatterEqualityComparer<T6>.Default;
+            var comparer7 = ZeroFormatterEqualityComparer<T7>.Default;
 
             int h0, h1;
             h0 = comparer1.GetHashCode(item1);
@@ -976,13 +957,13 @@ namespace ZeroFormatter
 
         public bool Equals(KeyTuple<T1, T2, T3, T4, T5, T6, T7> other)
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
-            var comparer5 = EqualityComparer<T5>.Default;
-            var comparer6 = EqualityComparer<T6>.Default;
-            var comparer7 = EqualityComparer<T7>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
+            var comparer5 = ZeroFormatterEqualityComparer<T5>.Default;
+            var comparer6 = ZeroFormatterEqualityComparer<T6>.Default;
+            var comparer7 = ZeroFormatterEqualityComparer<T7>.Default;
 
             return comparer1.Equals(item1, other.Item1) &&
                 comparer2.Equals(item2, other.Item2) &&
@@ -995,7 +976,9 @@ namespace ZeroFormatter
     }
 
     [Serializable]
-    public partial class KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest> : IStructuralEquatable, IStructuralComparable, IComparable, IKeyTuple, IEquatable<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
+    public struct KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest> : IStructuralEquatable, IStructuralComparable, IComparable, IKeyTuple,
+        IEquatable<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
+        where TRest : struct
     {
         T1 item1;
         T2 item2;
@@ -1005,6 +988,21 @@ namespace ZeroFormatter
         T6 item6;
         T7 item7;
         TRest rest;
+
+        public KeyTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, TRest rest)
+        {
+            this.item1 = item1;
+            this.item2 = item2;
+            this.item3 = item3;
+            this.item4 = item4;
+            this.item5 = item5;
+            this.item6 = item6;
+            this.item7 = item7;
+            this.rest = rest;
+
+            if (!(rest is IKeyTuple))
+                throw new ArgumentException("rest", "The last element of an eight element tuple must be a Tuple.");
+        }
 
         public T1 Item1
         {
@@ -1100,14 +1098,14 @@ namespace ZeroFormatter
 
         public override int GetHashCode()
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
-            var comparer5 = EqualityComparer<T5>.Default;
-            var comparer6 = EqualityComparer<T6>.Default;
-            var comparer7 = EqualityComparer<T7>.Default;
-            var comparer8 = EqualityComparer<TRest>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
+            var comparer5 = ZeroFormatterEqualityComparer<T5>.Default;
+            var comparer6 = ZeroFormatterEqualityComparer<T6>.Default;
+            var comparer7 = ZeroFormatterEqualityComparer<T7>.Default;
+            var comparer8 = ZeroFormatterEqualityComparer<TRest>.Default;
 
             int h0, h1, h2;
             h0 = comparer1.GetHashCode(item1);
@@ -1153,14 +1151,14 @@ namespace ZeroFormatter
 
         public bool Equals(KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest> other)
         {
-            var comparer1 = EqualityComparer<T1>.Default;
-            var comparer2 = EqualityComparer<T2>.Default;
-            var comparer3 = EqualityComparer<T3>.Default;
-            var comparer4 = EqualityComparer<T4>.Default;
-            var comparer5 = EqualityComparer<T5>.Default;
-            var comparer6 = EqualityComparer<T6>.Default;
-            var comparer7 = EqualityComparer<T7>.Default;
-            var comparer8 = EqualityComparer<TRest>.Default;
+            var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
+            var comparer2 = ZeroFormatterEqualityComparer<T2>.Default;
+            var comparer3 = ZeroFormatterEqualityComparer<T3>.Default;
+            var comparer4 = ZeroFormatterEqualityComparer<T4>.Default;
+            var comparer5 = ZeroFormatterEqualityComparer<T5>.Default;
+            var comparer6 = ZeroFormatterEqualityComparer<T6>.Default;
+            var comparer7 = ZeroFormatterEqualityComparer<T7>.Default;
+            var comparer8 = ZeroFormatterEqualityComparer<TRest>.Default;
 
             return comparer1.Equals(item1, other.Item1) &&
                 comparer2.Equals(item2, other.Item2) &&

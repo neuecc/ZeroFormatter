@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -81,6 +82,10 @@ namespace ZeroFormatter.Comparers
             else if (t.IsEnum)
             {
                 comparer = EnumEqualityComparer<T>.Default;
+            }
+            else if (t.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
+            {
+                comparer = EqualityComparer<T>.Default; // IKeyTuple implements safe EqualityComaprer
             }
             else
             {

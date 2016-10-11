@@ -46,6 +46,11 @@
   <ItemGroup>
     <Compile Include="Attributes.cs" />
     <Compile Include="Comparers\WireFormatEqualityComparers.cs" />
+    <Compile Include="Formatters\KeyTupleFormatter.cs">
+      <DependentUpon>KeyTupleFormatter.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="KeyTuple.cs" />
     <Compile Include="Comparers\EnumEqualityComparer.cs" />
     <Compile Include="Formatters\LookupFormatter.cs" />
@@ -64,7 +69,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PrimitiveFormatter.tt</DependentUpon>
     </Compile>
-    <Compile Include="Formatters\VariousFormatter.cs" />
+    <Compile Include="Formatters\StringCharFormatter.cs" />
     <Compile Include="Internal\BinaryUtil.cs" />
     <Compile Include="Internal\HashHelper.cs" />
     <Compile Include="Comparers\ZeroFormatterEqualityComparer.cs" />
@@ -83,6 +88,10 @@
     <Compile Include="ZeroFormatter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Formatters\KeyTupleFormatter.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>KeyTupleFormatter.cs</LastGenOutput>
+    </Content>
     <Content Include="Formatters\EnumFormatter.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>EnumFormatter.cs</LastGenOutput>
