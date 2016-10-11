@@ -48,11 +48,10 @@ namespace ZeroFormatter.Segments
             this.freeCount = 0;
         }
 
-        internal static DictionarySegment<TKey, TValue> Create(DirtyTracker tracker, ArraySegment<byte> originalBytes, out int byteSize)
+        internal static DictionarySegment<TKey, TValue> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
-            var array = originalBytes.Array;
-            byteSize = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
-            return new DictionarySegment<TKey, TValue>(tracker, originalBytes);
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            return new DictionarySegment<TKey, TValue>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
         }
 
         DictionarySegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
@@ -416,26 +415,24 @@ namespace ZeroFormatter.Segments
     public static class DictionaryEntry
     {
         // deserialize immediate:)
-        public static DictionaryEntry<TKey, TValue> Create<TKey, TValue>(ArraySegment<byte> bytes, DirtyTracker tracker, out int byteSize)
+        public static DictionaryEntry<TKey, TValue> Create<TKey, TValue>(byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            var array = bytes.Array;
-            var offset = bytes.Offset;
             byteSize = 0;
 
-            var hashCode = BinaryUtil.ReadInt32(ref array, offset);
+            var hashCode = BinaryUtil.ReadInt32(ref bytes, offset);
             offset += 4;
             byteSize += 4;
 
-            var next = BinaryUtil.ReadInt32(ref array, offset);
+            var next = BinaryUtil.ReadInt32(ref bytes, offset);
             offset += 4;
             byteSize += 4;
 
             int size;
-            var key = Formatter<TKey>.Default.Deserialize(ref array, offset, tracker, out size);
+            var key = Formatter<TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
-            var value = Formatter<TValue>.Default.Deserialize(ref array, offset, tracker, out size);
+            var value = Formatter<TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
             byteSize += size;
 
             return new DictionaryEntry<TKey, TValue>(hashCode, next, key, value);

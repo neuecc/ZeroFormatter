@@ -266,21 +266,14 @@ namespace ZeroFormatter.Internal
             return (ulong)((int)bytes[offset + 4] | (int)bytes[offset + 5] << 8 | (int)bytes[offset + 6] << 16 | (int)bytes[offset + 7] << 24) << 32 | (ulong)num;
         }
 
-        [ThreadStatic]
-        static char[] charPool = new char[1];
-
         public static int WriteChar(ref byte[] bytes, int offset, char value)
         {
-            var ensureSize = StringEncoding.UTF8.GetMaxByteCount(1);
-            EnsureCapacity(ref bytes, offset, ensureSize);
-
-            charPool[0] = value;
-            return StringEncoding.UTF8.GetBytes(charPool, 0, 1, bytes, offset);
+            return WriteUInt16(ref bytes, offset, (ushort)value);
         }
 
-        public static char ReadChar(ref byte[] bytes, int offset, int count)
+        public static char ReadChar(ref byte[] bytes, int offset)
         {
-            return StringEncoding.UTF8.GetChars(bytes, offset, count)[0];
+            return (char)ReadUInt16(ref bytes, offset);
         }
 
         public static int WriteString(ref byte[] bytes, int offset, string value)

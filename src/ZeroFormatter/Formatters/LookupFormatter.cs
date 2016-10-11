@@ -29,7 +29,7 @@ namespace ZeroFormatter.Formatters
 
         public override ILookup<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            return LookupSegment<TKey, TValue>.Create(new ArraySegment<byte>(bytes, offset, 0), tracker, out byteSize);
+            return LookupSegment<TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
         }
     }
 
@@ -47,7 +47,7 @@ namespace ZeroFormatter.Formatters
 
         public override GroupingSegment<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            return GroupingSegment<TKey, TValue>.Create(new ArraySegment<byte>(bytes, offset, 0), tracker, out byteSize);
+            return GroupingSegment<TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
         }
     }
 }

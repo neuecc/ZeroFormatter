@@ -23,7 +23,7 @@ namespace ZeroFormatter.Tests
             var actual = ms.ToArray();
             var tracker = new DirtyTracker();
             tracker.IsDirty.IsFalse();
-            var segment = new StringSegment(tracker, new ArraySegment<byte>(actual));
+            var segment = new CacheSegment<string>(tracker, new ArraySegment<byte>(actual));
 
             segment.Value = "あいうえおかきくけこ";
             tracker.IsDirty.IsTrue();

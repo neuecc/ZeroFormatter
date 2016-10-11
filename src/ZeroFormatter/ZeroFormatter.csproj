@@ -69,7 +69,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PrimitiveFormatter.tt</DependentUpon>
     </Compile>
-    <Compile Include="Formatters\StringCharFormatter.cs" />
+    <Compile Include="Formatters\StringFormatter.cs" />
     <Compile Include="Internal\BinaryUtil.cs" />
     <Compile Include="Internal\HashHelper.cs" />
     <Compile Include="Comparers\ZeroFormatterEqualityComparer.cs" />
@@ -79,11 +79,10 @@
     <Compile Include="Segments\DictionarySegment.cs" />
     <Compile Include="Segments\LookupSegment.cs" />
     <Compile Include="Segments\ListSegment.cs" />
-    <Compile Include="Segments\NullableSegment.cs" />
+    <Compile Include="Segments\CacheSegment.cs" />
     <Compile Include="Segments\DynamicObjectSegment.cs" />
     <Compile Include="Segments\ObjectTracker.cs" />
     <Compile Include="Segments\SegmentState.cs" />
-    <Compile Include="Segments\StringSegment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZeroFormatter.cs" />
   </ItemGroup>

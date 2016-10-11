@@ -32,22 +32,24 @@ namespace ZeroFormatter.Tests
     {
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
+        readonly int __lastIndex;
 
         // generated mutable segements
-        readonly StringSegment _lastName;
-        readonly StringSegment _firstName;
+        readonly CacheSegment<string> _lastName;
+        readonly CacheSegment<string> _firstName;
 
         public override int Age
         {
             get
             {
                 var array = __originalBytes.Array;
-                return BinaryUtil.ReadInt32(ref array, ObjectSegmentHelper.GetOffset(__originalBytes, 0));
+                int _;
+                return Formatter<int>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(__originalBytes, 0), __tracker, out _);
             }
             set
             {
                 var array = __originalBytes.Array;
-                BinaryUtil.WriteInt32(ref array, ObjectSegmentHelper.GetOffset(__originalBytes, 0), value);
+                Formatter<int>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(__originalBytes, 0), value);
             }
         }
 
@@ -82,13 +84,13 @@ namespace ZeroFormatter.Tests
             get
             {
                 var array = __originalBytes.Array;
-                return BinaryUtil.ReadInt32(ref array, ObjectSegmentHelper.GetOffset(__originalBytes, 3));
+                int _;
+                return Formatter<int>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(__originalBytes, 3), __tracker, out _);
             }
-
             protected set
             {
                 var array = __originalBytes.Array;
-                BinaryUtil.WriteInt32(ref array, ObjectSegmentHelper.GetOffset(__originalBytes, 3), value);
+                Formatter<int>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(__originalBytes, 3), value);
             }
         }
 
@@ -97,10 +99,11 @@ namespace ZeroFormatter.Tests
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
             var __array = originalBytes.Array;
+            this.__lastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
 
             // Auto Generate Area
-            _firstName = new StringSegment(__tracker, new ArraySegment<byte>(originalBytes.Array, ObjectSegmentHelper.GetOffset(originalBytes, 1), 0));
-            _lastName = new StringSegment(__tracker, new ArraySegment<byte>(originalBytes.Array, ObjectSegmentHelper.GetOffset(originalBytes, 2), 0));
+            _firstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __lastIndex));
+            _lastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __lastIndex));
         }
 
         public bool CanDirectCopy()
@@ -118,19 +121,19 @@ namespace ZeroFormatter.Tests
             if (__tracker.IsDirty)
             {
                 var startOffset = offset;
-                offset += (4 + 4 * 4);
+                offset += (8 + 4 * 4);
 
                 // Auto Generate Area
-                BinaryUtil.WriteInt32(ref targetBytes, startOffset + (4 + 4 * 0), offset);
+                BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * 0), offset);
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, offset, __originalBytes, 0);
 
-                BinaryUtil.WriteInt32(ref targetBytes, startOffset + (4 + 4 * 1), offset);
+                BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * 1), offset);
                 offset += ObjectSegmentHelper.SerializeSegment<string>(ref targetBytes, offset, _firstName);
 
-                BinaryUtil.WriteInt32(ref targetBytes, startOffset + (4 + 4 * 2), offset);
+                BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * 2), offset);
                 offset += ObjectSegmentHelper.SerializeSegment<string>(ref targetBytes, offset, _lastName);
 
-                BinaryUtil.WriteInt32(ref targetBytes, startOffset + (4 + 4 * 3), offset);
+                BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * 3), offset);
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, offset, __originalBytes, 3);
 
                 var writeSize = offset - startOffset;
@@ -152,6 +155,13 @@ namespace ZeroFormatter.Tests
 
     public class MyClassFormatter : Formatter<MyClass>
     {
+        readonly int lastIndex;
+
+        public MyClassFormatter(int lastIndex) // generate
+        {
+            this.lastIndex = lastIndex;
+        }
+
         public override int? GetLength()
         {
             return null;
@@ -164,26 +174,31 @@ namespace ZeroFormatter.Tests
             {
                 return segment.Serialize(ref bytes, offset);
             }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
             else
             {
                 var startOffset = offset;
-                offset += (4 + 4 * 4);
+                offset += (8 + 4 * 4);
 
-                BinaryUtil.WriteInt32(ref bytes, startOffset + (4 + 4 * 0), offset);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 0), offset);
                 offset += Formatter<int>.Default.Serialize(ref bytes, offset, value.Age);
 
-                BinaryUtil.WriteInt32(ref bytes, startOffset + (4 + 4 * 1), offset);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 1), offset);
                 offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.FirstName);
 
-                BinaryUtil.WriteInt32(ref bytes, startOffset + (4 + 4 * 2), offset);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 2), offset);
                 offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.LastName);
 
-                BinaryUtil.WriteInt32(ref bytes, startOffset + (4 + 4 * 3), offset);
+                BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 3), offset);
                 offset += Formatter<int>.Default.Serialize(ref bytes, offset, value.HogeMoge);
 
                 var writeSize = offset - startOffset;
                 BinaryUtil.WriteInt32(ref bytes, startOffset, writeSize);
-
+                BinaryUtil.WriteInt32(ref bytes, startOffset + 4, lastIndex);
                 return writeSize;
             }
         }
@@ -191,6 +206,11 @@ namespace ZeroFormatter.Tests
         public override MyClass Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
             return new MyClass_ObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
         }
     }
@@ -211,16 +231,16 @@ namespace ZeroFormatter.Tests
                 // HogeMoge = 10000
             };
 
-            Formatter<MyClass>.Register(new MyClassFormatter());
+            Formatter<MyClass>.Register(new MyClassFormatter(3));
 
             byte[] bytes = null;
             int size;
             Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc);
             var mc2 = Formatter<MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
 
-            mc.Age.Is(mc2.Age);
-            mc.FirstName.Is(mc2.FirstName);
-            mc.LastName.Is(mc2.LastName);
+            mc2.Age.Is(mc.Age);
+            mc2.FirstName.Is(mc.FirstName);
+            mc2.LastName.Is(mc.LastName);
 
             bytes = null;
             Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc2);
@@ -267,19 +287,24 @@ namespace ZeroFormatter.Tests
                 LastName = "tako"
             });
 
-            var generatedFormatter = new MyClassFormatter();
+            var generatedFormatter = new MyClassFormatter(3);
             var mc2 = generatedFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
 
 
             mc2.Age.Is(999);
             mc2.FirstName.Is("hogehoge");
             mc2.LastName.Is("tako");
+
+            var mc3 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
+            mc3.Age.Is(999);
+            mc3.FirstName.Is("hogehoge");
+            mc3.LastName.Is("tako");
         }
 
         [TestMethod]
         public void DynamicSegmentTest()
         {
-            var t = DynamicObjectSegmentBuilder<MyClass>.Build();
+            var t = DynamicObjectSegmentBuilder<MyClass>.GetProxyType();
 
 
             var hugahugahuga = t.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) });

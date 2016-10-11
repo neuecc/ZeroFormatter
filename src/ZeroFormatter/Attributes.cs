@@ -22,7 +22,7 @@ namespace ZeroFormatter
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public class IgnoreFormat : Attribute
+    public class IgnoreFormatAttribute : Attribute
     {
     }
 }

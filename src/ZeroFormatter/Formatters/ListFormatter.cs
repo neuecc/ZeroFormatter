@@ -9,7 +9,7 @@ using ZeroFormatter.Segments;
 namespace ZeroFormatter.Formatters
 {
     // Layout: FixedSize -> [count:int][t format...]
-    // Layout: VariableSize -> [count:int][elementOffset:int...][t format...]
+    // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...]
     internal class ListFormatter<T> : Formatter<IList<T>>
     {
         public override int? GetLength()
@@ -65,11 +65,11 @@ namespace ZeroFormatter.Formatters
             var length = formatter.GetLength();
             if (length != null)
             {
-                return FixedListSegment<T>.Create(tracker, new ArraySegment<byte>(bytes, offset, 0), out byteSize);
+                return FixedListSegment<T>.Create(tracker, bytes, offset, out byteSize);
             }
             else
             {
-                return VariableListSegment<T>.Create(tracker, new ArraySegment<byte>(bytes, offset, 0), out byteSize);
+                return VariableListSegment<T>.Create(tracker, bytes, offset, out byteSize);
             }
         }
     }

@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Segments
 {
     // ObjectSegment is inherit to target class directly or generate.
 
-    // Layout: [int byteSize][indexOffset:int...][t format...]
+    // Layout: [int byteSize][indexCount][indexOffset:int...][t format...]
 
     public static class ObjectSegmentHelper
     {
@@ -20,7 +24,22 @@ namespace ZeroFormatter.Segments
         public static int GetOffset(ArraySegment<byte> originalBytes, int index)
         {
             var array = originalBytes.Array;
-            return BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4 + 4 * index);
+            return BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + 4 * index);
+        }
+
+        public static ArraySegment<byte> GetSegment(ArraySegment<byte> originalBytes, int index, int lastIndex)
+        {
+            var offset = GetOffset(originalBytes, index);
+            if (index == lastIndex)
+            {
+                var sliceLength = originalBytes.Offset + originalBytes.Count;
+                return new ArraySegment<byte>(originalBytes.Array, offset, (sliceLength - offset));
+            }
+            else
+            {
+                var nextOffset = GetOffset(originalBytes, index + 1);
+                return new ArraySegment<byte>(originalBytes.Array, offset, (nextOffset - offset));
+            }
         }
 
         public static int SerializeFixedLength<T>(ref byte[] targetBytes, int offset, ArraySegment<byte> originalBytes, int index)
@@ -38,14 +57,21 @@ namespace ZeroFormatter.Segments
         }
     }
 
+    // TODO:internal
     public static class DynamicObjectSegmentBuilder<T>
     {
-        const string ModuleName = "ZeroFormatter.Segments.DynamicObjectSegment";
+        const string ModuleName = "ZeroFormatter.Segments.DynamicObjectSegments";
 
-        public static Type Build()
+        static readonly Lazy<Type> lazyBuild = new Lazy<Type>(() => Build());
+
+        public static Type GetProxyType()
         {
-            // TODO:Verify
-            // VerifyInterface(typeof(T));
+            return lazyBuild.Value;
+        }
+
+        static Type Build()
+        {
+            // TODO:VerifyType
 
             var assemblyName = new AssemblyName(ModuleName);
             var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
@@ -124,6 +150,42 @@ namespace ZeroFormatter.Segments
             // TODO:...
 
             generator.Emit(OpCodes.Ret);
+        }
+
+
+        static void GetProperties()
+        {
+            var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            foreach (var propInfo in props)
+            {
+                if (propInfo.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) continue;
+                var indexAttribute = propInfo.GetCustomAttributes(typeof(IndexAttribute), true).FirstOrDefault();
+                if (indexAttribute == null) continue;
+
+                var hasLength = Formatter<T>.Default.GetLength();
+                // needs segment.
+                if (hasLength == null)
+                {
+                    // WellknownSegment
+
+                    // ByteArraySegment
+                    // DictionarySegment
+                    // ListSegment
+                    // LookupSegment
+                    // KeyTupleSegment
+                    // StringSegment
+
+
+
+                    // and Object...
+
+
+
+                    DynamicObjectSegmentBuilder<T>.GetProxyType();
+                }
+
+            }
+
         }
 
         //static void BuildMethod(TypeBuilder type, MethodInfo interfaceMethodInfo, FieldInfo contextField, FieldInfo targetPeerField)

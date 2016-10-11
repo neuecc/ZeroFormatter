@@ -10,12 +10,10 @@ namespace ZeroFormatter.Segments
 {
     // Lookup gurantees element order, key order is not guranteed.
 
-    // TODO:DirtyTracker
-
     // [int byteSize]
     // [int count]
     // [IList<IList<GroupingSemengt>>]
-    public class LookupSegment<TKey, TElement> : ILookup<TKey, TElement>
+    public class LookupSegment<TKey, TElement> : ILookup<TKey, TElement>, IZeroFormatterSegment
     {
         static TElement[] EmptyArray = new TElement[0];
         readonly IEqualityComparer<TKey> comparer;
@@ -24,7 +22,12 @@ namespace ZeroFormatter.Segments
         int count;
         IList<IList<GroupingSegment<TKey, TElement>>> groupings;
 
-        public LookupSegment(ILookup<TKey, TElement> source)
+        // others
+        internal DirtyTracker tracker;
+        ArraySegment<byte> originalBytes;
+
+        // from Formatter only for serialize.
+        internal LookupSegment(ILookup<TKey, TElement> source)
         {
             this.comparer = ZeroFormatterEqualityComparer<TKey>.Default;
             this.groupings = new List<IList<GroupingSegment<TKey, TElement>>>(source.Count);
@@ -44,18 +47,21 @@ namespace ZeroFormatter.Segments
             this.count = source.Count;
         }
 
-        internal static LookupSegment<TKey, TElement> Create(ArraySegment<byte> originalBytes, DirtyTracker tracker, out int byteSize)
+        public static LookupSegment<TKey, TElement> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
+            tracker = tracker.CreateChild();
+
             var segment = new LookupSegment<TKey, TElement>();
 
-            var array = originalBytes.Array;
-
-            byteSize = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
-            segment.count = BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4);
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            segment.count = BinaryUtil.ReadInt32(ref bytes, offset + 4);
 
             var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
             int _;
-            segment.groupings = formatter.Deserialize(ref array, originalBytes.Offset + 8, tracker, out _);
+            segment.groupings = formatter.Deserialize(ref bytes, offset + 8, tracker, out _);
+
+            segment.tracker = tracker;
+            segment.originalBytes = new ArraySegment<byte>(bytes, offset, byteSize);
 
             return segment;
         }
@@ -145,47 +151,74 @@ namespace ZeroFormatter.Segments
             return null;
         }
 
+        public bool CanDirectCopy()
+        {
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return originalBytes;
+        }
+
         public int Serialize(ref byte[] bytes, int offset)
         {
-            var totalSize = 4;
-            totalSize += BinaryUtil.WriteInt32(ref bytes, offset + 4, count);
-            var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
-            totalSize += formatter.Serialize(ref bytes, offset + 8, groupings);
-            BinaryUtil.WriteInt32(ref bytes, offset, totalSize);
+            if (CanDirectCopy())
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, originalBytes.Count);
+                Buffer.BlockCopy(originalBytes.Array, originalBytes.Offset, bytes, offset, originalBytes.Count);
+                return originalBytes.Count;
+            }
+            else
+            {
+                var totalSize = 4;
+                totalSize += BinaryUtil.WriteInt32(ref bytes, offset + 4, count);
+                var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
+                totalSize += formatter.Serialize(ref bytes, offset + 8, groupings);
+                BinaryUtil.WriteInt32(ref bytes, offset, totalSize);
 
-            return totalSize;
+                return totalSize;
+            }
         }
+
     }
 
 
     // [TKey key]
     // [int hashCode]
     // [IList<TElement> elements]
-    public class GroupingSegment<TKey, TElement> : IGrouping<TKey, TElement>, IList<TElement>
+    public class GroupingSegment<TKey, TElement> : IGrouping<TKey, TElement>, IList<TElement>, IZeroFormatterSegment
     {
+        // serializestate.
         internal TKey key;
         internal int hashCode;
         internal IList<TElement> elements;
 
-        internal static GroupingSegment<TKey, TElement> Create(ArraySegment<byte> originalBytes, DirtyTracker tracker, out int byteSize)
+        // others
+        internal DirtyTracker tracker;
+        ArraySegment<byte> originalBytes;
+
+        internal static GroupingSegment<TKey, TElement> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
             var segment = new GroupingSegment<TKey, TElement>();
 
-            var array = originalBytes.Array;
-            var offset = originalBytes.Offset;
+            tracker = tracker.CreateChild();
+            segment.tracker = tracker;
 
             var keyFormatter = Formatter<TKey>.Default;
             var listFormatter = Formatter<IList<TElement>>.Default;
 
             int keySize;
-            segment.key = keyFormatter.Deserialize(ref array, offset, tracker, out keySize);
+            segment.key = keyFormatter.Deserialize(ref bytes, offset, tracker, out keySize);
 
-            segment.hashCode = BinaryUtil.ReadInt32(ref array, offset + keySize);
+            segment.hashCode = BinaryUtil.ReadInt32(ref bytes, offset + keySize);
 
             int listSize;
-            segment.elements = listFormatter.Deserialize(ref array, offset + keySize + 4, tracker, out listSize);
+            segment.elements = listFormatter.Deserialize(ref bytes, offset + keySize + 4, tracker, out listSize);
 
             byteSize = keySize + 4 + listSize;
+            segment.originalBytes = new ArraySegment<byte>(bytes, offset, byteSize);
+
             return segment;
         }
 
@@ -288,21 +321,42 @@ namespace ZeroFormatter.Segments
             }
         }
 
-        internal int Serialize(ref byte[] bytes, int offset)
+        public bool CanDirectCopy()
         {
-            var keyFormatter = Formatter<TKey>.Default;
-            var listFormatter = Formatter<IList<TElement>>.Default;
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+        }
 
-            var initialOffset = offset;
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return originalBytes;
+        }
 
-            offset += keyFormatter.Serialize(ref bytes, offset, key);
+        public int Serialize(ref byte[] bytes, int offset)
+        {
+            if (CanDirectCopy())
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, originalBytes.Count);
+                Buffer.BlockCopy(originalBytes.Array, originalBytes.Offset, bytes, offset, originalBytes.Count);
+                return originalBytes.Count;
+            }
+            else
+            {
+                var keyFormatter = Formatter<TKey>.Default;
+                var listFormatter = Formatter<IList<TElement>>.Default;
 
-            BinaryUtil.WriteInt32(ref bytes, offset, hashCode);
-            offset += 4;
+                var initialOffset = offset;
 
-            offset += listFormatter.Serialize(ref bytes, offset, elements);
+                offset += keyFormatter.Serialize(ref bytes, offset, key);
 
-            return offset - initialOffset;
+                BinaryUtil.WriteInt32(ref bytes, offset, hashCode);
+                offset += 4;
+
+                offset += listFormatter.Serialize(ref bytes, offset, elements);
+
+                // Note:Cache serialized byte? or not?, initial release does not cache.
+                var writeSize = offset - initialOffset;
+                return writeSize;
+            }
         }
     }
 }

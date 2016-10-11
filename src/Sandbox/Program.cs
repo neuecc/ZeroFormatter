@@ -36,7 +36,7 @@ namespace Sandbox
         {
        
 
-            var t = DynamicObjectSegmentBuilder<MyClass>.Build();
+            var t = DynamicObjectSegmentBuilder<MyClass>.GetProxyType();
 
 
             var hugahugahuga = t.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) });
@@ -48,6 +48,13 @@ namespace Sandbox
             // test2
 
             var f = new DynamicObjectFormatter<MyClass>();
+
+            
+
+
+            var bytes = array.Array;
+            int s = 0;
+            f.Deserialize(ref bytes, 0, tracker, out s);
 
         }
     }

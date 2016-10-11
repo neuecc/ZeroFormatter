@@ -591,6 +591,59 @@ namespace ZeroFormatter.Formatters
     }
 
 
+    internal class CharFormatter : Formatter<Char>
+    {
+        public override int? GetLength()
+        {
+            return 2;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, Char value)
+        {
+            return BinaryUtil.WriteChar(ref bytes, offset, value);
+        }
+
+        public override Char Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 2;
+            return BinaryUtil.ReadChar(ref bytes, offset);
+        }
+    }
+
+    internal class NullableCharFormatter : Formatter<Char?>
+    {
+        public override int? GetLength()
+        {
+            return 3;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, Char? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteChar(ref bytes, offset + 1, value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 3);
+            }
+
+            return 3;
+        }
+
+        public override Char? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 3;
+
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Char?);
+
+            return BinaryUtil.ReadChar(ref bytes, offset + 1);
+        }
+    }
+
+
     internal class DecimalFormatter : Formatter<Decimal>
     {
         public override int? GetLength()

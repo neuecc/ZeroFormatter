@@ -19,6 +19,7 @@
         Tuple.Create(typeof(bool), 1),
         Tuple.Create(typeof(byte), 1),
         Tuple.Create(typeof(sbyte), 1),
+        Tuple.Create(typeof(char), 2),
         Tuple.Create(typeof(decimal), 16),
         Tuple.Create(typeof(TimeSpan), 12),
         Tuple.Create(typeof(DateTime), 12),

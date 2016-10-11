@@ -20,7 +20,8 @@ namespace ZeroFormatter.Tests
             BinaryUtil.WriteInt32(ref bytes, 4 * 5, -432423);
             BinaryUtil.WriteInt32(ref bytes, 4 * 6, 2423);
 
-            var list = new FixedListSegment<int>(tracker, new ArraySegment<byte>(bytes, 0, bytes.Length));
+            int _;
+            var list = FixedListSegment<int>.Create(tracker, bytes, 0, out _);
             return list;
         }
 
@@ -28,7 +29,8 @@ namespace ZeroFormatter.Tests
         {
             var bytes = ZeroFormatter.Serialize<IList<string>>(new[] { "hoge", "あああ", "huga", null, "takotako", "chop", "!^ :a<>" });
 
-            var list = new VariableListSegment<string>(tracker, new ArraySegment<byte>(bytes, 0, bytes.Length));
+            int _;
+            var list = VariableListSegment<string>.Create(tracker, bytes, 0, out _);
             return list;
         }
 
@@ -148,7 +150,7 @@ namespace ZeroFormatter.Tests
 
                 var copy = new string[7];
                 list.CopyTo(copy, 0);
-                copy.Is("hoge", "あああ", "huga", null, "takotako", "chop","!^ :a<>");
+                copy.Is("hoge", "あああ", "huga", null, "takotako", "chop", "!^ :a<>");
 
                 copy = new string[15];
                 list.CopyTo(copy, 4);
@@ -164,7 +166,7 @@ namespace ZeroFormatter.Tests
                     {
                         l.Add(e.Current);
                     }
-                    l.Is("hoge", "あああ", "takoyaki x", null, "takotako", "chop",  "!^ :a<>");
+                    l.Is("hoge", "あああ", "takoyaki x", null, "takotako", "chop", "!^ :a<>");
                 }
             }
 
@@ -174,7 +176,7 @@ namespace ZeroFormatter.Tests
                 list.Add("0");
                 list.Add(null);
                 list.Add("2");
-                list.Is("hoge", "あああ", "huga", null, "takotako", "chop",  "!^ :a<>", "0", null, "2");
+                list.Is("hoge", "あああ", "huga", null, "takotako", "chop", "!^ :a<>", "0", null, "2");
 
                 list = CraeteVariableList(tracker);
                 list.Clear();
@@ -186,18 +188,18 @@ namespace ZeroFormatter.Tests
                 list.Insert(3, "-5");
                 list.Is("hoge", "あああ", "huga", "-5", null, "takotako", "chop", "!^ :a<>");
                 list.Insert(0, "zero");
-                list.Is("zero", "hoge", "あああ", "huga", "-5", null, "takotako", "chop",  "!^ :a<>");
+                list.Is("zero", "hoge", "あああ", "huga", "-5", null, "takotako", "chop", "!^ :a<>");
 
                 list = CraeteVariableList(tracker);
                 list.Remove("あああ").IsTrue();
                 list.Remove("-1").IsFalse();
-                list.Is("hoge", "huga", null, "takotako", "chop",  "!^ :a<>");
+                list.Is("hoge", "huga", null, "takotako", "chop", "!^ :a<>");
 
                 list = CraeteVariableList(tracker);
                 list.RemoveAt(3);
-                list.Is("hoge", "あああ", "huga", "takotako", "chop",  "!^ :a<>");
+                list.Is("hoge", "あああ", "huga", "takotako", "chop", "!^ :a<>");
                 list.RemoveAt(0);
-                list.Is("あああ", "huga", "takotako", "chop",  "!^ :a<>");
+                list.Is("あああ", "huga", "takotako", "chop", "!^ :a<>");
                 list.RemoveAt(4);
                 list.Is("あああ", "huga", "takotako", "chop");
             }
