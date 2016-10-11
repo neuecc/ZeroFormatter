@@ -59,17 +59,17 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-        public override IList<T> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override IList<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             var formatter = Formatter<T>.Default;
             var length = formatter.GetLength();
             if (length != null)
             {
-                return FixedListSegment<T>.Create(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0), out byteSize);
+                return FixedListSegment<T>.Create(tracker, new ArraySegment<byte>(bytes, offset, 0), out byteSize);
             }
             else
             {
-                return VariableListSegment<T>.Create(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0), out byteSize);
+                return VariableListSegment<T>.Create(tracker, new ArraySegment<byte>(bytes, offset, 0), out byteSize);
             }
         }
     }

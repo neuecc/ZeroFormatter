@@ -30,7 +30,7 @@ namespace ZeroFormatter.Segments
                     case SegmentState.Original:
                         var array = serializedBytes.Array;
                         int _;
-                        this.cached = Formatter<string>.Default.Deserialize(ref array, serializedBytes.Offset, out _);
+                        this.cached = Formatter<string>.Default.Deserialize(ref array, serializedBytes.Offset, tracker, out _);
                         this.state = SegmentState.Cached;
                         return cached;
                     default:

@@ -19,7 +19,10 @@
         public void Dirty()
         {
             IsDirty = true;
-            parent.IsDirty = true;
+            if (parent != null)
+            {
+                parent.IsDirty = true;
+            }
         }
 
         public DirtyTracker CreateChild()

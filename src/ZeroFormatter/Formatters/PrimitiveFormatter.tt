@@ -28,6 +28,7 @@
 #>
 using System;
 using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -48,7 +49,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.Write<#= t.Name #>(ref bytes, offset, value);
         }
 
-        public override <#= t.Name #> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override <#= t.Name #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = <#= tuple.Item2 #>;
             return BinaryUtil.Read<#= t.Name #>(ref bytes, offset);
@@ -77,7 +78,7 @@ namespace ZeroFormatter.Formatters
             return <#= tuple.Item2 + 1 #>;
         }
 
-        public override <#= t.Name #>? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override <#= t.Name #>? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = <#= tuple.Item2 + 1 #>;
 

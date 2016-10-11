@@ -68,10 +68,10 @@ namespace ZeroFormatter.Segments
             var entryListFormatter = Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default;
 
             int size;
-            this.buckets = intListFormatter.Deserialize(ref bytes, offset, out size);
+            this.buckets = intListFormatter.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
 
-            this.entries = entryListFormatter.Deserialize(ref bytes, offset, out size);
+            this.entries = entryListFormatter.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
 
             // new size
@@ -416,7 +416,7 @@ namespace ZeroFormatter.Segments
     public static class DictionaryEntry
     {
         // deserialize immediate:)
-        public static DictionaryEntry<TKey, TValue> Create<TKey, TValue>(ArraySegment<byte> bytes, out int byteSize)
+        public static DictionaryEntry<TKey, TValue> Create<TKey, TValue>(ArraySegment<byte> bytes, DirtyTracker tracker, out int byteSize)
         {
             var array = bytes.Array;
             var offset = bytes.Offset;
@@ -431,11 +431,11 @@ namespace ZeroFormatter.Segments
             byteSize += 4;
 
             int size;
-            var key = Formatter<TKey>.Default.Deserialize(ref array, offset, out size);
+            var key = Formatter<TKey>.Default.Deserialize(ref array, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
-            var value = Formatter<TValue>.Default.Deserialize(ref array, offset, out size);
+            var value = Formatter<TValue>.Default.Deserialize(ref array, offset, tracker, out size);
             byteSize += size;
 
             return new DictionaryEntry<TKey, TValue>(hashCode, next, key, value);

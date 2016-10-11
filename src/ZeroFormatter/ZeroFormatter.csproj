@@ -63,7 +63,7 @@
     <Compile Include="Formatters\ByteArrayFormatter.cs" />
     <Compile Include="Formatters\DictionaryFormatter.cs" />
     <Compile Include="Formatters\ListFormatter.cs" />
-    <Compile Include="Formatters\ObjectFormatter.cs" />
+    <Compile Include="Formatters\DynamicObjectFormatter.cs" />
     <Compile Include="Formatters\PrimitiveFormatter.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -80,7 +80,7 @@
     <Compile Include="Segments\LookupSegment.cs" />
     <Compile Include="Segments\ListSegment.cs" />
     <Compile Include="Segments\NullableSegment.cs" />
-    <Compile Include="Segments\ObjectSegment.cs" />
+    <Compile Include="Segments\DynamicObjectSegment.cs" />
     <Compile Include="Segments\ObjectTracker.cs" />
     <Compile Include="Segments\SegmentState.cs" />
     <Compile Include="Segments\StringSegment.cs" />

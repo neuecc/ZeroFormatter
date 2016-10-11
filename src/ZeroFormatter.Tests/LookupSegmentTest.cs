@@ -16,7 +16,7 @@ namespace ZeroFormatter.Tests
             var bytes = ZeroFormatter.Serialize(lookup);
 
             int _;
-            var segment = LookupSegment<bool, int>.Create(new ArraySegment<byte>(bytes), out _);
+            var segment = LookupSegment<bool, int>.Create(new ArraySegment<byte>(bytes), new DirtyTracker(), out _);
 
             segment[true].Is(2, 4, 6, 8, 10);
             segment[false].Is(1, 3, 5, 7, 9);

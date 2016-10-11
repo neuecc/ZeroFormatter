@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -28,7 +29,7 @@ namespace ZeroFormatter.Formatters
             return stringSize + 4;
         }
 
-        public override string Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override string Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)
@@ -60,7 +61,7 @@ namespace ZeroFormatter.Formatters
             return charSize + 4;
         }
 
-        public override char Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override char Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             byteSize = length;
@@ -89,7 +90,7 @@ namespace ZeroFormatter.Formatters
             return charSize + 4;
         }
 
-        public override char? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override char? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)

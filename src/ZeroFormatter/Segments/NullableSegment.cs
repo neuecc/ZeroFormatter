@@ -8,10 +8,12 @@ namespace ZeroFormatter.Segments
     public struct NullableSegment<T>
         where T : struct
     {
+        DirtyTracker tracker;
         ArraySegment<byte> originalBytes;
 
-        public NullableSegment(ArraySegment<byte> originalBytes)
+        public NullableSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
         {
+            this.tracker = tracker;
             this.originalBytes = originalBytes;
         }
 
@@ -21,7 +23,7 @@ namespace ZeroFormatter.Segments
             {
                 var array = originalBytes.Array;
                 int _;
-                return Formatters.Formatter<Nullable<T>>.Default.Deserialize(ref array, originalBytes.Offset, out _);
+                return Formatters.Formatter<Nullable<T>>.Default.Deserialize(ref array, originalBytes.Offset, tracker, out _);
             }
             set
             {

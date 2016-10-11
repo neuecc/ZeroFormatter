@@ -10,6 +10,8 @@ namespace ZeroFormatter.Segments
 {
     // Lookup gurantees element order, key order is not guranteed.
 
+    // TODO:DirtyTracker
+
     // [int byteSize]
     // [int count]
     // [IList<IList<GroupingSemengt>>]
@@ -42,7 +44,7 @@ namespace ZeroFormatter.Segments
             this.count = source.Count;
         }
 
-        internal static LookupSegment<TKey, TElement> Create(ArraySegment<byte> originalBytes, out int byteSize)
+        internal static LookupSegment<TKey, TElement> Create(ArraySegment<byte> originalBytes, DirtyTracker tracker, out int byteSize)
         {
             var segment = new LookupSegment<TKey, TElement>();
 
@@ -53,7 +55,7 @@ namespace ZeroFormatter.Segments
 
             var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
             int _;
-            segment.groupings = formatter.Deserialize(ref array, originalBytes.Offset + 8, out _);
+            segment.groupings = formatter.Deserialize(ref array, originalBytes.Offset + 8, tracker, out _);
 
             return segment;
         }
@@ -165,7 +167,7 @@ namespace ZeroFormatter.Segments
         internal int hashCode;
         internal IList<TElement> elements;
 
-        internal static GroupingSegment<TKey, TElement> Create(ArraySegment<byte> originalBytes, out int byteSize)
+        internal static GroupingSegment<TKey, TElement> Create(ArraySegment<byte> originalBytes, DirtyTracker tracker, out int byteSize)
         {
             var segment = new GroupingSegment<TKey, TElement>();
 
@@ -176,12 +178,12 @@ namespace ZeroFormatter.Segments
             var listFormatter = Formatter<IList<TElement>>.Default;
 
             int keySize;
-            segment.key = keyFormatter.Deserialize(ref array, offset, out keySize);
+            segment.key = keyFormatter.Deserialize(ref array, offset, tracker, out keySize);
 
             segment.hashCode = BinaryUtil.ReadInt32(ref array, offset + keySize);
 
             int listSize;
-            segment.elements = listFormatter.Deserialize(ref array, offset + keySize + 4, out listSize);
+            segment.elements = listFormatter.Deserialize(ref array, offset + keySize + 4, tracker, out listSize);
 
             byteSize = keySize + 4 + listSize;
             return segment;

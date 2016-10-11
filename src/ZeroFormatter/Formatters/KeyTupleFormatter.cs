@@ -1,5 +1,6 @@
 ﻿using System;
 using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -20,12 +21,12 @@ namespace ZeroFormatter.Formatters
             return offset - startOffset;
         }
 
-        public override KeyTuple<T1> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override KeyTuple<T1> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, out size);
+            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -49,15 +50,15 @@ namespace ZeroFormatter.Formatters
             return offset - startOffset;
         }
 
-        public override KeyTuple<T1, T2> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override KeyTuple<T1, T2> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, out size);
+            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, out size);
+            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -82,18 +83,18 @@ namespace ZeroFormatter.Formatters
             return offset - startOffset;
         }
 
-        public override KeyTuple<T1, T2, T3> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override KeyTuple<T1, T2, T3> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, out size);
+            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, out size);
+            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, out size);
+            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -119,21 +120,21 @@ namespace ZeroFormatter.Formatters
             return offset - startOffset;
         }
 
-        public override KeyTuple<T1, T2, T3, T4> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override KeyTuple<T1, T2, T3, T4> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, out size);
+            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, out size);
+            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, out size);
+            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, out size);
+            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -160,24 +161,24 @@ namespace ZeroFormatter.Formatters
             return offset - startOffset;
         }
 
-        public override KeyTuple<T1, T2, T3, T4, T5> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override KeyTuple<T1, T2, T3, T4, T5> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, out size);
+            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, out size);
+            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, out size);
+            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, out size);
+            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, out size);
+            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -205,27 +206,27 @@ namespace ZeroFormatter.Formatters
             return offset - startOffset;
         }
 
-        public override KeyTuple<T1, T2, T3, T4, T5, T6> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override KeyTuple<T1, T2, T3, T4, T5, T6> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, out size);
+            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, out size);
+            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, out size);
+            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, out size);
+            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, out size);
+            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, out size);
+            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -254,30 +255,30 @@ namespace ZeroFormatter.Formatters
             return offset - startOffset;
         }
 
-        public override KeyTuple<T1, T2, T3, T4, T5, T6, T7> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override KeyTuple<T1, T2, T3, T4, T5, T6, T7> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, out size);
+            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, out size);
+            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, out size);
+            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, out size);
+            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, out size);
+            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, out size);
+            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item7 = Formatter<T7>.Default.Deserialize(ref bytes, offset, out size);
+            var item7 = Formatter<T7>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -287,7 +288,6 @@ namespace ZeroFormatter.Formatters
 
 
     internal class KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
-        where TRest : struct
     {
         public override int? GetLength()
         {
@@ -308,37 +308,39 @@ namespace ZeroFormatter.Formatters
             return offset - startOffset;
         }
 
-        public override KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, out size);
+            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, out size);
+            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, out size);
+            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, out size);
+            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, out size);
+            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, out size);
+            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item7 = Formatter<T7>.Default.Deserialize(ref bytes, offset, out size);
+            var item7 = Formatter<T7>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item8 = Formatter<TRest>.Default.Deserialize(ref bytes, offset, out size);
+            var item8 = Formatter<TRest>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
             return new KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>(item1, item2, item3, item4, item5, item6, item7, item8);
         }
     }
+
+
 }

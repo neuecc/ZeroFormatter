@@ -7,6 +7,7 @@
 <#@ output extension=".cs" #>
 using System;
 using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -35,13 +36,13 @@ namespace ZeroFormatter.Formatters
             return offset - startOffset;
         }
 
-        public override <#= t #> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override <#= t #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;
 
 <# for(var j = 1; j <= i; j++) { #>
-            var item<#= j #> = Formatter<<#= toT(j) #>>.Default.Deserialize(ref bytes, offset, out size);
+            var item<#= j #> = Formatter<<#= toT(j) #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 <# } #>

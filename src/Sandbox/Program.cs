@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZeroFormatter;
+using ZeroFormatter.Formatters;
+using ZeroFormatter.Segments;
 
 namespace Sandbox
 {
@@ -32,6 +34,21 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
+       
+
+            var t = DynamicObjectSegmentBuilder<MyClass>.Build();
+
+
+            var hugahugahuga = t.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) });
+
+            var array = new ArraySegment<byte>(new byte[] { 1, 2, 3, 4, 5 });
+            var tracker = new DirtyTracker();
+            var hoge = hugahugahuga.Invoke(new object[] { tracker, array });
+
+            // test2
+
+            var f = new DynamicObjectFormatter<MyClass>();
+
         }
     }
 }

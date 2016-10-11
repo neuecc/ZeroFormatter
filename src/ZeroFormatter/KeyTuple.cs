@@ -978,7 +978,6 @@ namespace ZeroFormatter
     [Serializable]
     public struct KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest> : IStructuralEquatable, IStructuralComparable, IComparable, IKeyTuple,
         IEquatable<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
-        where TRest : struct
     {
         T1 item1;
         T2 item2;

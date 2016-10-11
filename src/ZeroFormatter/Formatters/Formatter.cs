@@ -366,7 +366,7 @@ namespace ZeroFormatter.Formatters
         public abstract int? GetLength();
 
         public abstract int Serialize(ref byte[] bytes, int offset, T value);
-        public abstract T Deserialize(ref byte[] bytes, int offset, out int byteSize);
+        public abstract T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize);
     }
 
     internal class ErrorFormatter<T> : Formatter<T>
@@ -378,7 +378,7 @@ namespace ZeroFormatter.Formatters
             this.exception = new InvalidOperationException("Type is not supported, please register,:" + typeof(T).Name);
         }
 
-        public override T Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             throw exception;
         }

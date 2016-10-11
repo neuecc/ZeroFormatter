@@ -31,9 +31,9 @@ namespace ZeroFormatter.Formatters
             return dictionary.Serialize(ref bytes, offset);
         }
 
-        public override IDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override IDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            return DictionarySegment<TKey, TValue>.Create(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, 0), out byteSize);
+            return DictionarySegment<TKey, TValue>.Create(tracker, new ArraySegment<byte>(bytes, offset, 0), out byteSize);
         }
     }
 
@@ -49,10 +49,9 @@ namespace ZeroFormatter.Formatters
             return value.Serialize(ref bytes, offset);
         }
 
-        public override DictionaryEntry<TKey, TValue> Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override DictionaryEntry<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            return DictionaryEntry.Create<TKey, TValue>(new ArraySegment<byte>(bytes, offset, 0), out byteSize);
+            return DictionaryEntry.Create<TKey, TValue>(new ArraySegment<byte>(bytes, offset, 0), tracker, out byteSize);
         }
-
     }
 }

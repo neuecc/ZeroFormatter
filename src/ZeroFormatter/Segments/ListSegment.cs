@@ -64,7 +64,7 @@ namespace ZeroFormatter.Segments
                     {
                         var offset = GetOffset(i);
                         int _;
-                        cache[i] = formatter.Deserialize(ref array, offset, out _);
+                        cache[i] = formatter.Deserialize(ref array, offset, tracker, out _);
                         isCached[i] = true;
                     }
                 }
@@ -285,7 +285,7 @@ namespace ZeroFormatter.Segments
                     var array = originalBytes.Array;
                     var offset = GetOffset(index);
                     int _;
-                    return formatter.Deserialize(ref array, offset, out _);
+                    return formatter.Deserialize(ref array, offset, tracker, out _);
                 }
                 else
                 {
@@ -361,7 +361,7 @@ namespace ZeroFormatter.Segments
                     var array = originalBytes.Array;
                     var offset = GetOffset(index);
                     int _;
-                    cache[index] = formatter.Deserialize(ref array, offset, out _);
+                    cache[index] = formatter.Deserialize(ref array, offset, tracker, out _);
                     isCached[index] = true;
                 }
 

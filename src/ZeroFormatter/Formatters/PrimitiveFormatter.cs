@@ -1,5 +1,6 @@
 ﻿using System;
 using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -19,7 +20,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteInt16(ref bytes, offset, value);
         }
 
-        public override Int16 Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Int16 Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 2;
             return BinaryUtil.ReadInt16(ref bytes, offset);
@@ -48,7 +49,7 @@ namespace ZeroFormatter.Formatters
             return 3;
         }
 
-        public override Int16? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Int16? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 3;
 
@@ -72,7 +73,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteInt32(ref bytes, offset, value);
         }
 
-        public override Int32 Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Int32 Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 4;
             return BinaryUtil.ReadInt32(ref bytes, offset);
@@ -101,7 +102,7 @@ namespace ZeroFormatter.Formatters
             return 5;
         }
 
-        public override Int32? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Int32? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 5;
 
@@ -125,7 +126,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteInt64(ref bytes, offset, value);
         }
 
-        public override Int64 Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Int64 Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 8;
             return BinaryUtil.ReadInt64(ref bytes, offset);
@@ -154,7 +155,7 @@ namespace ZeroFormatter.Formatters
             return 9;
         }
 
-        public override Int64? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Int64? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 9;
 
@@ -178,7 +179,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteUInt16(ref bytes, offset, value);
         }
 
-        public override UInt16 Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override UInt16 Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 2;
             return BinaryUtil.ReadUInt16(ref bytes, offset);
@@ -207,7 +208,7 @@ namespace ZeroFormatter.Formatters
             return 3;
         }
 
-        public override UInt16? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override UInt16? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 3;
 
@@ -231,7 +232,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteUInt32(ref bytes, offset, value);
         }
 
-        public override UInt32 Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override UInt32 Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 4;
             return BinaryUtil.ReadUInt32(ref bytes, offset);
@@ -260,7 +261,7 @@ namespace ZeroFormatter.Formatters
             return 5;
         }
 
-        public override UInt32? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override UInt32? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 5;
 
@@ -284,7 +285,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteUInt64(ref bytes, offset, value);
         }
 
-        public override UInt64 Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override UInt64 Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 8;
             return BinaryUtil.ReadUInt64(ref bytes, offset);
@@ -313,7 +314,7 @@ namespace ZeroFormatter.Formatters
             return 9;
         }
 
-        public override UInt64? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override UInt64? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 9;
 
@@ -337,7 +338,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteSingle(ref bytes, offset, value);
         }
 
-        public override Single Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Single Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 4;
             return BinaryUtil.ReadSingle(ref bytes, offset);
@@ -366,7 +367,7 @@ namespace ZeroFormatter.Formatters
             return 5;
         }
 
-        public override Single? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Single? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 5;
 
@@ -390,7 +391,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteDouble(ref bytes, offset, value);
         }
 
-        public override Double Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Double Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 8;
             return BinaryUtil.ReadDouble(ref bytes, offset);
@@ -419,7 +420,7 @@ namespace ZeroFormatter.Formatters
             return 9;
         }
 
-        public override Double? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Double? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 9;
 
@@ -443,7 +444,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteBoolean(ref bytes, offset, value);
         }
 
-        public override Boolean Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Boolean Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 1;
             return BinaryUtil.ReadBoolean(ref bytes, offset);
@@ -472,7 +473,7 @@ namespace ZeroFormatter.Formatters
             return 2;
         }
 
-        public override Boolean? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Boolean? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 2;
 
@@ -496,7 +497,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteByte(ref bytes, offset, value);
         }
 
-        public override Byte Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Byte Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 1;
             return BinaryUtil.ReadByte(ref bytes, offset);
@@ -525,7 +526,7 @@ namespace ZeroFormatter.Formatters
             return 2;
         }
 
-        public override Byte? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Byte? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 2;
 
@@ -549,7 +550,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteSByte(ref bytes, offset, value);
         }
 
-        public override SByte Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override SByte Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 1;
             return BinaryUtil.ReadSByte(ref bytes, offset);
@@ -578,7 +579,7 @@ namespace ZeroFormatter.Formatters
             return 2;
         }
 
-        public override SByte? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override SByte? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 2;
 
@@ -602,7 +603,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteDecimal(ref bytes, offset, value);
         }
 
-        public override Decimal Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Decimal Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 16;
             return BinaryUtil.ReadDecimal(ref bytes, offset);
@@ -631,7 +632,7 @@ namespace ZeroFormatter.Formatters
             return 17;
         }
 
-        public override Decimal? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override Decimal? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 17;
 
@@ -655,7 +656,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteTimeSpan(ref bytes, offset, value);
         }
 
-        public override TimeSpan Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override TimeSpan Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 12;
             return BinaryUtil.ReadTimeSpan(ref bytes, offset);
@@ -684,7 +685,7 @@ namespace ZeroFormatter.Formatters
             return 13;
         }
 
-        public override TimeSpan? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override TimeSpan? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 13;
 
@@ -708,7 +709,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteDateTime(ref bytes, offset, value);
         }
 
-        public override DateTime Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override DateTime Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 12;
             return BinaryUtil.ReadDateTime(ref bytes, offset);
@@ -737,7 +738,7 @@ namespace ZeroFormatter.Formatters
             return 13;
         }
 
-        public override DateTime? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override DateTime? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 13;
 
@@ -761,7 +762,7 @@ namespace ZeroFormatter.Formatters
             return BinaryUtil.WriteDateTimeOffset(ref bytes, offset, value);
         }
 
-        public override DateTimeOffset Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override DateTimeOffset Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 12;
             return BinaryUtil.ReadDateTimeOffset(ref bytes, offset);
@@ -790,7 +791,7 @@ namespace ZeroFormatter.Formatters
             return 13;
         }
 
-        public override DateTimeOffset? Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override DateTimeOffset? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = 13;
 

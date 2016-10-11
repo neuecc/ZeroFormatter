@@ -115,7 +115,7 @@ namespace ZeroFormatter.Tests
 
     public class TestFormatter : Formatter<HashCollision>
     {
-        public override HashCollision Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override HashCollision Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             var a = BinaryUtil.ReadInt32(ref bytes, offset);
             var b = BinaryUtil.ReadInt32(ref bytes, offset + 4);

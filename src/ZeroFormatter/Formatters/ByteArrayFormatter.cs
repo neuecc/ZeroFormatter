@@ -1,5 +1,6 @@
 ﻿using System;
 using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -28,7 +29,7 @@ namespace ZeroFormatter.Formatters
             return writeSize + 4;
         }
 
-        public override byte[] Deserialize(ref byte[] bytes, int offset, out int byteSize)
+        public override byte[] Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)

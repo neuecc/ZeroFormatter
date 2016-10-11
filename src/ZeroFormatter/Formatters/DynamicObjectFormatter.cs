@@ -1,0 +1,127 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
+
+namespace ZeroFormatter.Formatters
+{
+    // Layout: [int byteSize][indexOffset:int...][t format...]
+
+    public class DynamicObjectFormatter<T> : Formatter<T>
+    {
+        internal delegate int PropertyDeserializer(ref byte[] bytes, int startOffset, int currentOffset, int index, T self);
+        internal delegate T FactoryFunc(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize);
+
+        readonly Tuple<int, PropertyDeserializer>[] deserializers;
+        readonly FactoryFunc factory;
+
+        public DynamicObjectFormatter()
+        {
+            // Create descriptor.
+            var type = typeof(T);
+            var isZeroFormattable = type.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).Any();
+
+            if (!isZeroFormattable)
+            {
+                // throw new InvalidOperationException
+            }
+
+            var props = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            var list = new List<Tuple<int, PropertyDeserializer>>(props.Length);
+
+            //BinaryUtil.WriteInt32(ref bytes, startOffset + (4 + 4 * 1), offset);
+            //offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.LastName);
+            foreach (var propInfo in props)
+            {
+                var indexAttribute = propInfo.GetCustomAttributes(typeof(IndexAttribute), true).FirstOrDefault();
+                if (indexAttribute == null) continue;
+
+                var index = (indexAttribute as IndexAttribute).Index;
+
+                var propType = propInfo.PropertyType;
+                var formatterType = typeof(Formatter<>).MakeGenericType(propType);
+                var formatterGet = formatterType.GetProperty("Default").GetGetMethod();
+                var serializeMethod = formatterType.GetMethod("Serialize");
+
+                var intSize = Expression.Constant(4, typeof(int));
+                var arg1 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
+                var arg2 = Expression.Parameter(typeof(int), "startOffset");
+                var arg3 = Expression.Parameter(typeof(int), "currentOffset");
+                var arg4 = Expression.Parameter(typeof(int), "index");
+                var arg5 = Expression.Parameter(type, "self");
+
+                var writeInt32 = Expression.Call(typeof(BinaryUtil).GetMethod("WriteInt32"),
+                    arg1,
+                    Expression.Add(arg2, Expression.Add(intSize, Expression.Multiply(intSize, arg4))),
+                    arg3);
+
+                var formatterSerialize = Expression.Call(Expression.Call(formatterGet), serializeMethod, arg1, arg3, Expression.Property(arg5, propInfo));
+
+                var body = Expression.Block(writeInt32, formatterSerialize);
+                var lambda = Expression.Lambda<PropertyDeserializer>(body, arg1, arg2, arg3, arg4, arg5);
+                var deserializerFunc = lambda.Compile();
+
+                list.Add(Tuple.Create(index, deserializerFunc));
+            }
+
+            this.deserializers = list.ToArray();
+
+            // create factory
+            {
+                var objectSegment = DynamicObjectSegmentBuilder<T>.Build();
+                var ctorInfo = objectSegment.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) });
+                var arraySegmentCtor = typeof(ArraySegment<byte>).GetConstructor(new[] { typeof(byte[]), typeof(int), typeof(int) });
+
+                var arg1 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
+                var arg2 = Expression.Parameter(typeof(int), "offset");
+                var arg3 = Expression.Parameter(typeof(int).MakeByRefType(), "byteSize");
+
+                // TODO:Not yet
+                Expression.New(arraySegmentCtor, arg1, arg2, arg3);
+
+                // new MyClass_ObjectSegment(new DirtyTracker(), new ArraySegment<byte>(bytes, offset, byteSize));
+                var lambda = Expression.Lambda<FactoryFunc>(Expression.New(ctorInfo, arg1, arg2, arg3), arg1, arg2, arg3);
+                this.factory = lambda.Compile();
+            }
+        }
+
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, T value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else
+            {
+                var startOffset = offset;
+                offset += (4 + 4 * 4);
+
+                for (int i = 0; i < deserializers.Length; i++)
+                {
+                    offset += deserializers[i].Item2(ref bytes, startOffset, offset, deserializers[i].Item1, value);
+                }
+
+                var writeSize = offset - startOffset;
+                BinaryUtil.WriteInt32(ref bytes, startOffset, writeSize);
+
+                return writeSize;
+            }
+        }
+
+        public override T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            return factory(ref bytes, offset, tracker, out byteSize);
+        }
+    }
+}
