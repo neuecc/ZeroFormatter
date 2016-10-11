@@ -1,54 +1,43 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Runtime.Serialization;
-//using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using ZeroFormatter.Internal;
 
-//namespace ZeroFormatter.Segments
-//{
-//    // ObjectSegment is inherit to target class directly but make helper methods.
+namespace ZeroFormatter.Segments
+{
+    // ObjectSegment is inherit to target class directly or generate.
 
-//    internal class ObjectSegment : IZeroFormatterSegment
-//    {
-//        readonly DirtyTracker parentTracker;
-//        readonly DirtyTracker childTracker;
-//        SegmentState state;
-//        ArraySegment<byte> serializedBytes;
+    // Layout: [int byteSize][indexOffset:int...][t format...]
 
-//        public ObjectSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
-//        {
-//            this.parentTracker = tracker;
-//            this.childTracker = new DirtyTracker();
-//            this.state = SegmentState.Original;
-//            this.serializedBytes = originalBytes;
-//        }
+    public static class ObjectSegmentHelper
+    {
+        public static int GetByteSize(ArraySegment<byte> originalBytes)
+        {
+            var array = originalBytes.Array;
+            return BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
+        }
 
-//        bool IZeroFormatterSegment.CanDirectCopy()
-//        {
-//            return !parentTracker.IsDirty && !childTracker.IsDirty;
-//        }
+        public static int GetOffset(ArraySegment<byte> originalBytes, int index)
+        {
+            var array = originalBytes.Array;
+            return BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 4 + 4 * index);
+        }
 
-//        ArraySegment<byte> IZeroFormatterSegment.GetBufferReference()
-//        {
-//            return serializedBytes;
-//        }
+        public static int SerializeFixedLength<T>(ref byte[] targetBytes, int offset, ArraySegment<byte> originalBytes, int index)
+        {
+            var formatter = global::ZeroFormatter.Formatters.Formatter<T>.Default;
+            var len = formatter.GetLength();
+            BinaryUtil.EnsureCapacity(ref targetBytes, offset, len.Value);
+            Buffer.BlockCopy(originalBytes.Array, GetOffset(originalBytes, index), targetBytes, offset, len.Value);
+            return len.Value;
+        }
 
-//        public int Serialize(ref byte[] targetBytes, int offset)
-//        {
-//            if (!parentTracker.IsDirty)
-//            {
-//                var src = serializedBytes.Array;
-//                Buffer.BlockCopy(src, serializedBytes.Offset, targetBytes, offset, serializedBytes.Count);
-//            }
+        public static int SerializeSegment<T>(ref byte[] targetBytes, int offset, IZeroFormatterSegment segment)
+        {
+            return segment.Serialize(ref targetBytes, offset);
+        }
+    }
+}
 
-//            // var formatter1 = Formatter<T>.Default;
-//            // formatter1.
-
-//            // formatter1
-//            // offset += Formatters.Formatter<int>.Default.Serialize(ref targetBytes, offset, v1);
-
-
-//            throw new NotImplementedException();
-//        }
-//    }
-//}

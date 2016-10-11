@@ -68,6 +68,13 @@ namespace ZeroFormatter.Segments
                 serializedBytes = new ArraySegment<byte>(newBytes, 0, newBytes.Length);
                 state = SegmentState.Cached;
             }
+            else if (serializedBytes.Count == 0)
+            {
+                var array = serializedBytes.Array;
+                var length = BinaryUtil.ReadInt32(ref array, serializedBytes.Offset);
+                if (length == -1) length = 4;
+                serializedBytes = new ArraySegment<byte>(serializedBytes.Array, serializedBytes.Offset, length + 4);
+            }
 
             BinaryUtil.EnsureCapacity(ref targetBytes, offset, serializedBytes.Count);
             Buffer.BlockCopy(serializedBytes.Array, serializedBytes.Offset, targetBytes, offset, serializedBytes.Count);

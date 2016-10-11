@@ -12,7 +12,8 @@ namespace ZeroFormatter.Internal
 
     // Timestamp, Duration codes are based on Google.Protobuf
 
-    internal static class BinaryUtil
+    // "internal" but "public" because generated code uses BinaryUtil.
+    public static class BinaryUtil
     {
         public static void EnsureCapacity(ref byte[] bytes, int offset, int appendLength)
         {

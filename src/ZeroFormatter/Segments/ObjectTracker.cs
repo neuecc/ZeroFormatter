@@ -2,6 +2,7 @@
 {
     public sealed class DirtyTracker
     {
+        readonly DirtyTracker parent;
         public bool IsDirty { get; private set; }
 
         public DirtyTracker()
@@ -9,14 +10,21 @@
             IsDirty = false;
         }
 
+        DirtyTracker(DirtyTracker parent)
+        {
+            this.parent = parent;
+            IsDirty = parent.IsDirty;
+        }
+
         public void Dirty()
         {
             IsDirty = true;
+            parent.IsDirty = true;
         }
 
-        public void Clear()
+        public DirtyTracker CreateChild()
         {
-            IsDirty = false;
+            return new DirtyTracker(this);
         }
     }
 }
