@@ -83,7 +83,6 @@
     <Compile Include="Segments\CacheSegment.cs" />
     <Compile Include="Segments\DynamicObjectSegment.cs" />
     <Compile Include="Segments\ObjectTracker.cs" />
-    <Compile Include="Segments\SegmentState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZeroFormatterSerializer.cs" />
   </ItemGroup>

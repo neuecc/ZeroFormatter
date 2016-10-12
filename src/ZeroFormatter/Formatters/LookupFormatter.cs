@@ -18,6 +18,12 @@ namespace ZeroFormatter.Formatters
 
         public override int Serialize(ref byte[] bytes, int offset, ILookup<TKey, TValue> value)
         {
+            if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+
             var lookup = value as LookupSegment<TKey, TValue>;
             if (lookup == null)
             {

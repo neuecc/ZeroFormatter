@@ -34,7 +34,17 @@ namespace ZeroFormatter.Segments
         }
     }
 
-    public class CacheSegment<T> : IZeroFormatterSegment
+    /// <summary>
+    /// Mutable Segment State
+    /// </summary>
+    internal enum SegmentState
+    {
+        Original = 0,
+        Cached = 1,
+        Dirty = 2
+    }
+
+    public sealed class CacheSegment<T> : IZeroFormatterSegment
     {
         readonly DirtyTracker tracker;
         SegmentState state;
@@ -43,7 +53,7 @@ namespace ZeroFormatter.Segments
 
         public CacheSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
         {
-            this.tracker = tracker;
+            this.tracker = tracker.CreateChild();
             this.state = SegmentState.Original;
             this.serializedBytes = originalBytes;
             this.cached = default(T);

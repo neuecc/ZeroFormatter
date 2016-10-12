@@ -1,5 +1,9 @@
-﻿namespace ZeroFormatter.Segments
+﻿using System.Threading;
+
+namespace ZeroFormatter.Segments
 {
+    // Note:Can we change to struct? like CancellationTokenSource, CreateLinkedTokenSource...
+
     public sealed class DirtyTracker
     {
         readonly DirtyTracker parent;

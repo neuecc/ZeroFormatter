@@ -254,7 +254,7 @@ namespace ZeroFormatter.Segments
         }
     }
 
-    // Layout: FixedSize -> [count:int][t format...]
+    // Layout: FixedSize -> [count:int][t format...] if count== -1 is null
     public class FixedListSegment<T> : ListSegment<T>
     {
         readonly int elementSize;
@@ -275,6 +275,11 @@ namespace ZeroFormatter.Segments
             if (formatterLength == null) throw new InvalidOperationException("T should be fixed length. Type: " + typeof(T).Name);
 
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (length == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
 
             byteSize = formatterLength.Value * length + 4;
             var list = new FixedListSegment<T>(tracker, new ArraySegment<byte>(bytes, offset, byteSize), length);
@@ -341,11 +346,18 @@ namespace ZeroFormatter.Segments
     }
 
     // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...]
+    // if byteSize == -1 is null
     public class VariableListSegment<T> : ListSegment<T>
     {
         internal static VariableListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+
             var length = BinaryUtil.ReadInt32(ref bytes, offset + 4);
             var list = new VariableListSegment<T>(tracker, new ArraySegment<byte>(bytes, offset, byteSize), length);
             return list;

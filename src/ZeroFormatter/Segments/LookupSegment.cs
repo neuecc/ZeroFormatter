@@ -10,6 +10,8 @@ namespace ZeroFormatter.Segments
 {
     // Lookup gurantees element order, key order is not guranteed.
 
+    // if byteSize == -1 is null
+
     // [int byteSize]
     // [int count]
     // [IList<IList<GroupingSemengt>>]
@@ -51,9 +53,14 @@ namespace ZeroFormatter.Segments
         {
             tracker = tracker.CreateChild();
 
-            var segment = new LookupSegment<TKey, TElement>();
-
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+
+            var segment = new LookupSegment<TKey, TElement>();
             segment.count = BinaryUtil.ReadInt32(ref bytes, offset + 4);
 
             var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;

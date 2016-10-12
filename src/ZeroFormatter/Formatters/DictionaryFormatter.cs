@@ -18,6 +18,12 @@ namespace ZeroFormatter.Formatters
 
         public override int Serialize(ref byte[] bytes, int offset, IDictionary<TKey, TValue> value)
         {
+            if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+
             var dictionary = value as DictionarySegment<TKey, TValue>;
             if (dictionary == null)
             {

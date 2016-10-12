@@ -8,8 +8,8 @@ using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
-    // Layout: FixedSize -> [count:int][t format...]
-    // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...]
+    // Layout: FixedSize -> [count:int][t format...] -> if count = -1 is null
+    // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...] -> if byteSize = -1 is null
     internal class ListFormatter<T> : Formatter<IList<T>>
     {
         public override int? GetLength()
@@ -17,9 +17,14 @@ namespace ZeroFormatter.Formatters
             return null;
         }
 
-        // TODO:value == null?
         public override int Serialize(ref byte[] bytes, int offset, IList<T> value)
         {
+            if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+
             var segment = value as IZeroFormatterSegment;
             if (segment != null)
             {

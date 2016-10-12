@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sandbox;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,11 +23,15 @@ public class MyClass
     public string FullName { get { return FirstName + LastName; } }
 
     [Index(3)]
-    public virtual IList<int> List { get; set; }
+    public virtual IList<MogeMoge> List { get; set; }
 }
 
 namespace Sandbox
 {
+    public enum MogeMoge
+    {
+        Apple, Orange
+    }
 
 
 
@@ -39,13 +44,12 @@ namespace Sandbox
                 Age = 99,
                 FirstName = "hoge",
                 LastName = "huga",
-                List = new List<int> { 1, 10, 100 }
+                List = new List<MogeMoge> { MogeMoge.Apple, MogeMoge.Orange, MogeMoge.Apple }
             };
 
             var bytes = ZeroFormatter.ZeroFormatterSerializer.Serialize(mc);
             var mc2 = ZeroFormatter.ZeroFormatterSerializer.Deserialize<MyClass>(bytes);
 
-            mc2.List.Add(999);
 
             var huga = ZeroFormatterSerializer.Serialize(mc2);
 

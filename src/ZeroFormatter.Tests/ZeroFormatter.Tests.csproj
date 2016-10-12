@@ -65,6 +65,7 @@
     <Compile Include="StringSegmentTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LookupSegmentTest.cs" />
+    <Compile Include="NullCheckTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChainingAssertion.Ext.cs" />
