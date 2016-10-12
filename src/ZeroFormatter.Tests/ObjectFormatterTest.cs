@@ -142,7 +142,7 @@ namespace ZeroFormatter.Tests
             {
                 var startOffset = offset;
                 offset += (8 + 4 * (__lastIndex + 1));
-
+                
                 // Auto Generate Area
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __originalBytes);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 1, _firstName);
@@ -150,7 +150,7 @@ namespace ZeroFormatter.Tests
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __originalBytes);
                 offset += ObjectSegmentHelper.SerializeSegment<IList<int>>(ref targetBytes, startOffset, offset, 4, _myList);
 
-                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset);
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, __lastIndex);
             }
             else
             {

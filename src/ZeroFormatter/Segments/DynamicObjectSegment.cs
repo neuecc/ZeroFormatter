@@ -80,8 +80,9 @@ namespace ZeroFormatter.Segments
             Formatter<T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index), value);
         }
 
-        public static int WriteSize(ref byte[] targetBytes, int startOffset, int lastOffset)
+        public static int WriteSize(ref byte[] targetBytes, int startOffset, int lastOffset, int lastIndex)
         {
+            BinaryUtil.WriteInt32(ref targetBytes, startOffset + 4, lastIndex);
             var writeSize = lastOffset - startOffset;
             BinaryUtil.WriteInt32(ref targetBytes, startOffset, writeSize);
             return writeSize;
@@ -521,6 +522,8 @@ namespace ZeroFormatter.Segments
                     generator.Emit(OpCodes.Ldarg_1);
                     generator.Emit(OpCodes.Ldloc_0);
                     generator.Emit(OpCodes.Ldarg_2);
+                    generator.Emit(OpCodes.Ldarg_0);
+                    generator.Emit(OpCodes.Ldfld, lastIndexField);
                     generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetMethod("WriteSize"));
                     generator.Emit(OpCodes.Ret);
                 }

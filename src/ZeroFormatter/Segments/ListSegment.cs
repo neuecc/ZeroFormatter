@@ -7,7 +7,7 @@ using ZeroFormatter.Internal;
 namespace ZeroFormatter.Segments
 {
     // TODO: /* IReadOnlyList??? */
-    public abstract class ListSegment<T> : IList<T>, IZeroFormatterSegment
+    public abstract class ListSegment<T> : IList<T>
     {
         protected readonly ArraySegment<byte> originalBytes;
         protected readonly Formatter<T> formatter;
@@ -211,62 +211,12 @@ namespace ZeroFormatter.Segments
             this.cache[this.length] = default(T);
             tracker.Dirty();
         }
-
-        internal ListSegment<T> Clone(DirtyTracker tracker, int newLength)
-        {
-            ListSegment<T> clone;
-            if (formatter.GetLength() == null)
-            {
-                clone = new VariableListSegment<T>(tracker, newLength);
-            }
-            else
-            {
-                clone = new FixedListSegment<T>(tracker, newLength);
-            }
-
-            CacheAllWhenNotYet();
-            Array.Copy(this.cache, 0, clone.cache, 0, Math.Min(length, newLength));
-            return clone;
-        }
-
-        public bool CanDirectCopy()
-        {
-            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
-        }
-
-        public ArraySegment<byte> GetBufferReference()
-        {
-            return originalBytes;
-        }
-
-        public int Serialize(ref byte[] bytes, int offset)
-        {
-            if (CanDirectCopy())
-            {
-                BinaryUtil.EnsureCapacity(ref bytes, offset, originalBytes.Count);
-                Buffer.BlockCopy(originalBytes.Array, originalBytes.Offset, bytes, offset, originalBytes.Count);
-                return originalBytes.Count;
-            }
-            else
-            {
-                return Formatter<IList<T>>.Default.Serialize(ref bytes, offset, this);
-            }
-        }
     }
 
     // Layout: FixedSize -> [count:int][t format...] if count== -1 is null
-    public class FixedListSegment<T> : ListSegment<T>
+    public class FixedListSegment<T> : ListSegment<T>, IZeroFormatterSegment
     {
         readonly int elementSize;
-
-        internal FixedListSegment(DirtyTracker tracker, int length)
-            : base(tracker, length)
-        {
-            var formatterLength = formatter.GetLength();
-            if (formatterLength == null) throw new InvalidOperationException("T should be fixed length. Type: " + typeof(T).Name);
-
-            elementSize = formatterLength.Value;
-        }
 
         internal static FixedListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
@@ -343,11 +293,47 @@ namespace ZeroFormatter.Segments
                 }
             }
         }
+
+        public bool CanDirectCopy()
+        {
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return originalBytes;
+        }
+
+        public int Serialize(ref byte[] bytes, int offset)
+        {
+            if (CanDirectCopy())
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, originalBytes.Count);
+                Buffer.BlockCopy(originalBytes.Array, originalBytes.Offset, bytes, offset, originalBytes.Count);
+                return originalBytes.Count;
+            }
+            else
+            {
+                var writeSize = this.Count * elementSize + 4;
+                if (bytes == null)
+                {
+                    bytes = new byte[writeSize];
+                }
+
+                offset += BinaryUtil.WriteInt32(ref bytes, offset, this.Count);
+                for (int i = 0; i < this.Count; i++)
+                {
+                    offset += formatter.Serialize(ref bytes, offset, this[i]);
+                }
+
+                return writeSize;
+            }
+        }
     }
 
     // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...]
     // if byteSize == -1 is null
-    public class VariableListSegment<T> : ListSegment<T>
+    public class VariableListSegment<T> : ListSegment<T>, IZeroFormatterSegment
     {
         internal static VariableListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
@@ -361,13 +347,6 @@ namespace ZeroFormatter.Segments
             var length = BinaryUtil.ReadInt32(ref bytes, offset + 4);
             var list = new VariableListSegment<T>(tracker, new ArraySegment<byte>(bytes, offset, byteSize), length);
             return list;
-        }
-
-        internal VariableListSegment(DirtyTracker tracker, int length)
-            : base(tracker, length)
-        {
-            var formatterLength = formatter.GetLength();
-            if (formatterLength != null) throw new InvalidOperationException("T has fixed length, use FixedListSegement instead. Type: " + typeof(T).Name);
         }
 
         VariableListSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes, int length)
@@ -419,6 +398,49 @@ namespace ZeroFormatter.Segments
                     isCached[index] = true;
                 }
                 tracker.Dirty();
+            }
+        }
+
+        public bool CanDirectCopy()
+        {
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return originalBytes;
+        }
+
+        public int Serialize(ref byte[] bytes, int offset)
+        {
+            if (CanDirectCopy())
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, originalBytes.Count);
+                Buffer.BlockCopy(originalBytes.Array, originalBytes.Offset, bytes, offset, originalBytes.Count);
+                return originalBytes.Count;
+            }
+            else
+            {
+                var startoffset = offset;
+
+                var count = 0;
+                offset = (startoffset + 8) + (Count * 4);
+                for (int i = 0; i < Count; i++)
+                {
+                    var item = this[i];
+
+                    var size = formatter.Serialize(ref bytes, offset, item);
+                    BinaryUtil.WriteInt32(ref bytes, (startoffset + 8) + count * 4, offset);
+                    offset += size;
+                    count++;
+                }
+
+                BinaryUtil.WriteInt32(ref bytes, startoffset + 4, Count);
+
+                var totalBytes = offset - startoffset;
+                BinaryUtil.WriteInt32(ref bytes, startoffset, totalBytes);
+
+                return totalBytes;
             }
         }
     }

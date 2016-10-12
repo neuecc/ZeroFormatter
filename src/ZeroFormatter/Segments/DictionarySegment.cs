@@ -9,7 +9,7 @@ namespace ZeroFormatter.Segments
 {
     // [int byteSize][int count]
     // [IList<int> buckets][List<DictionaryEntry> entries]
-   //  byteSize == -1 is null
+    //  byteSize == -1 is null
 
     // TODO:ReadOnlyDictionary?
     public sealed class DictionarySegment<TKey, TValue> : IDictionary<TKey, TValue>, IZeroFormatterSegment
@@ -41,10 +41,11 @@ namespace ZeroFormatter.Segments
                 size = HashHelpers.GetPrime(size);
             }
 
-            this.buckets = new FixedListSegment<int>(tracker, size);
-            for (int i = 0; i < buckets.Count; i++) buckets[i] = -1;
+            var newBuckets = new int[size];
+            for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
+            this.buckets = newBuckets;
 
-            this.entries = new VariableListSegment<DictionaryEntry<TKey, TValue>>(tracker, size);
+            this.entries = new DictionaryEntry<TKey, TValue>[size];
             this.comparer = ZeroFormatterEqualityComparer<TKey>.Default;
 
             this.freeList = -1;
@@ -170,7 +171,21 @@ namespace ZeroFormatter.Segments
             if (count > 0)
             {
                 for (int i = 0; i < buckets.Count; i++) buckets[i] = -1;
-                entries.Clear();
+
+                var el = entries as ListSegment<DictionaryEntry<TKey, TValue>>;
+                var ea = entries as DictionaryEntry<TKey, TValue>[];
+                if (el != null)
+                {
+                    el.Clear();
+                }
+                else if (ea != null)
+                {
+                    Array.Clear(ea, 0, count);
+                }
+                else
+                {
+                    throw new InvalidOperationException("entries type is invalid. " + entries.GetType().Name);
+                }
 
                 freeList = -1;
                 count = 0;
@@ -384,17 +399,17 @@ namespace ZeroFormatter.Segments
         void Resize(int newSize)
         {
             this.tracker.Dirty();
-            IList<int> newBuckets = new FixedListSegment<int>(tracker, newSize);
-            for (int i = 0; i < newBuckets.Count; i++) newBuckets[i] = -1;
+            var newBuckets = new int[newSize];
+            for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
 
-            var newEntries = (entries as ListSegment<DictionaryEntry<TKey, TValue>>).Clone(tracker, newSize);
+            var newEntries = new DictionaryEntry<TKey, TValue>[newSize];
+            entries.CopyTo(newEntries, 0);
 
             for (int i = 0; i < count; i++)
             {
                 if (newEntries[i].HashCode >= 0)
                 {
                     int bucket = newEntries[i].HashCode % newSize;
-                    // newEntries[i].Next = newBuckets[bucket];
                     newEntries[i] = newEntries[i].WithNext(newBuckets[bucket]);
                     newBuckets[bucket] = i;
                 }
