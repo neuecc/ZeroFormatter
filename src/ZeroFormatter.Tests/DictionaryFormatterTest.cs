@@ -14,8 +14,8 @@ namespace ZeroFormatter.Tests
             {
                 IDictionary<int, int> xs = new Dictionary<int, int> { { 1, 120 }, { 3431242, 532 }, { 32, 5 } };
 
-                var r = Serializer.Serialize(xs);
-                var v = Serializer.Deserialize<IDictionary<int, int>>(r);
+                var r = ZeroFormatterSerializer.Serialize(xs);
+                var v = ZeroFormatterSerializer.Deserialize<IDictionary<int, int>>(r);
                 v.OrderBy(x => x.Key)
                     .Select(x => Tuple.Create(x.Key, x.Value))
                     .Is(
@@ -33,8 +33,8 @@ namespace ZeroFormatter.Tests
                     { "zfweb", "linqfsd" },
                 };
 
-                var r = Serializer.Serialize(xs);
-                var v = Serializer.Deserialize<IDictionary<string, string>>(r);
+                var r = ZeroFormatterSerializer.Serialize(xs);
+                var v = ZeroFormatterSerializer.Deserialize<IDictionary<string, string>>(r);
                 v.Count.Is(5);
                 v["abcde"].Is("hogehoge");
                 v["あいうえお"].Is("かきくけこ");

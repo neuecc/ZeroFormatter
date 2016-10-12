@@ -12,8 +12,8 @@ namespace ZeroFormatter.Tests
         [TestMethod]
         public void String()
         {
-            var _ = Serializer.Serialize<string>("");
-            var str = Serializer.Deserialize<string>(_);
+            var _ = ZeroFormatterSerializer.Serialize<string>("");
+            var str = ZeroFormatterSerializer.Deserialize<string>(_);
 
             var ms = new MemoryStream();
             var bw = new BinaryWriter(ms);
@@ -31,14 +31,14 @@ namespace ZeroFormatter.Tests
             byte[] result = new byte[0];
             segment.Serialize(ref result, 0);
 
-            Serializer.Deserialize<string>(result).Is("あいうえおかきくけこ");
+            ZeroFormatterSerializer.Deserialize<string>(result).Is("あいうえおかきくけこ");
 
 
             segment.Value = null;
 
             segment.Serialize(ref result, 0);
 
-            Serializer.Deserialize<string>(result).IsNull();
+            ZeroFormatterSerializer.Deserialize<string>(result).IsNull();
         }
     }
 }

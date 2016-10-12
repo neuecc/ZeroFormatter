@@ -84,7 +84,7 @@
     <Compile Include="Segments\ObjectTracker.cs" />
     <Compile Include="Segments\SegmentState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ZeroFormatter.cs" />
+    <Compile Include="ZeroFormatterSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Formatters\KeyTupleFormatter.tt">

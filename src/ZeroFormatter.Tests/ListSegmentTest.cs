@@ -27,7 +27,7 @@ namespace ZeroFormatter.Tests
 
         VariableListSegment<string> CraeteVariableList(DirtyTracker tracker)
         {
-            var bytes = Serializer.Serialize<IList<string>>(new[] { "hoge", "あああ", "huga", null, "takotako", "chop", "!^ :a<>" });
+            var bytes = ZeroFormatterSerializer.Serialize<IList<string>>(new[] { "hoge", "あああ", "huga", null, "takotako", "chop", "!^ :a<>" });
 
             int _;
             var list = VariableListSegment<string>.Create(tracker, bytes, 0, out _);

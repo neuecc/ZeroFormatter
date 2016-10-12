@@ -14,7 +14,7 @@ namespace ZeroFormatter.Tests
         {
             {
                 var t1 = KeyTuple.Create(100, 200, 300);
-                var t2 = Serializer.Convert(t1);
+                var t2 = ZeroFormatterSerializer.Convert(t1);
 
                 t2.Item1.Is(t1.Item1);
                 t2.Item2.Is(t1.Item2);
@@ -22,7 +22,7 @@ namespace ZeroFormatter.Tests
             }
             {
                 var t1 = KeyTuple.Create(100, 200, 300, "aaa", "bbb", MyEnum.Fruit);
-                var t2 = Serializer.Convert(t1);
+                var t2 = ZeroFormatterSerializer.Convert(t1);
 
                 t2.Item1.Is(t1.Item1);
                 t2.Item2.Is(t1.Item2);

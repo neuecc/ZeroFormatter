@@ -37,8 +37,8 @@ class Program
             List = new List<int> { 1, 10, 100 }
         };
 
-        var bytes = ZeroFormatter.Serializer.Serialize(mc);
-        var mc2 = ZeroFormatter.Serializer.Deserialize<MyClass>(bytes);
+        var bytes = ZeroFormatterSerializer.Serialize(mc);
+        var mc2 = ZeroFormatterSerializer.Deserialize<MyClass>(bytes);
 
         // ZeroFormatter.DynamicObjectSegments.MyClass
         Console.WriteLine(mc2.GetType().FullName);

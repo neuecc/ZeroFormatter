@@ -13,7 +13,7 @@ namespace ZeroFormatter.Tests
         {
             var lookup = Enumerable.Range(1, 10)
                 .ToLookup(x => x % 2 == 0);
-            var bytes = Serializer.Serialize(lookup);
+            var bytes = ZeroFormatterSerializer.Serialize(lookup);
 
             int _;
             var segment = LookupSegment<bool, int>.Create(new DirtyTracker(), bytes, 0, out _);

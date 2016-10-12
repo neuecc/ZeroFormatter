@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
@@ -6,7 +7,7 @@ using ZeroFormatter.Segments;
 
 namespace ZeroFormatter
 {
-    public static class Serializer
+    public static class ZeroFormatterSerializer
     {
         public static byte[] Serialize<T>(T obj)
         {
