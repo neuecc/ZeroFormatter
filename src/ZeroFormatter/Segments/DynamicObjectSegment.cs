@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -104,6 +103,8 @@ namespace ZeroFormatter.Segments
 
         public static readonly Lazy<ModuleBuilder> Module = new Lazy<ModuleBuilder>(() => MakeDynamicAssembly(), true);
 
+        public static object ModuleLock = new object(); // be careful!
+
         static ModuleBuilder MakeDynamicAssembly()
         {
             var assemblyName = new AssemblyName(ModuleName);
@@ -134,9 +135,12 @@ namespace ZeroFormatter.Segments
 
         static Type Build()
         {
-            var moduleBuilder = DynamicAssemblyHolder.Module.Value;
-            var generatedType = GenerateObjectSegmentImplementation(moduleBuilder);
-
+            Type generatedType;
+            lock (DynamicAssemblyHolder.ModuleLock)
+            {
+                var moduleBuilder = DynamicAssemblyHolder.Module.Value;
+                generatedType = GenerateObjectSegmentImplementation(moduleBuilder);
+            }
             return generatedType;
         }
 
@@ -664,4 +668,3 @@ namespace ZeroFormatter.Segments
         }
     }
 }
-

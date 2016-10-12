@@ -20,6 +20,12 @@ namespace ZeroFormatter.Formatters
         // TODO:value == null?
         public override int Serialize(ref byte[] bytes, int offset, IList<T> value)
         {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+
             var formatter = Formatter<T>.Default;
             var length = formatter.GetLength();
             if (length != null)

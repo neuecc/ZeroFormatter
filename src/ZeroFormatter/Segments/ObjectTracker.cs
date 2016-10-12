@@ -21,7 +21,7 @@
             IsDirty = true;
             if (parent != null)
             {
-                parent.IsDirty = true;
+                parent.Dirty();
             }
         }
 

@@ -7,13 +7,12 @@ using ZeroFormatter.Internal;
 namespace ZeroFormatter.Segments
 {
     // TODO: /* IReadOnlyList??? */
-    public abstract class ListSegment<T> : IList<T>
+    public abstract class ListSegment<T> : IList<T>, IZeroFormatterSegment
     {
         protected readonly ArraySegment<byte> originalBytes;
         protected readonly Formatter<T> formatter;
 
         protected DirtyTracker tracker;
-        protected SegmentState state;
 
         protected int length;
         protected T[] cache;        // if modified, use cache start
@@ -25,7 +24,7 @@ namespace ZeroFormatter.Segments
             this.isAllCached = true;
             this.cache = new T[length];
             this.length = length;
-            this.tracker = tracker;
+            this.tracker = tracker.CreateChild();
             this.formatter = Formatters.Formatter<T>.Default;
         }
 
@@ -34,8 +33,7 @@ namespace ZeroFormatter.Segments
             this.originalBytes = originalBytes;
             this.formatter = Formatters.Formatter<T>.Default;
             this.length = length;
-            this.tracker = tracker;
-            this.state = SegmentState.Original;
+            this.tracker = tracker.CreateChild();
         }
 
         protected void CreateCacheWhenNotYet()
@@ -142,7 +140,7 @@ namespace ZeroFormatter.Segments
             }
             cache[length] = item;
             length++;
-            state = SegmentState.Dirty;
+            tracker.Dirty();
         }
 
         public void Clear()
@@ -157,7 +155,7 @@ namespace ZeroFormatter.Segments
                 cache = new T[0];
             }
             length = 0;
-            state = SegmentState.Dirty;
+            tracker.Dirty();
         }
 
         public void Insert(int index, T item)
@@ -180,7 +178,7 @@ namespace ZeroFormatter.Segments
             }
             cache[index] = item;
             length++;
-            state = SegmentState.Dirty;
+            tracker.Dirty();
         }
 
         public bool Remove(T item)
@@ -198,6 +196,7 @@ namespace ZeroFormatter.Segments
 
         public void RemoveAt(int index)
         {
+            tracker.Dirty();
             if (index >= this.length)
             {
                 throw new ArgumentOutOfRangeException("index is out of range:" + index);
@@ -210,7 +209,7 @@ namespace ZeroFormatter.Segments
                 Array.Copy(this.cache, index + 1, this.cache, index, this.length - index);
             }
             this.cache[this.length] = default(T);
-            state = SegmentState.Dirty;
+            tracker.Dirty();
         }
 
         internal ListSegment<T> Clone(DirtyTracker tracker, int newLength)
@@ -228,6 +227,30 @@ namespace ZeroFormatter.Segments
             CacheAllWhenNotYet();
             Array.Copy(this.cache, 0, clone.cache, 0, Math.Min(length, newLength));
             return clone;
+        }
+
+        public bool CanDirectCopy()
+        {
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return originalBytes;
+        }
+
+        public int Serialize(ref byte[] bytes, int offset)
+        {
+            if (CanDirectCopy())
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, originalBytes.Count);
+                Buffer.BlockCopy(originalBytes.Array, originalBytes.Offset, bytes, offset, originalBytes.Count);
+                return originalBytes.Count;
+            }
+            else
+            {
+                return Formatter<IList<T>>.Default.Serialize(ref bytes, offset, this);
+            }
         }
     }
 
@@ -303,6 +326,7 @@ namespace ZeroFormatter.Segments
 
                 if (!isAllCached)
                 {
+                    // FixedList[set] does not do dirty.
                     var array = originalBytes.Array;
                     var offset = 4 + (elementSize * index);
                     formatter.Serialize(ref array, originalBytes.Offset + offset, value);
@@ -310,7 +334,7 @@ namespace ZeroFormatter.Segments
                 else
                 {
                     cache[index] = value;
-                    state = SegmentState.Dirty;
+                    tracker.Dirty();
                 }
             }
         }
@@ -366,7 +390,6 @@ namespace ZeroFormatter.Segments
                     isCached[index] = true;
                 }
 
-                state = SegmentState.Cached;
                 return cache[index];
             }
 
@@ -383,7 +406,7 @@ namespace ZeroFormatter.Segments
                 {
                     isCached[index] = true;
                 }
-                state = SegmentState.Dirty;
+                tracker.Dirty();
             }
         }
     }
