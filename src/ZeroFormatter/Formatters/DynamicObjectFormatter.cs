@@ -40,7 +40,7 @@ namespace ZeroFormatter.Formatters
 
             var list = new List<Tuple<int, PropertyDeserializer>>();
 
-            //BinaryUtil.WriteInt32(ref bytes, startOffset + (4 + 4 * 1), offset);
+            //BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 1), offset);
             //offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.LastName);
             foreach (var p in props)
             {
@@ -52,6 +52,7 @@ namespace ZeroFormatter.Formatters
                 var formatterGet = formatterType.GetProperty("Default").GetGetMethod();
                 var serializeMethod = formatterType.GetMethod("Serialize");
 
+                var headerSize = Expression.Constant(8, typeof(int));
                 var intSize = Expression.Constant(4, typeof(int));
                 var arg1 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
                 var arg2 = Expression.Parameter(typeof(int), "startOffset");
@@ -61,7 +62,7 @@ namespace ZeroFormatter.Formatters
 
                 var writeInt32 = Expression.Call(typeof(BinaryUtil).GetMethod("WriteInt32"),
                     arg1,
-                    Expression.Add(arg2, Expression.Add(intSize, Expression.Multiply(intSize, arg4))),
+                    Expression.Add(arg2, Expression.Add(headerSize, Expression.Multiply(intSize, arg4))),
                     arg3);
 
                 var formatterSerialize = Expression.Call(Expression.Call(formatterGet), serializeMethod, arg1, arg3, Expression.Property(arg5, propInfo));
@@ -118,7 +119,7 @@ namespace ZeroFormatter.Formatters
             else
             {
                 var startOffset = offset;
-                offset += (8 + 4 * 4);
+                offset += (8 + 4 * (lastIndex + 1));
 
                 for (int i = 0; i < deserializers.Length; i++)
                 {

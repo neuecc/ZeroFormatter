@@ -6,7 +6,7 @@ using ZeroFormatter.Segments;
 
 namespace ZeroFormatter
 {
-    public static class ZeroFormatter
+    public static class Serializer
     {
         public static byte[] Serialize<T>(T obj)
         {

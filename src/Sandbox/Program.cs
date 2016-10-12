@@ -4,29 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZeroFormatter;
-using ZeroFormatter.Formatters;
-using ZeroFormatter.Segments;
+
+
+[ZeroFormattable]
+public class MyClass
+{
+    [Index(0)]
+    public virtual int Age { get; set; }
+
+    [Index(1)]
+    public virtual string FirstName { get; set; }
+
+    [Index(2)]
+    public virtual string LastName { get; set; }
+
+    [IgnoreFormat]
+    public string FullName { get { return FirstName + LastName; } }
+
+    [Index(3)]
+    public virtual IList<int> List { get; set; }
+}
 
 namespace Sandbox
 {
-    [ZeroFormattable]
-    public class MyClass
-    {
-        [Index(0)]
-        public virtual int Age { get; set; }
-
-        [Index(1)]
-        public virtual string FirstName { get; set; }
-
-        [Index(2)]
-        public virtual string LastName { get; set; }
-
-        [IgnoreFormat]
-        public string FullName { get { return FirstName + LastName; } }
-
-        [Index(3)]
-        public virtual int HogeMoge { get; protected set; }
-    }
 
 
 
@@ -34,28 +34,19 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
+            var mc = new MyClass
+            {
+                Age = 99,
+                FirstName = "hoge",
+                LastName = "huga",
+                List = new List<int> { 1, 10, 100 }
+            };
 
+            var bytes = ZeroFormatter.Serializer.Serialize(mc);
+            var mc2 = ZeroFormatter.Serializer.Deserialize<MyClass>(bytes);
 
-            var t = DynamicObjectSegmentBuilder<MyClass>.GetProxyType();
-
-
-            var hugahugahuga = t.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) });
-
-            var array = new ArraySegment<byte>(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
-            var tracker = new DirtyTracker();
-            var hoge = hugahugahuga.Invoke(new object[] { tracker, array });
-
-            // test2
-
-            var f = new DynamicObjectFormatter<MyClass>();
-
-
-
-
-            var bytes = array.Array;
-            int s = 0;
-            f.Deserialize(ref bytes, 0, tracker, out s);
-
+            // ZeroFormatter.DynamicObjectSegments.MyClass
+            Console.WriteLine(mc2.GetType().FullName);
         }
     }
 }

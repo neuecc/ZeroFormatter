@@ -15,20 +15,20 @@ namespace ZeroFormatter.Tests
         public void Bool()
         {
             {
-                var r = ZeroFormatter.Serialize(true);
-                ZeroFormatter.Deserialize<bool>(r).IsTrue();
+                var r = Serializer.Serialize(true);
+                Serializer.Deserialize<bool>(r).IsTrue();
             }
             {
-                var r = ZeroFormatter.Serialize(false);
-                ZeroFormatter.Deserialize<bool>(r).IsFalse();
+                var r = Serializer.Serialize(false);
+                Serializer.Deserialize<bool>(r).IsFalse();
             }
             {
-                var r = ZeroFormatter.Serialize<bool?>(null);
-                ZeroFormatter.Deserialize<bool?>(r).IsNull();
+                var r = Serializer.Serialize<bool?>(null);
+                Serializer.Deserialize<bool?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<bool?>(true);
-                ZeroFormatter.Deserialize<bool?>(r).Value.IsTrue();
+                var r = Serializer.Serialize<bool?>(true);
+                Serializer.Deserialize<bool?>(r).Value.IsTrue();
             }
         }
 
@@ -36,16 +36,16 @@ namespace ZeroFormatter.Tests
         public void Byte()
         {
             {
-                var r = ZeroFormatter.Serialize((byte)123);
-                ZeroFormatter.Deserialize<byte>(r).Is((byte)123);
+                var r = Serializer.Serialize((byte)123);
+                Serializer.Deserialize<byte>(r).Is((byte)123);
             }
             {
-                var r = ZeroFormatter.Serialize<byte?>(null);
-                ZeroFormatter.Deserialize<byte?>(r).IsNull();
+                var r = Serializer.Serialize<byte?>(null);
+                Serializer.Deserialize<byte?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<byte?>(234);
-                ZeroFormatter.Deserialize<byte?>(r).Value.Is((byte)234);
+                var r = Serializer.Serialize<byte?>(234);
+                Serializer.Deserialize<byte?>(r).Value.Is((byte)234);
             }
         }
 
@@ -53,16 +53,16 @@ namespace ZeroFormatter.Tests
         public void SByte()
         {
             {
-                var r = ZeroFormatter.Serialize((sbyte)123);
-                ZeroFormatter.Deserialize<sbyte>(r).Is((sbyte)123);
+                var r = Serializer.Serialize((sbyte)123);
+                Serializer.Deserialize<sbyte>(r).Is((sbyte)123);
             }
             {
-                var r = ZeroFormatter.Serialize<sbyte?>(null);
-                ZeroFormatter.Deserialize<sbyte?>(r).IsNull();
+                var r = Serializer.Serialize<sbyte?>(null);
+                Serializer.Deserialize<sbyte?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<sbyte?>(111);
-                ZeroFormatter.Deserialize<sbyte?>(r).Value.Is((sbyte)111);
+                var r = Serializer.Serialize<sbyte?>(111);
+                Serializer.Deserialize<sbyte?>(r).Value.Is((sbyte)111);
             }
         }
 
@@ -70,16 +70,16 @@ namespace ZeroFormatter.Tests
         public void Float()
         {
             {
-                var r = ZeroFormatter.Serialize(123.445f);
-                ZeroFormatter.Deserialize<float>(r).Is(123.445f);
+                var r = Serializer.Serialize(123.445f);
+                Serializer.Deserialize<float>(r).Is(123.445f);
             }
             {
-                var r = ZeroFormatter.Serialize<float?>(null);
-                ZeroFormatter.Deserialize<float?>(r).IsNull();
+                var r = Serializer.Serialize<float?>(null);
+                Serializer.Deserialize<float?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<float?>(4444.444f);
-                ZeroFormatter.Deserialize<float?>(r).Value.Is(4444.444f);
+                var r = Serializer.Serialize<float?>(4444.444f);
+                Serializer.Deserialize<float?>(r).Value.Is(4444.444f);
             }
         }
 
@@ -87,16 +87,16 @@ namespace ZeroFormatter.Tests
         public void Double()
         {
             {
-                var r = ZeroFormatter.Serialize(123.445);
-                ZeroFormatter.Deserialize<double>(r).Is(123.445);
+                var r = Serializer.Serialize(123.445);
+                Serializer.Deserialize<double>(r).Is(123.445);
             }
             {
-                var r = ZeroFormatter.Serialize<double?>(null);
-                ZeroFormatter.Deserialize<double?>(r).IsNull();
+                var r = Serializer.Serialize<double?>(null);
+                Serializer.Deserialize<double?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<double?>(4444.444);
-                ZeroFormatter.Deserialize<double?>(r).Value.Is(4444.444);
+                var r = Serializer.Serialize<double?>(4444.444);
+                Serializer.Deserialize<double?>(r).Value.Is(4444.444);
             }
         }
 
@@ -104,16 +104,16 @@ namespace ZeroFormatter.Tests
         public void Short()
         {
             {
-                var r = ZeroFormatter.Serialize((short)123);
-                ZeroFormatter.Deserialize<short>(r).Is((short)123);
+                var r = Serializer.Serialize((short)123);
+                Serializer.Deserialize<short>(r).Is((short)123);
             }
             {
-                var r = ZeroFormatter.Serialize<short?>(null);
-                ZeroFormatter.Deserialize<short?>(r).IsNull();
+                var r = Serializer.Serialize<short?>(null);
+                Serializer.Deserialize<short?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<short?>((short)44);
-                ZeroFormatter.Deserialize<short?>(r).Value.Is((short)44);
+                var r = Serializer.Serialize<short?>((short)44);
+                Serializer.Deserialize<short?>(r).Value.Is((short)44);
             }
         }
 
@@ -121,16 +121,16 @@ namespace ZeroFormatter.Tests
         public void UShort()
         {
             {
-                var r = ZeroFormatter.Serialize(ushort.MaxValue);
-                ZeroFormatter.Deserialize<ushort>(r).Is((ushort)ushort.MaxValue);
+                var r = Serializer.Serialize(ushort.MaxValue);
+                Serializer.Deserialize<ushort>(r).Is((ushort)ushort.MaxValue);
             }
             {
-                var r = ZeroFormatter.Serialize<ushort?>(null);
-                ZeroFormatter.Deserialize<ushort?>(r).IsNull();
+                var r = Serializer.Serialize<ushort?>(null);
+                Serializer.Deserialize<ushort?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<ushort?>(ushort.MinValue);
-                ZeroFormatter.Deserialize<ushort?>(r).Value.Is(ushort.MinValue);
+                var r = Serializer.Serialize<ushort?>(ushort.MinValue);
+                Serializer.Deserialize<ushort?>(r).Value.Is(ushort.MinValue);
             }
         }
 
@@ -138,16 +138,16 @@ namespace ZeroFormatter.Tests
         public void Int()
         {
             {
-                var r = ZeroFormatter.Serialize(int.MaxValue);
-                ZeroFormatter.Deserialize<int>(r).Is((int)int.MaxValue);
+                var r = Serializer.Serialize(int.MaxValue);
+                Serializer.Deserialize<int>(r).Is((int)int.MaxValue);
             }
             {
-                var r = ZeroFormatter.Serialize<int?>(null);
-                ZeroFormatter.Deserialize<int?>(r).IsNull();
+                var r = Serializer.Serialize<int?>(null);
+                Serializer.Deserialize<int?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<int?>(int.MinValue);
-                ZeroFormatter.Deserialize<int?>(r).Value.Is(int.MinValue);
+                var r = Serializer.Serialize<int?>(int.MinValue);
+                Serializer.Deserialize<int?>(r).Value.Is(int.MinValue);
             }
         }
 
@@ -155,16 +155,16 @@ namespace ZeroFormatter.Tests
         public void UInt()
         {
             {
-                var r = ZeroFormatter.Serialize(uint.MaxValue);
-                ZeroFormatter.Deserialize<uint>(r).Is((uint)uint.MaxValue);
+                var r = Serializer.Serialize(uint.MaxValue);
+                Serializer.Deserialize<uint>(r).Is((uint)uint.MaxValue);
             }
             {
-                var r = ZeroFormatter.Serialize<uint?>(null);
-                ZeroFormatter.Deserialize<uint?>(r).IsNull();
+                var r = Serializer.Serialize<uint?>(null);
+                Serializer.Deserialize<uint?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<uint?>(uint.MinValue);
-                ZeroFormatter.Deserialize<uint?>(r).Value.Is(uint.MinValue);
+                var r = Serializer.Serialize<uint?>(uint.MinValue);
+                Serializer.Deserialize<uint?>(r).Value.Is(uint.MinValue);
             }
         }
 
@@ -172,16 +172,16 @@ namespace ZeroFormatter.Tests
         public void Long()
         {
             {
-                var r = ZeroFormatter.Serialize(long.MaxValue);
-                ZeroFormatter.Deserialize<long>(r).Is((long)long.MaxValue);
+                var r = Serializer.Serialize(long.MaxValue);
+                Serializer.Deserialize<long>(r).Is((long)long.MaxValue);
             }
             {
-                var r = ZeroFormatter.Serialize<long?>(null);
-                ZeroFormatter.Deserialize<long?>(r).IsNull();
+                var r = Serializer.Serialize<long?>(null);
+                Serializer.Deserialize<long?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<long?>(long.MinValue);
-                ZeroFormatter.Deserialize<long?>(r).Value.Is(long.MinValue);
+                var r = Serializer.Serialize<long?>(long.MinValue);
+                Serializer.Deserialize<long?>(r).Value.Is(long.MinValue);
             }
         }
 
@@ -189,16 +189,16 @@ namespace ZeroFormatter.Tests
         public void ULong()
         {
             {
-                var r = ZeroFormatter.Serialize(ulong.MaxValue);
-                ZeroFormatter.Deserialize<ulong>(r).Is((ulong)ulong.MaxValue);
+                var r = Serializer.Serialize(ulong.MaxValue);
+                Serializer.Deserialize<ulong>(r).Is((ulong)ulong.MaxValue);
             }
             {
-                var r = ZeroFormatter.Serialize<ulong?>(null);
-                ZeroFormatter.Deserialize<ulong?>(r).IsNull();
+                var r = Serializer.Serialize<ulong?>(null);
+                Serializer.Deserialize<ulong?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<ulong?>(ulong.MinValue);
-                ZeroFormatter.Deserialize<ulong?>(r).Value.Is(ulong.MinValue);
+                var r = Serializer.Serialize<ulong?>(ulong.MinValue);
+                Serializer.Deserialize<ulong?>(r).Value.Is(ulong.MinValue);
             }
         }
 
@@ -206,12 +206,12 @@ namespace ZeroFormatter.Tests
         public void String()
         {
             {
-                var r = ZeroFormatter.Serialize("あいうえお");
-                ZeroFormatter.Deserialize<string>(r).Is("あいうえお");
+                var r = Serializer.Serialize("あいうえお");
+                Serializer.Deserialize<string>(r).Is("あいうえお");
             }
             {
-                var r = ZeroFormatter.Serialize<string>(null);
-                ZeroFormatter.Deserialize<string>(r).IsNull();
+                var r = Serializer.Serialize<string>(null);
+                Serializer.Deserialize<string>(r).IsNull();
             }
         }
 
@@ -219,21 +219,21 @@ namespace ZeroFormatter.Tests
         public void Char()
         {
             {
-                var r = ZeroFormatter.Serialize('あ');
-                ZeroFormatter.Deserialize<char>(r).Is('あ');
+                var r = Serializer.Serialize('あ');
+                Serializer.Deserialize<char>(r).Is('あ');
             }
             {
-                var r = ZeroFormatter.Serialize('z');
-                ZeroFormatter.Deserialize<char>(r).Is('z');
+                var r = Serializer.Serialize('z');
+                Serializer.Deserialize<char>(r).Is('z');
             }
 
             {
-                var r = ZeroFormatter.Serialize<char?>(null);
-                ZeroFormatter.Deserialize<char?>(r).IsNull();
+                var r = Serializer.Serialize<char?>(null);
+                Serializer.Deserialize<char?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<char?>('花');
-                ZeroFormatter.Deserialize<char?>(r).Value.Is('花');
+                var r = Serializer.Serialize<char?>('花');
+                Serializer.Deserialize<char?>(r).Value.Is('花');
             }
         }
 
@@ -241,18 +241,18 @@ namespace ZeroFormatter.Tests
         public void Decimal()
         {
             {
-                var r = ZeroFormatter.Serialize<decimal>(1000M);
-                ZeroFormatter.Deserialize<decimal>(r).Is(1000M);
+                var r = Serializer.Serialize<decimal>(1000M);
+                Serializer.Deserialize<decimal>(r).Is(1000M);
             }
 
             {
-                var r = ZeroFormatter.Serialize<decimal?>(null);
-                ZeroFormatter.Deserialize<decimal?>(r).IsNull();
+                var r = Serializer.Serialize<decimal?>(null);
+                Serializer.Deserialize<decimal?>(r).IsNull();
             }
 
             {
-                var r = ZeroFormatter.Serialize<decimal?>(decimal.MaxValue);
-                ZeroFormatter.Deserialize<decimal?>(r).Is(decimal.MaxValue);
+                var r = Serializer.Serialize<decimal?>(decimal.MaxValue);
+                Serializer.Deserialize<decimal?>(r).Is(decimal.MaxValue);
             }
         }
 
@@ -260,17 +260,17 @@ namespace ZeroFormatter.Tests
         public void TimeSpan()
         {
             {
-                var r = ZeroFormatter.Serialize<TimeSpan>(new System.TimeSpan(12, 12, 43, 54));
-                ZeroFormatter.Deserialize<TimeSpan>(r).Is(new System.TimeSpan(12, 12, 43, 54));
+                var r = Serializer.Serialize<TimeSpan>(new System.TimeSpan(12, 12, 43, 54));
+                Serializer.Deserialize<TimeSpan>(r).Is(new System.TimeSpan(12, 12, 43, 54));
             }
 
             {
-                var r = ZeroFormatter.Serialize<TimeSpan?>(null);
-                ZeroFormatter.Deserialize<TimeSpan?>(r).IsNull();
+                var r = Serializer.Serialize<TimeSpan?>(null);
+                Serializer.Deserialize<TimeSpan?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<TimeSpan?>(System.TimeSpan.Zero);
-                ZeroFormatter.Deserialize<TimeSpan?>(r).Is(System.TimeSpan.Zero);
+                var r = Serializer.Serialize<TimeSpan?>(System.TimeSpan.Zero);
+                Serializer.Deserialize<TimeSpan?>(r).Is(System.TimeSpan.Zero);
             }
         }
 
@@ -279,17 +279,17 @@ namespace ZeroFormatter.Tests
         {
             var now = DateTime.Now.ToUniversalTime();
             {
-                var r = ZeroFormatter.Serialize<DateTime>(now);
-                ZeroFormatter.Deserialize<DateTime>(r).ToString("yyyy-MM-dd HH:mm:ss fff").Is(now.ToString("yyyy-MM-dd HH:mm:ss fff"));
+                var r = Serializer.Serialize<DateTime>(now);
+                Serializer.Deserialize<DateTime>(r).ToString("yyyy-MM-dd HH:mm:ss fff").Is(now.ToString("yyyy-MM-dd HH:mm:ss fff"));
             }
 
             {
-                var r = ZeroFormatter.Serialize<DateTime?>(null);
-                ZeroFormatter.Deserialize<DateTime?>(r).IsNull();
+                var r = Serializer.Serialize<DateTime?>(null);
+                Serializer.Deserialize<DateTime?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<DateTime?>(now);
-                ZeroFormatter.Deserialize<DateTime?>(r).Is(now);
+                var r = Serializer.Serialize<DateTime?>(now);
+                Serializer.Deserialize<DateTime?>(r).Is(now);
             }
         }
 
@@ -298,17 +298,17 @@ namespace ZeroFormatter.Tests
         {
             var now = DateTimeOffset.Now.ToUniversalTime();
             {
-                var r = ZeroFormatter.Serialize<DateTimeOffset>(now);
-                ZeroFormatter.Deserialize<DateTimeOffset>(r).ToString("yyyy-MM-dd HH:mm:ss fff").Is(now.ToString("yyyy-MM-dd HH:mm:ss fff"));
+                var r = Serializer.Serialize<DateTimeOffset>(now);
+                Serializer.Deserialize<DateTimeOffset>(r).ToString("yyyy-MM-dd HH:mm:ss fff").Is(now.ToString("yyyy-MM-dd HH:mm:ss fff"));
             }
 
             {
-                var r = ZeroFormatter.Serialize<DateTimeOffset?>(null);
-                ZeroFormatter.Deserialize<DateTimeOffset?>(r).IsNull();
+                var r = Serializer.Serialize<DateTimeOffset?>(null);
+                Serializer.Deserialize<DateTimeOffset?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<DateTimeOffset?>(now);
-                ZeroFormatter.Deserialize<DateTimeOffset?>(r).Is(now);
+                var r = Serializer.Serialize<DateTimeOffset?>(now);
+                Serializer.Deserialize<DateTimeOffset?>(r).Is(now);
             }
         }
 
@@ -317,17 +317,17 @@ namespace ZeroFormatter.Tests
         {
             {
                 var bytes = new byte[] { 123, 31, 5, 64, 26, 2, 47, 2, 43 };
-                var r = ZeroFormatter.Serialize(bytes);
-                ZeroFormatter.Deserialize<byte[]>(r).Is(bytes);
+                var r = Serializer.Serialize(bytes);
+                Serializer.Deserialize<byte[]>(r).Is(bytes);
             }
             {
                 var bytes = new byte[0] { };
-                var r = ZeroFormatter.Serialize(bytes);
-                ZeroFormatter.Deserialize<byte[]>(r).Is(bytes);
+                var r = Serializer.Serialize(bytes);
+                Serializer.Deserialize<byte[]>(r).Is(bytes);
             }
             {
-                var r = ZeroFormatter.Serialize<byte[]>(null);
-                ZeroFormatter.Deserialize<byte[]>(r).IsNull();
+                var r = Serializer.Serialize<byte[]>(null);
+                Serializer.Deserialize<byte[]>(r).IsNull();
             }
         }
 
@@ -335,97 +335,97 @@ namespace ZeroFormatter.Tests
         public void EnumFormatTest()
         {
             {
-                var r = ZeroFormatter.Serialize<IntEnum>(IntEnum.Apple);
-                ZeroFormatter.Deserialize<IntEnum>(r).Is(IntEnum.Apple);
+                var r = Serializer.Serialize<IntEnum>(IntEnum.Apple);
+                Serializer.Deserialize<IntEnum>(r).Is(IntEnum.Apple);
 
 
-                ZeroFormatter.Serialize<IntEnum>(IntEnum.Orange);
+                Serializer.Serialize<IntEnum>(IntEnum.Orange);
             }
             {
-                var r = ZeroFormatter.Serialize<IntEnum?>(null);
-                ZeroFormatter.Deserialize<IntEnum?>(r).IsNull();
+                var r = Serializer.Serialize<IntEnum?>(null);
+                Serializer.Deserialize<IntEnum?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<IntEnum?>(IntEnum.Apple);
-                ZeroFormatter.Deserialize<IntEnum?>(r).Is(IntEnum.Apple);
+                var r = Serializer.Serialize<IntEnum?>(IntEnum.Apple);
+                Serializer.Deserialize<IntEnum?>(r).Is(IntEnum.Apple);
             }
             {
-                var r = ZeroFormatter.Serialize<UIntEnum>(UIntEnum.Apple);
-                ZeroFormatter.Deserialize<UIntEnum>(r).Is(UIntEnum.Apple);
+                var r = Serializer.Serialize<UIntEnum>(UIntEnum.Apple);
+                Serializer.Deserialize<UIntEnum>(r).Is(UIntEnum.Apple);
             }
             {
-                var r = ZeroFormatter.Serialize<UIntEnum?>(null);
-                ZeroFormatter.Deserialize<UIntEnum?>(r).IsNull();
+                var r = Serializer.Serialize<UIntEnum?>(null);
+                Serializer.Deserialize<UIntEnum?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<UIntEnum?>(UIntEnum.Apple);
-                ZeroFormatter.Deserialize<UIntEnum?>(r).Is(UIntEnum.Apple);
+                var r = Serializer.Serialize<UIntEnum?>(UIntEnum.Apple);
+                Serializer.Deserialize<UIntEnum?>(r).Is(UIntEnum.Apple);
             }
             {
-                var r = ZeroFormatter.Serialize<UShortEnum>(UShortEnum.Apple);
-                ZeroFormatter.Deserialize<UShortEnum>(r).Is(UShortEnum.Apple);
+                var r = Serializer.Serialize<UShortEnum>(UShortEnum.Apple);
+                Serializer.Deserialize<UShortEnum>(r).Is(UShortEnum.Apple);
             }
             {
-                var r = ZeroFormatter.Serialize<UShortEnum?>(null);
-                ZeroFormatter.Deserialize<UShortEnum?>(r).IsNull();
+                var r = Serializer.Serialize<UShortEnum?>(null);
+                Serializer.Deserialize<UShortEnum?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<UShortEnum?>(UShortEnum.Apple);
-                ZeroFormatter.Deserialize<UShortEnum?>(r).Is(UShortEnum.Apple);
+                var r = Serializer.Serialize<UShortEnum?>(UShortEnum.Apple);
+                Serializer.Deserialize<UShortEnum?>(r).Is(UShortEnum.Apple);
             }
             {
-                var r = ZeroFormatter.Serialize<ByteEnum>(ByteEnum.Apple);
-                ZeroFormatter.Deserialize<ByteEnum>(r).Is(ByteEnum.Apple);
+                var r = Serializer.Serialize<ByteEnum>(ByteEnum.Apple);
+                Serializer.Deserialize<ByteEnum>(r).Is(ByteEnum.Apple);
             }
             {
-                var r = ZeroFormatter.Serialize<ByteEnum?>(null);
-                ZeroFormatter.Deserialize<ByteEnum?>(r).IsNull();
+                var r = Serializer.Serialize<ByteEnum?>(null);
+                Serializer.Deserialize<ByteEnum?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<ByteEnum?>(ByteEnum.Apple);
-                ZeroFormatter.Deserialize<ByteEnum?>(r).Is(ByteEnum.Apple);
-            }
-
-
-            {
-                var r = ZeroFormatter.Serialize<SByteEnum>(SByteEnum.Apple);
-                ZeroFormatter.Deserialize<SByteEnum>(r).Is(SByteEnum.Apple);
-            }
-            {
-                var r = ZeroFormatter.Serialize<SByteEnum?>(null);
-                ZeroFormatter.Deserialize<SByteEnum?>(r).IsNull();
-            }
-            {
-                var r = ZeroFormatter.Serialize<SByteEnum?>(SByteEnum.Apple);
-                ZeroFormatter.Deserialize<SByteEnum?>(r).Is(SByteEnum.Apple);
+                var r = Serializer.Serialize<ByteEnum?>(ByteEnum.Apple);
+                Serializer.Deserialize<ByteEnum?>(r).Is(ByteEnum.Apple);
             }
 
 
             {
-                var r = ZeroFormatter.Serialize<LongEnum>(LongEnum.Apple);
-                ZeroFormatter.Deserialize<LongEnum>(r).Is(LongEnum.Apple);
+                var r = Serializer.Serialize<SByteEnum>(SByteEnum.Apple);
+                Serializer.Deserialize<SByteEnum>(r).Is(SByteEnum.Apple);
             }
             {
-                var r = ZeroFormatter.Serialize<LongEnum?>(null);
-                ZeroFormatter.Deserialize<LongEnum?>(r).IsNull();
+                var r = Serializer.Serialize<SByteEnum?>(null);
+                Serializer.Deserialize<SByteEnum?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<LongEnum?>(LongEnum.Apple);
-                ZeroFormatter.Deserialize<LongEnum?>(r).Is(LongEnum.Apple);
+                var r = Serializer.Serialize<SByteEnum?>(SByteEnum.Apple);
+                Serializer.Deserialize<SByteEnum?>(r).Is(SByteEnum.Apple);
             }
 
 
             {
-                var r = ZeroFormatter.Serialize<ULongEnum>(ULongEnum.Apple);
-                ZeroFormatter.Deserialize<ULongEnum>(r).Is(ULongEnum.Apple);
+                var r = Serializer.Serialize<LongEnum>(LongEnum.Apple);
+                Serializer.Deserialize<LongEnum>(r).Is(LongEnum.Apple);
             }
             {
-                var r = ZeroFormatter.Serialize<ULongEnum?>(null);
-                ZeroFormatter.Deserialize<ULongEnum?>(r).IsNull();
+                var r = Serializer.Serialize<LongEnum?>(null);
+                Serializer.Deserialize<LongEnum?>(r).IsNull();
             }
             {
-                var r = ZeroFormatter.Serialize<ULongEnum?>(ULongEnum.Apple);
-                ZeroFormatter.Deserialize<ULongEnum?>(r).Is(ULongEnum.Apple);
+                var r = Serializer.Serialize<LongEnum?>(LongEnum.Apple);
+                Serializer.Deserialize<LongEnum?>(r).Is(LongEnum.Apple);
+            }
+
+
+            {
+                var r = Serializer.Serialize<ULongEnum>(ULongEnum.Apple);
+                Serializer.Deserialize<ULongEnum>(r).Is(ULongEnum.Apple);
+            }
+            {
+                var r = Serializer.Serialize<ULongEnum?>(null);
+                Serializer.Deserialize<ULongEnum?>(r).IsNull();
+            }
+            {
+                var r = Serializer.Serialize<ULongEnum?>(ULongEnum.Apple);
+                Serializer.Deserialize<ULongEnum?>(r).Is(ULongEnum.Apple);
             }
         }
     }

@@ -339,18 +339,16 @@ namespace ZeroFormatter.Formatters
 
             }
 
-            // TODO:make the object formatter...
 
             else if (t.IsArray)
             {
                 throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[].");
             }
 
-
-
-
-
-
+            else if (t.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).Any())
+            {
+                formatter = new DynamicObjectFormatter<T>();
+            }
 
             else
             {

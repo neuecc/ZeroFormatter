@@ -23,7 +23,7 @@ namespace ZeroFormatter.Tests
                 {-42432, "more mainasu" },
                 {99999, "plus plus" }
             };
-            var bytes = ZeroFormatter.Serialize(sampleDict);
+            var bytes = Serializer.Serialize(sampleDict);
 
             int _;
             return DictionarySegment<int, string>.Create(new DirtyTracker(), bytes, 0, out _);

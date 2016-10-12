@@ -42,8 +42,10 @@ namespace ZeroFormatter.Segments
             }
         }
 
-        public static int SerializeFixedLength<T>(ref byte[] targetBytes, int offset, ArraySegment<byte> originalBytes, int index)
+        public static int SerializeFixedLength<T>(ref byte[] targetBytes, int startOffset, int offset, int index, ArraySegment<byte> originalBytes)
         {
+            BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset);
+
             var formatter = global::ZeroFormatter.Formatters.Formatter<T>.Default;
             var len = formatter.GetLength();
             BinaryUtil.EnsureCapacity(ref targetBytes, offset, len.Value);
@@ -51,14 +53,18 @@ namespace ZeroFormatter.Segments
             return len.Value;
         }
 
-        public static int SerializeSegment<T>(ref byte[] targetBytes, int offset, T segment)
+        public static int SerializeSegment<T>(ref byte[] targetBytes, int startOffset, int offset, int index, T segment)
         {
+            BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset);
+
             var formatter = global::ZeroFormatter.Formatters.Formatter<T>.Default;
             return formatter.Serialize(ref targetBytes, offset, segment);
         }
 
-        public static int SerializeSegment<T>(ref byte[] targetBytes, int offset, CacheSegment<T> segment)
+        public static int SerializeCacheSegment<T>(ref byte[] targetBytes, int startOffset, int offset, int index, CacheSegment<T> segment)
         {
+            BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset);
+
             return segment.Serialize(ref targetBytes, offset);
         }
 
@@ -74,22 +80,52 @@ namespace ZeroFormatter.Segments
             var array = bytes.Array;
             Formatter<T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index), value);
         }
+
+        public static int WriteSize(ref byte[] targetBytes, int startOffset, int lastOffset)
+        {
+            var writeSize = lastOffset - startOffset;
+            BinaryUtil.WriteInt32(ref targetBytes, startOffset, writeSize);
+            return writeSize;
+        }
+
+        public static int DirectCopyAll(ArraySegment<byte> originalBytes, byte[] targetBytes, int targetOffset)
+        {
+            var array = originalBytes.Array;
+            var copyCount = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
+            BinaryUtil.EnsureCapacity(ref targetBytes, targetOffset, copyCount);
+            Buffer.BlockCopy(array, originalBytes.Offset, targetBytes, targetOffset, copyCount);
+            return copyCount;
+        }
     }
 
-    // TODO:internal
-    public static class DynamicObjectSegmentBuilder<T>
+    internal static class DynamicAssemblyHolder
     {
-        const string ModuleName = "ZeroFormatter.Segments.DynamicObjectSegments";
+        public const string ModuleName = "ZeroFormatter.DynamicObjectSegments";
 
+        public static readonly Lazy<ModuleBuilder> Module = new Lazy<ModuleBuilder>(() => MakeDynamicAssembly(), true);
+
+        static ModuleBuilder MakeDynamicAssembly()
+        {
+            var assemblyName = new AssemblyName(ModuleName);
+            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            var moduleBuilder = assemblyBuilder.DefineDynamicModule(ModuleName);
+
+            return moduleBuilder;
+        }
+    }
+
+    internal static class DynamicObjectSegmentBuilder<T>
+    {
         static readonly MethodInfo ArraySegmentArrayGet = typeof(ArraySegment<byte>).GetProperty("Array").GetGetMethod();
         static readonly MethodInfo ArraySegmentOffsetGet = typeof(ArraySegment<byte>).GetProperty("Offset").GetGetMethod();
         static readonly MethodInfo ReadInt32 = typeof(BinaryUtil).GetMethod("ReadInt32");
         static readonly MethodInfo CreateChild = typeof(DirtyTracker).GetMethod("CreateChild");
-        static readonly MethodInfo IsDirty = typeof(DirtyTracker).GetMethod("Dirty");
+        static readonly MethodInfo Dirty = typeof(DirtyTracker).GetMethod("Dirty");
+        static readonly MethodInfo IsDirty = typeof(DirtyTracker).GetProperty("IsDirty").GetGetMethod();
         static readonly MethodInfo GetSegment = typeof(ObjectSegmentHelper).GetMethod("GetSegment");
         static readonly MethodInfo GetOffset = typeof(ObjectSegmentHelper).GetMethod("GetOffset");
 
-        static readonly Lazy<Type> lazyBuild = new Lazy<Type>(() => Build());
+        static readonly Lazy<Type> lazyBuild = new Lazy<Type>(() => Build(), true);
 
         public static Type GetProxyType()
         {
@@ -98,11 +134,7 @@ namespace ZeroFormatter.Segments
 
         static Type Build()
         {
-            // TODO:VerifyType
-
-            var assemblyName = new AssemblyName(ModuleName);
-            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule(ModuleName);
+            var moduleBuilder = DynamicAssemblyHolder.Module.Value;
             var generatedType = GenerateObjectSegmentImplementation(moduleBuilder);
 
             return generatedType;
@@ -112,11 +144,9 @@ namespace ZeroFormatter.Segments
         {
             // public class DynamicObjectSegment.MyClass : MyClass, IZeroFormatterSegment
             var type = moduleBuilder.DefineType(
-                ModuleName + "." + typeof(T).Name,
+                DynamicAssemblyHolder.ModuleName + "." + typeof(T).FullName,
                 TypeAttributes.Public,
                 typeof(T));
-            // TODO:Impl Interface
-            //new[] { typeof(IZeroFormatterSegment) });
 
             // TODO:Change name to <>_
             var originalBytes = type.DefineField("_originalBytes", typeof(ArraySegment<byte>), FieldAttributes.Private | FieldAttributes.InitOnly);
@@ -143,8 +173,7 @@ namespace ZeroFormatter.Segments
                 }
             }
 
-            // TODO:not implemented yet;
-            BuildInterface();
+            BuildInterfaceMethod(type, originalBytes, tracker, lastIndex, properties);
 
             return type.CreateType();
         }
@@ -246,7 +275,7 @@ namespace ZeroFormatter.Segments
                 {
                     AssignCacheSegment(generator, item.Index, trackerField, lastIndexField, item.SegmentField);
                 }
-                else 
+                else
                 {
                     AssignSegment(generator, item.Index, trackerField, lastIndexField, item.SegmentField);
                 }
@@ -287,10 +316,6 @@ namespace ZeroFormatter.Segments
         static void BuildFixedProperty(TypeBuilder type, FieldInfo originalBytesField, FieldInfo trackerField, PropertyTuple property)
         {
             var prop = type.DefineProperty(property.PropertyInfo.Name, property.PropertyInfo.Attributes, property.PropertyInfo.PropertyType, Type.EmptyTypes);
-
-
-            
-
 
             // build get
             var getMethod = property.PropertyInfo.GetGetMethod();
@@ -399,7 +424,7 @@ namespace ZeroFormatter.Segments
 
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldfld, trackerField);
-                generator.Emit(OpCodes.Callvirt, IsDirty);
+                generator.Emit(OpCodes.Callvirt, Dirty);
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldarg_1);
                 generator.Emit(OpCodes.Stfld, property.SegmentField);
@@ -409,8 +434,104 @@ namespace ZeroFormatter.Segments
             }
         }
 
-        static void BuildInterface()
+        static void BuildInterfaceMethod(TypeBuilder type, FieldInfo originalBytesField, FieldInfo trackerField, FieldInfo lastIndexField, List<PropertyTuple> properties)
         {
+            type.AddInterfaceImplementation(typeof(IZeroFormatterSegment));
+
+            // CanDirectCopy
+            {
+                var method = type.DefineMethod("CanDirectCopy", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof(bool), Type.EmptyTypes);
+                var generator = method.GetILGenerator();
+
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, trackerField);
+                generator.Emit(OpCodes.Callvirt, IsDirty);
+                generator.Emit(OpCodes.Ldc_I4_0);
+                generator.Emit(OpCodes.Ceq);
+                generator.Emit(OpCodes.Ret);
+            }
+            // GetBufferReference
+            {
+                var method = type.DefineMethod("GetBufferReference", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof(ArraySegment<byte>), Type.EmptyTypes);
+                var generator = method.GetILGenerator();
+
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, originalBytesField);
+                generator.Emit(OpCodes.Ret);
+            }
+            // Serialize
+            {
+                var method = type.DefineMethod("Serialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof(int), new[] { typeof(byte[]).MakeByRefType(), typeof(int) });
+                var generator = method.GetILGenerator();
+
+                generator.DeclareLocal(typeof(int));
+                var label = generator.DefineLabel();
+
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, trackerField);
+                generator.Emit(OpCodes.Callvirt, IsDirty);
+                // if
+                {
+                    generator.Emit(OpCodes.Brfalse, label);
+                    generator.Emit(OpCodes.Ldarg_2);
+                    generator.Emit(OpCodes.Ldc_I4_8);
+                    generator.Emit(OpCodes.Ldc_I4_4);
+                    generator.Emit(OpCodes.Ldarg_0);
+                    generator.Emit(OpCodes.Ldfld, lastIndexField);
+                    generator.Emit(OpCodes.Ldc_I4_1);
+                    generator.Emit(OpCodes.Add);
+                    generator.Emit(OpCodes.Mul);
+                    generator.Emit(OpCodes.Add);
+                    generator.Emit(OpCodes.Add);
+
+                    foreach (var prop in properties)
+                    {
+                        generator.Emit(OpCodes.Starg_S, (byte)2);
+                        generator.Emit(OpCodes.Ldarg_2);
+                        generator.Emit(OpCodes.Ldarg_1);
+                        generator.Emit(OpCodes.Ldloc_0);
+                        generator.Emit(OpCodes.Ldarg_2);
+                        generator.Emit(OpCodes.Ldc_I4, prop.Index);
+                        generator.Emit(OpCodes.Ldarg_0);
+
+                        // load field and call
+                        if (prop.IsFixedSize)
+                        {
+                            generator.Emit(OpCodes.Ldfld, originalBytesField);
+                            generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetMethod("SerializeFixedLength").MakeGenericMethod(prop.PropertyInfo.PropertyType));
+                        }
+                        else if (prop.IsCacheSegment)
+                        {
+                            generator.Emit(OpCodes.Ldfld, prop.SegmentField);
+                            generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetMethod("SerializeCacheSegment").MakeGenericMethod(prop.PropertyInfo.PropertyType));
+                        }
+                        else
+                        {
+                            generator.Emit(OpCodes.Ldfld, prop.SegmentField);
+                            generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetMethod("SerializeSegment").MakeGenericMethod(prop.PropertyInfo.PropertyType));
+                        }
+                        generator.Emit(OpCodes.Add);
+                    }
+
+                    generator.Emit(OpCodes.Starg_S, (byte)2);
+                    generator.Emit(OpCodes.Ldarg_1);
+                    generator.Emit(OpCodes.Ldloc_0);
+                    generator.Emit(OpCodes.Ldarg_2);
+                    generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetMethod("WriteSize"));
+                    generator.Emit(OpCodes.Ret);
+                }
+                // else
+                {
+                    generator.MarkLabel(label);
+                    generator.Emit(OpCodes.Ldarg_0);
+                    generator.Emit(OpCodes.Ldfld, originalBytesField);
+                    generator.Emit(OpCodes.Ldarg_1);
+                    generator.Emit(OpCodes.Ldind_Ref);
+                    generator.Emit(OpCodes.Ldarg_2);
+                    generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetMethod("DirectCopyAll"));
+                    generator.Emit(OpCodes.Ret);
+                }
+            }
         }
 
 
