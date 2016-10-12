@@ -45,8 +45,8 @@ namespace Sandbox
             var bytes = ZeroFormatter.ZeroFormatterSerializer.Serialize(mc);
             var mc2 = ZeroFormatter.ZeroFormatterSerializer.Deserialize<MyClass>(bytes);
 
-            // ZeroFormatter.DynamicObjectSegments.MyClass
-            Console.WriteLine(mc2.GetType().FullName);
+            ZeroFormatterSerializer.Serialize(mc2);
+            
         }
     }
 }

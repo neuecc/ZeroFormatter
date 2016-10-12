@@ -88,7 +88,7 @@ namespace ZeroFormatter.Segments
             return writeSize;
         }
 
-        public static int DirectCopyAll(ArraySegment<byte> originalBytes, byte[] targetBytes, int targetOffset)
+        public static int DirectCopyAll(ArraySegment<byte> originalBytes, ref byte[] targetBytes, int targetOffset)
         {
             var array = originalBytes.Array;
             var copyCount = BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
@@ -526,7 +526,6 @@ namespace ZeroFormatter.Segments
                     generator.Emit(OpCodes.Ldarg_0);
                     generator.Emit(OpCodes.Ldfld, originalBytesField);
                     generator.Emit(OpCodes.Ldarg_1);
-                    generator.Emit(OpCodes.Ldind_Ref);
                     generator.Emit(OpCodes.Ldarg_2);
                     generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetMethod("DirectCopyAll"));
                     generator.Emit(OpCodes.Ret);

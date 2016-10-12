@@ -154,7 +154,7 @@ namespace ZeroFormatter.Tests
             }
             else
             {
-                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, targetBytes, offset);
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
             }
         }
     }
