@@ -1,10 +1,39 @@
 ﻿using System;
+using System.Linq;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Segments
 {
     // for KeyTuple, String, byte[]
+    internal static class CacheSegment
+    {
+        public static bool CanAccept(Type type)
+        {
+            if (type == typeof(string))
+            {
+                return true;
+            }
+            else if (type == typeof(byte[]))
+            {
+                return true;
+            }
+            else if (type.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
+            {
+                return true;
+            }
+            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                if (type.GetGenericArguments()[0].GetInterfaces().Any(x => x == typeof(IKeyTuple)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
     public class CacheSegment<T> : IZeroFormatterSegment
     {
         readonly DirtyTracker tracker;
@@ -18,10 +47,6 @@ namespace ZeroFormatter.Segments
             this.state = SegmentState.Original;
             this.serializedBytes = originalBytes;
             this.cached = default(T);
-
-            if (originalBytes.Count == 0)
-            {
-            }
         }
 
         public T Value

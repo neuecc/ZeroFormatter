@@ -34,14 +34,14 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-       
+
 
             var t = DynamicObjectSegmentBuilder<MyClass>.GetProxyType();
 
 
             var hugahugahuga = t.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) });
 
-            var array = new ArraySegment<byte>(new byte[] { 1, 2, 3, 4, 5 });
+            var array = new ArraySegment<byte>(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
             var tracker = new DirtyTracker();
             var hoge = hugahugahuga.Invoke(new object[] { tracker, array });
 
@@ -49,7 +49,7 @@ namespace Sandbox
 
             var f = new DynamicObjectFormatter<MyClass>();
 
-            
+
 
 
             var bytes = array.Array;

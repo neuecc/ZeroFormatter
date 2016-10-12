@@ -17,6 +17,7 @@ namespace ZeroFormatter.Formatters
             return null;
         }
 
+        // TODO:value == null?
         public override int Serialize(ref byte[] bytes, int offset, IList<T> value)
         {
             var formatter = Formatter<T>.Default;

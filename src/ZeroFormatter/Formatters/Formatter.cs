@@ -8,7 +8,12 @@ namespace ZeroFormatter.Formatters
 {
     // raw layer of serialization.
 
-    public abstract class Formatter<T>
+    public interface IFormatter
+    {
+        int? GetLength();
+    }
+
+    public abstract class Formatter<T> : IFormatter
     {
         static Formatter<T> defaultFormatter;
         public static Formatter<T> Default

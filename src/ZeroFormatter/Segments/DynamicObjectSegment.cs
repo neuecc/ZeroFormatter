@@ -51,9 +51,28 @@ namespace ZeroFormatter.Segments
             return len.Value;
         }
 
-        public static int SerializeSegment<T>(ref byte[] targetBytes, int offset, IZeroFormatterSegment segment)
+        public static int SerializeSegment<T>(ref byte[] targetBytes, int offset, T segment)
+        {
+            var formatter = global::ZeroFormatter.Formatters.Formatter<T>.Default;
+            return formatter.Serialize(ref targetBytes, offset, segment);
+        }
+
+        public static int SerializeSegment<T>(ref byte[] targetBytes, int offset, CacheSegment<T> segment)
         {
             return segment.Serialize(ref targetBytes, offset);
+        }
+
+        public static T GetFixedProperty<T>(ArraySegment<byte> bytes, int index, DirtyTracker tracker)
+        {
+            var array = bytes.Array;
+            int _;
+            return Formatter<T>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index), tracker, out _);
+        }
+
+        public static void SetFixedProperty<T>(ArraySegment<byte> bytes, int index, T value)
+        {
+            var array = bytes.Array;
+            Formatter<T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index), value);
         }
     }
 
@@ -61,6 +80,14 @@ namespace ZeroFormatter.Segments
     public static class DynamicObjectSegmentBuilder<T>
     {
         const string ModuleName = "ZeroFormatter.Segments.DynamicObjectSegments";
+
+        static readonly MethodInfo ArraySegmentArrayGet = typeof(ArraySegment<byte>).GetProperty("Array").GetGetMethod();
+        static readonly MethodInfo ArraySegmentOffsetGet = typeof(ArraySegment<byte>).GetProperty("Offset").GetGetMethod();
+        static readonly MethodInfo ReadInt32 = typeof(BinaryUtil).GetMethod("ReadInt32");
+        static readonly MethodInfo CreateChild = typeof(DirtyTracker).GetMethod("CreateChild");
+        static readonly MethodInfo IsDirty = typeof(DirtyTracker).GetMethod("Dirty");
+        static readonly MethodInfo GetSegment = typeof(ObjectSegmentHelper).GetMethod("GetSegment");
+        static readonly MethodInfo GetOffset = typeof(ObjectSegmentHelper).GetMethod("GetOffset");
 
         static readonly Lazy<Type> lazyBuild = new Lazy<Type>(() => Build());
 
@@ -91,28 +118,82 @@ namespace ZeroFormatter.Segments
             // TODO:Impl Interface
             //new[] { typeof(IZeroFormatterSegment) });
 
-            var originalBytes = type.DefineField("<>_originalBytes", typeof(ArraySegment<byte>), FieldAttributes.Private | FieldAttributes.InitOnly);
-            var tracker = type.DefineField("<>_tracker", typeof(DirtyTracker), FieldAttributes.Private | FieldAttributes.InitOnly);
+            // TODO:Change name to <>_
+            var originalBytes = type.DefineField("_originalBytes", typeof(ArraySegment<byte>), FieldAttributes.Private | FieldAttributes.InitOnly);
+            var tracker = type.DefineField("_tracker", typeof(DirtyTracker), FieldAttributes.Private | FieldAttributes.InitOnly);
+            var lastIndex = type.DefineField("_lastIndex", typeof(int), FieldAttributes.Private | FieldAttributes.InitOnly);
 
-            // TODO:XxxSegment...
+            var properties = GetProperties(type);
 
-            BuildConstructor(type, originalBytes, tracker);
+            BuildConstructor(type, originalBytes, tracker, lastIndex, properties);
 
-            // BuildProperties
-            // BuildZeroFormatterSegmentMethods
+            foreach (var item in properties)
+            {
+                if (item.IsFixedSize)
+                {
+                    BuildFixedProperty(type, originalBytes, tracker, item);
+                }
+                else if (item.IsCacheSegment)
+                {
+                    BuildCacheSegmentProperty(type, originalBytes, tracker, item);
+                }
+                else
+                {
+                    BuildSegmentProperty(type, originalBytes, tracker, item);
+                }
+            }
 
-            //foreach (var method in GetAllInterfaceMethods(typeof(T)))
-            //{
-            //    BuildMethod(type, method, contextField, targetPeerField);
-            //}
+            // TODO:not implemented yet;
+            BuildInterface();
 
             return type.CreateType();
         }
 
-        static readonly MethodInfo ArraySegmentArrayGet = typeof(ArraySegment<byte>).GetProperty("Array").GetGetMethod();
-        static readonly MethodInfo CreateChild = typeof(DirtyTracker).GetMethod("CreateChild");
+        static List<PropertyTuple> GetProperties(TypeBuilder typeBuilder)
+        {
+            var lastIndex = -1;
 
-        static void BuildConstructor(TypeBuilder type, FieldInfo originalBytesField, FieldInfo trackerField)
+            var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(x => !x.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any())
+                .Select(x => new { PropInfo = x, IndexAttr = x.GetCustomAttributes(typeof(IndexAttribute), true).Cast<IndexAttribute>().FirstOrDefault() })
+                .Where(x => x.IndexAttr != null)
+                .OrderBy(x => x.IndexAttr.Index);
+
+            var list = new List<PropertyTuple>();
+
+            foreach (var p in props)
+            {
+                var propInfo = p.PropInfo;
+                var index = p.IndexAttr.Index;
+
+                var formatter = (IFormatter)typeof(Formatter<>).MakeGenericType(propInfo.PropertyType).GetProperty("Default").GetValue(null, Type.EmptyTypes);
+
+                if (formatter.GetLength() == null)
+                {
+                    // TODO:use <>
+                    if (CacheSegment.CanAccept(propInfo.PropertyType))
+                    {
+                        var fieldBuilder = typeBuilder.DefineField("__" + propInfo.Name, typeof(CacheSegment<>).MakeGenericType(propInfo.PropertyType), FieldAttributes.Private);
+                        list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo, IsFixedSize = false, SegmentField = fieldBuilder, IsCacheSegment = true });
+                    }
+                    else
+                    {
+                        var fieldBuilder = typeBuilder.DefineField("__" + propInfo.Name, propInfo.PropertyType, FieldAttributes.Private);
+                        list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo, IsFixedSize = false, SegmentField = fieldBuilder });
+                    }
+                }
+                else
+                {
+                    list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo, IsFixedSize = true });
+                }
+
+                lastIndex = index;
+            }
+
+            return list;
+        }
+
+        static void BuildConstructor(TypeBuilder type, FieldInfo originalBytesField, FieldInfo trackerField, FieldInfo lastIndexField, List<PropertyTuple> properties)
         {
             var method = type.DefineMethod(".ctor", System.Reflection.MethodAttributes.Public | System.Reflection.MethodAttributes.HideBySig);
 
@@ -125,12 +206,13 @@ namespace ZeroFormatter.Segments
             var generator = method.GetILGenerator();
 
             generator.DeclareLocal(typeof(byte[]));
+            generator.DeclareLocal(typeof(int));
 
             // ctor
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Call, baseCtor);
 
-            // Local Var( var __array = originalBytes.Array; )
+            // Local Var( var array = originalBytes.Array; )
             generator.Emit(OpCodes.Ldarga_S, (byte)2);
             generator.Emit(OpCodes.Call, ArraySegmentArrayGet);
             generator.Emit(OpCodes.Stloc_0);
@@ -139,6 +221,7 @@ namespace ZeroFormatter.Segments
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Ldarg_2);
             generator.Emit(OpCodes.Stfld, originalBytesField);
+
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Ldarg_1);
             generator.Emit(OpCodes.Callvirt, CreateChild);
@@ -146,47 +229,190 @@ namespace ZeroFormatter.Segments
             generator.Emit(OpCodes.Starg_S, (byte)1);
             generator.Emit(OpCodes.Stfld, trackerField);
 
-            // Assign Field MutableSegments
-            // TODO:...
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Ldloca_S, (byte)0);
+            generator.Emit(OpCodes.Ldarga_S, (byte)2);
+            generator.Emit(OpCodes.Call, ArraySegmentOffsetGet);
+            generator.Emit(OpCodes.Ldc_I4_4);
+            generator.Emit(OpCodes.Add);
+            generator.Emit(OpCodes.Call, ReadInt32);
+            generator.Emit(OpCodes.Stfld, lastIndexField);
+
+            foreach (var item in properties)
+            {
+                if (item.IsFixedSize) continue;
+
+                if (item.IsCacheSegment)
+                {
+                    AssignCacheSegment(generator, item.Index, trackerField, lastIndexField, item.SegmentField);
+                }
+                else 
+                {
+                    AssignSegment(generator, item.Index, trackerField, lastIndexField, item.SegmentField);
+                }
+            }
 
             generator.Emit(OpCodes.Ret);
         }
 
-
-        static void GetProperties()
+        static void AssignCacheSegment(ILGenerator generator, int index, FieldInfo tracker, FieldInfo lastIndex, FieldInfo field)
         {
-            var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            foreach (var propInfo in props)
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Ldfld, tracker);
+            generator.Emit(OpCodes.Ldarg_2);
+            generator.Emit(OpCodes.Ldc_I4, index);
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Ldfld, lastIndex);
+            generator.Emit(OpCodes.Call, GetSegment);
+            generator.Emit(OpCodes.Newobj, field.FieldType.GetConstructors().First());
+            generator.Emit(OpCodes.Stfld, field);
+        }
+
+        static void AssignSegment(ILGenerator generator, int index, FieldInfo tracker, FieldInfo lastIndex, FieldInfo field)
+        {
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Call, typeof(Formatter<>).MakeGenericType(field.FieldType).GetProperty("Default").GetGetMethod());
+            generator.Emit(OpCodes.Ldloca_S, (byte)0);
+            generator.Emit(OpCodes.Ldarg_2);
+            generator.Emit(OpCodes.Ldc_I4, index);
+            generator.Emit(OpCodes.Call, GetOffset);
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Ldfld, tracker);
+            generator.Emit(OpCodes.Ldloca_S, (byte)1);
+            generator.Emit(OpCodes.Callvirt, typeof(Formatter<>).MakeGenericType(field.FieldType).GetMethod("Deserialize"));
+            generator.Emit(OpCodes.Stfld, field);
+        }
+
+        static void BuildFixedProperty(TypeBuilder type, FieldInfo originalBytesField, FieldInfo trackerField, PropertyTuple property)
+        {
+            var prop = type.DefineProperty(property.PropertyInfo.Name, property.PropertyInfo.Attributes, property.PropertyInfo.PropertyType, Type.EmptyTypes);
+
+
+            
+
+
+            // build get
+            var getMethod = property.PropertyInfo.GetGetMethod();
+            if (getMethod != null)
             {
-                if (propInfo.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) continue;
-                var indexAttribute = propInfo.GetCustomAttributes(typeof(IndexAttribute), true).FirstOrDefault();
-                if (indexAttribute == null) continue;
+                var method = type.DefineMethod(getMethod.Name, getMethod.Attributes & ~MethodAttributes.NewSlot, getMethod.ReturnType, Type.EmptyTypes);
 
-                var hasLength = Formatter<T>.Default.GetLength();
-                // needs segment.
-                if (hasLength == null)
-                {
-                    // WellknownSegment
+                var generator = method.GetILGenerator();
 
-                    // ByteArraySegment
-                    // DictionarySegment
-                    // ListSegment
-                    // LookupSegment
-                    // KeyTupleSegment
-                    // StringSegment
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, originalBytesField);
+                generator.Emit(OpCodes.Ldc_I4, property.Index);
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, trackerField);
+                generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetMethod("GetFixedProperty").MakeGenericMethod(getMethod.ReturnType));
+                generator.Emit(OpCodes.Ret);
 
-
-
-                    // and Object...
-
-
-
-                    DynamicObjectSegmentBuilder<T>.GetProxyType();
-                }
-
+                prop.SetGetMethod(method);
             }
 
+            // build set
+            var setMethod = property.PropertyInfo.GetSetMethod();
+            if (setMethod != null)
+            {
+                var method = type.DefineMethod(setMethod.Name, setMethod.Attributes & ~MethodAttributes.NewSlot, null, new[] { setMethod.GetParameters()[0].ParameterType });
+
+                var generator = method.GetILGenerator();
+
+                generator.DeclareLocal(typeof(byte[]));
+
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, originalBytesField);
+                generator.Emit(OpCodes.Ldc_I4, property.Index);
+                generator.Emit(OpCodes.Ldarg_1);
+                generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetMethod("SetFixedProperty").MakeGenericMethod(getMethod.ReturnType));
+                generator.Emit(OpCodes.Ret);
+
+                prop.SetSetMethod(method);
+            }
         }
+
+        static void BuildCacheSegmentProperty(TypeBuilder type, FieldInfo originalBytesField, FieldInfo trackerField, PropertyTuple property)
+        {
+            var prop = type.DefineProperty(property.PropertyInfo.Name, property.PropertyInfo.Attributes, property.PropertyInfo.PropertyType, Type.EmptyTypes);
+
+            // build get
+            var getMethod = property.PropertyInfo.GetGetMethod();
+            if (getMethod != null)
+            {
+                var method = type.DefineMethod(getMethod.Name, getMethod.Attributes & ~MethodAttributes.NewSlot, getMethod.ReturnType, Type.EmptyTypes);
+
+                var generator = method.GetILGenerator();
+
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, property.SegmentField);
+                generator.Emit(OpCodes.Callvirt, property.SegmentField.FieldType.GetProperty("Value").GetGetMethod());
+                generator.Emit(OpCodes.Ret);
+
+                prop.SetGetMethod(method);
+            }
+
+            // build set
+            var setMethod = property.PropertyInfo.GetSetMethod();
+            if (setMethod != null)
+            {
+                var method = type.DefineMethod(setMethod.Name, setMethod.Attributes & ~MethodAttributes.NewSlot, null, new[] { setMethod.GetParameters()[0].ParameterType });
+
+                var generator = method.GetILGenerator();
+
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, property.SegmentField);
+                generator.Emit(OpCodes.Ldarg_1);
+                generator.Emit(OpCodes.Callvirt, property.SegmentField.FieldType.GetProperty("Value").GetSetMethod());
+                generator.Emit(OpCodes.Ret);
+
+                prop.SetSetMethod(method);
+            }
+        }
+
+        static void BuildSegmentProperty(TypeBuilder type, FieldInfo originalBytesField, FieldInfo trackerField, PropertyTuple property)
+        {
+            var prop = type.DefineProperty(property.PropertyInfo.Name, property.PropertyInfo.Attributes, property.PropertyInfo.PropertyType, Type.EmptyTypes);
+
+            // build get
+            var getMethod = property.PropertyInfo.GetGetMethod();
+            if (getMethod != null)
+            {
+                var method = type.DefineMethod(getMethod.Name, getMethod.Attributes & ~MethodAttributes.NewSlot, getMethod.ReturnType, Type.EmptyTypes);
+
+                var generator = method.GetILGenerator();
+
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, property.SegmentField);
+                generator.Emit(OpCodes.Ret);
+
+                prop.SetGetMethod(method);
+            }
+
+            // build set
+            var setMethod = property.PropertyInfo.GetSetMethod();
+            if (setMethod != null)
+            {
+                var method = type.DefineMethod(setMethod.Name, setMethod.Attributes & ~MethodAttributes.NewSlot, null, new[] { setMethod.GetParameters()[0].ParameterType });
+
+                var generator = method.GetILGenerator();
+
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, trackerField);
+                generator.Emit(OpCodes.Callvirt, IsDirty);
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldarg_1);
+                generator.Emit(OpCodes.Stfld, property.SegmentField);
+                generator.Emit(OpCodes.Ret);
+
+                prop.SetSetMethod(method);
+            }
+        }
+
+        static void BuildInterface()
+        {
+        }
+
 
         //static void BuildMethod(TypeBuilder type, MethodInfo interfaceMethodInfo, FieldInfo contextField, FieldInfo targetPeerField)
         //{
@@ -307,6 +533,15 @@ namespace ZeroFormatter.Segments
         //        throw new InvalidOperationException($"Client proxy's method must not take ref parameter : {interfaceType.Name}.{interfaceMethod.Name}({parameter.Name})");
         //    }
         //}
+
+        class PropertyTuple
+        {
+            public int Index;
+            public PropertyInfo PropertyInfo;
+            public FieldInfo SegmentField;
+            public bool IsCacheSegment;
+            public bool IsFixedSize;
+        }
     }
 }
 

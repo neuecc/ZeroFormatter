@@ -27,14 +27,13 @@ namespace ZeroFormatter.Formatters
 
             if (!isZeroFormattable)
             {
-                // TODO:Validation
-                // throw new InvalidOperationException
+                throw new InvalidOperationException(typeof(T).Name + " is not marked ZeroFormattableAttirbute.");
             }
 
             this.lastIndex = -1;
 
             var props = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(x => x.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any())
+                .Where(x => !x.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any())
                 .Select(x => new { PropInfo = x, IndexAttr = x.GetCustomAttributes(typeof(IndexAttribute), true).Cast<IndexAttribute>().FirstOrDefault() })
                 .Where(x => x.IndexAttr != null)
                 .OrderBy(x => x.IndexAttr.Index);
