@@ -156,8 +156,6 @@ namespace ZeroFormatter.Analyzer
                 var genericType = namedType.ConstructUnboundGenericType();
                 var genericTypeString = genericType.ToDisplayString();
 
-                // TODO:IReadOnlyList, IReadOnlyDictionary
-
                 if (genericTypeString == "T?")
                 {
                     VerifyType(context, callerLocation, namedType.TypeArguments[0], alreadyAnalyzed, callFromProperty);
@@ -175,6 +173,8 @@ namespace ZeroFormatter.Analyzer
                 }
                 else if (genericTypeString == "System.Collections.Generic.IList<>"
                       || genericTypeString == "System.Collections.Generic.IDictionary<,>"
+                      || genericTypeString == "System.Collections.Generic.IReadOnlyList<>"
+                      || genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>"
                       || genericTypeString == "System.Linq.ILookup<,>"
                       || genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
                 {
