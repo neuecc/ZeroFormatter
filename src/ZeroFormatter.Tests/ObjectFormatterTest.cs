@@ -41,24 +41,27 @@ namespace ZeroFormatter.Tests
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
         readonly int __lastIndex;
+        readonly byte[] __extraFixedBytes;
 
         // generated mutable segements
         readonly CacheSegment<string> _lastName;
         readonly CacheSegment<string> _firstName;
         readonly IList<int> _myList;
 
+        // 0
         public override int Age
         {
             get
             {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 0, __tracker);
+                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 0, __lastIndex, __tracker);
             }
             set
             {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 0, value);
+                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 0, __lastIndex, value);
             }
         }
 
+        // 1
         public override string FirstName
         {
             get
@@ -72,6 +75,7 @@ namespace ZeroFormatter.Tests
             }
         }
 
+        // 2
         public override string LastName
         {
             get
@@ -85,18 +89,20 @@ namespace ZeroFormatter.Tests
             }
         }
 
+        // 3
         public override int HogeMoge
         {
             get
             {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 3, __tracker);
+                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 3, __lastIndex, __tracker);
             }
             protected set
             {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 3, value);
+                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 3, __lastIndex, value);
             }
         }
 
+        // 4
         public override IList<int> MyList
         {
             get
@@ -120,10 +126,13 @@ namespace ZeroFormatter.Tests
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
             this.__lastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
 
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__lastIndex, 4, 40); // embed schemaLastIndex, elementSizeSum
+
             // Auto Generate Area
             _firstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __lastIndex));
             _lastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __lastIndex));
-            _myList = Formatter<IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4), __tracker, out __out);
+            _myList = Formatter<IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __lastIndex), __tracker, out __out);
+
         }
 
         public bool CanDirectCopy()
@@ -142,12 +151,12 @@ namespace ZeroFormatter.Tests
             {
                 var startOffset = offset;
                 offset += (8 + 4 * (__lastIndex + 1));
-                
+
                 // Auto Generate Area
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __originalBytes);
+                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __lastIndex, __originalBytes);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 1, _firstName);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 2, _lastName);
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __originalBytes);
+                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __lastIndex, __originalBytes);
                 offset += ObjectSegmentHelper.SerializeSegment<IList<int>>(ref targetBytes, startOffset, offset, 4, _myList);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, __lastIndex);
@@ -324,6 +333,68 @@ namespace ZeroFormatter.Tests
             mc4.Age.Is(9);
             mc4.LastName.Is("chop");
             mc4.MyList.Is(1, 10, 100, 1000, 9999);
+        }
+
+
+        [ZeroFormattable]
+        public class SkipIndex
+        {
+            [Index(1)]
+            public virtual string MyProperty1 { get; set; }
+
+            [Index(3)]
+            public virtual string MyProperty3 { get; set; }
+            [Index(5)]
+            public virtual string MyProperty5 { get; set; }
+        }
+
+        [ZeroFormattable]
+        public class OtherSchema1
+        {
+            [Index(1)]
+            public virtual string MyProperty1 { get; set; }
+        }
+
+        [ZeroFormattable]
+        public class OtherSchema2
+        {
+            [Index(3)]
+            public virtual string MyProperty3 { get; set; }
+        }
+
+        [ZeroFormattable]
+        public class OtherSchema3
+        {
+            [Index(6)]
+            public virtual string MyProperty6 { get; set; }
+        }
+
+        [TestMethod]
+        public void SkipIndexTest()
+        {
+            var c = new SkipIndex
+            {
+                MyProperty1 = "あああああ",
+                MyProperty3 = "いいじょｄｓｆｄそｊふぉさｆ",
+                MyProperty5 = "ほぐあｈｚｇっｈれあｇはえ"
+            };
+
+
+            var bytes = ZeroFormatterSerializer.Serialize(c);
+            var r = ZeroFormatterSerializer.Deserialize<SkipIndex>(bytes);
+
+            r.MyProperty1.Is("あああああ");
+            r.MyProperty3.Is("いいじょｄｓｆｄそｊふぉさｆ");
+            r.MyProperty5.Is("ほぐあｈｚｇっｈれあｇはえ");
+
+            var r2 = ZeroFormatterSerializer.Deserialize<OtherSchema1>(bytes);
+            r2.MyProperty1.Is("あああああ");
+
+            var r3 = ZeroFormatterSerializer.Deserialize<OtherSchema2>(bytes);
+            r3.MyProperty3.Is("いいじょｄｓｆｄそｊふぉさｆ");
+
+            var r4 = ZeroFormatterSerializer.Deserialize<OtherSchema3>(bytes);
+            r4.MyProperty6.IsNull();
         }
     }
 }

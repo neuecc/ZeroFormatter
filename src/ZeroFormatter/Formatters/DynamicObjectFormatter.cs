@@ -10,6 +10,81 @@ namespace ZeroFormatter.Formatters
 {
     // Layout: [int byteSize][lastIndex][indexOffset:int...][t format...], byteSize == -1 is null.
 
+    internal static class DynamicObjectDescriptor
+    {
+        public static Tuple<int, PropertyInfo>[] GetProperties(Type type)
+        {
+            if (!type.IsClass)
+            {
+                throw new InvalidOperationException("Type must be class. " + type.Name);
+            }
+
+            if (type.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() == null)
+            {
+                throw new InvalidOperationException("Type must mark ZeroFormattableAttribute. " + type.Name);
+            }
+
+            var dict = new Dictionary<int, PropertyInfo>();
+            foreach (var item in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (item.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) continue;
+
+                var index = item.GetCustomAttributes(typeof(IndexAttribute), true).Cast<IndexAttribute>().FirstOrDefault();
+                if (index == null)
+                {
+                    throw new InvalidOperationException("Public property must mark IndexAttribute or IgnoreFormatAttribute. " + type.Name + "." + item.Name);
+                }
+
+                var getMethod = item.GetGetMethod(true);
+                var setMethod = item.GetSetMethod(true);
+
+                if (getMethod == null || setMethod == null || getMethod.IsPrivate || setMethod.IsPrivate)
+                {
+                    throw new InvalidOperationException("Public property's accessor must needs both public/protected get and set." + type.Name + "." + item.Name);
+                }
+
+                if (!getMethod.IsVirtual || !setMethod.IsVirtual)
+                {
+                    throw new InvalidOperationException("Public property's accessor must be virtual. " + type.Name + "." + item.Name);
+                }
+
+                if (dict.ContainsKey(index.Index))
+                {
+                    throw new InvalidOperationException("IndexAttribute can not allow duplicate. " + type.Name + "." + item.Name + ", Index:" + index.Index);
+                }
+
+                dict[index.Index] = item;
+            }
+
+            return dict.OrderBy(x => x.Key).Select(x => Tuple.Create(x.Key, x.Value)).ToArray();
+        }
+
+        static void VerifyProeprtyType(PropertyInfo property)
+        {
+            if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                throw new InvalidOperationException("Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary. " + property.DeclaringType.Name + "." + property.PropertyType.Name);
+            }
+            else if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                throw new InvalidOperationException("List does not support in ZeroFormatter because List have to deserialize all objects. You can use IList<T> instead of List. " + property.DeclaringType.Name + "." + property.PropertyType.Name);
+            }
+            else if (property.PropertyType.IsArray && property.PropertyType != typeof(byte[]))
+            {
+                throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[]. " + property.DeclaringType.Name + "." + property.PropertyType.Name);
+            }
+
+            var formatter = typeof(Formatter<>).MakeGenericType(property.PropertyType).GetProperty("Default").GetValue(null, null);
+            var error = formatter as IErrorFormatter;
+            if (error != null)
+            {
+                throw error.GetException();
+            }
+
+            // OK, Can Serialzie.
+        }
+    }
+
     public class DynamicObjectFormatter<T> : Formatter<T>
     {
         internal delegate int PropertyDeserializer(ref byte[] bytes, int startOffset, int currentOffset, int index, T self);
@@ -23,29 +98,16 @@ namespace ZeroFormatter.Formatters
         {
             // Create descriptor.
             var type = typeof(T);
-            var isZeroFormattable = type.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).Any();
-
-            if (!isZeroFormattable)
-            {
-                throw new InvalidOperationException(typeof(T).Name + " is not marked ZeroFormattableAttirbute.");
-            }
 
             this.lastIndex = -1;
-
-            var props = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(x => !x.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any())
-                .Select(x => new { PropInfo = x, IndexAttr = x.GetCustomAttributes(typeof(IndexAttribute), true).Cast<IndexAttribute>().FirstOrDefault() })
-                .Where(x => x.IndexAttr != null)
-                .OrderBy(x => x.IndexAttr.Index);
-
             var list = new List<Tuple<int, PropertyDeserializer>>();
 
             //BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 1), offset);
             //offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.LastName);
-            foreach (var p in props)
+            foreach (var p in DynamicObjectDescriptor.GetProperties(type))
             {
-                var propInfo = p.PropInfo;
-                var index = p.IndexAttr.Index;
+                var propInfo = p.Item2;
+                var index = p.Item1;
 
                 var propType = propInfo.PropertyType;
                 var formatterType = typeof(Formatter<>).MakeGenericType(propType);
@@ -92,8 +154,6 @@ namespace ZeroFormatter.Formatters
 
                 var newArraySegment = Expression.New(arraySegmentCtor, arg1, arg2, arg4);
 
-
-
                 var lambda = Expression.Lambda<FactoryFunc>(Expression.New(ctorInfo, arg3, newArraySegment), arg1, arg2, arg3, arg4);
                 this.factory = lambda.Compile();
             }
@@ -136,6 +196,12 @@ namespace ZeroFormatter.Formatters
 
         public override T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
+            if (offset == -1)
+            {
+                byteSize = 0;
+                return default(T);
+            }
+
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSize == -1)
             {

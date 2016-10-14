@@ -3,7 +3,8 @@
 namespace ZeroFormatter
 {
     // We need to use Analyazer so can't use DataContractAttribute.
-    // Analyzer detect attribtues by name.
+    // Analyzer detect attribtues by "short" name.
+    // Short name means does not needs reference ZeroFormatter so create no dependent libraries.
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class ZeroFormattableAttribute : Attribute

@@ -20,15 +20,24 @@ namespace ZeroFormatter.Segments
             return BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
         }
 
-        public static int GetOffset(ArraySegment<byte> originalBytes, int index)
+        public static int GetOffset(ArraySegment<byte> originalBytes, int index, int lastIndex)
         {
+            if (index > lastIndex)
+            {
+                return -1;
+            }
             var array = originalBytes.Array;
             return BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + 4 * index);
         }
 
         public static ArraySegment<byte> GetSegment(ArraySegment<byte> originalBytes, int index, int lastIndex)
         {
-            var offset = GetOffset(originalBytes, index);
+            if (index > lastIndex)
+            {
+                return default(ArraySegment<byte>); // note:very very dangerous.
+            }
+
+            var offset = GetOffset(originalBytes, index, lastIndex);
             if (index == lastIndex)
             {
                 var sliceLength = originalBytes.Offset + originalBytes.Count;
@@ -36,19 +45,30 @@ namespace ZeroFormatter.Segments
             }
             else
             {
-                var nextOffset = GetOffset(originalBytes, index + 1);
-                return new ArraySegment<byte>(originalBytes.Array, offset, (nextOffset - offset));
+                var nextIndex = index + 1;
+                do
+                {
+                    var nextOffset = GetOffset(originalBytes, nextIndex, lastIndex);
+                    if (nextOffset != 0)
+                    {
+                        return new ArraySegment<byte>(originalBytes.Array, offset, (nextOffset - offset));
+                    }
+                } while (nextIndex++ < lastIndex); // if reached over the lastIndex, ge
+
+
+                var sliceLength = originalBytes.Offset + originalBytes.Count;
+                return new ArraySegment<byte>(originalBytes.Array, offset, (sliceLength - offset));
             }
         }
 
-        public static int SerializeFixedLength<T>(ref byte[] targetBytes, int startOffset, int offset, int index, ArraySegment<byte> originalBytes)
+        public static int SerializeFixedLength<T>(ref byte[] targetBytes, int startOffset, int offset, int index, int lastIndex, ArraySegment<byte> originalBytes)
         {
             BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset);
 
             var formatter = global::ZeroFormatter.Formatters.Formatter<T>.Default;
             var len = formatter.GetLength();
             BinaryUtil.EnsureCapacity(ref targetBytes, offset, len.Value);
-            Buffer.BlockCopy(originalBytes.Array, GetOffset(originalBytes, index), targetBytes, offset, len.Value);
+            Buffer.BlockCopy(originalBytes.Array, GetOffset(originalBytes, index, lastIndex), targetBytes, offset, len.Value);
             return len.Value;
         }
 
@@ -67,17 +87,17 @@ namespace ZeroFormatter.Segments
             return segment.Serialize(ref targetBytes, offset);
         }
 
-        public static T GetFixedProperty<T>(ArraySegment<byte> bytes, int index, DirtyTracker tracker)
+        public static T GetFixedProperty<T>(ArraySegment<byte> bytes, int index,int lastIndex, DirtyTracker tracker)
         {
             var array = bytes.Array;
             int _;
-            return Formatter<T>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index), tracker, out _);
+            return Formatter<T>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex), tracker, out _);
         }
 
-        public static void SetFixedProperty<T>(ArraySegment<byte> bytes, int index, T value)
+        public static void SetFixedProperty<T>(ArraySegment<byte> bytes, int index,int lastIndex, T value)
         {
             var array = bytes.Array;
-            Formatter<T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index), value);
+            Formatter<T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex), value);
         }
 
         public static int WriteSize(ref byte[] targetBytes, int startOffset, int lastOffset, int lastIndex)
@@ -95,6 +115,19 @@ namespace ZeroFormatter.Segments
             BinaryUtil.EnsureCapacity(ref targetBytes, targetOffset, copyCount);
             Buffer.BlockCopy(array, originalBytes.Offset, targetBytes, targetOffset, copyCount);
             return copyCount;
+        }
+
+        public static byte[] CreateExtraFixedBytes(int binaryLastIndex, int schemaLastIndex, int elementSizeSum)
+        {
+            if (binaryLastIndex < schemaLastIndex)
+            {
+                // [header offsets] + [elements]
+                return new byte[((schemaLastIndex - binaryLastIndex) * 4) + elementSizeSum];
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
@@ -129,6 +162,15 @@ namespace ZeroFormatter.Segments
 
         static readonly Lazy<Type> lazyBuild = new Lazy<Type>(() => Build(), true);
 
+        class PropertyTuple
+        {
+            public int Index;
+            public PropertyInfo PropertyInfo;
+            public FieldInfo SegmentField;
+            public bool IsCacheSegment;
+            public bool IsFixedSize;
+        }
+
         public static Type GetProxyType()
         {
             return lazyBuild.Value;
@@ -153,12 +195,11 @@ namespace ZeroFormatter.Segments
                 TypeAttributes.Public,
                 typeof(T));
 
-            // TODO:Change name to <>_
-            var originalBytes = type.DefineField("_originalBytes", typeof(ArraySegment<byte>), FieldAttributes.Private | FieldAttributes.InitOnly);
-            var tracker = type.DefineField("_tracker", typeof(DirtyTracker), FieldAttributes.Private | FieldAttributes.InitOnly);
-            var lastIndex = type.DefineField("_lastIndex", typeof(int), FieldAttributes.Private | FieldAttributes.InitOnly);
+            var originalBytes = type.DefineField("<>_originalBytes", typeof(ArraySegment<byte>), FieldAttributes.Private | FieldAttributes.InitOnly);
+            var tracker = type.DefineField("<>_tracker", typeof(DirtyTracker), FieldAttributes.Private | FieldAttributes.InitOnly);
+            var lastIndex = type.DefineField("<>_lastIndex", typeof(int), FieldAttributes.Private | FieldAttributes.InitOnly);
 
-            var properties = GetProperties(type);
+            var properties = GetPropertiesWithVerify(type);
 
             BuildConstructor(type, originalBytes, tracker, lastIndex, properties);
 
@@ -183,36 +224,30 @@ namespace ZeroFormatter.Segments
             return type.CreateType();
         }
 
-        static List<PropertyTuple> GetProperties(TypeBuilder typeBuilder)
+        static List<PropertyTuple> GetPropertiesWithVerify(TypeBuilder typeBuilder)
         {
             var lastIndex = -1;
 
-            var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(x => !x.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any())
-                .Select(x => new { PropInfo = x, IndexAttr = x.GetCustomAttributes(typeof(IndexAttribute), true).Cast<IndexAttribute>().FirstOrDefault() })
-                .Where(x => x.IndexAttr != null)
-                .OrderBy(x => x.IndexAttr.Index);
-
             var list = new List<PropertyTuple>();
 
-            foreach (var p in props)
+            // getproperties contains verify.
+            foreach (var p in DynamicObjectDescriptor.GetProperties(typeof(T)))
             {
-                var propInfo = p.PropInfo;
-                var index = p.IndexAttr.Index;
+                var propInfo = p.Item2;
+                var index = p.Item1;
 
                 var formatter = (IFormatter)typeof(Formatter<>).MakeGenericType(propInfo.PropertyType).GetProperty("Default").GetValue(null, Type.EmptyTypes);
 
                 if (formatter.GetLength() == null)
                 {
-                    // TODO:use <>
                     if (CacheSegment.CanAccept(propInfo.PropertyType))
                     {
-                        var fieldBuilder = typeBuilder.DefineField("__" + propInfo.Name, typeof(CacheSegment<>).MakeGenericType(propInfo.PropertyType), FieldAttributes.Private);
+                        var fieldBuilder = typeBuilder.DefineField("<>_" + propInfo.Name, typeof(CacheSegment<>).MakeGenericType(propInfo.PropertyType), FieldAttributes.Private);
                         list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo, IsFixedSize = false, SegmentField = fieldBuilder, IsCacheSegment = true });
                     }
                     else
                     {
-                        var fieldBuilder = typeBuilder.DefineField("__" + propInfo.Name, propInfo.PropertyType, FieldAttributes.Private);
+                        var fieldBuilder = typeBuilder.DefineField("<>_" + propInfo.Name, propInfo.PropertyType, FieldAttributes.Private);
                         list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo, IsFixedSize = false, SegmentField = fieldBuilder });
                     }
                 }
@@ -538,136 +573,6 @@ namespace ZeroFormatter.Segments
                     generator.Emit(OpCodes.Ret);
                 }
             }
-        }
-
-
-        //static void BuildMethod(TypeBuilder type, MethodInfo interfaceMethodInfo, FieldInfo contextField, FieldInfo targetPeerField)
-        //{
-        //    MethodAttributes methodAttributes =
-        //          MethodAttributes.Public
-        //        | MethodAttributes.Virtual
-        //        | MethodAttributes.Final
-        //        | MethodAttributes.HideBySig
-        //        | MethodAttributes.NewSlot;
-
-        //    ParameterInfo[] parameters = interfaceMethodInfo.GetParameters();
-        //    Type[] paramTypes = parameters.Select(param => param.ParameterType).ToArray();
-
-        //    MethodBuilder methodBuilder = type.DefineMethod(interfaceMethodInfo.Name, methodAttributes);
-
-        //    // void BroadcastEvent(IEnumerable<IPhotonWirePeer> targetPeers, byte eventCode, params object[] args);
-        //    MethodInfo invokeMethod = typeof(HubContext).GetMethod(
-        //        "BroadcastEvent", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null,
-        //        new Type[] { typeof(IEnumerable<IPhotonWirePeer>), typeof(byte), typeof(object[]) }, null);
-
-        //    methodBuilder.SetReturnType(interfaceMethodInfo.ReturnType);
-        //    methodBuilder.SetParameters(paramTypes);
-
-        //    ILGenerator generator = methodBuilder.GetILGenerator();
-
-        //    generator.DeclareLocal(typeof(object[]));
-
-        //    // Get Context and peer
-        //    generator.Emit(OpCodes.Ldarg_0);
-        //    generator.Emit(OpCodes.Ldfld, contextField); // context
-        //    generator.Emit(OpCodes.Ldarg_0);
-        //    generator.Emit(OpCodes.Ldfld, targetPeerField); // peer
-
-        //    // OpCode
-        //    var opCode = interfaceMethodInfo.GetCustomAttribute<OperationAttribute>().OperationCode;
-        //    generator.Emit(OpCodes.Ldc_I4, (int)opCode);
-
-        //    // new[]{ }
-        //    generator.Emit(OpCodes.Ldc_I4, parameters.Length);
-        //    generator.Emit(OpCodes.Newarr, typeof(object));
-        //    generator.Emit(OpCodes.Stloc_0);
-
-        //    // object[]
-        //    for (int i = 0; i < paramTypes.Length; i++)
-        //    {
-        //        generator.Emit(OpCodes.Ldloc_0);
-        //        generator.Emit(OpCodes.Ldc_I4, i);
-        //        generator.Emit(OpCodes.Ldarg, i + 1);
-        //        generator.Emit(OpCodes.Box, paramTypes[i]);
-        //        generator.Emit(OpCodes.Stelem_Ref);
-        //    }
-
-        //    // Call BroadcastEvent
-        //    generator.Emit(OpCodes.Ldloc_0);
-        //    generator.Emit(OpCodes.Callvirt, invokeMethod);
-
-        //    generator.Emit(OpCodes.Ret);
-        //}
-
-        //// Verify
-
-        //// TODO:No Interface
-        //static void VerifyInterface(Type interfaceType)
-        //{
-        //    if (!interfaceType.IsInterface)
-        //    {
-        //        throw new InvalidOperationException($"Hub<T>'s T must be interface : {interfaceType.Name}");
-        //    }
-
-        //    if (interfaceType.GetProperties().Length != 0)
-        //    {
-        //        throw new InvalidOperationException($"Client proxy type must not contains properties : {interfaceType.Name}");
-        //    }
-
-        //    if (interfaceType.GetEvents().Length != 0)
-        //    {
-        //        throw new InvalidOperationException($"Client proxy type must not contains events : {interfaceType.Name}");
-        //    }
-
-        //    foreach (var method in interfaceType.GetMethods())
-        //    {
-        //        VerifyMethod(interfaceType, method);
-        //    }
-
-        //    foreach (var parent in interfaceType.GetInterfaces())
-        //    {
-        //        VerifyInterface(parent);
-        //    }
-        //}
-
-        //static void VerifyMethod(Type interfaceType, MethodInfo interfaceMethod)
-        //{
-        //    if (interfaceMethod.ReturnType != typeof(void))
-        //    {
-        //        throw new InvalidOperationException($"Client proxy's method must return void : {interfaceType.Name}.{interfaceMethod.Name}");
-        //    }
-
-        //    if (interfaceMethod.GetCustomAttributes<OperationAttribute>().FirstOrDefault() == null)
-        //    {
-        //        throw new InvalidOperationException($"Client proxy's method must put OperationAttribute : {interfaceType.Name}.{interfaceMethod.Name}");
-        //    }
-
-        //    foreach (var parameter in interfaceMethod.GetParameters())
-        //    {
-        //        VerifyParameter(interfaceType, interfaceMethod, parameter);
-        //    }
-        //}
-
-        //static void VerifyParameter(Type interfaceType, MethodInfo interfaceMethod, ParameterInfo parameter)
-        //{
-        //    if (parameter.IsOut)
-        //    {
-        //        throw new InvalidOperationException($"Client proxy's method must not take out parameter : {interfaceType.Name}.{interfaceMethod.Name}({parameter.Name})");
-        //    }
-
-        //    if (parameter.ParameterType.IsByRef)
-        //    {
-        //        throw new InvalidOperationException($"Client proxy's method must not take ref parameter : {interfaceType.Name}.{interfaceMethod.Name}({parameter.Name})");
-        //    }
-        //}
-
-        class PropertyTuple
-        {
-            public int Index;
-            public PropertyInfo PropertyInfo;
-            public FieldInfo SegmentField;
-            public bool IsCacheSegment;
-            public bool IsFixedSize;
         }
     }
 }
