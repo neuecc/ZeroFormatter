@@ -11,8 +11,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ZeroFormatter.DotNetCore", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter.Tests", "src\ZeroFormatter.Tests\ZeroFormatter.Tests.csproj", "{419EF6DC-7A15-4B50-88A4-E2AEDB73FA7F}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ZeroFrmatter.Shared", "src\ZeroFrmatter.Shared\ZeroFrmatter.Shared.shproj", "{8E7D471D-F2D8-4763-B001-CF9A0C5685E5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpCompilerPlatformSDKDownload1", "CSharpCompilerPlatformSDKDownload1\CSharpCompilerPlatformSDKDownload1.csproj", "{0E9B0C8F-FC7B-4548-BFE4-2AB8C754AC74}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatterAnalyzer", "src\ZeroFormatterAnalyzer\ZeroFormatterAnalyzer.csproj", "{A15F092D-C6D9-4938-B288-7A8B6CF39A53}"
@@ -20,9 +18,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatterAnalyzer.Vsix", "src\ZeroFormatterAnalyzer.Vsix\ZeroFormatterAnalyzer.Vsix.csproj", "{C039E946-455C-478B-8FA3-733F9E0DF1BD}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\ZeroFrmatter.Shared\ZeroFrmatter.Shared.projitems*{8e7d471d-f2d8-4763-b001-cf9a0c5685e5}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
