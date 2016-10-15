@@ -149,14 +149,17 @@ namespace ZeroFormatter.Analyzer
                 return; // it is primitive...
             }
 
+            if (type.TypeKind == TypeKind.Enum)
+            {
+                return;
+            }
+
             var namedType = type as INamedTypeSymbol;
             if (namedType != null && namedType.IsGenericType && callFromProperty != null)
             {
 
                 var genericType = namedType.ConstructUnboundGenericType();
                 var genericTypeString = genericType.ToDisplayString();
-
-                // TODO:IReadOnlyList, IReadOnlyDictionary
 
                 if (genericTypeString == "T?")
                 {
@@ -175,6 +178,8 @@ namespace ZeroFormatter.Analyzer
                 }
                 else if (genericTypeString == "System.Collections.Generic.IList<>"
                       || genericTypeString == "System.Collections.Generic.IDictionary<,>"
+                      || genericTypeString == "System.Collections.Generic.IReadOnlyList<>"
+                      || genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>"
                       || genericTypeString == "System.Linq.ILookup<,>"
                       || genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
                 {
@@ -229,7 +234,7 @@ namespace ZeroFormatter.Analyzer
             }
 
             var indexAttr = attributes.FindAttributeShortName(IndexAttributeShortName);
-            if (indexAttr == null)
+            if (indexAttr == null || indexAttr.ConstructorArguments.Length == 0)
             {
                 context.Add(Diagnostic.Create(PublicPropertyNeedsIndex, property.Locations[0], property.ContainingType?.Name, property.Name));
                 return;
