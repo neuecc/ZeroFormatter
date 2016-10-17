@@ -11,8 +11,7 @@ namespace ZeroFormatter.Segments
     // [IList<int> buckets][List<DictionaryEntry> entries]
     //  byteSize == -1 is null
 
-    // TODO:ReadOnlyDictionary?
-    public sealed class DictionarySegment<TKey, TValue> : IDictionary<TKey, TValue>, IZeroFormatterSegment
+    public sealed class DictionarySegment<TKey, TValue> : IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>, IZeroFormatterSegment
     {
         #region SerializableStates
 
@@ -118,6 +117,22 @@ namespace ZeroFormatter.Segments
         }
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values
+        {
+            get
+            {
+                throw new NotSupportedException("ZeroFormatter Dictionary does not support Values; use GetEnumerator instead.");
+            }
+        }
+
+        public IEnumerable<TKey> Keys
+        {
+            get
+            {
+                throw new NotSupportedException("ZeroFormatter Dictionary does not support Keys; use GetEnumerator instead.");
+            }
+        }
+
+        public IEnumerable<TValue> Values
         {
             get
             {
@@ -317,6 +332,7 @@ namespace ZeroFormatter.Segments
         {
             get { return true; }
         }
+
 
         void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
         {

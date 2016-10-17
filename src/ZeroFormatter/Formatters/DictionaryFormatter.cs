@@ -43,6 +43,40 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    internal class ReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<IReadOnlyDictionary<TKey, TValue>>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, IReadOnlyDictionary<TKey, TValue> value)
+        {
+            if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+
+            var dictionary = value as DictionarySegment<TKey, TValue>;
+            if (dictionary == null)
+            {
+                dictionary = new DictionarySegment<TKey, TValue>(new DirtyTracker(), value.Count);
+                foreach (var item in value)
+                {
+                    dictionary.Add(item.Key, item.Value);
+                }
+            }
+
+            return dictionary.Serialize(ref bytes, offset);
+        }
+
+        public override IReadOnlyDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            return DictionarySegment<TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
+        }
+    }
+
     internal class DictionaryEntryFormatter<TKey, TValue> : Formatter<DictionaryEntry<TKey, TValue>>
     {
         public override int? GetLength()

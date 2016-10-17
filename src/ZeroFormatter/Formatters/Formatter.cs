@@ -183,6 +183,12 @@ namespace ZeroFormatter.Formatters
                     formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                 }
 
+                else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
+                {
+                    var formatterType = typeof(ReadOnlyListFormatter<>).MakeGenericType(t.GetGenericArguments());
+                    formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                }
+
                 else if (t.IsEnum)
                 {
                     var underlyingType = Enum.GetUnderlyingType(t);
@@ -280,6 +286,11 @@ namespace ZeroFormatter.Formatters
                     if (t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                     {
                         var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+                    else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
+                    {
+                        var formatterType = typeof(ReadOnlyDictionaryFormatter<,>).MakeGenericType(t.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
 
