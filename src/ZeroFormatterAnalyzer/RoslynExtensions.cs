@@ -80,5 +80,14 @@ namespace ZeroFormatter.Analyzer
         {
             return node.WithAdditionalAnnotations(Formatter.Annotation);
         }
+
+        public static AttributeListSyntax ParseAttributeList(string text)
+        {
+            return SyntaxFactory.ParseCompilationUnit(text)
+                .DescendantNodes()
+                .OfType<AttributeListSyntax>()
+                .First()
+                .WithFormat();
+        }
     }
 }

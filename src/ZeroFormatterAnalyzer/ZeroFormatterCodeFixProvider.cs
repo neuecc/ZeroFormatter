@@ -74,11 +74,7 @@ namespace ZeroFormatter.Analyzer
                 var attr = item.GetAttributes().FindAttributeShortName(ZeroFormatterAnalyzer.IndexAttributeShortName);
                 if (attr != null) continue; // already tagged Index.
 
-                var attribute = SyntaxFactory.ParseCompilationUnit($"[Index({startOrder++})]")
-                    .DescendantNodes()
-                    .OfType<AttributeListSyntax>()
-                    .First()
-                    .WithFormat();
+                var attribute = RoslynExtensions.ParseAttributeList($"[Index({startOrder++})]");
 
                 editor.AddAttribute(node, attribute);
             }
