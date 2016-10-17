@@ -15,19 +15,9 @@ namespace ZeroFormatter.Analyzer
         readonly List<Diagnostic> diagnostics = new List<Diagnostic>();
         readonly SyntaxNodeAnalysisContext context;
 
-        readonly bool fromAnalysis;
-
-        public IReadOnlyCollection<Diagnostic> StoredDiagnostics => diagnostics;
-
         public DiagnosticsReportContext(SyntaxNodeAnalysisContext context)
         {
             this.context = context;
-            this.fromAnalysis = true;
-        }
-
-        public DiagnosticsReportContext(CodeFixContext context)
-        {
-            this.fromAnalysis = false;
         }
 
         public void Add(Diagnostic diagnostic)
@@ -37,12 +27,9 @@ namespace ZeroFormatter.Analyzer
 
         public void ReportAll()
         {
-            if (fromAnalysis)
+            foreach (var item in diagnostics)
             {
-                foreach (var item in diagnostics)
-                {
-                    context.ReportDiagnostic(item);
-                }
+                context.ReportDiagnostic(item);
             }
         }
     }
