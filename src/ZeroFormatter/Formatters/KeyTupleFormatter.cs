@@ -5,7 +5,7 @@ using ZeroFormatter.Segments;
 namespace ZeroFormatter.Formatters
 {
     // Layout: [T1, T2...]
-    // Layout: [isNull:1][T1, T2...]
+    // Layout: [hasValue:1][T1, T2...]
 
 
     internal class KeyTupleFormatter<T1> : Formatter<KeyTuple<T1>>
