@@ -87,14 +87,25 @@ namespace ZeroFormatter.Segments
             return segment.Serialize(ref targetBytes, offset);
         }
 
-        public static T GetFixedProperty<T>(ArraySegment<byte> bytes, int index,int lastIndex, DirtyTracker tracker)
+        public static T GetFixedProperty<T>(ArraySegment<byte> bytes, int index, int lastIndex, byte[] extraBytes, DirtyTracker tracker)
         {
-            var array = bytes.Array;
-            int _;
-            return Formatter<T>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex), tracker, out _);
+            if (index <= lastIndex)
+            {
+                var array = bytes.Array;
+                int _;
+                return Formatter<T>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex), tracker, out _);
+            }
+            else
+            {
+                // from extraBytes
+                var targetIndex = index - lastIndex;
+                var offset = extraBytes[targetIndex];
+                int _;
+                return Formatter<T>.Default.Deserialize(ref extraBytes, extraBytes[offset], tracker, out _);
+            }
         }
 
-        public static void SetFixedProperty<T>(ArraySegment<byte> bytes, int index,int lastIndex, T value)
+        public static void SetFixedProperty<T>(ArraySegment<byte> bytes, int index, int lastIndex, T value)
         {
             var array = bytes.Array;
             Formatter<T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex), value);

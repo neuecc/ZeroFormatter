@@ -149,6 +149,11 @@ namespace ZeroFormatter.Analyzer
                 return; // it is primitive...
             }
 
+            if (type.TypeKind == TypeKind.Enum)
+            {
+                return;
+            }
+
             var namedType = type as INamedTypeSymbol;
             if (namedType != null && namedType.IsGenericType && callFromProperty != null)
             {
@@ -229,7 +234,7 @@ namespace ZeroFormatter.Analyzer
             }
 
             var indexAttr = attributes.FindAttributeShortName(IndexAttributeShortName);
-            if (indexAttr == null)
+            if (indexAttr == null || indexAttr.ConstructorArguments.Length == 0)
             {
                 context.Add(Diagnostic.Create(PublicPropertyNeedsIndex, property.Locations[0], property.ContainingType?.Name, property.Name));
                 return;
