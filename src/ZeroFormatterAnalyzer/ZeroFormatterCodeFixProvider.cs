@@ -44,8 +44,7 @@ namespace ZeroFormatter.Analyzer
             if (targetType == null) return;
             if (targetType.GetMembers().Length == 0) return;
 
-            var targetDocument = context.Document.Project.Solution.GetDocument(targetType.DeclaringSyntaxReferences[0].SyntaxTree);
-            var action = CodeAction.Create("Add IndexAttribute and Set 'virtual'", c => AddIndexAttributeAndSetVirtual(targetDocument, targetType, c));
+            var action = CodeAction.Create("Add IndexAttribute and Set 'virtual'", c => AddIndexAttributeAndSetVirtual(context.Document, targetType, c));
 
             context.RegisterCodeFix(action, context.Diagnostics.First()); // use single.
         }
@@ -75,7 +74,6 @@ namespace ZeroFormatter.Analyzer
                 var attr = item.GetAttributes().FindAttributeShortName(ZeroFormatterAnalyzer.IndexAttributeShortName);
                 if (attr != null) continue; // already tagged Index.
 
-                var indent = node.GetLeadingTrivia().LastOrDefault(x => x.IsKind(SyntaxKind.WhitespaceTrivia));
                 var attribute = SyntaxFactory.ParseCompilationUnit($"[Index({startOrder++})]")
                     .DescendantNodes()
                     .OfType<AttributeListSyntax>()
