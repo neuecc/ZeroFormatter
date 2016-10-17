@@ -63,7 +63,7 @@ namespace ZeroFormatter.Analyzer
                 .Select(x => x.ConstructorArguments[0])
                 .Where(x => !x.IsNull)
                 .Select(x => (int)x.Value)
-                .DefaultIfEmpty(-1)
+                .DefaultIfEmpty(-1) // if empty, start from zero.
                 .Max() + 1;
 
             foreach (var item in targets)
