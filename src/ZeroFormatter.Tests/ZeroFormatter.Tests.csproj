@@ -66,6 +66,7 @@
     <Compile Include="ListSegmentTest.cs" />
     <Compile Include="ObjectFormatterTest.cs" />
     <Compile Include="ReadOnlyTest.cs" />
+    <Compile Include="RecursiveCheck.cs" />
     <Compile Include="StringSegmentTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LookupSegmentTest.cs" />

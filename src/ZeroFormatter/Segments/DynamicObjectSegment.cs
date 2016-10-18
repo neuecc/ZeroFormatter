@@ -297,6 +297,11 @@ namespace ZeroFormatter.Segments
 
                 var formatter = (IFormatter)typeof(Formatter<>).MakeGenericType(propInfo.PropertyType).GetProperty("Default").GetValue(null, Type.EmptyTypes);
 
+                if (formatter == null)
+                {
+                    throw new InvalidOperationException("Circular reference does not supported. " + typeof(T).Name + "." + propInfo.Name);
+                }
+
                 if (formatter.GetLength() == null)
                 {
                     if (CacheSegment.CanAccept(propInfo.PropertyType))
