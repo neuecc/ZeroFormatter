@@ -3,12 +3,13 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-using System;
-using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
-
 namespace <#= Namespace #>
 {
+    using System;
+    using ZeroFormatter.Formatters;
+    using ZeroFormatter.Internal;
+    using ZeroFormatter.Segments;
+
 <# foreach(var t in Types) {  #>
     public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
     {
@@ -42,7 +43,7 @@ namespace <#= Namespace #>
             }
         }
 
-        public override <#= t.Name #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSize == -1)

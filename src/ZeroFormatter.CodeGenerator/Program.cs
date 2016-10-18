@@ -31,6 +31,7 @@ namespace ZeroFormatter.CodeGenerator
     {
         public string Name { get; set; }
         public string FullName { get; set; }
+        public string Namespace { get; set; }
         public int LastIndex { get; set; }
         public PropertyTuple[] Properties { get; set; }
 
@@ -48,8 +49,18 @@ namespace ZeroFormatter.CodeGenerator
         {
             get
             {
-                // TODO:Calcularte sizes
-                return new[] { 1, 2, 3, 4, 325 };
+                var schemaLastIndex = Properties.Select(x => x.Index).LastOrDefault();
+                var dict = Properties.Where(x => x.IsFixedSize).ToDictionary(x => x.Index, x => x.FixedSize);
+                var elementSizes = new int[schemaLastIndex + 1];
+                for (int i = 0; i < schemaLastIndex + 1; i++)
+                {
+                    if (!dict.TryGetValue(i, out elementSizes[i]))
+                    {
+                        elementSizes[i] = 0;
+                    }
+                }
+
+                return elementSizes;
             }
         }
     }
@@ -136,11 +147,26 @@ namespace ZeroFormatter.CodeGenerator
                 }
             };
 
-            Console.WriteLine(gen2.TransformText());
+
+
+            //Console.WriteLine(gen2.TransformText());
 
             //Console.WriteLine(gen.TransformText());
 
+            var path = @"C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ZeroFormatter.CodeGenerator.csproj";
 
+            path = @"C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.Tests\ZeroFormatter.Tests.csproj";
+
+            var tc = new TypeCollector(path);
+
+            var sb = new StringBuilder();
+            foreach(var item in tc.CreateObjectGenerators())
+            {
+                //Console.WriteLine(item.TransformText());
+                sb.AppendLine(item.TransformText());
+            }
+
+            // System.IO.File.WriteAllText(@"C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\Test.cs", sb.ToString());
 
         }
     }
@@ -148,5 +174,40 @@ namespace ZeroFormatter.CodeGenerator
     public enum MyFruit
     {
         Apple, Orange, Pine
+    }
+
+    // We need to use Analyazer so can't use DataContractAttribute.
+    // Analyzer detect attribtues by "short" name.
+    // Short name means does not needs reference ZeroFormatter so create no dependent libraries.
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    public class ZeroFormattableAttribute : Attribute
+    {
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public class IndexAttribute : Attribute
+    {
+        public int Index { get; private set; }
+
+        public IndexAttribute(int index)
+        {
+            this.Index = index;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public class IgnoreFormatAttribute : Attribute
+    {
+    }
+
+    [ZeroFormattable]
+    public class MyTest
+    {
+        [Index(0)]
+        public virtual int MyProperty0 { get; set; }
+        [Index(1)]
+        public virtual string MyProperty1 { get; set; }
+
     }
 }
