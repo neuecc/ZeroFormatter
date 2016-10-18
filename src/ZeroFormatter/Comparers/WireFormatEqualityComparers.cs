@@ -162,10 +162,6 @@ namespace ZeroFormatter.Comparers
         }
     }
 
-
-
-    // TODO:decimal...
-
     internal class DecimalEqualityComparer : IEqualityComparer<decimal>
     {
         public bool Equals(decimal x, decimal y)
@@ -175,8 +171,13 @@ namespace ZeroFormatter.Comparers
 
         public int GetHashCode(decimal obj)
         {
-            var xs = Decimal.GetBits(obj);
-            throw new NotImplementedException();
+            var bits = decimal.GetBits(obj);
+            var lo = bits[0];
+            var mid = bits[1];
+            var hi = bits[2];
+            var flags = bits[3];
+
+            return (int)(flags ^ hi ^ lo ^ mid);
         }
     }
 

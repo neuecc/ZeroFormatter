@@ -16,12 +16,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter", "src\ZeroFo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter.Tests", "src\ZeroFormatter.Tests\ZeroFormatter.Tests.csproj", "{419EF6DC-7A15-4B50-88A4-E2AEDB73FA7F}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ZeroFrmatter.Shared", "src\ZeroFrmatter.Shared\ZeroFrmatter.Shared.shproj", "{8E7D471D-F2D8-4763-B001-CF9A0C5685E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatterAnalyzer", "src\ZeroFormatterAnalyzer\ZeroFormatterAnalyzer.csproj", "{A15F092D-C6D9-4938-B288-7A8B6CF39A53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatterAnalyzer.Vsix", "src\ZeroFormatterAnalyzer.Vsix\ZeroFormatterAnalyzer.Vsix.csproj", "{C039E946-455C-478B-8FA3-733F9E0DF1BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter.CodeGenerator", "src\ZeroFormatter.CodeGenerator\ZeroFormatter.CodeGenerator.csproj", "{00F36123-EEEC-4428-89BD-848FC968B520}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\ZeroFrmatter.Shared\ZeroFrmatter.Shared.projitems*{8e7d471d-f2d8-4763-b001-cf9a0c5685e5}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -43,6 +44,18 @@ Global
 		{419EF6DC-7A15-4B50-88A4-E2AEDB73FA7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{419EF6DC-7A15-4B50-88A4-E2AEDB73FA7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{419EF6DC-7A15-4B50-88A4-E2AEDB73FA7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A15F092D-C6D9-4938-B288-7A8B6CF39A53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A15F092D-C6D9-4938-B288-7A8B6CF39A53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A15F092D-C6D9-4938-B288-7A8B6CF39A53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A15F092D-C6D9-4938-B288-7A8B6CF39A53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C039E946-455C-478B-8FA3-733F9E0DF1BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C039E946-455C-478B-8FA3-733F9E0DF1BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C039E946-455C-478B-8FA3-733F9E0DF1BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C039E946-455C-478B-8FA3-733F9E0DF1BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00F36123-EEEC-4428-89BD-848FC968B520}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00F36123-EEEC-4428-89BD-848FC968B520}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00F36123-EEEC-4428-89BD-848FC968B520}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00F36123-EEEC-4428-89BD-848FC968B520}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,7 +5,7 @@ using ZeroFormatter.Segments;
 namespace ZeroFormatter.Formatters
 {
     // Layout: [fixedElementSize]
-    // Layout: [isNull:1][fixedElementSize]
+    // Layout: [hasValue:1][fixedElementSize]
 
 
     internal class Int16Formatter : Formatter<Int16>
