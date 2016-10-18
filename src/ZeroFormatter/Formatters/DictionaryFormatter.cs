@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZeroFormatter.Comparers;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 
@@ -43,6 +39,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+#if !UNITY
+
     internal class ReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<IReadOnlyDictionary<TKey, TValue>>
     {
         public override int? GetLength()
@@ -76,6 +74,8 @@ namespace ZeroFormatter.Formatters
             return DictionarySegment<TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
         }
     }
+
+#endif
 
     internal class DictionaryEntryFormatter<TKey, TValue> : Formatter<DictionaryEntry<TKey, TValue>>
     {

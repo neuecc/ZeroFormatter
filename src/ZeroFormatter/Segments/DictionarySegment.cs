@@ -11,7 +11,10 @@ namespace ZeroFormatter.Segments
     // [IList<int> buckets][List<DictionaryEntry> entries]
     //  byteSize == -1 is null
 
-    public sealed class DictionarySegment<TKey, TValue> : IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>, IZeroFormatterSegment
+    public sealed class DictionarySegment<TKey, TValue> : IDictionary<TKey, TValue>, IZeroFormatterSegment
+#if !UNITY
+        , IReadOnlyDictionary<TKey, TValue>
+#endif
     {
         #region SerializableStates
 

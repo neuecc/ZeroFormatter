@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Reflection;
 using System.Linq;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace ZeroFormatter.Comparers
@@ -79,14 +79,53 @@ namespace ZeroFormatter.Comparers
                 comparer = new CharEqualityComparer();
             }
 
-            else if (t.IsEnum)
+            else if (t.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
+            {
+                Type keyTupleComparerType = null;
+                switch (t.GetGenericArguments().Length)
+                {
+                    case 1:
+                        keyTupleComparerType = typeof(KeyTupleEqualityComparer<>);
+                        break;
+                    case 2:
+                        keyTupleComparerType = typeof(KeyTupleEqualityComparer<,>);
+                        break;
+                    case 3:
+                        keyTupleComparerType = typeof(KeyTupleEqualityComparer<,,>);
+                        break;
+                    case 4:
+                        keyTupleComparerType = typeof(KeyTupleEqualityComparer<,,,>);
+                        break;
+                    case 5:
+                        keyTupleComparerType = typeof(KeyTupleEqualityComparer<,,,,>);
+                        break;
+                    case 6:
+                        keyTupleComparerType = typeof(KeyTupleEqualityComparer<,,,,,>);
+                        break;
+                    case 7:
+                        keyTupleComparerType = typeof(KeyTupleEqualityComparer<,,,,,,>);
+                        break;
+                    case 8:
+                        keyTupleComparerType = typeof(KeyTupleEqualityComparer<,,,,,,,>);
+                        break;
+                    default:
+                        break;
+                }
+
+                var formatterType = keyTupleComparerType.MakeGenericType(t.GetGenericArguments());
+                comparer = Activator.CreateInstance(formatterType);
+            }
+
+            // Unity Can't use EnumEqualityComparer.
+#if !UNITY
+
+            else if (t.GetType().IsEnum)
             {
                 comparer = EnumEqualityComparer<T>.Default;
             }
-            else if (t.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
-            {
-                comparer = EqualityComparer<T>.Default; // IKeyTuple implements safe EqualityComaprer
-            }
+
+#endif
+
             else
             {
                 comparer = new ErrorEqualityComparer<T>();

@@ -1,18 +1,15 @@
 {
   "version": "1.0.0-*",
-
   "testRunner": "xunit",
-
   "dependencies": {
     "Microsoft.CSharp": "4.0.1",
     "NETStandard.Library": "1.6.0",
     "System.Diagnostics.Contracts": "4.0.1",
     "System.Dynamic.Runtime": "4.0.11",
-    "ZeroFormatter.DotNetCore": "1.0.0-*",
     "xunit": "2.2.0-beta3-build3402",
-    "dotnet-test-xunit": "2.2.0-preview2-build1029"
+    "dotnet-test-xunit": "2.2.0-preview2-build1029",
+    "ZeroFormatter.DotNetCore": "1.0.0-*"
   },
-
   "frameworks": {
     "netcoreapp1.0": {
       "dependencies": {
@@ -22,5 +19,8 @@
         }
       }
     }
+  },
+  "configurations": {
+    "Unity": {}
   }
 }

@@ -32,6 +32,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Unity|AnyCPU'">
+    <OutputPath>bin\Unity\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -50,7 +60,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ZeroFormatter\ZeroFormatter.csproj">
+    <ProjectReference Include="..\..\src\ZeroFormatter.Interfaces\ZeroFormatter.Interfaces.csproj">
+      <Project>{c051f473-427f-4062-94fb-cae3fa460fc8}</Project>
+      <Name>ZeroFormatter.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\ZeroFormatter\ZeroFormatter.csproj">
       <Project>{82049AFE-0913-4FA4-B924-AD5354952154}</Project>
       <Name>ZeroFormatter</Name>
     </ProjectReference>

@@ -108,3 +108,6 @@ Backup*/
 UpgradeLog*.XML
 .vs/config/applicationhost.config
 .vs/restore.dg
+
+# Unity
+tests/ZeroFormatter.UnityTests/*

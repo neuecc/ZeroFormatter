@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !UNITY
+
+using System;
 using System.Collections.Generic;
 
 namespace ZeroFormatter.Comparers
@@ -124,7 +126,7 @@ namespace ZeroFormatter.Comparers
         }
     }
 
-    public class EnumEqualityComparer<T> : IEqualityComparer<T>
+    internal class EnumEqualityComparer<T> : IEqualityComparer<T>
     {
         public static IEqualityComparer<T> Default = new EnumEqualityComparer<T>();
 
@@ -148,3 +150,5 @@ namespace ZeroFormatter.Comparers
         }
     }
 }
+
+#endif

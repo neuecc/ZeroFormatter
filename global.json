@@ -1,6 +1,7 @@
 {
   "projects": [
       "src",
-      "test"
+      "tests",
+      "sandbox"
   ]
 }

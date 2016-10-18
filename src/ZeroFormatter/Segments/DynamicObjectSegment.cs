@@ -188,6 +188,8 @@ namespace ZeroFormatter.Segments
         }
     }
 
+#if !UNITY
+
     internal static class DynamicAssemblyHolder
     {
         public const string ModuleName = "ZeroFormatter.DynamicObjectSegments";
@@ -688,4 +690,6 @@ namespace ZeroFormatter.Segments
             }
         }
     }
+
+#endif
 }

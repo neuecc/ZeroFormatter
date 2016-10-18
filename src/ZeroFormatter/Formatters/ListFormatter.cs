@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 
@@ -86,6 +83,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+#if !UNITY
+
     internal class ReadOnlyListFormatter<T> : Formatter<IReadOnlyList<T>>
     {
         public override int? GetLength()
@@ -161,4 +160,6 @@ namespace ZeroFormatter.Formatters
             }
         }
     }
+
+#endif
 }

@@ -19,6 +19,7 @@
     };
 
 #>
+#if !UNITY
 using System;
 using System.Reflection;
 using ZeroFormatter.DotNetCore.Internal;
@@ -110,3 +111,4 @@ namespace ZeroFormatter.DotNetCore.Formatters
 <# } #>
 
 }
+#endif

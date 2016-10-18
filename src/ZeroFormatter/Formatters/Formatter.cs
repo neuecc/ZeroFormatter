@@ -184,6 +184,8 @@ namespace ZeroFormatter.Formatters
                     formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                 }
 
+#if !UNITY
+
                 else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
                 {
                     var formatterType = typeof(ReadOnlyListFormatter<>).MakeGenericType(t.GetGenericArguments());
@@ -282,6 +284,8 @@ namespace ZeroFormatter.Formatters
                     }
                 }
 
+#endif
+
                 else if (t.IsGenericType)
                 {
                     if (t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
@@ -289,11 +293,16 @@ namespace ZeroFormatter.Formatters
                         var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(t.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
+
+#if !UNITY
+
                     else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
                     {
                         var formatterType = typeof(ReadOnlyDictionaryFormatter<,>).MakeGenericType(t.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
+
+#endif
 
                     else if (t.GetGenericTypeDefinition() == typeof(DictionaryEntry<,>))
                     {
@@ -362,10 +371,14 @@ namespace ZeroFormatter.Formatters
                     throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[].");
                 }
 
-                else if (t.GetAttributeShortName("ZeroFormattableAttribute") != null)
+#if !UNITY
+
+                else if (t.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() != null)
                 {
                     formatter = new DynamicObjectFormatter<T>();
                 }
+
+#endif
 
                 else
                 {

@@ -64,7 +64,7 @@ namespace ZeroFormatter.Tests
             r1[0].Key.Is(0); r1[0].Value.Is("a");
             r1[1].Key.Is(100); r1[1].Value.Is("bcd");
 
-            var r2 = converted.MyReadOnlyDictTwo.OrderBy(x => x.Key).ToArray();
+            var r2 = converted.MyReadOnlyDictTwo.OrderBy(x => x.Key.Item1).ToArray();
             r2[0].Key.Is(KeyTuple.Create(10, "aiueo")); r2[0].Value.Is("AAA");
             r2[1].Key.Is(KeyTuple.Create(999, "nano")); r2[1].Value.Is("sa");
         }

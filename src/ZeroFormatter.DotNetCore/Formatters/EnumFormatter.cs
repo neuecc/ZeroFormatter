@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UNITY
+using System;
 using System.Reflection;
 using ZeroFormatter.DotNetCore.Internal;
 using ZeroFormatter.DotNetCore.Segments;
@@ -626,3 +627,4 @@ namespace ZeroFormatter.DotNetCore.Formatters
 
 
 }
+#endif

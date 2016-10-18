@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !UNITY
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -19,7 +21,7 @@ namespace ZeroFormatter.Formatters
                 throw new InvalidOperationException("Type must be class. " + type.Name);
             }
 
-            if (type.GetAttributeShortName("ZeroFormattableAttribute") == null)
+            if (type.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() == null)
             {
                 throw new InvalidOperationException("Type must mark ZeroFormattableAttribute. " + type.Name);
             }
@@ -27,9 +29,9 @@ namespace ZeroFormatter.Formatters
             var dict = new Dictionary<int, PropertyInfo>();
             foreach (var item in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (item.GetAttributeShortName("IgnoreFormatAttribute") != null) continue;
+                if (item.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) continue;
 
-                var index = item.GetIndexAttribute();
+                var index = item.GetCustomAttributes(typeof(IndexAttribute), true).Cast<IndexAttribute>().FirstOrDefault();
                 if (index == null)
                 {
                     throw new InvalidOperationException("Public property must mark IndexAttribute or IgnoreFormatAttribute. " + type.Name + "." + item.Name);
@@ -48,12 +50,12 @@ namespace ZeroFormatter.Formatters
                     throw new InvalidOperationException("Public property's accessor must be virtual. " + type.Name + "." + item.Name);
                 }
 
-                if (dict.ContainsKey(index.Value))
+                if (dict.ContainsKey(index.Index))
                 {
-                    throw new InvalidOperationException("IndexAttribute can not allow duplicate. " + type.Name + "." + item.Name + ", Index:" + index.Value);
+                    throw new InvalidOperationException("IndexAttribute can not allow duplicate. " + type.Name + "." + item.Name + ", Index:" + index.Index);
                 }
 
-                dict[index.Value] = item;
+                dict[index.Index] = item;
             }
 
             return dict.OrderBy(x => x.Key).Select(x => Tuple.Create(x.Key, x.Value)).ToArray();
@@ -212,3 +214,5 @@ namespace ZeroFormatter.Formatters
         }
     }
 }
+
+#endif

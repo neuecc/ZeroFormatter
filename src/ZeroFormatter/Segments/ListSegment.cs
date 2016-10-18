@@ -6,7 +6,10 @@ using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Segments
 {
-    public abstract class ListSegment<T> : IList<T>, IReadOnlyList<T>
+    public abstract class ListSegment<T> : IList<T>
+#if !UNITY
+        , IReadOnlyList<T>
+#endif
     {
         protected readonly ArraySegment<byte> originalBytes;
         protected readonly Formatter<T> formatter;
