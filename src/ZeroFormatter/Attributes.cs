@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+using System.Linq;
 
 namespace ZeroFormatter
 {
@@ -25,5 +27,30 @@ namespace ZeroFormatter
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class IgnoreFormatAttribute : Attribute
     {
+    }
+}
+
+namespace ZeroFormatter.Internal
+{
+    internal static class ReflectionExtensions
+    {
+        public static Attribute GetAttributeShortName(this Type type, string shortName)
+        {
+            return type.GetCustomAttributes<Attribute>(true).FirstOrDefault(x => x.GetType().Name == shortName);
+        }
+
+        public static Attribute GetAttributeShortName(this PropertyInfo propInfo, string shortName)
+        {
+            return propInfo.GetCustomAttributes<Attribute>(true).FirstOrDefault(x => x.GetType().Name == shortName);
+        }
+
+        public static int? GetIndexAttribute(this PropertyInfo propInfo)
+        {
+            var indexAttr = propInfo.GetCustomAttributes<Attribute>(true).FirstOrDefault(x => x.GetType().Name == "IndexAttribute");
+            if (indexAttr == null) return null;
+
+            var i = indexAttr.GetType().GetProperty("Index").GetGetMethod().Invoke(indexAttr, null);
+            return (int)i;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using ZeroFormatter.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using ZeroFormatter.Segments;
@@ -361,7 +362,7 @@ namespace ZeroFormatter.Formatters
                     throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[].");
                 }
 
-                else if (t.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).Any())
+                else if (t.GetAttributeShortName("ZeroFormattableAttribute") != null)
                 {
                     formatter = new DynamicObjectFormatter<T>();
                 }

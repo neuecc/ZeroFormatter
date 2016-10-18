@@ -19,7 +19,7 @@ namespace ZeroFormatter.Formatters
                 throw new InvalidOperationException("Type must be class. " + type.Name);
             }
 
-            if (type.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() == null)
+            if (type.GetAttributeShortName("ZeroFormattableAttribute") == null)
             {
                 throw new InvalidOperationException("Type must mark ZeroFormattableAttribute. " + type.Name);
             }
@@ -27,9 +27,9 @@ namespace ZeroFormatter.Formatters
             var dict = new Dictionary<int, PropertyInfo>();
             foreach (var item in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (item.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) continue;
+                if (item.GetAttributeShortName("IgnoreFormatAttribute") != null) continue;
 
-                var index = item.GetCustomAttributes(typeof(IndexAttribute), true).Cast<IndexAttribute>().FirstOrDefault();
+                var index = item.GetIndexAttribute();
                 if (index == null)
                 {
                     throw new InvalidOperationException("Public property must mark IndexAttribute or IgnoreFormatAttribute. " + type.Name + "." + item.Name);
@@ -48,12 +48,12 @@ namespace ZeroFormatter.Formatters
                     throw new InvalidOperationException("Public property's accessor must be virtual. " + type.Name + "." + item.Name);
                 }
 
-                if (dict.ContainsKey(index.Index))
+                if (dict.ContainsKey(index.Value))
                 {
-                    throw new InvalidOperationException("IndexAttribute can not allow duplicate. " + type.Name + "." + item.Name + ", Index:" + index.Index);
+                    throw new InvalidOperationException("IndexAttribute can not allow duplicate. " + type.Name + "." + item.Name + ", Index:" + index.Value);
                 }
 
-                dict[index.Index] = item;
+                dict[index.Value] = item;
             }
 
             return dict.OrderBy(x => x.Key).Select(x => Tuple.Create(x.Key, x.Value)).ToArray();
