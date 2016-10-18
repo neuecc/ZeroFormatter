@@ -1,0 +1,80 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
+
+namespace <#= Namespace #>
+{
+<# foreach(var t in Types) {  #>
+
+    public class <#= t.Name #>EnumFormatter : Formatter<<#= t.Name #>>
+    {
+        public override int? GetLength()
+        {
+            return <#= t.Length #>;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, <#= t.Name #> value)
+        {
+            return BinaryUtil.Write<#= t.UnderlyingType #>(ref bytes, offset, (<#= t.UnderlyingType #>)value);
+        }
+
+        public override <#= t.Name #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = <#= t.Length #>;
+            return (<#= t.Name #>)BinaryUtil.Read<#= t.UnderlyingType #>(ref bytes, offset);
+        }
+    }
+
+    public class Nullable<#= t.Name #>EnumFormatter : Formatter<<#= t.Name #>?>
+    {
+        public override int? GetLength()
+        {
+            return <#= t.Length + 1 #>;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, <#= t.Name #>? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.Write<#= t.UnderlyingType #>(ref bytes, offset + 1, (<#= t.UnderlyingType #>)value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + <#= t.Length + 1 #>);
+            }
+
+            return <#= t.Length + 1 #>;
+        }
+
+        public override <#= t.Name #>? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = <#= t.Length + 1 #>;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
+
+            return (<#= t.Name #>)BinaryUtil.Read<#= t.UnderlyingType #>(ref bytes, offset + 1);
+        }
+    }
+
+    public class <#= t.Name #>EqualityComparer : IEqualityComparer<<#= t.Name #>>
+    {
+        public bool Equals(<#= t.Name #> x, <#= t.Name #> y)
+        {
+            return (<#= t.UnderlyingType #>)x == (<#= t.UnderlyingType #>)y;
+        }
+
+        public int GetHashCode(<#= t.Name #> obj)
+        {
+            return (<#= t.UnderlyingType #>)obj;
+        }
+    }
+
+<# } #>
+
+}

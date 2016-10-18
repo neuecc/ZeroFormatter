@@ -1,0 +1,169 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
+
+namespace <#= Namespace #>
+{
+<# foreach(var t in Types) {  #>
+    public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, <#= t.FullName #> value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (<#= t.LastIndex #> + 1));
+<# foreach(var p in t.Properties) { #>
+                offset += ObjectSegmentHelper.SerialzieFromFormatter<<#= p.Type #>>(ref bytes, startOffset, offset, <#= p.Index #>, value.<#= p.Name #>);
+<# } #>
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, <#= t.LastIndex #>);
+            }
+        }
+
+        public override <#= t.Name #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new <#= t.Name #>_ObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class <#= t.Name #>_ObjectSegment : <#= t.FullName #>, IZeroFormatterSegment
+    {
+        static readonly int[] __elementSizes = new int[]{ <#= string.Join(", ", t.ElementFixedSizes) #> };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+<# foreach(var p in t.Properties) { #>
+<# if(p.IsFixedSize) { #>
+<# } else if(p.IsCacheSegment) { #>
+        readonly CacheSegment<<#= p.Type #>> _<#= p.Name #>;
+<# } else { #>
+        <#= p.Type #> _<#= p.Name #>;
+<# } } #>
+
+<# foreach(var p in t.Properties) { #>
+        // <#= p.Index #>
+        public override <#= p.Type #> <#= p.Name #>
+        {
+<# if(p.IsFixedSize) { #>
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<<#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<<#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, value);
+            }
+<# } else if(p.IsCacheSegment) { #>
+            get
+            {
+                return _<#= p.Name #>.Value;
+            }
+            set
+            {
+                _<#= p.Name #>.Value = value;
+            }
+<# } else { #>
+            get
+            {
+                return _<#= p.Name #>;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _<#= p.Name #> = value;
+            }
+<# } #>
+        }
+
+<# } #>
+
+        public <#= t.Name #>_ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+            int __out;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 4, __elementSizes);
+
+<# foreach(var p in t.Properties) { #>
+<# if (p.IsFixedSize) { #>
+<# } else if(p.IsCacheSegment) { #>
+            _<#= p.Name #> = new CacheSegment<<#= p.Type #>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, <#= p.Index #>, __binaryLastIndex));
+<# } else { #>
+            _<#= p.Name #> = Formatter<<#= p.Type #>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, <#= p.Index #>, __binaryLastIndex), __tracker, out __out);
+<# } #>
+<# } #>
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (<#= t.LastIndex #> + 1));
+
+<# foreach(var p in t.Properties) { #>
+<# if (p.IsFixedSize) { #>
+                offset += ObjectSegmentHelper.SerializeFixedLength<<#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, __binaryLastIndex, __originalBytes, __extraFixedBytes);
+<# } else if(p.IsCacheSegment) { #>
+                offset += ObjectSegmentHelper.SerializeCacheSegment<<#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, _<#= p.Name #>);
+<# } else { #>
+                offset += ObjectSegmentHelper.SerializeSegment<<#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, _<#= p.Name #>);
+<# } } #>
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, <#= t.LastIndex #>);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+<# } #>
+
+}

@@ -34,138 +34,138 @@ namespace ZeroFormatter.Tests
         public int HugaHuga { get { return 100000; } }
     }
 
-    public class MyClass_ObjectSegment : MyClass, IZeroFormatterSegment
+public class MyClass_ObjectSegment : MyClass, IZeroFormatterSegment
+{
+    readonly ArraySegment<byte> __originalBytes;
+    readonly DirtyTracker __tracker;
+    readonly int __binaryLastIndex;
+    readonly byte[] __extraFixedBytes;
+
+    // generated mutable segements
+    readonly CacheSegment<string> _lastName;
+    readonly CacheSegment<string> _firstName;
+    IList<int> _myList; // no readonly
+
+    // 0
+    public override int Age
     {
-        readonly ArraySegment<byte> __originalBytes;
-        readonly DirtyTracker __tracker;
-        readonly int __binaryLastIndex;
-        readonly byte[] __extraFixedBytes;
-
-        // generated mutable segements
-        readonly CacheSegment<string> _lastName;
-        readonly CacheSegment<string> _firstName;
-        IList<int> _myList; // no readonly
-
-        // 0
-        public override int Age
+        get
         {
-            get
-            {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
-            }
-            set
-            {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value);
-            }
+            return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
         }
-
-        // 1
-        public override string FirstName
+        set
         {
-            get
-            {
-                return _firstName.Value;
-            }
-
-            set
-            {
-                _firstName.Value = value;
-            }
-        }
-
-        // 2
-        public override string LastName
-        {
-            get
-            {
-                return _lastName.Value;
-            }
-
-            set
-            {
-                _lastName.Value = value;
-            }
-        }
-
-        // 3
-        public override int HogeMoge
-        {
-            get
-            {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, __tracker);
-            }
-            protected set
-            {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, value);
-            }
-        }
-
-        // 4
-        public override IList<int> MyList
-        {
-            get
-            {
-                return this._myList;
-            }
-
-            set
-            {
-                __tracker.Dirty();
-                this._myList = value;
-            }
-        }
-
-        public MyClass_ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
-        {
-            var __array = originalBytes.Array;
-            int __out;
-
-            this.__originalBytes = originalBytes;
-            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
-            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
-
-            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 4, new[] { 4, 4 }); // embed schemaLastIndex, elementSizeSum = should calcurate
-
-            // Auto Generate Area
-            _firstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex));
-            _lastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex));
-            _myList = Formatter<IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex), __tracker, out __out);
-
-        }
-
-        public bool CanDirectCopy()
-        {
-            return !__tracker.IsDirty;
-        }
-
-        public ArraySegment<byte> GetBufferReference()
-        {
-            return __originalBytes;
-        }
-
-        public int Serialize(ref byte[] targetBytes, int offset)
-        {
-            if (__tracker.IsDirty)
-            {
-                var lastIndex = 4; // schemaLastIndex
-                var startOffset = offset;
-                offset += (8 + 4 * (lastIndex + 1));
-
-                // Auto Generate Area(incr index...)
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 1, _firstName);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 2, _lastName);
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes);
-                offset += ObjectSegmentHelper.SerializeSegment<IList<int>>(ref targetBytes, startOffset, offset, 4, _myList);
-
-                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, lastIndex);
-            }
-            else
-            {
-                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
-            }
+            ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value);
         }
     }
+
+    // 1
+    public override string FirstName
+    {
+        get
+        {
+            return _firstName.Value;
+        }
+
+        set
+        {
+            _firstName.Value = value;
+        }
+    }
+
+    // 2
+    public override string LastName
+    {
+        get
+        {
+            return _lastName.Value;
+        }
+
+        set
+        {
+            _lastName.Value = value;
+        }
+    }
+
+    // 3
+    public override int HogeMoge
+    {
+        get
+        {
+            return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, __tracker);
+        }
+        protected set
+        {
+            ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, value);
+        }
+    }
+
+    // 4
+    public override IList<int> MyList
+    {
+        get
+        {
+            return this._myList;
+        }
+
+        set
+        {
+            __tracker.Dirty();
+            this._myList = value;
+        }
+    }
+
+    public MyClass_ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+    {
+        var __array = originalBytes.Array;
+        int __out;
+
+        this.__originalBytes = originalBytes;
+        this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+        this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+        this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 4, new[] { 4, 4 }); // embed schemaLastIndex, elementSizeSum = should calcurate
+
+        // Auto Generate Area
+        _firstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex));
+        _lastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex));
+        _myList = Formatter<IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex), __tracker, out __out);
+
+    }
+
+    public bool CanDirectCopy()
+    {
+        return !__tracker.IsDirty;
+    }
+
+    public ArraySegment<byte> GetBufferReference()
+    {
+        return __originalBytes;
+    }
+
+    public int Serialize(ref byte[] targetBytes, int offset)
+    {
+        if (__tracker.IsDirty)
+        {
+            var lastIndex = 4; // schemaLastIndex
+            var startOffset = offset;
+            offset += (8 + 4 * (lastIndex + 1));
+
+            // Auto Generate Area(incr index...)
+            offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes);
+            offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 1, _firstName);
+            offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 2, _lastName);
+            offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes);
+            offset += ObjectSegmentHelper.SerializeSegment<IList<int>>(ref targetBytes, startOffset, offset, 4, _myList);
+
+            return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, lastIndex);
+        }
+        else
+        {
+            return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+        }
+    }
+}
 
     public class MyClassFormatter : Formatter<MyClass>
     {
