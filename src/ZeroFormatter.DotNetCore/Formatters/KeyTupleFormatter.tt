@@ -6,13 +6,13 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
 using System;
-using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
+using ZeroFormatter.DotNetCore.Internal;
+using ZeroFormatter.DotNetCore.Segments;
 
-namespace ZeroFormatter.Formatters
+namespace ZeroFormatter.DotNetCore.Formatters
 {
     // Layout: [T1, T2...]
-    // Layout: [isNull:1][T1, T2...]
+    // Layout: [hasValue:1][T1, T2...]
 
 <# for(var i = 1; i <= 8; i++) { 
     Func<int, string> toT = x => "T" + ((x == 8) ? "Rest" : x.ToString());

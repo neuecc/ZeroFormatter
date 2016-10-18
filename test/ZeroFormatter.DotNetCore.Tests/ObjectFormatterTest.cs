@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Xunit;
+using ZeroFormatter.DotNetCore;
 using ZeroFormatter.DotNetCore.Formatters;
 using ZeroFormatter.DotNetCore.Internal;
 using ZeroFormatter.DotNetCore.Segments;
 
-namespace ZeroFormatter.DotNetCore.Tests
+namespace ZeroFormatter.Tests
 {
     [ZeroFormattable]
     public class MyClass
@@ -25,10 +28,8 @@ namespace ZeroFormatter.DotNetCore.Tests
         [Index(3)]
         public virtual int HogeMoge { get; protected set; }
 
-
         [Index(4)]
         public virtual IList<int> MyList { get; set; }
-
 
         [IgnoreFormat]
         public int HugaHuga { get { return 100000; } }
@@ -38,25 +39,28 @@ namespace ZeroFormatter.DotNetCore.Tests
     {
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
-        readonly int __lastIndex;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
 
         // generated mutable segements
         readonly CacheSegment<string> _lastName;
         readonly CacheSegment<string> _firstName;
-        readonly IList<int> _myList;
+        IList<int> _myList; // no readonly
 
+        // 0
         public override int Age
         {
             get
             {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 0, __tracker);
+                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
             }
             set
             {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 0, value);
+                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value);
             }
         }
 
+        // 1
         public override string FirstName
         {
             get
@@ -70,6 +74,7 @@ namespace ZeroFormatter.DotNetCore.Tests
             }
         }
 
+        // 2
         public override string LastName
         {
             get
@@ -83,29 +88,31 @@ namespace ZeroFormatter.DotNetCore.Tests
             }
         }
 
+        // 3
         public override int HogeMoge
         {
             get
             {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 3, __tracker);
+                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, __tracker);
             }
             protected set
             {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 3, value);
+                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, value);
             }
         }
 
+        // 4
         public override IList<int> MyList
         {
             get
             {
-                return base.MyList;
+                return this._myList;
             }
 
             set
             {
                 __tracker.Dirty();
-                base.MyList = value;
+                this._myList = value;
             }
         }
 
@@ -116,12 +123,15 @@ namespace ZeroFormatter.DotNetCore.Tests
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
-            this.__lastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 4, new[] { 4, 4 }); // embed schemaLastIndex, elementSizeSum = should calcurate
 
             // Auto Generate Area
-            _firstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __lastIndex));
-            _lastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __lastIndex));
-            _myList = Formatter<IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4), __tracker, out __out);
+            _firstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex));
+            _lastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex));
+            _myList = Formatter<IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex), __tracker, out __out);
+
         }
 
         public bool CanDirectCopy()
@@ -138,17 +148,18 @@ namespace ZeroFormatter.DotNetCore.Tests
         {
             if (__tracker.IsDirty)
             {
+                var lastIndex = 4; // schemaLastIndex
                 var startOffset = offset;
-                offset += (8 + 4 * (__lastIndex + 1));
-                
-                // Auto Generate Area
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __originalBytes);
+                offset += (8 + 4 * (lastIndex + 1));
+
+                // Auto Generate Area(incr index...)
+                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 1, _firstName);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 2, _lastName);
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __originalBytes);
+                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes);
                 offset += ObjectSegmentHelper.SerializeSegment<IList<int>>(ref targetBytes, startOffset, offset, 4, _myList);
 
-                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, __lastIndex);
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, lastIndex);
             }
             else
             {
@@ -159,13 +170,6 @@ namespace ZeroFormatter.DotNetCore.Tests
 
     public class MyClassFormatter : Formatter<MyClass>
     {
-        readonly int lastIndex;
-
-        public MyClassFormatter(int lastIndex) // generate
-        {
-            this.lastIndex = lastIndex;
-        }
-
         public override int? GetLength()
         {
             return null;
@@ -185,28 +189,17 @@ namespace ZeroFormatter.DotNetCore.Tests
             }
             else
             {
+                var lastIndex = 4;
                 var startOffset = offset;
+
                 offset += (8 + 4 * (lastIndex + 1));
+                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
+                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
+                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
+                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 3, value.HogeMoge);
+                offset += ObjectSegmentHelper.SerialzieFromFormatter<IList<int>>(ref bytes, startOffset, offset, 4, value.MyList);
 
-                BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 0), offset);
-                offset += Formatter<int>.Default.Serialize(ref bytes, offset, value.Age);
-
-                BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 1), offset);
-                offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.FirstName);
-
-                BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 2), offset);
-                offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.LastName);
-
-                BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 3), offset);
-                offset += Formatter<int>.Default.Serialize(ref bytes, offset, value.HogeMoge);
-
-                BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 4), offset);
-                offset += Formatter<IList<int>>.Default.Serialize(ref bytes, offset, value.MyList);
-
-                var writeSize = offset - startOffset;
-                BinaryUtil.WriteInt32(ref bytes, startOffset, writeSize);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4, lastIndex);
-                return writeSize;
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, lastIndex);
             }
         }
 
@@ -237,7 +230,7 @@ namespace ZeroFormatter.DotNetCore.Tests
                 MyList = new List<int> { 1, 10, 100, 1000 }
             };
 
-            Formatter<MyClass>.Register(new MyClassFormatter(4));
+            Formatter<MyClass>.Register(new MyClassFormatter());
 
             byte[] bytes = null;
             int size;
@@ -297,9 +290,8 @@ namespace ZeroFormatter.DotNetCore.Tests
             BinaryUtil.FastResize(ref bytes, size);
 
 
-            var generatedFormatter = new MyClassFormatter(4);
+            var generatedFormatter = new MyClassFormatter();
             var mc2 = generatedFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
-
 
             mc2.Age.Is(999);
             mc2.FirstName.Is("hogehoge");
@@ -321,6 +313,130 @@ namespace ZeroFormatter.DotNetCore.Tests
             mc4.Age.Is(9);
             mc4.LastName.Is("chop");
             mc4.MyList.Is(1, 10, 100, 1000, 9999);
+        }
+
+
+        [ZeroFormattable]
+        public class SkipIndex
+        {
+            [Index(1)]
+            public virtual int MyProperty1 { get; set; }
+            [Index(2)]
+            public virtual int MyProperty2 { get; set; }
+
+            [Index(3)]
+            public virtual int MyProperty3 { get; set; }
+            [Index(4)]
+            public virtual IList<int> MyProperty4 { get; set; }
+            [Index(5)]
+            public virtual string MyProperty5 { get; set; }
+        }
+
+        [ZeroFormattable]
+        public class OtherSchema1
+        {
+            [Index(1)]
+            public virtual int MyProperty1 { get; set; }
+        }
+
+        [ZeroFormattable]
+        public class OtherSchema2
+        {
+            [Index(3)]
+            public virtual int MyProperty3 { get; set; }
+        }
+
+        [ZeroFormattable]
+        public class OtherSchema3
+        {
+            [Index(3)]
+            public virtual int MyProperty3 { get; set; }
+
+            [Index(7)]
+            public virtual double MyProperty7 { get; set; }
+
+            [Index(8)]
+            public virtual int? MyProperty8 { get; set; }
+
+            [Index(10)]
+            public virtual int MyProperty10 { get; set; }
+        }
+
+        [Fact]
+        public void SkipIndexTest()
+        {
+            var c = new SkipIndex
+            {
+                MyProperty1 = 1111,
+                MyProperty2 = 9999,
+                MyProperty3 = 500,
+                MyProperty5 = "ほぐあｈｚｇっｈれあｇはえ"
+            };
+
+
+            var bytes = ZeroFormatterSerializer.Serialize(c);
+            var r = ZeroFormatterSerializer.Deserialize<SkipIndex>(bytes);
+
+            r.MyProperty1.Is(1111);
+            r.MyProperty2.Is(9999);
+            r.MyProperty3.Is(500);
+            r.MyProperty5.Is("ほぐあｈｚｇっｈれあｇはえ");
+
+            var r_b = ZeroFormatterSerializer.Convert<SkipIndex>(r);
+
+            r_b.MyProperty1.Is(1111);
+            r_b.MyProperty2.Is(9999);
+            r_b.MyProperty3.Is(500);
+            r_b.MyProperty5.Is("ほぐあｈｚｇっｈれあｇはえ");
+
+
+
+            var r2 = ZeroFormatterSerializer.Deserialize<OtherSchema1>(bytes);
+            r2.MyProperty1.Is(1111);
+
+            var r3 = ZeroFormatterSerializer.Deserialize<OtherSchema2>(bytes);
+            r3.MyProperty3.Is(500);
+
+            var r4 = ZeroFormatterSerializer.Deserialize<OtherSchema3>(bytes);
+            r4.MyProperty7.Is(0);
+            r4.MyProperty8.IsNull();
+            r4.MyProperty10 = 0;
+
+            r4.MyProperty3 = 3;
+            r4.MyProperty8 = 99999999;
+            r4.MyProperty7 = 12345.12345;
+
+            r4.MyProperty10 = 54321;
+
+            var moreBytes = ZeroFormatterSerializer.Serialize<OtherSchema3>(r4);
+            var r5 = ZeroFormatterSerializer.Deserialize<OtherSchema3>(moreBytes);
+            r5.MyProperty3.Is(3);
+            r5.MyProperty7.Is(12345.12345);
+            r5.MyProperty8.Value.Is(99999999);
+            r5.MyProperty10.Is(54321);
+        }
+
+        [Fact]
+        public void BinaryDoubleWrite()
+        {
+            byte[] bytes = null;
+
+            BinaryUtil.WriteDouble(ref bytes, 0, 12345.12345);
+            var newDouble = BinaryUtil.ReadDouble(ref bytes, 0);
+            newDouble.Is(12345.12345);
+
+
+            var newBytes = new byte[bytes.Length];
+            Buffer.BlockCopy(bytes, 0, newBytes, 0, bytes.Length);
+            var newDouble2 = BinaryUtil.ReadDouble(ref newBytes, 0);
+
+            newBytes = null;
+            Formatter<double>.Default.Serialize(ref newBytes, 0, 12345.12345);
+
+
+            var pureBytes = new byte[bytes.Length];
+            var hogehogehoge = BinaryUtil.ReadDouble(ref pureBytes, 0);
+
         }
     }
 }

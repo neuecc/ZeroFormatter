@@ -26,6 +26,12 @@ namespace ZeroFormatter.DotNetCore.Formatters
 
         public override string Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
+            if (offset == -1)
+            {
+                byteSize = 0;
+                return null;
+            }
+
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)
             {

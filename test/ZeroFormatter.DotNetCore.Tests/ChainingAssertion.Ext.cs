@@ -34,6 +34,21 @@ namespace ZeroFormatter.DotNetCore.Tests
             return (T)exception;
         }
 
+        public static T Throws<T>(Action testCode, string message = "") where T : Exception
+        {
+            var exception = Catch<T>(testCode, message);
+
+            if (!typeof(T).Equals(exception.GetType()))
+            {
+                var headerMsg = "Failed Throws<" + typeof(T).Name + ">.";
+                var additionalMsg = string.IsNullOrEmpty(message) ? "" : ", " + message;
+                var formatted = string.Format("{0} Catched:{1}{2}", headerMsg, exception.GetType().Name, additionalMsg);
+                throw new AssertFailedException(formatted);
+            }
+
+            return (T)exception;
+        }
+
         /// <summary>execute action and return exception when catched otherwise return null</summary>
         private static Exception ExecuteCode(Action testCode)
         {

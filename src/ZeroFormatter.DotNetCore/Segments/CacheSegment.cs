@@ -58,6 +58,11 @@ namespace ZeroFormatter.DotNetCore.Segments
             this.state = SegmentState.Original;
             this.serializedBytes = originalBytes;
             this.cached = default(T);
+
+            if (originalBytes.Array == null)
+            {
+                this.state = SegmentState.Dirty;
+            }
         }
 
         public T Value
