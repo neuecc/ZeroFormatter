@@ -20,10 +20,11 @@
 
 #>
 using System;
-using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
+using System.Reflection;
+using ZeroFormatter.DotNetCore.Internal;
+using ZeroFormatter.DotNetCore.Segments;
 
-namespace ZeroFormatter.Formatters
+namespace ZeroFormatter.DotNetCore.Formatters
 {
     // Layout: [fixedElementSize]
     // Layout: [isNull:1][fixedElementSize]
@@ -40,8 +41,8 @@ namespace ZeroFormatter.Formatters
         public <#= t.Name #>EnumFormatter()
         {
             Func<<#= t.Name #>, <#= t.Name #>> identity = Identity;
-            this.serializeCast = Delegate.CreateDelegate(typeof(Func<T, <#= t.Name #>>), identity.Method) as Func<T, <#= t.Name #>>;
-            this.deserializeCast = Delegate.CreateDelegate(typeof(Func<<#= t.Name #>, T>), identity.Method) as Func<<#= t.Name #>, T>;
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, <#= t.Name #>>)) as Func<T, <#= t.Name #>>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<<#= t.Name #>, T>)) as Func<<#= t.Name #>, T>;
         }
 
         public override int? GetLength()
@@ -72,8 +73,8 @@ namespace ZeroFormatter.Formatters
         public Nullable<#= t.Name #>EnumFormatter()
         {
             Func<<#= t.Name #>, <#= t.Name #>> identity = Identity;
-            this.serializeCast = Delegate.CreateDelegate(typeof(Func<T, <#= t.Name #>>), identity.Method) as Func<T, <#= t.Name #>>;
-            this.deserializeCast = Delegate.CreateDelegate(typeof(Func<<#= t.Name #>, T>), identity.Method) as Func<<#= t.Name #>, T>;
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, <#= t.Name #>>)) as Func<T, <#= t.Name #>>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<<#= t.Name #>, T>)) as Func<<#= t.Name #>, T>;
         }
 
         public override int? GetLength()

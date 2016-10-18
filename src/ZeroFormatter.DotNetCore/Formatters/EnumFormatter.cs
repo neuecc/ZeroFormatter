@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq.Expressions;
 using System.Reflection;
 using ZeroFormatter.DotNetCore.Internal;
 using ZeroFormatter.DotNetCore.Segments;
@@ -20,9 +19,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public Int16EnumFormatter()
         {
             Func<Int16, Int16> identity = Identity;
-
-            this.serializeCast = Expression.Lambda<Func<T, Int16>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<Int16, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, Int16>)) as Func<T, Int16>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<Int16, T>)) as Func<Int16, T>;
         }
 
         public override int? GetLength()
@@ -53,8 +51,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public NullableInt16EnumFormatter()
         {
             Func<Int16, Int16> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, Int16>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<Int16, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, Int16>)) as Func<T, Int16>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<Int16, T>)) as Func<Int16, T>;
         }
 
         public override int? GetLength()
@@ -98,8 +96,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public Int32EnumFormatter()
         {
             Func<Int32, Int32> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, Int32>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<Int32, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, Int32>)) as Func<T, Int32>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<Int32, T>)) as Func<Int32, T>;
         }
 
         public override int? GetLength()
@@ -130,8 +128,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public NullableInt32EnumFormatter()
         {
             Func<Int32, Int32> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, Int32>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<Int32, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, Int32>)) as Func<T, Int32>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<Int32, T>)) as Func<Int32, T>;
         }
 
         public override int? GetLength()
@@ -175,8 +173,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public Int64EnumFormatter()
         {
             Func<Int64, Int64> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, Int64>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<Int64, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, Int64>)) as Func<T, Int64>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<Int64, T>)) as Func<Int64, T>;
         }
 
         public override int? GetLength()
@@ -207,8 +205,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public NullableInt64EnumFormatter()
         {
             Func<Int64, Int64> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, Int64>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<Int64, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, Int64>)) as Func<T, Int64>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<Int64, T>)) as Func<Int64, T>;
         }
 
         public override int? GetLength()
@@ -252,8 +250,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public UInt16EnumFormatter()
         {
             Func<UInt16, UInt16> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, UInt16>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<UInt16, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, UInt16>)) as Func<T, UInt16>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<UInt16, T>)) as Func<UInt16, T>;
         }
 
         public override int? GetLength()
@@ -284,8 +282,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public NullableUInt16EnumFormatter()
         {
             Func<UInt16, UInt16> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, UInt16>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<UInt16, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, UInt16>)) as Func<T, UInt16>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<UInt16, T>)) as Func<UInt16, T>;
         }
 
         public override int? GetLength()
@@ -329,8 +327,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public UInt32EnumFormatter()
         {
             Func<UInt32, UInt32> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, UInt32>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<UInt32, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, UInt32>)) as Func<T, UInt32>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<UInt32, T>)) as Func<UInt32, T>;
         }
 
         public override int? GetLength()
@@ -361,8 +359,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public NullableUInt32EnumFormatter()
         {
             Func<UInt32, UInt32> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, UInt32>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<UInt32, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, UInt32>)) as Func<T, UInt32>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<UInt32, T>)) as Func<UInt32, T>;
         }
 
         public override int? GetLength()
@@ -406,8 +404,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public UInt64EnumFormatter()
         {
             Func<UInt64, UInt64> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, UInt64>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<UInt64, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, UInt64>)) as Func<T, UInt64>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<UInt64, T>)) as Func<UInt64, T>;
         }
 
         public override int? GetLength()
@@ -438,8 +436,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public NullableUInt64EnumFormatter()
         {
             Func<UInt64, UInt64> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, UInt64>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<UInt64, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, UInt64>)) as Func<T, UInt64>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<UInt64, T>)) as Func<UInt64, T>;
         }
 
         public override int? GetLength()
@@ -483,8 +481,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public ByteEnumFormatter()
         {
             Func<Byte, Byte> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, Byte>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<Byte, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, Byte>)) as Func<T, Byte>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<Byte, T>)) as Func<Byte, T>;
         }
 
         public override int? GetLength()
@@ -515,8 +513,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public NullableByteEnumFormatter()
         {
             Func<Byte, Byte> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, Byte>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<Byte, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, Byte>)) as Func<T, Byte>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<Byte, T>)) as Func<Byte, T>;
         }
 
         public override int? GetLength()
@@ -560,8 +558,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public SByteEnumFormatter()
         {
             Func<SByte, SByte> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, SByte>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<SByte, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, SByte>)) as Func<T, SByte>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<SByte, T>)) as Func<SByte, T>;
         }
 
         public override int? GetLength()
@@ -592,8 +590,8 @@ namespace ZeroFormatter.DotNetCore.Formatters
         public NullableSByteEnumFormatter()
         {
             Func<SByte, SByte> identity = Identity;
-            this.serializeCast = Expression.Lambda<Func<T, SByte>>(Expression.Call(identity.GetMethodInfo())).Compile();
-            this.deserializeCast = Expression.Lambda<Func<SByte, T>>(Expression.Call(identity.GetMethodInfo())).Compile();
+            this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, SByte>)) as Func<T, SByte>;
+            this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<SByte, T>)) as Func<SByte, T>;
         }
 
         public override int? GetLength()

@@ -218,7 +218,7 @@ namespace ZeroFormatter.DotNetCore.Segments
     {
         readonly int elementSize;
 
-        internal static FixedListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
+        public static FixedListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
             var formatter = Formatters.Formatter<T>.Default;
             var formatterLength = formatter.GetLength();
@@ -335,7 +335,7 @@ namespace ZeroFormatter.DotNetCore.Segments
     // if byteSize == -1 is null
     public class VariableListSegment<T> : ListSegment<T>, IZeroFormatterSegment
     {
-        internal static VariableListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
+        public static VariableListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSize == -1)
