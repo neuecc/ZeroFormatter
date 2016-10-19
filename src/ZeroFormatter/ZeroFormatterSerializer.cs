@@ -43,16 +43,26 @@ namespace ZeroFormatter
                 {
                     var bufferRef = zeroFormatterObj.GetBufferReference();
 
+#if NET_CORE
+                    ArraySegment<byte> buf;
+                    if (ms.TryGetBuffer(out buf))
+                    {
+                        ms.SetLength(bufferRef.Count);
+                        var dest = buf.Array;
+                        Buffer.BlockCopy(bufferRef.Array, bufferRef.Offset, dest, 0, bufferRef.Count);
+                        return;
+                    }
+#else
                     ms.SetLength(bufferRef.Count);
                     var dest = ms.GetBuffer();
                     Buffer.BlockCopy(bufferRef.Array, bufferRef.Offset, dest, 0, bufferRef.Count);
+                    return;
+#endif
                 }
             }
-            else
-            {
-                var buffer = Serialize<T>(obj);
-                stream.Write(buffer, 0, buffer.Length);
-            }
+
+            var buffer = Serialize<T>(obj);
+            stream.Write(buffer, 0, buffer.Length);
         }
 
         public static T Deserialize<T>(byte[] bytes)
@@ -69,12 +79,23 @@ namespace ZeroFormatter
             var ms = stream as MemoryStream;
             if (ms != null)
             {
+#if NET_CORE
+                ArraySegment<byte> b;
+                if (ms.TryGetBuffer(out b))
+                {
+                    var buffer = b.Array;
+                    var formatter = Formatter<T>.Default;
+                    int _;
+                    return formatter.Deserialize(ref buffer, b.Offset, new DirtyTracker(), out _);
+                }
+#else
                 var buffer = ms.GetBuffer();
                 var formatter = Formatter<T>.Default;
                 int _;
                 return formatter.Deserialize(ref buffer, (int)ms.Position, new DirtyTracker(), out _);
+#endif
             }
-            else
+
             {
                 var buffer = FillFromStream(stream);
                 var array = buffer.Array;

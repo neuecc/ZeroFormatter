@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Linq;
+using ZeroFormatter.Internal;
 using System.Collections.Generic;
 
 namespace ZeroFormatter.Comparers
@@ -79,10 +80,12 @@ namespace ZeroFormatter.Comparers
                 comparer = new CharEqualityComparer();
             }
 
-            else if (t.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
+            else if (t.GetTypeInfo().GetInterfaces().Any(x => x == typeof(IKeyTuple)))
             {
+                var ti = t.GetTypeInfo();
+                
                 Type keyTupleComparerType = null;
-                switch (t.GetGenericArguments().Length)
+                switch (ti.GetGenericArguments().Length)
                 {
                     case 1:
                         keyTupleComparerType = typeof(KeyTupleEqualityComparer<>);
@@ -112,14 +115,15 @@ namespace ZeroFormatter.Comparers
                         break;
                 }
 
-                var formatterType = keyTupleComparerType.MakeGenericType(t.GetGenericArguments());
+                var formatterType = keyTupleComparerType.MakeGenericType(ti.GetGenericArguments());
                 comparer = Activator.CreateInstance(formatterType);
             }
+
 
             // Unity Can't use EnumEqualityComparer.
 #if !UNITY
 
-            else if (t.GetType().IsEnum)
+            else if (t.GetTypeInfo().IsEnum)
             {
                 comparer = EnumEqualityComparer<T>.Default;
             }

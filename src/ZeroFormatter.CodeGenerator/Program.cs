@@ -160,7 +160,7 @@ namespace ZeroFormatter.CodeGenerator
             var tc = new TypeCollector(path);
 
             var sb = new StringBuilder();
-            foreach(var item in tc.CreateObjectGenerators())
+            foreach (var item in tc.CreateObjectGenerators())
             {
                 //Console.WriteLine(item.TransformText());
                 sb.AppendLine(item.TransformText());

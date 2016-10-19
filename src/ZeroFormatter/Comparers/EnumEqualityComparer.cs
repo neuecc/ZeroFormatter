@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace ZeroFormatter.Comparers
 {
@@ -59,64 +60,64 @@ namespace ZeroFormatter.Comparers
                         {
                             Func<sbyte, int> getHash = SByteGetHashCode;
                             Func<sbyte, sbyte, bool> eq = SByteEquals;
-                            GetHashCodeDelegate = Delegate.CreateDelegate(typeof(Func<T, int>), getHash.Method) as Func<T, int>;
-                            EqualsDelegate = Delegate.CreateDelegate(typeof(Func<T, T, bool>), eq.Method) as Func<T, T, bool>;
+                            GetHashCodeDelegate = getHash.GetMethodInfo().CreateDelegate(typeof(Func<T, int>)) as Func<T, int>;
+                            EqualsDelegate = eq.GetMethodInfo().CreateDelegate(typeof(Func<T, T, bool>)) as Func<T, T, bool>;
                         }
                         break;
                     case TypeCode.Byte:
                         {
                             Func<Byte, int> getHash = ByteGetHashCode;
                             Func<Byte, Byte, bool> eq = ByteEquals;
-                            GetHashCodeDelegate = Delegate.CreateDelegate(typeof(Func<T, int>), getHash.Method) as Func<T, int>;
-                            EqualsDelegate = Delegate.CreateDelegate(typeof(Func<T, T, bool>), eq.Method) as Func<T, T, bool>;
+                            GetHashCodeDelegate = getHash.GetMethodInfo().CreateDelegate(typeof(Func<T, int>)) as Func<T, int>;
+                            EqualsDelegate = eq.GetMethodInfo().CreateDelegate(typeof(Func<T, T, bool>)) as Func<T, T, bool>;
                         }
                         break;
                     case TypeCode.Int16:
                         {
                             Func<Int16, int> getHash = ShortGetHashCode;
                             Func<Int16, Int16, bool> eq = ShortEquals;
-                            GetHashCodeDelegate = Delegate.CreateDelegate(typeof(Func<T, int>), getHash.Method) as Func<T, int>;
-                            EqualsDelegate = Delegate.CreateDelegate(typeof(Func<T, T, bool>), eq.Method) as Func<T, T, bool>;
+                            GetHashCodeDelegate = getHash.GetMethodInfo().CreateDelegate(typeof(Func<T, int>)) as Func<T, int>;
+                            EqualsDelegate = eq.GetMethodInfo().CreateDelegate(typeof(Func<T, T, bool>)) as Func<T, T, bool>;
                         }
                         break;
                     case TypeCode.UInt16:
                         {
                             Func<UInt16, int> getHash = UShortGetHashCode;
                             Func<UInt16, UInt16, bool> eq = UShortEquals;
-                            GetHashCodeDelegate = Delegate.CreateDelegate(typeof(Func<T, int>), getHash.Method) as Func<T, int>;
-                            EqualsDelegate = Delegate.CreateDelegate(typeof(Func<T, T, bool>), eq.Method) as Func<T, T, bool>;
+                            GetHashCodeDelegate = getHash.GetMethodInfo().CreateDelegate(typeof(Func<T, int>)) as Func<T, int>;
+                            EqualsDelegate = eq.GetMethodInfo().CreateDelegate(typeof(Func<T, T, bool>)) as Func<T, T, bool>;
                         }
                         break;
                     case TypeCode.Int32:
                         {
                             Func<int, int> getHash = IntGetHashCode;
                             Func<int, int, bool> eq = IntEquals;
-                            GetHashCodeDelegate = Delegate.CreateDelegate(typeof(Func<T, int>), getHash.Method) as Func<T, int>;
-                            EqualsDelegate = Delegate.CreateDelegate(typeof(Func<T, T, bool>), eq.Method) as Func<T, T, bool>;
+                            GetHashCodeDelegate = getHash.GetMethodInfo().CreateDelegate(typeof(Func<T, int>)) as Func<T, int>;
+                            EqualsDelegate = eq.GetMethodInfo().CreateDelegate(typeof(Func<T, T, bool>)) as Func<T, T, bool>;
                         }
                         break;
                     case TypeCode.UInt32:
                         {
                             Func<UInt32, int> getHash = UIntGetHashCode;
                             Func<UInt32, UInt32, bool> eq = UIntEquals;
-                            GetHashCodeDelegate = Delegate.CreateDelegate(typeof(Func<T, int>), getHash.Method) as Func<T, int>;
-                            EqualsDelegate = Delegate.CreateDelegate(typeof(Func<T, T, bool>), eq.Method) as Func<T, T, bool>;
+                            GetHashCodeDelegate = getHash.GetMethodInfo().CreateDelegate(typeof(Func<T, int>)) as Func<T, int>;
+                            EqualsDelegate = eq.GetMethodInfo().CreateDelegate(typeof(Func<T, T, bool>)) as Func<T, T, bool>;
                         }
                         break;
                     case TypeCode.Int64:
                         {
                             Func<Int64, int> getHash = LongGetHashCode;
                             Func<Int64, Int64, bool> eq = LongEquals;
-                            GetHashCodeDelegate = Delegate.CreateDelegate(typeof(Func<T, int>), getHash.Method) as Func<T, int>;
-                            EqualsDelegate = Delegate.CreateDelegate(typeof(Func<T, T, bool>), eq.Method) as Func<T, T, bool>;
+                            GetHashCodeDelegate = getHash.GetMethodInfo().CreateDelegate(typeof(Func<T, int>)) as Func<T, int>;
+                            EqualsDelegate = eq.GetMethodInfo().CreateDelegate(typeof(Func<T, T, bool>)) as Func<T, T, bool>;
                         }
                         break;
                     case TypeCode.UInt64:
                         {
                             Func<UInt64, int> getHash = ULongGetHashCode;
                             Func<UInt64, UInt64, bool> eq = ULongEquals;
-                            GetHashCodeDelegate = Delegate.CreateDelegate(typeof(Func<T, int>), getHash.Method) as Func<T, int>;
-                            EqualsDelegate = Delegate.CreateDelegate(typeof(Func<T, T, bool>), eq.Method) as Func<T, T, bool>;
+                            GetHashCodeDelegate = getHash.GetMethodInfo().CreateDelegate(typeof(Func<T, int>)) as Func<T, int>;
+                            EqualsDelegate = eq.GetMethodInfo().CreateDelegate(typeof(Func<T, T, bool>)) as Func<T, T, bool>;
                         }
                         break;
                     default:

@@ -1,0 +1,14 @@
+{
+	"version": "1.0.0-*",
+	"buildOptions": {
+		"outputName": "ZeroFormatter.Interfaces",
+		"compile": "../ZeroFormatter.Interfaces/*.cs"
+	},
+	"dependencies": {
+		"System.Runtime": "4.1.0"
+	},
+  "frameworks": {
+    "netstandard1.1": {
+    }
+  }
+}

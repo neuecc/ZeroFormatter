@@ -37,4 +37,5 @@ using System.Runtime.InteropServices;
 
 
 [assembly: InternalsVisibleTo("ZeroFormatter.Tests")]
+[assembly: InternalsVisibleTo("ZeroFormatter.NETCore.Tests")]
 

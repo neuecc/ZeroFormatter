@@ -16,18 +16,18 @@ namespace ZeroFormatter.Formatters
     {
         public static Tuple<int, PropertyInfo>[] GetProperties(Type type)
         {
-            if (!type.IsClass)
+            if (!type.GetTypeInfo().IsClass)
             {
                 throw new InvalidOperationException("Type must be class. " + type.Name);
             }
 
-            if (type.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() == null)
+            if (type.GetTypeInfo().GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() == null)
             {
                 throw new InvalidOperationException("Type must mark ZeroFormattableAttribute. " + type.Name);
             }
 
             var dict = new Dictionary<int, PropertyInfo>();
-            foreach (var item in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var item in type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 if (item.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) continue;
 
@@ -63,11 +63,11 @@ namespace ZeroFormatter.Formatters
 
         static void VerifyProeprtyType(PropertyInfo property)
         {
-            if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            if (property.PropertyType.GetTypeInfo().IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
                 throw new InvalidOperationException("Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary. " + property.DeclaringType.Name + "." + property.PropertyType.Name);
             }
-            else if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
+            else if (property.PropertyType.GetTypeInfo().IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
             {
                 throw new InvalidOperationException("List does not support in ZeroFormatter because List have to deserialize all objects. You can use IList<T> instead of List. " + property.DeclaringType.Name + "." + property.PropertyType.Name);
             }
@@ -76,7 +76,7 @@ namespace ZeroFormatter.Formatters
                 throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[]. " + property.DeclaringType.Name + "." + property.PropertyType.Name);
             }
 
-            var formatter = typeof(Formatter<>).MakeGenericType(property.PropertyType).GetProperty("Default").GetValue(null, null);
+            var formatter = typeof(Formatter<>).MakeGenericType(property.PropertyType).GetTypeInfo().GetProperty("Default").GetValue(null, null);
             var error = formatter as IErrorFormatter;
             if (error != null)
             {
@@ -113,8 +113,8 @@ namespace ZeroFormatter.Formatters
 
                 var propType = propInfo.PropertyType;
                 var formatterType = typeof(Formatter<>).MakeGenericType(propType);
-                var formatterGet = formatterType.GetProperty("Default").GetGetMethod();
-                var serializeMethod = formatterType.GetMethod("Serialize");
+                var formatterGet = formatterType.GetTypeInfo().GetProperty("Default").GetGetMethod();
+                var serializeMethod = formatterType.GetTypeInfo().GetMethod("Serialize");
 
                 var headerSize = Expression.Constant(8, typeof(int));
                 var intSize = Expression.Constant(4, typeof(int));
@@ -124,7 +124,7 @@ namespace ZeroFormatter.Formatters
                 var arg4 = Expression.Parameter(typeof(int), "index");
                 var arg5 = Expression.Parameter(type, "self");
 
-                var writeInt32 = Expression.Call(typeof(BinaryUtil).GetMethod("WriteInt32"),
+                var writeInt32 = Expression.Call(typeof(BinaryUtil).GetTypeInfo().GetMethod("WriteInt32"),
                     arg1,
                     Expression.Add(arg2, Expression.Add(headerSize, Expression.Multiply(intSize, arg4))),
                     arg3);
@@ -147,7 +147,7 @@ namespace ZeroFormatter.Formatters
             {
                 var objectSegment = DynamicObjectSegmentBuilder<T>.GetProxyType();
                 var ctorInfo = objectSegment.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) });
-                var arraySegmentCtor = typeof(ArraySegment<byte>).GetConstructor(new[] { typeof(byte[]), typeof(int), typeof(int) });
+                var arraySegmentCtor = typeof(ArraySegment<byte>).GetTypeInfo().GetConstructor(new[] { typeof(byte[]), typeof(int), typeof(int) });
 
                 var arg1 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
                 var arg2 = Expression.Parameter(typeof(int), "offset");

@@ -81,6 +81,7 @@
     <Compile Include="Internal\BinaryUtil.cs" />
     <Compile Include="Internal\HashHelper.cs" />
     <Compile Include="Comparers\ZeroFormatterEqualityComparer.cs" />
+    <Compile Include="Internal\PseudoTypeInfo.cs" />
     <Compile Include="Internal\SR.cs" />
     <Compile Include="Internal\StringEncoding.cs" />
     <Compile Include="Segments\IZeroFormatterSegment.cs" />

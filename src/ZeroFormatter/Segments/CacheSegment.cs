@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Linq;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
@@ -10,6 +11,8 @@ namespace ZeroFormatter.Segments
     {
         public static bool CanAccept(Type type)
         {
+            var ti = type.GetTypeInfo();
+
             if (type == typeof(string))
             {
                 return true;
@@ -18,13 +21,13 @@ namespace ZeroFormatter.Segments
             {
                 return true;
             }
-            else if (type.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
+            else if (ti.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
             {
                 return true;
             }
-            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                if (type.GetGenericArguments()[0].GetInterfaces().Any(x => x == typeof(IKeyTuple)))
+                if (ti.GetGenericArguments()[0].GetTypeInfo().GetInterfaces().Any(x => x == typeof(IKeyTuple)))
                 {
                     return true;
                 }
