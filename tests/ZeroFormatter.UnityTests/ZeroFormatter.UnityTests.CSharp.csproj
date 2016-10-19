@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.4.0p2</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -78,19 +76,15 @@
     <Reference Include="ZeroFormatter.Interfaces">
       <HintPath>Assets\Dlls\ZeroFormatter.Interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="ZeroFormatter.Interfaces 1">
-      <HintPath>Assets\Dlls\ZeroFormatter.Interfaces 1.dll</HintPath>
-    </Reference>
-    <Reference Include="ZeroFormatter.Interfaces 2">
-      <HintPath>Assets\Dlls\ZeroFormatter.Interfaces 2.dll</HintPath>
-    </Reference>
-    <Reference Include="ZeroFormatter 1">
-      <HintPath>Assets\Dlls\ZeroFormatter 1.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\TestUtils\ChainingAssertion.Ext.cs" />
+    <Compile Include="Assets\Scripts\TestUtils\ChainingAssertion.Unity.cs" />
+    <Compile Include="Assets\Scripts\TestUtils\Shim.cs" />
+    <Compile Include="Assets\Scripts\TestUtils\Tuple.cs" />
     <Compile Include="Assets\Scripts\Tests\DictionaryFormatterTest.cs" />
     <Compile Include="Assets\Scripts\Tests\DictionarySegmentTest.cs" />
+    <Compile Include="Assets\Scripts\Tests\FormatterTest.cs" />
     <Compile Include="Assets\Scripts\Tests\KeyTupleFormatterTest.cs" />
     <Compile Include="Assets\Scripts\Tests\ListFormatterTest.cs" />
     <Compile Include="Assets\Scripts\Tests\ListSegmentTest.cs" />
@@ -99,11 +93,6 @@
     <Compile Include="Assets\Scripts\Tests\ObjectFormatterTest.cs" />
     <Compile Include="Assets\Scripts\Tests\RecursiveCheck.cs" />
     <Compile Include="Assets\Scripts\Tests\StringSegmentTest.cs" />
-    <Compile Include="Assets\Scripts\TestUtils\ChainingAssertion.Ext.cs" />
-    <Compile Include="Assets\Scripts\TestUtils\ChainingAssertion.Unity.cs" />
-    <Compile Include="Assets\Scripts\TestUtils\Shim.cs" />
-    <Compile Include="Assets\Scripts\Tests\FormatterTest.cs" />
-    <Compile Include="Assets\Scripts\TestUtils\Tuple.cs" />
     <Compile Include="Assets\Scripts\UnitTestRoot.cs" />
     <Compile Include="Assets\ZeroFormatterGenerated.cs" />
   </ItemGroup>
