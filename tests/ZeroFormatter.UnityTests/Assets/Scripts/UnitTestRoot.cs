@@ -27,7 +27,6 @@ public class UnitTestRoot : MonoBehaviour
             {
                 logText.text += condition + "\n";
             }
-            logScrollBar.value = 0;
         };
 
         clearButton.onClick.AddListener(() =>
@@ -35,6 +34,7 @@ public class UnitTestRoot : MonoBehaviour
             logText.text = "";
         });
 
+        var executeAll = new List<UnityAction>();
         foreach (var ___item in tests)
         {
             var actionList = ___item; // be careful, capture in lambda
@@ -62,16 +62,30 @@ public class UnitTestRoot : MonoBehaviour
                 sw.Stop();
                 logText.text += "[" + actionList.Key + " Complete]" + sw.Elapsed.TotalMilliseconds + "ms\n\n";
                 foreach (var btn in list.GetComponentsInChildren<Button>()) btn.interactable = true;
+                StartCoroutine(ScrollLogToEndNextFrame());
             };
 
+            executeAll.Add(groupAction);
             Add(actionList.Key, groupAction);
         }
+
+        var executeAllButton = Add("Run All Tests", () =>
+        {
+            foreach (var item in executeAll)
+            {
+                item();
+            }
+        });
+
+        clearButton.gameObject.GetComponent<Image>().color = new Color(170 / 255f, 170 / 255f, 170 / 255f, 1);
+        executeAllButton.gameObject.GetComponent<Image>().color = new Color(250 / 255f, 150 / 255f, 150 / 255f, 1);
+        executeAllButton.transform.SetSiblingIndex(1);
 
         listScrollBar.value = 1;
         logScrollBar.value = 1;
     }
 
-    void Add(string title, UnityAction test)
+    Button Add(string title, UnityAction test)
     {
         var newButton = GameObject.Instantiate(clearButton);
         newButton.name = title;
@@ -80,6 +94,7 @@ public class UnitTestRoot : MonoBehaviour
         newButton.onClick.AddListener(test);
 
         newButton.transform.SetParent(list);
+        return newButton;
     }
 
     public static void AddTest(string group, string title, Action test)
@@ -92,5 +107,12 @@ public class UnitTestRoot : MonoBehaviour
         }
 
         list.Add(new KeyValuePair<string, Action>(title, test));
+    }
+
+    System.Collections.IEnumerator ScrollLogToEndNextFrame()
+    {
+        yield return null;
+        yield return null;
+        logScrollBar.value = 0;
     }
 }
