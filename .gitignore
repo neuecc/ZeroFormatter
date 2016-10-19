@@ -110,4 +110,7 @@ UpgradeLog*.XML
 .vs/restore.dg
 
 # Unity
-tests/ZeroFormatter.UnityTests/*
+tests/ZeroFormatter.UnityTests/bin/*
+tests/ZeroFormatter.UnityTests/Library/*
+tests/ZeroFormatter.UnityTests/obj/*
+tests/ZeroFormatter.UnityTests/Temp/*
