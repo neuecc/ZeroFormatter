@@ -421,12 +421,12 @@ namespace ZeroFormatter.Formatters
 
         public ErrorFormatter()
         {
-            this.exception = new InvalidOperationException("Type is not supported, please register,:" + typeof(T).Name);
+            this.exception = new InvalidOperationException("Type is not supported, please register " + typeof(T).Name);
         }
 
         public ErrorFormatter(Exception ex)
         {
-            this.exception = new InvalidOperationException("Type is not supported, occurs invalid error,:" + typeof(T).Name + " InnerException:" + ex.ToString());
+            this.exception = new InvalidOperationException("Type is not supported, occurs invalid error: " + typeof(T).Name + " InnerException:" + ex.ToString());
         }
 
         public ErrorFormatter(InvalidOperationException exception)

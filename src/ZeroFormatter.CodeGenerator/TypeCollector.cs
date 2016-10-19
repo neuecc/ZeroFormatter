@@ -227,6 +227,8 @@ namespace ZeroFormatter.CodeGenerator
                     Name = property.Name,
                     Type = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     Index = (int)index.Value,
+                    IsGetProtected = property.GetMethod.DeclaredAccessibility == Accessibility.Protected,
+                    IsSetProtected = property.SetMethod.DeclaredAccessibility == Accessibility.Protected,
                     FixedSize = length ?? 0,
                     IsCacheSegment = KnownFormatterSpec.CanAcceptCacheSegment(property.Type),
                     IsFixedSize = (length != null)

@@ -150,7 +150,7 @@ namespace ZeroFormatter.Comparers
 
         public ErrorEqualityComparer()
         {
-            this.exception = new InvalidOperationException("Type is not supported, please register,:" + typeof(T).Name);
+            this.exception = new InvalidOperationException("Type is not supported, please register " + typeof(T).Name);
         }
 
         public bool Equals(T x, T y)

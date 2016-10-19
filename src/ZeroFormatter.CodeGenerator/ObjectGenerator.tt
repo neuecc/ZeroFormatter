@@ -3,12 +3,16 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
 namespace <#= Namespace #>
 {
     using System;
-    using ZeroFormatter.Formatters;
-    using ZeroFormatter.Internal;
-    using ZeroFormatter.Segments;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
 
 <# foreach(var t in Types) {  #>
     public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
@@ -77,29 +81,29 @@ namespace <#= Namespace #>
         public override <#= p.Type #> <#= p.Name #>
         {
 <# if(p.IsFixedSize) { #>
-            get
+            <#= (p.IsGetProtected ? "protected " : "") + "get" #>
             {
                 return ObjectSegmentHelper.GetFixedProperty<<#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, __tracker);
             }
-            set
+            <#= (p.IsSetProtected ? "protected " : "") + "set" #>
             {
                 ObjectSegmentHelper.SetFixedProperty<<#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, value);
             }
 <# } else if(p.IsCacheSegment) { #>
-            get
+            <#= (p.IsGetProtected ? "protected " : "") + "get" #>
             {
                 return _<#= p.Name #>.Value;
             }
-            set
+            <#= (p.IsSetProtected ? "protected " : "") + "set" #>
             {
                 _<#= p.Name #>.Value = value;
             }
 <# } else { #>
-            get
+            <#= (p.IsGetProtected ? "protected " : "") + "get" #>
             {
                 return _<#= p.Name #>;
             }
-            set
+            <#= (p.IsSetProtected ? "protected " : "") + "set" #>
             {
                 __tracker.Dirty();
                 _<#= p.Name #> = value;
@@ -168,3 +172,8 @@ namespace <#= Namespace #>
 <# } #>
 
 }
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612

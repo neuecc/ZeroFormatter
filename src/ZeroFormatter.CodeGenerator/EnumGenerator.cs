@@ -28,32 +28,33 @@ namespace ZeroFormatter.CodeGenerator
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("namespace ");
+            this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
+                    " 414\r\n#pragma warning disable 168\r\nnamespace ");
             
-            #line 6 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 10 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             
             #line default
             #line hidden
-            this.Write("\r\n{\r\n    using System;\r\n    using System.Collections.Generic;\r\n    using ZeroForm" +
-                    "atter.Formatters;\r\n    using ZeroFormatter.Internal;\r\n    using ZeroFormatter.Se" +
-                    "gments;\r\n\r\n");
+            this.Write("\r\n{\r\n    using System;\r\n    using System.Collections.Generic;\r\n    using global::" +
+                    "ZeroFormatter.Formatters;\r\n    using global::ZeroFormatter.Internal;\r\n    using " +
+                    "global::ZeroFormatter.Segments;\r\n\r\n");
             
-            #line 14 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 18 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
  foreach(var t in Types) {  
             
             #line default
             #line hidden
             this.Write("\r\n    public class ");
             
-            #line 16 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 20 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Name));
             
             #line default
             #line hidden
             this.Write("Formatter : Formatter<");
             
-            #line 16 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 20 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
@@ -61,7 +62,7 @@ namespace ZeroFormatter.CodeGenerator
             this.Write(">\r\n    {\r\n        public override int? GetLength()\r\n        {\r\n            return" +
                     " ");
             
-            #line 20 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 24 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Length));
             
             #line default
@@ -69,28 +70,28 @@ namespace ZeroFormatter.CodeGenerator
             this.Write(";\r\n        }\r\n\r\n        public override int Serialize(ref byte[] bytes, int offse" +
                     "t, ");
             
-            #line 23 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 27 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(" value)\r\n        {\r\n            return BinaryUtil.Write");
             
-            #line 25 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 29 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnderlyingType));
             
             #line default
             #line hidden
             this.Write("(ref bytes, offset, (");
             
-            #line 25 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 29 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnderlyingType));
             
             #line default
             #line hidden
             this.Write(")value);\r\n        }\r\n\r\n        public override ");
             
-            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 32 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
@@ -98,35 +99,35 @@ namespace ZeroFormatter.CodeGenerator
             this.Write(" Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize" +
                     ")\r\n        {\r\n            byteSize = ");
             
-            #line 30 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 34 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Length));
             
             #line default
             #line hidden
             this.Write(";\r\n            return (");
             
-            #line 31 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 35 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(")BinaryUtil.Read");
             
-            #line 31 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 35 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnderlyingType));
             
             #line default
             #line hidden
             this.Write("(ref bytes, offset);\r\n        }\r\n    }\r\n\r\n    public class Nullable");
             
-            #line 35 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 39 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Name));
             
             #line default
             #line hidden
             this.Write("Formatter : Formatter<");
             
-            #line 35 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 39 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
@@ -134,7 +135,7 @@ namespace ZeroFormatter.CodeGenerator
             this.Write("?>\r\n    {\r\n        public override int? GetLength()\r\n        {\r\n            retur" +
                     "n ");
             
-            #line 39 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 43 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Length + 1));
             
             #line default
@@ -142,7 +143,7 @@ namespace ZeroFormatter.CodeGenerator
             this.Write(";\r\n        }\r\n\r\n        public override int Serialize(ref byte[] bytes, int offse" +
                     "t, ");
             
-            #line 42 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 46 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
@@ -151,14 +152,14 @@ namespace ZeroFormatter.CodeGenerator
                     ".HasValue);\r\n            if (value.HasValue)\r\n            {\r\n                Bin" +
                     "aryUtil.Write");
             
-            #line 47 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 51 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnderlyingType));
             
             #line default
             #line hidden
             this.Write("(ref bytes, offset + 1, (");
             
-            #line 47 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 51 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnderlyingType));
             
             #line default
@@ -166,21 +167,21 @@ namespace ZeroFormatter.CodeGenerator
             this.Write(")value.Value);\r\n            }\r\n            else\r\n            {\r\n                B" +
                     "inaryUtil.EnsureCapacity(ref bytes, offset, offset + ");
             
-            #line 51 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 55 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Length + 1));
             
             #line default
             #line hidden
             this.Write(");\r\n            }\r\n\r\n            return ");
             
-            #line 54 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 58 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Length + 1));
             
             #line default
             #line hidden
             this.Write(";\r\n        }\r\n\r\n        public override ");
             
-            #line 57 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 61 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
@@ -188,7 +189,7 @@ namespace ZeroFormatter.CodeGenerator
             this.Write("? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSiz" +
                     "e)\r\n        {\r\n            byteSize = ");
             
-            #line 59 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 63 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Length + 1));
             
             #line default
@@ -196,82 +197,139 @@ namespace ZeroFormatter.CodeGenerator
             this.Write(";\r\n            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);\r\n       " +
                     "     if (!hasValue) return null;\r\n\r\n            return (");
             
-            #line 63 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 67 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(")BinaryUtil.Read");
             
-            #line 63 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 67 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnderlyingType));
             
             #line default
             #line hidden
             this.Write("(ref bytes, offset + 1);\r\n        }\r\n    }\r\n\r\n    public class ");
             
-            #line 67 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 71 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Name));
             
             #line default
             #line hidden
             this.Write("EqualityComparer : IEqualityComparer<");
             
-            #line 67 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 71 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(">\r\n    {\r\n        public bool Equals(");
             
-            #line 69 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 73 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(" x, ");
             
-            #line 69 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 73 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(" y)\r\n        {\r\n            return (");
             
-            #line 71 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 75 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnderlyingType));
             
             #line default
             #line hidden
             this.Write(")x == (");
             
-            #line 71 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 75 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnderlyingType));
             
             #line default
             #line hidden
             this.Write(")y;\r\n        }\r\n\r\n        public int GetHashCode(");
             
-            #line 74 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 78 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
-            this.Write(" obj)\r\n        {\r\n            return (");
+            this.Write(" x)\r\n        {\r\n");
             
-            #line 76 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(t.UnderlyingType));
+            #line 80 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+ if(t.UnderlyingType == "Byte") { 
             
             #line default
             #line hidden
-            this.Write(")obj;\r\n        }\r\n    }\r\n\r\n");
+            this.Write("            return (int)(Byte)x;\r\n");
             
-            #line 80 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+            #line 82 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+ } else if(t.UnderlyingType == "SByte") { 
+            
+            #line default
+            #line hidden
+            this.Write("             return (int)(SByte)x ^ (int)(SByte)x << 8; \r\n");
+            
+            #line 84 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+ } else if(t.UnderlyingType == "Int16") { 
+            
+            #line default
+            #line hidden
+            this.Write("            return (int)((Int16)x) | (int)(Int16)x << 16;\r\n");
+            
+            #line 86 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+ } else if(t.UnderlyingType == "UInt16") { 
+            
+            #line default
+            #line hidden
+            this.Write("            return (int)(UInt16)x;\r\n");
+            
+            #line 88 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+ } else if(t.UnderlyingType == "UInt32") { 
+            
+            #line default
+            #line hidden
+            this.Write("            return (int)(UInt32)x;\r\n");
+            
+            #line 90 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+ } else if(t.UnderlyingType == "UInt64") { 
+            
+            #line default
+            #line hidden
+            this.Write("            return (int)(UInt64)x ^ (int)((UInt64)x >> 32);\r\n");
+            
+            #line 92 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+ } else if(t.UnderlyingType == "Int64") { 
+            
+            #line default
+            #line hidden
+            this.Write("            return (int)(Int64)x ^ (int)((Int64)x >> 32);\r\n");
+            
+            #line 94 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+ } else { 
+            
+            #line default
+            #line hidden
+            this.Write("            return (int)x;\r\n");
+            
+            #line 96 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("\r\n}\r\n");
+            this.Write("        }\r\n    }\r\n\r\n");
+            
+            #line 100 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("\r\n}\r\n#pragma warning restore 168\r\n#pragma warning restore 414\r\n#pragma warning re" +
+                    "store 618\r\n#pragma warning restore 612");
             return this.GenerationEnvironment.ToString();
         }
     }

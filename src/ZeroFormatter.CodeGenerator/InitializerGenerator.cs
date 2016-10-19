@@ -28,93 +28,111 @@ namespace ZeroFormatter.CodeGenerator
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"namespace ZeroFormatter.Internal
+            this.Write(@"#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+namespace ZeroFormatter.Internal
 {
     using System;
     using System.Collections.Generic;
-    using ZeroFormatter.Formatters;
-    using ZeroFormatter.Internal;
-    using ZeroFormatter.Segments;
-    using UnityEngine;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
 
     public static class ZeroFormatterInitializer
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Register()
         {
             // Enums
 ");
             
-            #line 21 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 24 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  foreach(var g in Enums) { foreach(var t in g.Types) {   
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter<");
             
-            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 25 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(">.Register(new ");
             
-            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 25 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + "." + t.Name));
+            
+            #line default
+            #line hidden
+            this.Write("Formatter());\r\n            ZeroFormatter.Formatters.Formatter<");
+            
+            #line 26 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
+            
+            #line default
+            #line hidden
+            this.Write("?>.Register(new ");
+            
+            #line 26 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + ".Nullable" + t.Name));
             
             #line default
             #line hidden
             this.Write("Formatter());\r\n            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<" +
                     "");
             
-            #line 23 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 27 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(">.Register(new ");
             
-            #line 23 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 27 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + "." + t.Name));
             
             #line default
             #line hidden
             this.Write("EqualityComparer());\r\n");
             
-            #line 24 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } } 
             
             #line default
             #line hidden
             this.Write("            // Objects\r\n");
             
-            #line 26 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 30 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  foreach(var g in Objects) { foreach(var t in g.Types) {   
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter<");
             
-            #line 27 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 31 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(">.Register(new ");
             
-            #line 27 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 31 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + "." + t.Name));
             
             #line default
             #line hidden
             this.Write("Formatter());\r\n");
             
-            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 32 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } } 
             
             #line default
             #line hidden
-            this.Write("        }\r\n    }\r\n}");
+            this.Write("        }\r\n    }\r\n}\r\n#pragma warning restore 168\r\n#pragma warning restore 414\r\n#p" +
+                    "ragma warning restore 618\r\n#pragma warning restore 612");
             return this.GenerationEnvironment.ToString();
         }
     }

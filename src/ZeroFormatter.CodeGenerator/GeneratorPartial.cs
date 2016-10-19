@@ -40,6 +40,8 @@ namespace ZeroFormatter.CodeGenerator
             public int Index { get; set; }
             public string Name { get; set; }
             public string Type { get; set; }
+            public bool IsGetProtected { get; set; }
+            public bool IsSetProtected { get; set; }
             public bool IsCacheSegment { get; set; }
             public bool IsFixedSize { get; set; }
             public int FixedSize { get; set; }

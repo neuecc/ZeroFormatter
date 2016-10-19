@@ -3,13 +3,17 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
 namespace <#= Namespace #>
 {
     using System;
     using System.Collections.Generic;
-    using ZeroFormatter.Formatters;
-    using ZeroFormatter.Internal;
-    using ZeroFormatter.Segments;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
 
 <# foreach(var t in Types) {  #>
 
@@ -71,12 +75,32 @@ namespace <#= Namespace #>
             return (<#= t.UnderlyingType #>)x == (<#= t.UnderlyingType #>)y;
         }
 
-        public int GetHashCode(<#= t.FullName #> obj)
+        public int GetHashCode(<#= t.FullName #> x)
         {
-            return (<#= t.UnderlyingType #>)obj;
+<# if(t.UnderlyingType == "Byte") { #>
+            return (int)(Byte)x;
+<# } else if(t.UnderlyingType == "SByte") { #>
+             return (int)(SByte)x ^ (int)(SByte)x << 8; 
+<# } else if(t.UnderlyingType == "Int16") { #>
+            return (int)((Int16)x) | (int)(Int16)x << 16;
+<# } else if(t.UnderlyingType == "UInt16") { #>
+            return (int)(UInt16)x;
+<# } else if(t.UnderlyingType == "UInt32") { #>
+            return (int)(UInt32)x;
+<# } else if(t.UnderlyingType == "UInt64") { #>
+            return (int)(UInt64)x ^ (int)((UInt64)x >> 32);
+<# } else if(t.UnderlyingType == "Int64") { #>
+            return (int)(Int64)x ^ (int)((Int64)x >> 32);
+<# } else { #>
+            return (int)x;
+<# } #>
         }
     }
 
 <# } #>
 
 }
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
