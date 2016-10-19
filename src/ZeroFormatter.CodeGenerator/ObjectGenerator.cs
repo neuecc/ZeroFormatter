@@ -19,6 +19,7 @@ namespace ZeroFormatter.CodeGenerator
     /// </summary>
     
     #line 1 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "14.0.0.0")]
     public partial class ObjectGenerator : ObjectGeneratorBase
     {
 #line hidden
@@ -153,15 +154,15 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write("_ObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));\r\n      " +
-                    "  }\r\n    }\r\n\r\n    public class ");
+            this.Write("ObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));\r\n       " +
+                    " }\r\n    }\r\n\r\n    public class ");
             
             #line 58 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Name));
             
             #line default
             #line hidden
-            this.Write("_ObjectSegment : ");
+            this.Write("ObjectSegment : ");
             
             #line 58 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
@@ -368,7 +369,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(@"_ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+            this.Write(@"ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
             int __out;
@@ -602,10 +603,12 @@ namespace ZeroFormatter.CodeGenerator
     /// <summary>
     /// Base class for this transformation
     /// </summary>
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "14.0.0.0")]
     public class ObjectGeneratorBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;
+        private global::System.CodeDom.Compiler.CompilerErrorCollection errorsField;
         private global::System.Collections.Generic.List<int> indentLengthsField;
         private string currentIndentField = "";
         private bool endsWithNewline;
@@ -630,7 +633,20 @@ namespace ZeroFormatter.CodeGenerator
                 this.generationEnvironmentField = value;
             }
         }
-        
+        /// <summary>
+        /// The error collection for the generation process
+        /// </summary>
+        public System.CodeDom.Compiler.CompilerErrorCollection Errors
+        {
+            get
+            {
+                if ((this.errorsField == null))
+                {
+                    this.errorsField = new global::System.CodeDom.Compiler.CompilerErrorCollection();
+                }
+                return this.errorsField;
+            }
+        }
         /// <summary>
         /// A list of the lengths of each indent that was added with PushIndent
         /// </summary>
@@ -736,7 +752,25 @@ namespace ZeroFormatter.CodeGenerator
         {
             this.WriteLine(string.Format(global::System.Globalization.CultureInfo.CurrentCulture, format, args));
         }
- 
+        /// <summary>
+        /// Raise an error
+        /// </summary>
+        public void Error(string message)
+        {
+            System.CodeDom.Compiler.CompilerError error = new global::System.CodeDom.Compiler.CompilerError();
+            error.ErrorText = message;
+            this.Errors.Add(error);
+        }
+        /// <summary>
+        /// Raise a warning
+        /// </summary>
+        public void Warning(string message)
+        {
+            System.CodeDom.Compiler.CompilerError error = new global::System.CodeDom.Compiler.CompilerError();
+            error.ErrorText = message;
+            error.IsWarning = true;
+            this.Errors.Add(error);
+        }
         /// <summary>
         /// Increase the indent
         /// </summary>

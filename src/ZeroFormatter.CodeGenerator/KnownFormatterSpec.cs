@@ -59,7 +59,10 @@ namespace ZeroFormatter.CodeGenerator
                 return x;
             }
 
-            // TODO:Enum?
+            if (namedSymbol.TypeKind == TypeKind.Enum)
+            {
+                return GetLength(namedSymbol.EnumUnderlyingType);
+            }
 
             return null;
         }

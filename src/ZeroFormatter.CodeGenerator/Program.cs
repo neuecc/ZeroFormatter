@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -7,63 +9,7 @@ using System.Threading.Tasks;
 
 namespace ZeroFormatter.CodeGenerator
 {
-    public partial class EnumGenerator
-    {
-        public string Namespace { get; set; }
-        public EnumType[] Types { get; set; }
-    }
 
-    public class EnumType
-    {
-        public string Name { get; set; }
-        public string UnderlyingType { get; set; }
-        public int Length { get; set; }
-    }
-
-
-    public partial class ObjectGenerator
-    {
-        public string Namespace { get; set; }
-        public ObjectSegmentType[] Types { get; set; }
-    }
-
-    public class ObjectSegmentType
-    {
-        public string Name { get; set; }
-        public string FullName { get; set; }
-        public string Namespace { get; set; }
-        public int LastIndex { get; set; }
-        public PropertyTuple[] Properties { get; set; }
-
-        public class PropertyTuple
-        {
-            public int Index { get; set; }
-            public string Name { get; set; }
-            public string Type { get; set; }
-            public bool IsCacheSegment { get; set; }
-            public bool IsFixedSize { get; set; }
-            public int FixedSize { get; set; }
-        }
-
-        public int[] ElementFixedSizes
-        {
-            get
-            {
-                var schemaLastIndex = Properties.Select(x => x.Index).LastOrDefault();
-                var dict = Properties.Where(x => x.IsFixedSize).ToDictionary(x => x.Index, x => x.FixedSize);
-                var elementSizes = new int[schemaLastIndex + 1];
-                for (int i = 0; i < schemaLastIndex + 1; i++)
-                {
-                    if (!dict.TryGetValue(i, out elementSizes[i]))
-                    {
-                        elementSizes[i] = 0;
-                    }
-                }
-
-                return elementSizes;
-            }
-        }
-    }
 
 
     // zfc.exe
@@ -157,17 +103,38 @@ namespace ZeroFormatter.CodeGenerator
 
             path = @"C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.Tests\ZeroFormatter.Tests.csproj";
 
+            path = @"C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\sandbox\Sandbox.Shared\Sandbox.Shared.csproj";
+
+
+            var sw = Stopwatch.StartNew();
+            Console.WriteLine("Project Compilation Start:" + path);
+
             var tc = new TypeCollector(path);
 
+            Console.WriteLine("Project Compilation Complete:" + sw.Elapsed.ToString());
+
+            sw.Restart();
+            Console.WriteLine("Type Collect Start");
+            ObjectGenerator[] objectGen = tc.CreateObjectGenerators();
+            EnumGenerator[] enumGen = tc.CreateEnumGenerators();
+            Console.WriteLine("Type Collect Complete:" + sw.Elapsed.ToString());
+
+            Console.WriteLine("String Generation Start");
+            sw.Restart();
             var sb = new StringBuilder();
+            sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen }.TransformText());
+
             foreach (var item in tc.CreateObjectGenerators())
             {
-                //Console.WriteLine(item.TransformText());
                 sb.AppendLine(item.TransformText());
             }
+            foreach (var item in tc.CreateEnumGenerators())
+            {
+                sb.AppendLine(item.TransformText());
+            }
+            Console.WriteLine("String Generation Complete:" + sw.Elapsed.ToString());
 
-            // System.IO.File.WriteAllText(@"C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\Test.cs", sb.ToString());
-
+            System.IO.File.WriteAllText(@"C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\tests\ZeroFormatter.UnityTests\Assets\ZeroFormatterGenerated.cs", sb.ToString());
         }
     }
 

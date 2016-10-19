@@ -25,6 +25,9 @@ public class MyClass
 
     [Index(3)]
     public virtual IList<MogeMoge> List { get; set; }
+
+    [Index(4)]
+    public virtual MogeMoge Mone { get; set; }
 }
 
 namespace Sandbox

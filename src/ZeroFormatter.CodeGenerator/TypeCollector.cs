@@ -14,6 +14,11 @@ namespace ZeroFormatter.CodeGenerator
         const string IndexAttributeShortName = "IndexAttribute";
         const string IgnoreAttributeShortName = "IgnoreFormatAttribute";
 
+        static readonly SymbolDisplayFormat binaryWriteFormat = new SymbolDisplayFormat(
+                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable,
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly);
+
         ILookup<TypeKind, INamedTypeSymbol> targetTypes;
 
         public TypeCollector(string csProjPath)
@@ -31,15 +36,16 @@ namespace ZeroFormatter.CodeGenerator
         public EnumGenerator[] CreateEnumGenerators()
         {
             var generator = targetTypes[TypeKind.Enum]
-                .GroupBy(x => x.ContainingNamespace)
+                .GroupBy(x => x.ContainingNamespace.ToDisplayString())
                 .OrderBy(x => x.Key)
                 .Select(x => new EnumGenerator
                 {
-                    Namespace = x.Key.ToDisplayString(),
+                    Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
                     Types = x.Select(y => new EnumType
                     {
                         Name = y.Name,
-                        UnderlyingType = y.EnumUnderlyingType.ToDisplayString(),
+                        FullName = y.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                        UnderlyingType = y.EnumUnderlyingType.ToDisplayString(binaryWriteFormat),
                         Length = GetEnumSize(y.EnumUnderlyingType)
                     })
                     .ToArray()
@@ -62,7 +68,7 @@ namespace ZeroFormatter.CodeGenerator
             var generator = container.GroupBy(x => x.Namespace)
                 .Select(x => new ObjectGenerator
                 {
-                    Namespace = x.Key,
+                    Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
                     Types = x.ToArray(),
                 })
                 .ToArray();

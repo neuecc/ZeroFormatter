@@ -51,11 +51,11 @@ namespace <#= Namespace #>
                 byteSize = 4;
                 return null;
             }
-            return new <#= t.Name #>_ObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+            return new <#= t.Name #>ObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
         }
     }
 
-    public class <#= t.Name #>_ObjectSegment : <#= t.FullName #>, IZeroFormatterSegment
+    public class <#= t.Name #>ObjectSegment : <#= t.FullName #>, IZeroFormatterSegment
     {
         static readonly int[] __elementSizes = new int[]{ <#= string.Join(", ", t.ElementFixedSizes) #> };
 
@@ -109,7 +109,7 @@ namespace <#= Namespace #>
 
 <# } #>
 
-        public <#= t.Name #>_ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        public <#= t.Name #>ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
             int __out;

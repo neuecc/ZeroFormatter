@@ -28,7 +28,7 @@ namespace ZeroFormatter.CodeGenerator
 
                 var csProjRoot = Path.GetDirectoryName(csprojPath);
                 var framworkRoot = Path.GetDirectoryName(typeof(object).Assembly.Location);
-
+                
                 foreach (var item in xElem.Descendants(ns + "Reference"))
                 {
                     var hintPath = item.Element(ns + "HintPath")?.Value;
