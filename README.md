@@ -1,7 +1,21 @@
 # ZeroFormatter
 Infinitly fast serializer for .NET and Unity.
 
-Work in progress..
+(Work in progress..)
+
+Install
+---
+for .NET, .NET Core
+
+* PM> Install-Package [ZeroFormatter](https://www.nuget.org/packages/ZeroFormatter)
+* PM> Install-Package [ZeroFormatter.Analyzer](https://www.nuget.org/packages/ZeroFormatter.Analyzer)
+
+for Unity
+
+* PM> Install-Package [ZeroFormatter.Interfaces](https://www.nuget.org/packages/ZeroFormatter.Interfaces/)
+* PM> Install-Package [ZeroFormatter.Unity](https://www.nuget.org/packages/ZeroFormatter.Unity)
+
+Interfaces can reference both .NET 3.5 and Unity. ZeroFormatter.Unity is binary for Unity, it can 'not' use dynamic serializer generation. Code Generator is in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc\zfc.exe`. Commandline arguments are `[csproj path] [output path] [-unuseunityattr]`.
 
 Sample
 ---

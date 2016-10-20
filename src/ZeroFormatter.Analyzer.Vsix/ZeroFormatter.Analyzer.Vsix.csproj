@@ -22,8 +22,8 @@
     <ProjectGuid>{C039E946-455C-478B-8FA3-733F9E0DF1BD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ZeroFormatterAnalyzer.Vsix</RootNamespace>
-    <AssemblyName>ZeroFormatterAnalyzer.Vsix</AssemblyName>
+    <RootNamespace>ZeroFormatter.Analyzer</RootNamespace>
+    <AssemblyName>ZeroFormatter.Analyzer.Vsix</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>

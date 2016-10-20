@@ -10,7 +10,7 @@ namespace ZeroFormatter.Analyzer
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ZeroFormatterAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "ZeroFormatterAnalyzer";
+        const string DiagnosticIdBase = "ZeroFormatterAnalyzer";
 
         internal const string Title = "Lint of ZeroFormattable Type.";
         internal const string Category = "Usage";
@@ -20,61 +20,61 @@ namespace ZeroFormatter.Analyzer
         internal const string IgnoreShortName = "IgnoreFormatAttribute";
 
         internal static readonly DiagnosticDescriptor TypeMustBeClass = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(TypeMustBeClass) , title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(TypeMustBeClass), title: Title, category: Category,
             messageFormat: "Type must be class. {0}.", // type.Name
             description: "Type must be class.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor TypeMustBeZeroFormattable = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(TypeMustBeZeroFormattable), title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(TypeMustBeZeroFormattable), title: Title, category: Category,
             messageFormat: "Type must mark ZeroFormattableAttribute. {0}.", // type.Name
             description: "Type must mark ZeroFormattableAttribute.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor PublicPropertyNeedsIndex = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(PublicPropertyNeedsIndex), title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(PublicPropertyNeedsIndex), title: Title, category: Category,
             messageFormat: "Public property must mark IndexAttribute or IgnoreFormatAttribute. {0}.{1}.", // type.Name + "." + item.Name
             description: "Public property must mark IndexAttribute or IgnoreFormatAttribute.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor PublicPropertyNeedsGetAndSetAccessor = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(PublicPropertyNeedsGetAndSetAccessor), title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(PublicPropertyNeedsGetAndSetAccessor), title: Title, category: Category,
             messageFormat: "Public property's accessor must needs both public/protected get and set. {0}.{1}.", // type.Name + "." + item.Name
             description: "Public property's accessor must needs both public/protected get and set.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor PublicPropertyMustBeVirtual = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(PublicPropertyMustBeVirtual), title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(PublicPropertyMustBeVirtual), title: Title, category: Category,
             messageFormat: "Public property's accessor must be virtual. {0}.{1}.", // type.Name + "." + item.Name
             description: "Public property's accessor must be virtual.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor IndexAttributeDuplicate = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(IndexAttributeDuplicate), title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(IndexAttributeDuplicate), title: Title, category: Category,
             messageFormat: "IndexAttribute can not allow duplicate. {0}.{1}, Index:{2}", // type.Name, item.Name index.Index
             description: "IndexAttribute can not allow duplicate.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor DictionaryNotSupport = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(DictionaryNotSupport), title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(DictionaryNotSupport), title: Title, category: Category,
             messageFormat: "Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary. {0}.{1}.", // type.Name + "." + property.Name 
             description: "Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor ListNotSupport = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(ListNotSupport), title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(ListNotSupport), title: Title, category: Category,
             messageFormat: "List does not support in ZeroFormatter because List have to deserialize all objects. You can use IList<T> instead of List. {0}.{1}.", // type.Name + "." + property.Name 
             description: "List does not support in ZeroFormatter because List have to deserialize all objects. You can use IList<T> instead of List.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor ArrayNotSupport = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(ArrayNotSupport), title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(ArrayNotSupport), title: Title, category: Category,
             messageFormat: "Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[]. {0}.{1}.", // type.Name + "." + property.Name 
             description: "Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[].",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor IndexIsTooLarge = new DiagnosticDescriptor(
-            id: DiagnosticId + "_" + nameof(IndexIsTooLarge), title: Title, category: Category,
+            id: DiagnosticIdBase + "_" + nameof(IndexIsTooLarge), title: Title, category: Category,
             messageFormat: "MaxIndex is {0}, it is large. Index is size of binary, recommended to small. {1}", // index, type.Name
             description: "MaxIndex is large. Index is size of binary, recommended to small.",
             defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true);
@@ -104,7 +104,20 @@ namespace ZeroFormatter.Analyzer
         {
             get
             {
-                return ImmutableArray.Create(TypeMustBeClass, TypeMustBeZeroFormattable, PublicPropertyNeedsIndex, PublicPropertyNeedsGetAndSetAccessor, PublicPropertyMustBeVirtual, IndexAttributeDuplicate);
+                var supported = ImmutableArray.Create(
+                    TypeMustBeClass,
+                    TypeMustBeZeroFormattable,
+                    PublicPropertyNeedsIndex,
+                    PublicPropertyNeedsGetAndSetAccessor,
+                    PublicPropertyMustBeVirtual,
+                    IndexAttributeDuplicate,
+                    DictionaryNotSupport,
+                    ListNotSupport,
+                    ArrayNotSupport,
+                    IndexIsTooLarge);
+
+
+                return supported;
             }
         }
 
@@ -157,7 +170,6 @@ namespace ZeroFormatter.Analyzer
             var namedType = type as INamedTypeSymbol;
             if (namedType != null && namedType.IsGenericType && callFromProperty != null)
             {
-
                 var genericType = namedType.ConstructUnboundGenericType();
                 var genericTypeString = genericType.ToDisplayString();
 
