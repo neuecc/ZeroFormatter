@@ -72,6 +72,7 @@ namespace ZeroFormatter.CodeGenerator
         public ObjectGenerator[] Objects { get; set; }
         public EnumGenerator[] Enums { get; set; }
         public GenericType[] GenericTypes { get; set; }
+        public bool UnuseUnityAttribute { get; set; }
     }
 
     public class GenericType : IEqualityComparer<GenericType>
