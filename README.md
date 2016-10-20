@@ -64,9 +64,11 @@ Serializable target must mark `ZeroFormattableAttribute`, there public property 
 
 Supported Type
 ---
-Primitive, Enum, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<>`, `ILookup<>`, `byte[]` and there nullable.
+Primitive, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<>`, `ILookup<>`, `byte[]`, `ZeroFormatter.KeyTuple` and there nullable.
 
 `T[]`, `List<T>`, `Dictionary<TKey, TValue>` is not supported type. You should use `IList<>`, `IDictionary<>` instad.
+
+Dictionary's key is native serialized in binary, but has limitation of keys. Key can use Primitive, Enum and ZeroFormatter.KeyTuple for mulitple keys.
 
 Analyzer
 ---
