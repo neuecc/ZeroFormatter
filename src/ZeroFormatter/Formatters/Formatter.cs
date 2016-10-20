@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using ZeroFormatter.Segments;
+using ZeroFormatter.Comparers;
 
 namespace ZeroFormatter.Formatters
 {
@@ -179,14 +180,18 @@ namespace ZeroFormatter.Formatters
                 {
                     formatter = new ByteArrayFormatter();
                 }
+                else if (t == typeof(IList<int>)) // known generic formatter...
+                {
+                    formatter = new ListFormatter<int>();
+                }
+
+#if !UNITY
 
                 else if (ti.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>))
                 {
                     var formatterType = typeof(ListFormatter<>).MakeGenericType(ti.GetGenericArguments());
                     formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                 }
-
-#if !UNITY
 
                 else if (ti.IsGenericType && t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
                 {
@@ -286,8 +291,6 @@ namespace ZeroFormatter.Formatters
                     }
                 }
 
-#endif
-
                 else if (ti.IsGenericType)
                 {
                     if (t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
@@ -296,15 +299,12 @@ namespace ZeroFormatter.Formatters
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
 
-#if !UNITY
-
                     else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
                     {
                         var formatterType = typeof(ReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
 
-#endif
 
                     else if (t.GetGenericTypeDefinition() == typeof(DictionaryEntry<,>))
                     {
@@ -373,8 +373,6 @@ namespace ZeroFormatter.Formatters
                     throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[].");
                 }
 
-#if !UNITY
-
                 else if (ti.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() != null)
                 {
                     formatter = new DynamicObjectFormatter<T>();
@@ -410,6 +408,87 @@ namespace ZeroFormatter.Formatters
         public abstract T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize);
     }
 
+    public static class GenericFormatter
+    {
+        public static void RegisterLookup<TKey, TElement>()
+        {
+            Formatter<ILookup<TKey, TElement>>.Register(new LookupFormatter<TKey, TElement>());
+            Formatter<GroupingSegment<TKey, TElement>>.Register(new GroupingSegmentFormatter<TKey, TElement>());
+            Formatter<IList<TKey>>.Register(new ListFormatter<TKey>());
+            Formatter<IList<GroupingSegment<TKey, TElement>>>.Register(new ListFormatter<GroupingSegment<TKey, TElement>>());
+            Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Register(new ListFormatter<IList<GroupingSegment<TKey, TElement>>>());
+            Formatter<IList<TElement>>.Register(new ListFormatter<TElement>());
+        }
+
+        public static void RegisterDictionary<TKey, TValue>()
+        {
+            Formatter<IDictionary<TKey, TValue>>.Register(new DictionaryFormatter<TKey, TValue>());
+            Formatter<DictionaryEntry<TKey, TValue>>.Register(new DictionaryEntryFormatter<TKey, TValue>());
+            Formatter<IList<DictionaryEntry<TKey, TValue>>>.Register(new ListFormatter<DictionaryEntry<TKey, TValue>>());
+        }
+
+        public static void RegisterList<T>()
+        {
+            Formatter<IList<T>>.Register(new ListFormatter<T>());
+        }
+
+        public static void RegisterKeyTuple<T1>()
+        {
+            Formatter<KeyTuple<T1>>.Register(new KeyTupleFormatter<T1>());
+            Formatter<KeyTuple<T1>?>.Register(new NullableKeyTupleFormatter<T1>());
+            ZeroFormatterEqualityComparer<KeyTuple<T1>>.Register(new KeyTupleEqualityComparer<T1>());
+        }
+
+        public static void RegisterKeyTuple<T1, T2>()
+        {
+            Formatter<KeyTuple<T1, T2>>.Register(new KeyTupleFormatter<T1, T2>());
+            Formatter<KeyTuple<T1, T2>?>.Register(new NullableKeyTupleFormatter<T1, T2>());
+            ZeroFormatterEqualityComparer<KeyTuple<T1, T2>>.Register(new KeyTupleEqualityComparer<T1, T2>());
+        }
+
+        public static void RegisterKeyTuple<T1, T2, T3>()
+        {
+            Formatter<KeyTuple<T1, T2, T3>>.Register(new KeyTupleFormatter<T1, T2, T3>());
+            Formatter<KeyTuple<T1, T2, T3>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3>());
+            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3>>.Register(new KeyTupleEqualityComparer<T1, T2, T3>());
+        }
+
+        public static void RegisterKeyTuple<T1, T2, T3, T4>()
+        {
+            Formatter<KeyTuple<T1, T2, T3, T4>>.Register(new KeyTupleFormatter<T1, T2, T3, T4>());
+            Formatter<KeyTuple<T1, T2, T3, T4>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4>());
+            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4>());
+        }
+
+        public static void RegisterKeyTuple<T1, T2, T3, T4, T5>()
+        {
+            Formatter<KeyTuple<T1, T2, T3, T4, T5>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5>());
+            Formatter<KeyTuple<T1, T2, T3, T4, T5>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5>());
+            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5>());
+        }
+
+        public static void RegisterKeyTuple<T1, T2, T3, T4, T5, T6>()
+        {
+            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6>());
+            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6>());
+            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6>());
+        }
+
+        public static void RegisterKeyTuple<T1, T2, T3, T4, T5, T6, T7>()
+        {
+            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7>());
+            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7>());
+            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7>());
+        }
+
+        public static void RegisterKeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>()
+        {
+            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>());
+            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>());
+            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7, T8>());
+        }
+    }
+
     internal interface IErrorFormatter
     {
         InvalidOperationException GetException();
@@ -421,7 +500,20 @@ namespace ZeroFormatter.Formatters
 
         public ErrorFormatter()
         {
-            this.exception = new InvalidOperationException("Type is not supported, please register " + typeof(T).Name);
+            string message;
+            var t = typeof(T);
+            var ti = t.GetTypeInfo();
+            if (ti.IsGenericType)
+            {
+                // depth 1 only:)
+                message = t.Name + "<" + string.Join(", ", ti.GetGenericArguments().Select(x => x.Name).ToArray()) + ">";
+            }
+            else
+            {
+                message = t.Name;
+            }
+
+            this.exception = new InvalidOperationException("Type is not supported, please register " + message);
         }
 
         public ErrorFormatter(Exception ex)

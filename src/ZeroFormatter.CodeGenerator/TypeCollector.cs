@@ -55,14 +55,15 @@ namespace ZeroFormatter.CodeGenerator
             return generator;
         }
 
-        public ObjectGenerator[] CreateObjectGenerators()
+        public Tuple<ObjectGenerator[], GenericType[]> CreateObjectGenerators()
         {
             var container = new List<ObjectSegmentType>();
+            var genericTypeContainer = new List<GenericType>();
             var alreadyCollected = new HashSet<string>();
 
             foreach (var item in targetTypes[TypeKind.Class])
             {
-                CollectObjectSegment(item, container, alreadyCollected);
+                CollectObjectSegment(item, container, genericTypeContainer, alreadyCollected);
             }
 
             var generator = container.GroupBy(x => x.Namespace)
@@ -73,7 +74,8 @@ namespace ZeroFormatter.CodeGenerator
                 })
                 .ToArray();
 
-            return generator;
+            var t = Tuple.Create(generator, genericTypeContainer.Distinct().OrderBy(x => x.Type).ToArray());
+            return t;
         }
 
         static int GetEnumSize(INamedTypeSymbol enumUnderlyingType)
@@ -97,7 +99,7 @@ namespace ZeroFormatter.CodeGenerator
             }
         }
 
-        static void CollectObjectSegment(INamedTypeSymbol type, List<ObjectSegmentType> typeContainer, HashSet<string> alreadyCollected)
+        static void CollectObjectSegment(INamedTypeSymbol type, List<ObjectSegmentType> typeContainer, List<GenericType> genericTypeContainer, HashSet<string> alreadyCollected)
         {
             if (type == null)
             {
@@ -122,7 +124,7 @@ namespace ZeroFormatter.CodeGenerator
 
                 if (genericTypeString == "T?")
                 {
-                    CollectObjectSegment(type.TypeArguments[0] as INamedTypeSymbol, typeContainer, alreadyCollected);
+                    CollectObjectSegment(type.TypeArguments[0] as INamedTypeSymbol, typeContainer, genericTypeContainer, alreadyCollected);
                     return;
                 }
                 else if (genericTypeString == "System.Collections.Generic.List<>")
@@ -140,9 +142,28 @@ namespace ZeroFormatter.CodeGenerator
                       || genericTypeString == "System.Linq.ILookup<,>"
                       || genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
                 {
+                    var elementTypes = string.Join(", ", type.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
+
+                    if (genericTypeString == "System.Collections.Generic.IList<>")
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.List, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString == "System.Collections.Generic.IDictionary<,>")
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Dictionary, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString == "System.Linq.ILookup<,>")
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Lookup, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.KeyTuple, ElementTypes = elementTypes });
+                    }
+
                     foreach (var t in type.TypeArguments)
                     {
-                        CollectObjectSegment(t as INamedTypeSymbol, typeContainer, alreadyCollected);
+                        CollectObjectSegment(t as INamedTypeSymbol, typeContainer, genericTypeContainer, alreadyCollected);
                     }
                     return;
                 }
@@ -217,7 +238,7 @@ namespace ZeroFormatter.CodeGenerator
                     if (namedType != null) // if <T> is unnamed type, it can't analyze.
                     {
                         // Recursive
-                        CollectObjectSegment(namedType, typeContainer, alreadyCollected);
+                        CollectObjectSegment(namedType, typeContainer, genericTypeContainer, alreadyCollected);
                     }
                 }
 

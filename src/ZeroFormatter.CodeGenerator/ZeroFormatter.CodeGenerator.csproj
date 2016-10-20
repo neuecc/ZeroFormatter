@@ -169,7 +169,7 @@
       <DependentUpon>EnumGenerator.tt</DependentUpon>
     </Compile>
     <Compile Include="GeneratorPartial.cs" />
-    <Compile Include="InitializerGenerator.cs">
+    <Compile Include="InitializerGenerator1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>InitializerGenerator.tt</DependentUpon>
@@ -196,7 +196,7 @@
     </Content>
     <Content Include="InitializerGenerator.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>InitializerGenerator.cs</LastGenOutput>
+      <LastGenOutput>InitializerGenerator1.cs</LastGenOutput>
     </Content>
     <Content Include="ObjectGenerator.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>

@@ -11,9 +11,11 @@ namespace ZeroFormatter.Internal
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
+    using global::ZeroFormatter.Comparers;
 
     public static partial class ZeroFormatterInitializer
     {
@@ -29,6 +31,17 @@ namespace ZeroFormatter.Internal
             // Objects
 <# foreach(var g in Objects) { foreach(var t in g.Types) {   #>
             ZeroFormatter.Formatters.Formatter<<#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>Formatter());
+<# } } #>
+            // Generics
+<# foreach(var g in GenericTypes) { #>
+<# if (g.TypeKind == GenericTypeKind.KeyTuple) { #>
+            ZeroFormatter.Formatters.GenericFormatter.RegisterKeyTuple<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.List) { #>
+            ZeroFormatter.Formatters.GenericFormatter.RegisterList<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.Dictionary) { #>
+            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.Lookup) { #>
+            ZeroFormatter.Formatters.GenericFormatter.RegisterLookup<<#= g.ElementTypes #>>();
 <# } } #>
         }
     }

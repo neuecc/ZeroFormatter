@@ -66,9 +66,36 @@ namespace ZeroFormatter.CodeGenerator
             }
         }
     }
+
     public partial class InitializerGenerator
     {
         public ObjectGenerator[] Objects { get; set; }
         public EnumGenerator[] Enums { get; set; }
+        public GenericType[] GenericTypes { get; set; }
+    }
+
+    public class GenericType : IEqualityComparer<GenericType>
+    {
+        public GenericTypeKind TypeKind { get; set; }
+        public string Type { get; set; }
+        public string ElementTypes { get; set; } // ", " joined
+
+        public bool Equals(GenericType x, GenericType y)
+        {
+            return (x.TypeKind == y.TypeKind) && (x.Type == y.Type);
+        }
+
+        public int GetHashCode(GenericType obj)
+        {
+            return Tuple.Create(obj.TypeKind, obj.Type).GetHashCode();
+        }
+    }
+
+    public enum GenericTypeKind
+    {
+        KeyTuple, // needs to create KeyTupleFormatter, KeyTupleEqualityComparer, NullableKeyTupleFormatter
+        List, // needs to create ListFormatter
+        Dictionary, // needs to create DictionaryFormatter, DictionaryEntryFormatter
+        Lookup, // needs to create LookupFormatter, GroupingSegmentFormatter
     }
 }

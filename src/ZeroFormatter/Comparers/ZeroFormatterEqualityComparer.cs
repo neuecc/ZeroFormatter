@@ -80,6 +80,8 @@ namespace ZeroFormatter.Comparers
                 comparer = new CharEqualityComparer();
             }
 
+#if !UNITY
+
             else if (t.GetTypeInfo().GetInterfaces().Any(x => x == typeof(IKeyTuple)))
             {
                 var ti = t.GetTypeInfo();
@@ -119,9 +121,7 @@ namespace ZeroFormatter.Comparers
                 comparer = Activator.CreateInstance(formatterType);
             }
 
-
             // Unity Can't use EnumEqualityComparer.
-#if !UNITY
 
             else if (t.GetTypeInfo().IsEnum)
             {

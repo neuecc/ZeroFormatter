@@ -6,9 +6,11 @@ namespace ZeroFormatter.Internal
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
+    using global::ZeroFormatter.Comparers;
 
     public static partial class ZeroFormatterInitializer
     {
@@ -65,6 +67,17 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.OtherSchema2>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.OtherSchema2Formatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.OtherSchema3>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.OtherSchema3Formatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.RecMyClass>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.RecMyClassFormatter());
+            ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.KeyTupleCheck>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.KeyTupleCheckFormatter());
+            // Generics
+            ZeroFormatter.Formatters.GenericFormatter.RegisterList<global::Sandbox.Shared.Bar.MogeMoge>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterList<global::Sandbox.Shared.Foo.MogeMoge>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<int, string>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterList<int>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterList<string>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterLookup<bool, int>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<string, int>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterKeyTuple<int, string>();
         }
     }
 }
@@ -1985,6 +1998,116 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 offset += ObjectSegmentHelper.SerializeSegment<global::ZeroFormatter.Tests.RecMyClass>(ref targetBytes, startOffset, offset, 1, _Rec);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class KeyTupleCheckFormatter : Formatter<global::ZeroFormatter.Tests.KeyTupleCheck>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.KeyTupleCheck value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (0 + 1));
+                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(ref bytes, startOffset, offset, 0, value.KeyTupleDictionary);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 0);
+            }
+        }
+
+        public override global::ZeroFormatter.Tests.KeyTupleCheck Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new KeyTupleCheckObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class KeyTupleCheckObjectSegment : global::ZeroFormatter.Tests.KeyTupleCheck, IZeroFormatterSegment
+    {
+        static readonly int[] __elementSizes = new int[]{ 0 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+        global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass> _KeyTupleDictionary;
+
+        // 0
+        public override global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass> KeyTupleDictionary
+        {
+            get
+            {
+                return _KeyTupleDictionary;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _KeyTupleDictionary = value;
+            }
+        }
+
+
+        public KeyTupleCheckObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+            int __out;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 0, __elementSizes);
+
+            _KeyTupleDictionary = Formatter<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 0, __binaryLastIndex), __tracker, out __out);
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (0 + 1));
+
+                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(ref targetBytes, startOffset, offset, 0, _KeyTupleDictionary);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
             }
             else
             {

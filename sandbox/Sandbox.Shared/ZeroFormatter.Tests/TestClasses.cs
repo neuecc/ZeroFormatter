@@ -153,4 +153,11 @@ namespace ZeroFormatter.Tests
         [Index(1)]
         public virtual RecMyClass Rec { get; set; }
     }
+
+    [ZeroFormattable]
+    public class KeyTupleCheck
+    {
+        [Index(0)]
+        public virtual IDictionary<KeyTuple<int, string>, MyClass> KeyTupleDictionary { get; set; }
+    }
 }

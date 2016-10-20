@@ -80,6 +80,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Tests\TupleKeyFormatterTest.cs" />
     <Compile Include="Assets\Scripts\TestUtils\ChainingAssertion.Ext.cs" />
     <Compile Include="Assets\Scripts\TestUtils\ChainingAssertion.Unity.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Shim.cs" />

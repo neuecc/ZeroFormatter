@@ -115,20 +115,20 @@ namespace ZeroFormatter.CodeGenerator
 
             sw.Restart();
             Console.WriteLine("Type Collect Start");
-            ObjectGenerator[] objectGen = tc.CreateObjectGenerators();
+            var objectGen = tc.CreateObjectGenerators();
             EnumGenerator[] enumGen = tc.CreateEnumGenerators();
             Console.WriteLine("Type Collect Complete:" + sw.Elapsed.ToString());
 
             Console.WriteLine("String Generation Start");
             sw.Restart();
             var sb = new StringBuilder();
-            sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen }.TransformText());
+            sb.AppendLine(new InitializerGenerator() { Objects = objectGen.Item1, Enums = enumGen, GenericTypes = objectGen.Item2 }.TransformText());
 
-            foreach (var item in tc.CreateObjectGenerators())
+            foreach (var item in objectGen.Item1)
             {
                 sb.AppendLine(item.TransformText());
             }
-            foreach (var item in tc.CreateEnumGenerators())
+            foreach (var item in enumGen)
             {
                 sb.AppendLine(item.TransformText());
             }
