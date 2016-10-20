@@ -40,7 +40,7 @@ namespace ZeroFormatter.Internal
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
 
-    public static class ZeroFormatterInitializer
+    public static partial class ZeroFormatterInitializer
     {
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Register()

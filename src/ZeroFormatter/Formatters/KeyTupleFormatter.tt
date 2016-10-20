@@ -22,7 +22,7 @@ namespace ZeroFormatter.Formatters
 #>
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<<#= ts #>> : Formatter<<#= t #>>
+    public class KeyTupleFormatter<<#= ts #>> : Formatter<<#= t #>>
     {
         [Preserve]
         public KeyTupleFormatter()
@@ -59,7 +59,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<<#= ts #>> : Formatter<<#= t #>?>
+    public class NullableKeyTupleFormatter<<#= ts #>> : Formatter<<#= t #>?>
     {
         [Preserve]
         public NullableKeyTupleFormatter()

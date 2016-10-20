@@ -8,7 +8,7 @@ namespace ZeroFormatter.Formatters
     // Layout: FixedSize -> [count:int][t format...] -> if count = -1 is null
     // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...] -> if byteSize = -1 is null
     [Preserve(AllMembers = true)]
-    internal class ListFormatter<T> : Formatter<IList<T>>
+    public class ListFormatter<T> : Formatter<IList<T>>
     {
 
         [Preserve]
@@ -94,7 +94,7 @@ namespace ZeroFormatter.Formatters
 #if !UNITY
 
     [Preserve(AllMembers = true)]
-    internal class ReadOnlyListFormatter<T> : Formatter<IReadOnlyList<T>>
+    public class ReadOnlyListFormatter<T> : Formatter<IReadOnlyList<T>>
     {
         [Preserve]
         public ReadOnlyListFormatter()

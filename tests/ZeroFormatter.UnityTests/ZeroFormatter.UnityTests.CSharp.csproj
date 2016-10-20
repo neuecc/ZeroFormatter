@@ -97,5 +97,8 @@
     <Compile Include="Assets\Scripts\UnitTestRoot.cs" />
     <Compile Include="Assets\ZeroFormatterGenerated.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\ZeroFormatterGenerated.Additional.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

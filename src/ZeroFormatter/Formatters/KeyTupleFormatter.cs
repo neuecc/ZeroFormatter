@@ -9,7 +9,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<T1> : Formatter<KeyTuple<T1>>
+    public class KeyTupleFormatter<T1> : Formatter<KeyTuple<T1>>
     {
         [Preserve]
         public KeyTupleFormatter()
@@ -42,7 +42,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<T1> : Formatter<KeyTuple<T1>?>
+    public class NullableKeyTupleFormatter<T1> : Formatter<KeyTuple<T1>?>
     {
         [Preserve]
         public NullableKeyTupleFormatter()
@@ -89,7 +89,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<T1, T2> : Formatter<KeyTuple<T1, T2>>
+    public class KeyTupleFormatter<T1, T2> : Formatter<KeyTuple<T1, T2>>
     {
         [Preserve]
         public KeyTupleFormatter()
@@ -126,7 +126,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<T1, T2> : Formatter<KeyTuple<T1, T2>?>
+    public class NullableKeyTupleFormatter<T1, T2> : Formatter<KeyTuple<T1, T2>?>
     {
         [Preserve]
         public NullableKeyTupleFormatter()
@@ -177,7 +177,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<T1, T2, T3> : Formatter<KeyTuple<T1, T2, T3>>
+    public class KeyTupleFormatter<T1, T2, T3> : Formatter<KeyTuple<T1, T2, T3>>
     {
         [Preserve]
         public KeyTupleFormatter()
@@ -218,7 +218,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<T1, T2, T3> : Formatter<KeyTuple<T1, T2, T3>?>
+    public class NullableKeyTupleFormatter<T1, T2, T3> : Formatter<KeyTuple<T1, T2, T3>?>
     {
         [Preserve]
         public NullableKeyTupleFormatter()
@@ -273,7 +273,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<T1, T2, T3, T4> : Formatter<KeyTuple<T1, T2, T3, T4>>
+    public class KeyTupleFormatter<T1, T2, T3, T4> : Formatter<KeyTuple<T1, T2, T3, T4>>
     {
         [Preserve]
         public KeyTupleFormatter()
@@ -318,7 +318,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<T1, T2, T3, T4> : Formatter<KeyTuple<T1, T2, T3, T4>?>
+    public class NullableKeyTupleFormatter<T1, T2, T3, T4> : Formatter<KeyTuple<T1, T2, T3, T4>?>
     {
         [Preserve]
         public NullableKeyTupleFormatter()
@@ -377,7 +377,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<T1, T2, T3, T4, T5> : Formatter<KeyTuple<T1, T2, T3, T4, T5>>
+    public class KeyTupleFormatter<T1, T2, T3, T4, T5> : Formatter<KeyTuple<T1, T2, T3, T4, T5>>
     {
         [Preserve]
         public KeyTupleFormatter()
@@ -426,7 +426,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<T1, T2, T3, T4, T5> : Formatter<KeyTuple<T1, T2, T3, T4, T5>?>
+    public class NullableKeyTupleFormatter<T1, T2, T3, T4, T5> : Formatter<KeyTuple<T1, T2, T3, T4, T5>?>
     {
         [Preserve]
         public NullableKeyTupleFormatter()
@@ -489,7 +489,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<T1, T2, T3, T4, T5, T6> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>
+    public class KeyTupleFormatter<T1, T2, T3, T4, T5, T6> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>
     {
         [Preserve]
         public KeyTupleFormatter()
@@ -542,7 +542,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>
+    public class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>
     {
         [Preserve]
         public NullableKeyTupleFormatter()
@@ -609,7 +609,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>
+    public class KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>
     {
         [Preserve]
         public KeyTupleFormatter()
@@ -666,7 +666,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>
+    public class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>
     {
         [Preserve]
         public NullableKeyTupleFormatter()
@@ -737,7 +737,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
+    public class KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
     {
         [Preserve]
         public KeyTupleFormatter()
@@ -798,7 +798,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>?>
+    public class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>?>
     {
         [Preserve]
         public NullableKeyTupleFormatter()

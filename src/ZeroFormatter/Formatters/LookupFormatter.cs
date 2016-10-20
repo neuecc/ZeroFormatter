@@ -5,7 +5,7 @@ using ZeroFormatter.Segments;
 namespace ZeroFormatter.Formatters
 {
     [Preserve(AllMembers = true)]
-    internal class LookupFormatter<TKey, TValue> : Formatter<ILookup<TKey, TValue>>
+    public class LookupFormatter<TKey, TValue> : Formatter<ILookup<TKey, TValue>>
     {
         [Preserve]
         public LookupFormatter()
@@ -42,7 +42,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class GroupingSegmentFormatter<TKey, TValue> : Formatter<GroupingSegment<TKey, TValue>>
+    public class GroupingSegmentFormatter<TKey, TValue> : Formatter<GroupingSegment<TKey, TValue>>
     {
         [Preserve]
         public GroupingSegmentFormatter()

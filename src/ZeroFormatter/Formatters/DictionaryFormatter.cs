@@ -6,7 +6,7 @@ using ZeroFormatter.Segments;
 namespace ZeroFormatter.Formatters
 {
     [Preserve(AllMembers = true)]
-    internal class DictionaryFormatter<TKey, TValue> : Formatter<IDictionary<TKey, TValue>>
+    public class DictionaryFormatter<TKey, TValue> : Formatter<IDictionary<TKey, TValue>>
     {
         [Preserve]
         public DictionaryFormatter()
@@ -49,7 +49,7 @@ namespace ZeroFormatter.Formatters
 #if !UNITY
 
     [Preserve(AllMembers = true)]
-    internal class ReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<IReadOnlyDictionary<TKey, TValue>>
+    public class ReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<IReadOnlyDictionary<TKey, TValue>>
     {
         [Preserve]
         public ReadOnlyDictionaryFormatter()
@@ -92,7 +92,7 @@ namespace ZeroFormatter.Formatters
 #endif
 
     [Preserve(AllMembers = true)]
-    internal class DictionaryEntryFormatter<TKey, TValue> : Formatter<DictionaryEntry<TKey, TValue>>
+    public class DictionaryEntryFormatter<TKey, TValue> : Formatter<DictionaryEntry<TKey, TValue>>
     {
         [Preserve]
         public DictionaryEntryFormatter()
