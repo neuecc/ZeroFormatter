@@ -60,6 +60,8 @@ class Program
 }
 ```
 
+Serializable target must mark `ZeroFormattableAttribute`, there public property must be `virtual` and requires `IndexAttribute`.
+
 Supported Type
 ---
 Primitive, Enum, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<>`, `ILookup<>`, `byte[]` and there nullable.
