@@ -1068,7 +1068,7 @@
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
       },
-      "ZeroFormatter.Interfaces.NETCore/1.0.0": {
+      "ZeroFormatter.Interfaces.NETCore/0.1.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
@@ -4027,7 +4027,7 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "ZeroFormatter.Interfaces.NETCore/1.0.0": {
+    "ZeroFormatter.Interfaces.NETCore/0.1.0": {
       "type": "project",
       "path": "../ZeroFormatter.Interfaces.NETCore/project.json",
       "msbuildProject": "../ZeroFormatter.Interfaces.NETCore/ZeroFormatter.Interfaces.NETCore.xproj"
@@ -4037,7 +4037,7 @@
     "": [
       "NETStandard.Library >= 1.6.0",
       "System.Reflection.Emit >= 4.0.1",
-      "ZeroFormatter.Interfaces.NETCore >= 1.0.0-*"
+      "ZeroFormatter.Interfaces.NETCore >= 0.1.0"
     ],
     ".NETStandard,Version=v1.6": []
   },

@@ -7,14 +7,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_others", "_others", "{7FB7
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
 		LICENSE = LICENSE
+		nuget\pack.bat = nuget\pack.bat
+		nuget\push.bat = nuget\push.bat
 		README.md = README.md
+		nuget\ZeroFormatter.Analyzer.nuspec = nuget\ZeroFormatter.Analyzer.nuspec
+		nuget\ZeroFormatter.Interfaces.nuspec = nuget\ZeroFormatter.Interfaces.nuspec
+		nuget\ZeroFormatter.nuspec = nuget\ZeroFormatter.nuspec
+		nuget\ZeroFormatter.Unity.nuspec = nuget\ZeroFormatter.Unity.nuspec
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter", "src\ZeroFormatter\ZeroFormatter.csproj", "{82049AFE-0913-4FA4-B924-AD5354952154}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatterAnalyzer", "src\ZeroFormatterAnalyzer\ZeroFormatterAnalyzer.csproj", "{A15F092D-C6D9-4938-B288-7A8B6CF39A53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter.Analyzer", "src\ZeroFormatter.Analyzer\ZeroFormatter.Analyzer.csproj", "{A15F092D-C6D9-4938-B288-7A8B6CF39A53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatterAnalyzer.Vsix", "src\ZeroFormatterAnalyzer.Vsix\ZeroFormatterAnalyzer.Vsix.csproj", "{C039E946-455C-478B-8FA3-733F9E0DF1BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter.Analyzer.Vsix", "src\ZeroFormatter.Analyzer.Vsix\ZeroFormatter.Analyzer.Vsix.csproj", "{C039E946-455C-478B-8FA3-733F9E0DF1BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter.CodeGenerator", "src\ZeroFormatter.CodeGenerator\ZeroFormatter.CodeGenerator.csproj", "{00F36123-EEEC-4428-89BD-848FC968B520}"
 EndProject

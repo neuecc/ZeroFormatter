@@ -61,9 +61,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ZeroFormatterAnalyzer\ZeroFormatterAnalyzer.csproj">
+    <ProjectReference Include="..\ZeroFormatter.Analyzer\ZeroFormatter.Analyzer.csproj">
       <Project>{A15F092D-C6D9-4938-B288-7A8B6CF39A53}</Project>
-      <Name>ZeroFormatterAnalyzer</Name>
+      <Name>ZeroFormatter.Analyzer</Name>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>

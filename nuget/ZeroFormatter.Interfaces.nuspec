@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>ZeroFormatter.Interfaces</id>
+        <version>0.1.0</version>
+        <title>ZeroFormatter.Interfaces</title>
+        <authors>neuecc</authors>
+        <owners>y.neuecc</owners>
+        <projectUrl>https://github.com/neuecc/ZeroFormatter/</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Plain interfaces and KeyTuple of ZeroFormatter, it is used for define serializable targets.</description>
+        <releaseNotes>Initial Release.</releaseNotes>
+        <tags>ZeroFormatter, Serialization, Formatter, Serializer</tags>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System" targetFramework=".NETFramework3.5" />
+        </frameworkAssemblies>
+        <dependencies>
+            <group targetFramework="net35">
+            </group>
+            <group targetFramework="netstandard1.1">
+                <dependency id="System.Runtime" version="4.1.0" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\src\ZeroFormatter.Interfaces\bin\Release\ZeroFormatter.Interfaces.dll" target="lib\net35" />
+        <file src="..\src\ZeroFormatter.Interfaces.NETCore\bin\Release\netstandard1.1\ZeroFormatter.Interfaces.dll" target="lib\netstandard1.1" />
+        <file src="..\src\ZeroFormatter.CodeGenerator\bin\Release\*.*" target="tools\zfc\" />
+    </files>
+</package>

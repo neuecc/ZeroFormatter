@@ -1,0 +1,33 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>ZeroFormatter</id>
+        <version>0.1.0</version>
+        <title>ZeroFormatter</title>
+        <authors>neuecc</authors>
+        <owners>y.neuecc</owners>
+        <projectUrl>https://github.com/neuecc/ZeroFormatter/</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Infinitly fast serializer for .NET, .NET Core and Unity.</description>
+        <releaseNotes>Initial Release.</releaseNotes>
+        <tags>ZeroFormatter, Serialization, Formatter, Serializer</tags>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5" />
+            <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.5" />
+        </frameworkAssemblies>
+        <dependencies>
+            <group targetFramework="net45">
+                <dependency id="ZeroFormatter.Interfaces" version="0.1.0" />
+            </group>
+            <group targetFramework="netstandard1.6">
+                <dependency id="ZeroFormatter.Interfaces" version="0.1.0" />
+                <dependency id="NETStandard.Library" version="1.6.0" />
+                <dependency id="System.Reflection.Emit" version="4.1.0" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\src\ZeroFormatter\bin\Release\ZeroFormatter.dll" target="lib\net45" />
+        <file src="..\src\ZeroFormatter.NETCore\bin\Release\netstandard1.6\ZeroFormatter.dll" target="lib\netstandard1.6" />
+    </files>
+</package>
