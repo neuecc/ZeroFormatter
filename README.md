@@ -59,3 +59,7 @@ class Program
     }
 }
 ```
+
+Analyzer
+---
+![image](https://cloud.githubusercontent.com/assets/46207/19561566/291e4fda-9714-11e6-9633-e330a1430318.png)
