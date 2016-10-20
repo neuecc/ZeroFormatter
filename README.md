@@ -60,6 +60,12 @@ class Program
 }
 ```
 
+Supported Type
+---
+Primitive, Enum, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<>`, `ILookup<>`, `byte[]` and there nullable.
+
+`T[]`, `List<T>`, `Dictionary<TKey, TValue>` is not supported type. You should use `IList<>`, `IDictionary<>` instad.
+
 Analyzer
 ---
 ![image](https://cloud.githubusercontent.com/assets/46207/19561566/291e4fda-9714-11e6-9633-e330a1430318.png)
