@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>ZeroFormatter.Interfaces</id>
-        <version>0.1.0</version>
+        <version>0.1.3</version>
         <title>ZeroFormatter.Interfaces</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
@@ -15,9 +15,9 @@
             <frameworkAssembly assemblyName="System" targetFramework=".NETFramework3.5" />
         </frameworkAssemblies>
         <dependencies>
-            <group targetFramework="net35">
+            <group targetFramework=".NETFramework3.5">
             </group>
-            <group targetFramework="netstandard1.1">
+            <group targetFramework=".NETStandard1.1">
                 <dependency id="System.Runtime" version="4.1.0" />
             </group>
         </dependencies>
