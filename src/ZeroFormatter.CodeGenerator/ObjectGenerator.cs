@@ -418,9 +418,14 @@ namespace ZeroFormatter.CodeGenerator
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
             this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
 
-            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 4, __elementSizes);
-
-");
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, ");
+            
+            #line 125 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(t.LastIndex));
+            
+            #line default
+            #line hidden
+            this.Write(", __elementSizes);\r\n\r\n");
             
             #line 127 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
  foreach(var p in t.Properties) { 
@@ -515,7 +520,7 @@ namespace ZeroFormatter.CodeGenerator
 
         public int Serialize(ref byte[] targetBytes, int offset)
         {
-            if (__tracker.IsDirty)
+            if (__extraFixedBytes != null || __tracker.IsDirty)
             {
                 var startOffset = offset;
                 offset += (8 + 4 * (");

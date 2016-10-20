@@ -122,7 +122,7 @@ namespace <#= Namespace #>
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
             this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
 
-            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 4, __elementSizes);
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, <#= t.LastIndex #>, __elementSizes);
 
 <# foreach(var p in t.Properties) { #>
 <# if (p.IsFixedSize) { #>
@@ -146,7 +146,7 @@ namespace <#= Namespace #>
 
         public int Serialize(ref byte[] targetBytes, int offset)
         {
-            if (__tracker.IsDirty)
+            if (__extraFixedBytes != null || __tracker.IsDirty)
             {
                 var startOffset = offset;
                 offset += (8 + 4 * (<#= t.LastIndex #> + 1));

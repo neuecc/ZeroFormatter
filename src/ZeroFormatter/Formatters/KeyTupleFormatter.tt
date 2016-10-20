@@ -21,8 +21,14 @@ namespace ZeroFormatter.Formatters
     var t = "KeyTuple<" + ts + ">"; 
 #>
 
+    [Preserve(AllMembers = true)]
     internal class KeyTupleFormatter<<#= ts #>> : Formatter<<#= t #>>
     {
+        [Preserve]
+        public KeyTupleFormatter()
+        {
+        }
+
         public override int? GetLength()
         {
             return null;
@@ -52,8 +58,14 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class NullableKeyTupleFormatter<<#= ts #>> : Formatter<<#= t #>?>
     {
+        [Preserve]
+        public NullableKeyTupleFormatter()
+        {
+        }
+
         public override int? GetLength()
         {
             return null;

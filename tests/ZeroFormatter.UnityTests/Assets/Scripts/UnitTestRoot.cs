@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,11 +18,12 @@ public class UnitTestRoot : MonoBehaviour
 
     void Start()
     {
+        // register unexpected log
         Application.logMessageReceived += (string condition, string stackTrace, LogType type) =>
         {
             if (type == LogType.Error || type == LogType.Exception)
             {
-                logText.text += "<color=red>" + condition + "</color>\n";
+                logText.text += "<color=red>" + condition + "\n" + stackTrace + "</color>\n";
             }
             else
             {
@@ -55,8 +57,10 @@ public class UnitTestRoot : MonoBehaviour
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogException(ex);
-                    } // NG
+                        // found match line...
+                        var line = string.Join("\n", ex.StackTrace.Split('\n').Where(x => x.Contains(actionList.Key) || x.Contains(item2.Key)).ToArray());
+                        logText.text += "<color=red>" + ex.Message + "\n" + line + "</color>\n";
+                    }
                 }
 
                 sw.Stop();

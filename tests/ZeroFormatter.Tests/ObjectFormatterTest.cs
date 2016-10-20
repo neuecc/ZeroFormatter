@@ -274,46 +274,46 @@ public class MyClass_ObjectSegment : MyClass, IZeroFormatterSegment
             mc5.LastName.IsNull();
         }
 
-        [TestMethod]
-        public void DynamicFormatterTest()
-        {
-            var dynamicFormatter = new DynamicObjectFormatter<MyClass>();
+        //[TestMethod]
+        //public void DynamicFormatterTest()
+        //{
+        //    var dynamicFormatter = new DynamicObjectFormatter<MyClass>();
 
-            byte[] bytes = null;
-            var size = dynamicFormatter.Serialize(ref bytes, 0, new MyClass
-            {
-                Age = 999,
-                FirstName = "hogehoge",
-                LastName = "tako",
-                MyList = new List<int> { 1, 10, 100, 1000 }
-            });
-            BinaryUtil.FastResize(ref bytes, size);
+        //    byte[] bytes = null;
+        //    var size = dynamicFormatter.Serialize(ref bytes, 0, new MyClass
+        //    {
+        //        Age = 999,
+        //        FirstName = "hogehoge",
+        //        LastName = "tako",
+        //        MyList = new List<int> { 1, 10, 100, 1000 }
+        //    });
+        //    BinaryUtil.FastResize(ref bytes, size);
 
 
-            var generatedFormatter = new MyClassFormatter();
-            var mc2 = generatedFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
+        //    var generatedFormatter = new MyClassFormatter();
+        //    var mc2 = generatedFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
 
-            mc2.Age.Is(999);
-            mc2.FirstName.Is("hogehoge");
-            mc2.LastName.Is("tako");
+        //    mc2.Age.Is(999);
+        //    mc2.FirstName.Is("hogehoge");
+        //    mc2.LastName.Is("tako");
 
-            var mc3 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
-            mc3.Age.Is(999);
-            mc3.FirstName.Is("hogehoge");
-            mc3.LastName.Is("tako");
+        //    var mc3 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
+        //    mc3.Age.Is(999);
+        //    mc3.FirstName.Is("hogehoge");
+        //    mc3.LastName.Is("tako");
 
-            mc3.Age = 9;
-            mc3.LastName = "chop";
-            mc3.MyList.Add(9999);
+        //    mc3.Age = 9;
+        //    mc3.LastName = "chop";
+        //    mc3.MyList.Add(9999);
 
-            bytes = null;
-            dynamicFormatter.Serialize(ref bytes, 0, mc3);
-            var mc4 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
+        //    bytes = null;
+        //    dynamicFormatter.Serialize(ref bytes, 0, mc3);
+        //    var mc4 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
 
-            mc4.Age.Is(9);
-            mc4.LastName.Is("chop");
-            mc4.MyList.Is(1, 10, 100, 1000, 9999);
-        }
+        //    mc4.Age.Is(9);
+        //    mc4.LastName.Is("chop");
+        //    mc4.MyList.Is(1, 10, 100, 1000, 9999);
+        //}
 
 
         [ZeroFormattable]

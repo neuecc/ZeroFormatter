@@ -4,8 +4,15 @@ using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
+    [Preserve(AllMembers = true)]
     internal class LookupFormatter<TKey, TValue> : Formatter<ILookup<TKey, TValue>>
     {
+        [Preserve]
+        public LookupFormatter()
+        {
+
+        }
+
         public override int? GetLength()
         {
             return null;
@@ -34,8 +41,15 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class GroupingSegmentFormatter<TKey, TValue> : Formatter<GroupingSegment<TKey, TValue>>
     {
+        [Preserve]
+        public GroupingSegmentFormatter()
+        {
+
+        }
+
         public override int? GetLength()
         {
             return null;

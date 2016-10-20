@@ -7,8 +7,16 @@ namespace ZeroFormatter.Formatters
 {
     // Layout: FixedSize -> [count:int][t format...] -> if count = -1 is null
     // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...] -> if byteSize = -1 is null
+    [Preserve(AllMembers = true)]
     internal class ListFormatter<T> : Formatter<IList<T>>
     {
+
+        [Preserve]
+        public ListFormatter()
+        {
+
+        }
+
         public override int? GetLength()
         {
             return null;
@@ -85,8 +93,15 @@ namespace ZeroFormatter.Formatters
 
 #if !UNITY
 
+    [Preserve(AllMembers = true)]
     internal class ReadOnlyListFormatter<T> : Formatter<IReadOnlyList<T>>
     {
+        [Preserve]
+        public ReadOnlyListFormatter()
+        {
+
+        }
+
         public override int? GetLength()
         {
             return null;

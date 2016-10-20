@@ -24,4 +24,10 @@ namespace ZeroFormatter
     public class IgnoreFormatAttribute : Attribute
     {
     }
+
+    public sealed class PreserveAttribute : Attribute
+    {
+        public bool AllMembers;
+        public bool Conditional;
+    }
 }

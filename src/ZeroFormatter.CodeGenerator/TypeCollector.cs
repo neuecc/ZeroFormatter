@@ -206,19 +206,19 @@ namespace ZeroFormatter.CodeGenerator
                 {
                     var array = property.Type as IArrayTypeSymbol;
                     var t = array.ElementType;
-                    if (t.SpecialType == SpecialType.System_Byte) // allows byte[]
+                    if (t.SpecialType != SpecialType.System_Byte) // allows byte[]
                     {
-                        continue;
+                        throw new Exception($"Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[]. {type.Name}.{property.Name}.  Location:{type.Locations[0]}");
                     }
-
-                    throw new Exception($"Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[]. {type.Name}.{property.Name}.  Location:{type.Locations[0]}");
                 }
-
-                var namedType = property.Type as INamedTypeSymbol;
-                if (namedType != null) // if <T> is unnamed type, it can't analyze.
+                else
                 {
-                    // Recursive
-                    CollectObjectSegment(namedType, typeContainer, alreadyCollected);
+                    var namedType = property.Type as INamedTypeSymbol;
+                    if (namedType != null) // if <T> is unnamed type, it can't analyze.
+                    {
+                        // Recursive
+                        CollectObjectSegment(namedType, typeContainer, alreadyCollected);
+                    }
                 }
 
                 var length = KnownFormatterSpec.GetLength(property.Type);

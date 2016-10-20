@@ -10,6 +10,7 @@ namespace ZeroFormatter.Formatters
     // Layout: [hasValue:1][fixedElementSize]
 
 
+    [Preserve(AllMembers = true)]
     internal class Int16EnumFormatter<T> : Formatter<T>
     {
         static Int16 Identity(Int16 x) { return x; }
@@ -17,6 +18,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<Int16, T> deserializeCast;
         readonly Func<T, Int16> serializeCast;
 
+        [Preserve]
         public Int16EnumFormatter()
         {
             Func<Int16, Int16> identity = Identity;
@@ -41,6 +43,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class NullableInt16EnumFormatter<T> : Formatter<T?>
         where T : struct
     {
@@ -49,6 +52,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<Int16, T> deserializeCast;
         readonly Func<T, Int16> serializeCast;
 
+        [Preserve]
         public NullableInt16EnumFormatter()
         {
             Func<Int16, Int16> identity = Identity;
@@ -87,6 +91,7 @@ namespace ZeroFormatter.Formatters
     }
 
 
+    [Preserve(AllMembers = true)]
     internal class Int32EnumFormatter<T> : Formatter<T>
     {
         static Int32 Identity(Int32 x) { return x; }
@@ -94,6 +99,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<Int32, T> deserializeCast;
         readonly Func<T, Int32> serializeCast;
 
+        [Preserve]
         public Int32EnumFormatter()
         {
             Func<Int32, Int32> identity = Identity;
@@ -118,6 +124,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class NullableInt32EnumFormatter<T> : Formatter<T?>
         where T : struct
     {
@@ -126,6 +133,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<Int32, T> deserializeCast;
         readonly Func<T, Int32> serializeCast;
 
+        [Preserve]
         public NullableInt32EnumFormatter()
         {
             Func<Int32, Int32> identity = Identity;
@@ -164,6 +172,7 @@ namespace ZeroFormatter.Formatters
     }
 
 
+    [Preserve(AllMembers = true)]
     internal class Int64EnumFormatter<T> : Formatter<T>
     {
         static Int64 Identity(Int64 x) { return x; }
@@ -171,6 +180,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<Int64, T> deserializeCast;
         readonly Func<T, Int64> serializeCast;
 
+        [Preserve]
         public Int64EnumFormatter()
         {
             Func<Int64, Int64> identity = Identity;
@@ -195,6 +205,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class NullableInt64EnumFormatter<T> : Formatter<T?>
         where T : struct
     {
@@ -203,6 +214,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<Int64, T> deserializeCast;
         readonly Func<T, Int64> serializeCast;
 
+        [Preserve]
         public NullableInt64EnumFormatter()
         {
             Func<Int64, Int64> identity = Identity;
@@ -241,6 +253,7 @@ namespace ZeroFormatter.Formatters
     }
 
 
+    [Preserve(AllMembers = true)]
     internal class UInt16EnumFormatter<T> : Formatter<T>
     {
         static UInt16 Identity(UInt16 x) { return x; }
@@ -248,6 +261,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<UInt16, T> deserializeCast;
         readonly Func<T, UInt16> serializeCast;
 
+        [Preserve]
         public UInt16EnumFormatter()
         {
             Func<UInt16, UInt16> identity = Identity;
@@ -272,6 +286,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class NullableUInt16EnumFormatter<T> : Formatter<T?>
         where T : struct
     {
@@ -280,6 +295,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<UInt16, T> deserializeCast;
         readonly Func<T, UInt16> serializeCast;
 
+        [Preserve]
         public NullableUInt16EnumFormatter()
         {
             Func<UInt16, UInt16> identity = Identity;
@@ -318,6 +334,7 @@ namespace ZeroFormatter.Formatters
     }
 
 
+    [Preserve(AllMembers = true)]
     internal class UInt32EnumFormatter<T> : Formatter<T>
     {
         static UInt32 Identity(UInt32 x) { return x; }
@@ -325,6 +342,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<UInt32, T> deserializeCast;
         readonly Func<T, UInt32> serializeCast;
 
+        [Preserve]
         public UInt32EnumFormatter()
         {
             Func<UInt32, UInt32> identity = Identity;
@@ -349,6 +367,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class NullableUInt32EnumFormatter<T> : Formatter<T?>
         where T : struct
     {
@@ -357,6 +376,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<UInt32, T> deserializeCast;
         readonly Func<T, UInt32> serializeCast;
 
+        [Preserve]
         public NullableUInt32EnumFormatter()
         {
             Func<UInt32, UInt32> identity = Identity;
@@ -395,6 +415,7 @@ namespace ZeroFormatter.Formatters
     }
 
 
+    [Preserve(AllMembers = true)]
     internal class UInt64EnumFormatter<T> : Formatter<T>
     {
         static UInt64 Identity(UInt64 x) { return x; }
@@ -402,6 +423,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<UInt64, T> deserializeCast;
         readonly Func<T, UInt64> serializeCast;
 
+        [Preserve]
         public UInt64EnumFormatter()
         {
             Func<UInt64, UInt64> identity = Identity;
@@ -426,6 +448,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class NullableUInt64EnumFormatter<T> : Formatter<T?>
         where T : struct
     {
@@ -434,6 +457,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<UInt64, T> deserializeCast;
         readonly Func<T, UInt64> serializeCast;
 
+        [Preserve]
         public NullableUInt64EnumFormatter()
         {
             Func<UInt64, UInt64> identity = Identity;
@@ -472,6 +496,7 @@ namespace ZeroFormatter.Formatters
     }
 
 
+    [Preserve(AllMembers = true)]
     internal class ByteEnumFormatter<T> : Formatter<T>
     {
         static Byte Identity(Byte x) { return x; }
@@ -479,6 +504,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<Byte, T> deserializeCast;
         readonly Func<T, Byte> serializeCast;
 
+        [Preserve]
         public ByteEnumFormatter()
         {
             Func<Byte, Byte> identity = Identity;
@@ -503,6 +529,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class NullableByteEnumFormatter<T> : Formatter<T?>
         where T : struct
     {
@@ -511,6 +538,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<Byte, T> deserializeCast;
         readonly Func<T, Byte> serializeCast;
 
+        [Preserve]
         public NullableByteEnumFormatter()
         {
             Func<Byte, Byte> identity = Identity;
@@ -549,6 +577,7 @@ namespace ZeroFormatter.Formatters
     }
 
 
+    [Preserve(AllMembers = true)]
     internal class SByteEnumFormatter<T> : Formatter<T>
     {
         static SByte Identity(SByte x) { return x; }
@@ -556,6 +585,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<SByte, T> deserializeCast;
         readonly Func<T, SByte> serializeCast;
 
+        [Preserve]
         public SByteEnumFormatter()
         {
             Func<SByte, SByte> identity = Identity;
@@ -580,6 +610,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    [Preserve(AllMembers = true)]
     internal class NullableSByteEnumFormatter<T> : Formatter<T?>
         where T : struct
     {
@@ -588,6 +619,7 @@ namespace ZeroFormatter.Formatters
         readonly Func<SByte, T> deserializeCast;
         readonly Func<T, SByte> serializeCast;
 
+        [Preserve]
         public NullableSByteEnumFormatter()
         {
             Func<SByte, SByte> identity = Identity;

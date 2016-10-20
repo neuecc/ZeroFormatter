@@ -21,7 +21,7 @@ namespace ZeroFormatter.Tests
 
         FixedListSegment<int> CreateFixedList(DirtyTracker tracker)
         {
-            return ZeroFormatter.ZeroFormatterSerializer.Convert<IList<int>>(new[] { 6, 99, 55, 3, 9423423, -432423, 2423 }) as FixedListSegment<int>;
+            return ZeroFormatter.ZeroFormatterSerializer.Convert<IList<int>>(new[] { 99, 55, 3, 9423423, -432423, 2423 }) as FixedListSegment<int>;
         }
 
         VariableListSegment<string> CraeteVariableList(DirtyTracker tracker)

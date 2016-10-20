@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -53,7 +54,6 @@ namespace ZeroFormatter.Tests
             }
         }
 
-
         public void Byte()
         {
             {
@@ -70,7 +70,6 @@ namespace ZeroFormatter.Tests
             }
         }
 
-
         public void SByte()
         {
             {
@@ -86,7 +85,6 @@ namespace ZeroFormatter.Tests
                 ZeroFormatterSerializer.Deserialize<sbyte?>(r).Value.Is((sbyte)111);
             }
         }
-
 
         public void Float()
         {

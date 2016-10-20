@@ -5,8 +5,15 @@ using ZeroFormatter.Comparers;
 
 namespace ZeroFormatter.Comparers
 {
+    [Preserve(AllMembers = true)]
     public class KeyTupleEqualityComparer<T1> : IEqualityComparer<KeyTuple<T1>>
     {
+        [Preserve]
+        public KeyTupleEqualityComparer()
+        {
+
+        }
+
         public bool Equals(KeyTuple<T1> x, KeyTuple<T1> y)
         {
             return ZeroFormatterEqualityComparer<T1>.Default.Equals(x.Item1, y.Item1);
@@ -19,8 +26,16 @@ namespace ZeroFormatter.Comparers
     }
 
 
+    [Preserve(AllMembers = true)]
     public class KeyTupleEqualityComparer<T1, T2> : IEqualityComparer<KeyTuple<T1, T2>>
     {
+
+        [Preserve]
+        public KeyTupleEqualityComparer()
+        {
+
+        }
+
         public bool Equals(KeyTuple<T1, T2> x, KeyTuple<T1, T2> y)
         {
             var comparer1 = ZeroFormatterEqualityComparer<T1>.Default;
@@ -43,8 +58,15 @@ namespace ZeroFormatter.Comparers
     }
 
 
+    [Preserve(AllMembers = true)]
     public class KeyTupleEqualityComparer<T1, T2, T3> : IEqualityComparer<KeyTuple<T1, T2, T3>>
     {
+
+        [Preserve]
+        public KeyTupleEqualityComparer()
+        {
+
+        }
 
         public bool Equals(KeyTuple<T1, T2, T3> x, KeyTuple<T1, T2, T3> y)
         {
@@ -74,9 +96,15 @@ namespace ZeroFormatter.Comparers
     }
 
 
+    [Preserve(AllMembers = true)]
     public class KeyTupleEqualityComparer<T1, T2, T3, T4> : IEqualityComparer<KeyTuple<T1, T2, T3, T4>>
     {
 
+        [Preserve]
+        public KeyTupleEqualityComparer()
+        {
+
+        }
 
         public bool Equals(KeyTuple<T1, T2, T3, T4> x, KeyTuple<T1, T2, T3, T4> y)
         {
@@ -111,10 +139,16 @@ namespace ZeroFormatter.Comparers
     }
 
 
+    [Preserve(AllMembers = true)]
     public class KeyTupleEqualityComparer<T1, T2, T3, T4, T5> : IEqualityComparer<KeyTuple<T1, T2, T3, T4, T5>>
     {
 
 
+        [Preserve]
+        public KeyTupleEqualityComparer()
+        {
+
+        }
 
         public bool Equals(KeyTuple<T1, T2, T3, T4, T5> x, KeyTuple<T1, T2, T3, T4, T5> y)
         {
@@ -153,8 +187,15 @@ namespace ZeroFormatter.Comparers
     }
 
 
+    [Preserve(AllMembers = true)]
     public class KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6> : IEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6>>
     {
+        [Preserve]
+        public KeyTupleEqualityComparer()
+        {
+
+        }
+
         public bool Equals(KeyTuple<T1, T2, T3, T4, T5, T6> x, KeyTuple<T1, T2, T3, T4, T5, T6> y)
         {
 
@@ -197,8 +238,16 @@ namespace ZeroFormatter.Comparers
     }
 
 
+    [Preserve(AllMembers = true)]
     public class KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7> : IEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>
     {
+
+        [Preserve]
+        public KeyTupleEqualityComparer()
+        {
+
+        }
+
 
         public bool Equals(KeyTuple<T1, T2, T3, T4, T5, T6, T7> x, KeyTuple<T1, T2, T3, T4, T5, T6, T7> y)
         {
@@ -246,8 +295,15 @@ namespace ZeroFormatter.Comparers
     }
 
 
+    [Preserve(AllMembers = true)]
     public class KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7, TRest> : IEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
     {
+        [Preserve]
+        public KeyTupleEqualityComparer()
+        {
+
+        }
+
         public bool Equals(KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest> x, KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest> y)
         {
 

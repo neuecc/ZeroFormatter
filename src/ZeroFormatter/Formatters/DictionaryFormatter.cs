@@ -5,8 +5,15 @@ using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
+    [Preserve(AllMembers = true)]
     internal class DictionaryFormatter<TKey, TValue> : Formatter<IDictionary<TKey, TValue>>
     {
+        [Preserve]
+        public DictionaryFormatter()
+        {
+
+        }
+
         public override int? GetLength()
         {
             return null;
@@ -41,8 +48,15 @@ namespace ZeroFormatter.Formatters
 
 #if !UNITY
 
+    [Preserve(AllMembers = true)]
     internal class ReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<IReadOnlyDictionary<TKey, TValue>>
     {
+        [Preserve]
+        public ReadOnlyDictionaryFormatter()
+        {
+
+        }
+
         public override int? GetLength()
         {
             return null;
@@ -77,8 +91,15 @@ namespace ZeroFormatter.Formatters
 
 #endif
 
+    [Preserve(AllMembers = true)]
     internal class DictionaryEntryFormatter<TKey, TValue> : Formatter<DictionaryEntry<TKey, TValue>>
     {
+        [Preserve]
+        public DictionaryEntryFormatter()
+        {
+
+        }
+
         public override int? GetLength()
         {
             return null;
