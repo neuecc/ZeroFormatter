@@ -87,7 +87,7 @@ Analyzer
 
 WireFormat Specification
 ---
-*Fixed Length Format*
+**Fixed Length Format**
 
 Fixed Length formats is ... (TODO:write description)
 
@@ -129,7 +129,7 @@ Enum is serialized there underlying type.
 | DateTimeOffset? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
 
 
-*Variable Length Format*
+**Variable Length Format**
 
 TODO:...
 
@@ -148,7 +148,7 @@ TODO:...
 | GroupingSegment | [key:TKey] [hashCode:int(4)][elements:`VariableSizeList<TElement>`] | substructure of MultiDictionary
 | Object | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | define from `[ZeroFormattable]` class. if byteSize = -1, indicates null |
 
-*EqualityComparer*
+**EqualityComparer**
 
 TODO:...
 
