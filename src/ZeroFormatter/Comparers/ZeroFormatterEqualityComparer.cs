@@ -144,7 +144,11 @@ namespace ZeroFormatter.Comparers
         }
     }
 
-    internal class ErrorEqualityComparer<T> : IEqualityComparer<T>
+    internal interface IErrorEqualityComparer
+    {
+    }
+
+    internal class ErrorEqualityComparer<T> : IEqualityComparer<T>, IErrorEqualityComparer
     {
         readonly Exception exception;
 

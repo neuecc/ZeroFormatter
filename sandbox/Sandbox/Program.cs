@@ -86,8 +86,7 @@ namespace Sandbox
 
         static void Main(string[] args)
         {
-            ZeroFormatterSerializer.Serialize(new MyClass());
-        
+            ZeroFormatter.Formatters.GenericFormatter.RegisterLookup<int, string>();
         }
     }
 }

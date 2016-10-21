@@ -412,80 +412,182 @@ namespace ZeroFormatter.Formatters
     {
         public static void RegisterLookup<TKey, TElement>()
         {
-            Formatter<ILookup<TKey, TElement>>.Register(new LookupFormatter<TKey, TElement>());
-            Formatter<GroupingSegment<TKey, TElement>>.Register(new GroupingSegmentFormatter<TKey, TElement>());
-            Formatter<IList<TKey>>.Register(new ListFormatter<TKey>());
-            Formatter<IList<GroupingSegment<TKey, TElement>>>.Register(new ListFormatter<GroupingSegment<TKey, TElement>>());
-            Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Register(new ListFormatter<IList<GroupingSegment<TKey, TElement>>>());
-            Formatter<IList<TElement>>.Register(new ListFormatter<TElement>());
+            if (Formatter<ILookup<TKey, TElement>>.Default is IErrorFormatter)
+            {
+                Formatter<ILookup<TKey, TElement>>.Register(new LookupFormatter<TKey, TElement>());
+            }
+            if (Formatter<GroupingSegment<TKey, TElement>>.Default is IErrorFormatter)
+            {
+                Formatter<GroupingSegment<TKey, TElement>>.Register(new GroupingSegmentFormatter<TKey, TElement>());
+            }
+            if (Formatter<IList<TKey>>.Default is IErrorFormatter)
+            {
+                Formatter<IList<TKey>>.Register(new ListFormatter<TKey>());
+            }
+            if (Formatter<IList<GroupingSegment<TKey, TElement>>>.Default is IErrorFormatter)
+            {
+                Formatter<IList<GroupingSegment<TKey, TElement>>>.Register(new ListFormatter<GroupingSegment<TKey, TElement>>());
+            }
+            if (Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default is IErrorFormatter)
+            {
+                Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Register(new ListFormatter<IList<GroupingSegment<TKey, TElement>>>());
+            }
+            if (Formatter<IList<TElement>>.Default is IErrorFormatter)
+            {
+                Formatter<IList<TElement>>.Register(new ListFormatter<TElement>());
+            }
         }
 
         public static void RegisterDictionary<TKey, TValue>()
         {
-            Formatter<IDictionary<TKey, TValue>>.Register(new DictionaryFormatter<TKey, TValue>());
-            Formatter<DictionaryEntry<TKey, TValue>>.Register(new DictionaryEntryFormatter<TKey, TValue>());
-            Formatter<IList<DictionaryEntry<TKey, TValue>>>.Register(new ListFormatter<DictionaryEntry<TKey, TValue>>());
+            if (Formatter<IDictionary<TKey, TValue>>.Default is IErrorFormatter)
+            {
+                Formatter<IDictionary<TKey, TValue>>.Register(new DictionaryFormatter<TKey, TValue>());
+            }
+            if (Formatter<DictionaryEntry<TKey, TValue>>.Default is IErrorFormatter)
+            {
+                Formatter<DictionaryEntry<TKey, TValue>>.Register(new DictionaryEntryFormatter<TKey, TValue>());
+            }
+            if (Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default is IErrorFormatter)
+            {
+                Formatter<IList<DictionaryEntry<TKey, TValue>>>.Register(new ListFormatter<DictionaryEntry<TKey, TValue>>());
+            }
         }
 
         public static void RegisterList<T>()
         {
-            Formatter<IList<T>>.Register(new ListFormatter<T>());
+            if (Formatter<IList<T>>.Default is IErrorFormatter)
+            {
+                Formatter<IList<T>>.Register(new ListFormatter<T>());
+            }
         }
 
         public static void RegisterKeyTuple<T1>()
         {
-            Formatter<KeyTuple<T1>>.Register(new KeyTupleFormatter<T1>());
-            Formatter<KeyTuple<T1>?>.Register(new NullableKeyTupleFormatter<T1>());
-            ZeroFormatterEqualityComparer<KeyTuple<T1>>.Register(new KeyTupleEqualityComparer<T1>());
+            if (Formatter<KeyTuple<T1>>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1>>.Register(new KeyTupleFormatter<T1>());
+            }
+            if (Formatter<KeyTuple<T1>?>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1>?>.Register(new NullableKeyTupleFormatter<T1>());
+            }
+            if (ZeroFormatterEqualityComparer<KeyTuple<T1>>.Default is IErrorEqualityComparer)
+            {
+                ZeroFormatterEqualityComparer<KeyTuple<T1>>.Register(new KeyTupleEqualityComparer<T1>());
+            }
         }
 
         public static void RegisterKeyTuple<T1, T2>()
         {
-            Formatter<KeyTuple<T1, T2>>.Register(new KeyTupleFormatter<T1, T2>());
-            Formatter<KeyTuple<T1, T2>?>.Register(new NullableKeyTupleFormatter<T1, T2>());
-            ZeroFormatterEqualityComparer<KeyTuple<T1, T2>>.Register(new KeyTupleEqualityComparer<T1, T2>());
+            if (Formatter<KeyTuple<T1, T2>>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2>>.Register(new KeyTupleFormatter<T1, T2>());
+            }
+            if (Formatter<KeyTuple<T1, T2>?>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2>?>.Register(new NullableKeyTupleFormatter<T1, T2>());
+            }
+            if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2>>.Default is IErrorEqualityComparer)
+            {
+                ZeroFormatterEqualityComparer<KeyTuple<T1, T2>>.Register(new KeyTupleEqualityComparer<T1, T2>());
+            }
         }
 
         public static void RegisterKeyTuple<T1, T2, T3>()
         {
-            Formatter<KeyTuple<T1, T2, T3>>.Register(new KeyTupleFormatter<T1, T2, T3>());
-            Formatter<KeyTuple<T1, T2, T3>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3>());
-            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3>>.Register(new KeyTupleEqualityComparer<T1, T2, T3>());
+            if (Formatter<KeyTuple<T1, T2, T3>>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3>>.Register(new KeyTupleFormatter<T1, T2, T3>());
+            }
+            if (Formatter<KeyTuple<T1, T2, T3>?>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3>());
+            }
+            if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3>>.Default is IErrorEqualityComparer)
+            {
+                ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3>>.Register(new KeyTupleEqualityComparer<T1, T2, T3>());
+            }
         }
 
         public static void RegisterKeyTuple<T1, T2, T3, T4>()
         {
-            Formatter<KeyTuple<T1, T2, T3, T4>>.Register(new KeyTupleFormatter<T1, T2, T3, T4>());
-            Formatter<KeyTuple<T1, T2, T3, T4>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4>());
-            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4>());
+            if (Formatter<KeyTuple<T1, T2, T3, T4>>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4>>.Register(new KeyTupleFormatter<T1, T2, T3, T4>());
+            }
+            if (Formatter<KeyTuple<T1, T2, T3, T4>?>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4>());
+            }
+            if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4>>.Default is IErrorEqualityComparer)
+            {
+                ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4>());
+            }
         }
 
         public static void RegisterKeyTuple<T1, T2, T3, T4, T5>()
         {
-            Formatter<KeyTuple<T1, T2, T3, T4, T5>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5>());
-            Formatter<KeyTuple<T1, T2, T3, T4, T5>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5>());
-            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5>());
+            if (Formatter<KeyTuple<T1, T2, T3, T4, T5>>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4, T5>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5>());
+            }
+            if (Formatter<KeyTuple<T1, T2, T3, T4, T5>?>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4, T5>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5>());
+            }
+            if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5>>.Default is IErrorEqualityComparer)
+            {
+                ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5>());
+            }
         }
 
         public static void RegisterKeyTuple<T1, T2, T3, T4, T5, T6>()
         {
-            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6>());
-            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6>());
-            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6>());
+            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6>());
+            }
+            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6>());
+            }
+            if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6>>.Default is IErrorEqualityComparer)
+            {
+                ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6>());
+            }
         }
 
         public static void RegisterKeyTuple<T1, T2, T3, T4, T5, T6, T7>()
         {
-            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7>());
-            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7>());
-            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7>());
+            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7>());
+            }
+            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7>());
+            }
+            if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Default is IErrorEqualityComparer)
+            {
+                ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7>());
+            }
         }
 
         public static void RegisterKeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>()
         {
-            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>());
-            Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>());
-            ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7, T8>());
+            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>());
+            }
+            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>?>.Default is IErrorFormatter)
+            {
+                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>());
+            }
+            if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Default is IErrorEqualityComparer)
+            {
+                ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7, T8>());
+            }
         }
     }
 
