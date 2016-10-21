@@ -15,7 +15,17 @@ for Unity
 * PM> Install-Package [ZeroFormatter.Interfaces](https://www.nuget.org/packages/ZeroFormatter.Interfaces/)
 * PM> Install-Package [ZeroFormatter.Unity](https://www.nuget.org/packages/ZeroFormatter.Unity)
 
-Interfaces can reference both .NET 3.5 and Unity. ZeroFormatter.Unity is binary for Unity, it can 'not' use dynamic serializer generation. Code Generator is in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc\zfc.exe`. Commandline arguments are `[csproj path] [output path] [-unuseunityattr]`.
+Interfaces can reference both .NET 3.5 and Unity.
+
+ZeroFormatter.Unity is binary for Unity, it can 'not' use dynamic serializer generation but pre code generate helps it. Code Generator is located in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc\zfc.exe`.
+
+```
+zfc arguments help:
+  -i, --input=VALUE          [required]Input path of analyze csproj
+  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
+  -s, --separate             [optional, default=false]Output files are separated
+  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
+```
 
 Why use ZeroFormatter?
 ---
@@ -23,8 +33,6 @@ Why use ZeroFormatter?
 * Strongly Typed and Code as schema
 no needs to other IDL.
 * Native support for Dictionary, MultiDictionary(ILookup)
-
-
 
 Sample
 ---
