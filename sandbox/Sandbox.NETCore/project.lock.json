@@ -6639,8 +6639,8 @@
   "projectFileDependencyGroups": {
     "": [
       "Microsoft.NETCore.App >= 1.0.0",
-      "ZeroFormatter.Interfaces.NETCore >= 1.0.0-*",
-      "ZeroFormatter.NETCore >= 1.0.0-*"
+      "ZeroFormatter.Interfaces.NETCore >= 0.1.3",
+      "ZeroFormatter.NETCore >= 0.1.3"
     ],
     ".NETCoreApp,Version=v1.0": []
   },
