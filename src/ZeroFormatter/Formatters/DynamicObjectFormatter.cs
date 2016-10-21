@@ -26,6 +26,11 @@ namespace ZeroFormatter.Formatters
                 throw new InvalidOperationException("Type must mark ZeroFormattableAttribute. " + type.Name);
             }
 
+            if (!type.GetTypeInfo().GetConstructors().Any(x => x.GetParameters().Length == 0))
+            {
+                throw new InvalidOperationException("Type must needs parameterless constructor. " + type.Name);
+            }
+
             var dict = new Dictionary<int, PropertyInfo>();
             foreach (var item in type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {

@@ -28,6 +28,8 @@ public class MyClass
 
     [Index(4)]
     public virtual MogeMoge Mone { get; set; }
+
+   
 }
 
 namespace Sandbox
@@ -84,16 +86,8 @@ namespace Sandbox
 
         static void Main(string[] args)
         {
-            MemoryStream xs = new MemoryStream();
-            ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), new MyClass
-            {
-                Age = 999
-            }, xs);
-
-            xs.Position = 0;
-
-            var i = ZeroFormatterSerializer.Deserialize<MyClass>(xs);
-            Console.WriteLine(i.Age);
+            ZeroFormatterSerializer.Serialize(new MyClass());
+        
         }
     }
 }

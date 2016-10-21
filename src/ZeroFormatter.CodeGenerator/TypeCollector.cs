@@ -177,6 +177,11 @@ namespace ZeroFormatter.CodeGenerator
             {
                 throw new Exception($"Type must be class. {type.Name}. Location:{type.Locations[0]}");
             }
+            if (!type.Constructors.Any(x => x.Parameters.Length == 0))
+            {
+                throw new Exception($"Type must needs parameterless constructor. {type.Name}. Location:{type.Locations[0]}");
+            }
+
 
             var list = new List<ObjectSegmentType.PropertyTuple>();
 

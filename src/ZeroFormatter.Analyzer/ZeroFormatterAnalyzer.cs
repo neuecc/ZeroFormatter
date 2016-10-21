@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -79,6 +80,25 @@ namespace ZeroFormatter.Analyzer
             description: "MaxIndex is large. Index is size of binary, recommended to small.",
             defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
+        internal static readonly DiagnosticDescriptor TypeMustNeedsParameterlessConstructor = new DiagnosticDescriptor(
+            id: DiagnosticIdBase + "_" + nameof(TypeMustNeedsParameterlessConstructor), title: Title, category: Category,
+            messageFormat: "Type must needs parameterless constructor. {0}", //  type.Name
+            description: "Type must needs parameterless constructor.",
+            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+
+        static readonly ImmutableArray<DiagnosticDescriptor> supportedDiagnostics = ImmutableArray.Create(
+            TypeMustBeClass,
+            TypeMustBeZeroFormattable,
+            PublicPropertyNeedsIndex,
+            PublicPropertyNeedsGetAndSetAccessor,
+            PublicPropertyMustBeVirtual,
+            IndexAttributeDuplicate,
+            DictionaryNotSupport,
+            ListNotSupport,
+            ArrayNotSupport,
+            IndexIsTooLarge,
+            TypeMustNeedsParameterlessConstructor);
+
         static readonly HashSet<string> AllowTypes = new HashSet<string>
         {
             "short",
@@ -104,20 +124,7 @@ namespace ZeroFormatter.Analyzer
         {
             get
             {
-                var supported = ImmutableArray.Create(
-                    TypeMustBeClass,
-                    TypeMustBeZeroFormattable,
-                    PublicPropertyNeedsIndex,
-                    PublicPropertyNeedsGetAndSetAccessor,
-                    PublicPropertyMustBeVirtual,
-                    IndexAttributeDuplicate,
-                    DictionaryNotSupport,
-                    ListNotSupport,
-                    ArrayNotSupport,
-                    IndexIsTooLarge);
-
-
-                return supported;
+                return supportedDiagnostics;
             }
         }
 
@@ -213,6 +220,15 @@ namespace ZeroFormatter.Analyzer
             {
                 context.Add(Diagnostic.Create(TypeMustBeClass, callerLocation, type.Locations, type.Name));
                 return;
+            }
+
+            if (namedType != null)
+            {
+                if (!namedType.Constructors.Any(x => x.Parameters.Length == 0))
+                {
+                    context.Add(Diagnostic.Create(TypeMustNeedsParameterlessConstructor, callerLocation, type.Locations, type.Name));
+                    return;
+                }
             }
 
             // If in another project, we can not report so stop analyze.
