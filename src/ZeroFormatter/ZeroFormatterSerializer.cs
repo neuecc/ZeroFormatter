@@ -1,9 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
+#if !UNITY
+using System.Reflection;
+using System.Linq.Expressions;
+#endif
 
 namespace ZeroFormatter
 {
@@ -141,5 +145,150 @@ namespace ZeroFormatter
 
             return new ArraySegment<byte>(buffer, 0, length);
         }
+
+#if !UNITY
+
+        public static class NonGeneric
+        {
+            static readonly System.Collections.Concurrent.ConcurrentDictionary<Type, CompiledMethods> serializes = new System.Collections.Concurrent.ConcurrentDictionary<Type, CompiledMethods>();
+
+            public static byte[] Serialize(Type type, object obj)
+            {
+                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).serialize1.Invoke(obj);
+            }
+
+            public static void Serialize(Type type, object obj, ref byte[] bytes)
+            {
+                serializes.GetOrAdd(type, t => new CompiledMethods(t)).serialize2.Invoke(obj, ref bytes);
+            }
+
+            public static void Serialize(Type type, object obj, Stream stream)
+            {
+                serializes.GetOrAdd(type, t => new CompiledMethods(t)).serialize3.Invoke(obj, stream);
+            }
+
+            public static object Deserialize(Type type, byte[] bytes)
+            {
+                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).deserialize1.Invoke(bytes);
+            }
+
+            public static object Deserialize(Type type, Stream stream)
+            {
+                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).deserialize2.Invoke(stream);
+            }
+
+            public static object Convert(Type type, object obj)
+            {
+                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).convert.Invoke(obj);
+            }
+
+            public static bool IsFormattedObject(object obj)
+            {
+                return obj is IZeroFormatterSegment;
+            }
+
+            delegate void RefSerialize(object obj, ref byte[] bytes);
+
+            class CompiledMethods
+            {
+                public readonly Func<object, byte[]> serialize1;
+                public readonly RefSerialize serialize2;
+                public readonly Action<object, Stream> serialize3;
+                public readonly Func<byte[], object> deserialize1;
+                public readonly Func<Stream, object> deserialize2;
+                public readonly Func<object, object> convert;
+
+                public CompiledMethods(Type type)
+                {
+                    var ti = type.GetTypeInfo();
+                    var methods = typeof(ZeroFormatterSerializer).GetTypeInfo().GetMethods();
+
+                    {
+                        // public static byte[] Serialize<T>(T obj)
+                        var serialize = methods.First(x => x.Name == "Serialize" && x.GetParameters().Length == 1).MakeGenericMethod(type);
+
+                        var param1 = Expression.Parameter(typeof(object), "obj");
+                        var body = Expression.Call(serialize, ti.IsValueType
+                            ? Expression.Unbox(param1, type)
+                            : Expression.Convert(param1, type));
+                        var lambda = Expression.Lambda<Func<object, byte[]>>(body, param1).Compile();
+
+                        this.serialize1 = lambda;
+                    }
+                    {
+                        // public static void Serialize<T>(T obj, ref byte[] bytes)
+                        var serialize = methods.First(x => x.Name == "Serialize"
+                            && x.GetParameters().Length == 2
+                            && x.GetParameters()[1].ParameterType.IsByRef).MakeGenericMethod(type);
+
+                        var param1 = Expression.Parameter(typeof(object), "obj");
+                        var param2 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
+
+                        var body = Expression.Call(serialize, ti.IsValueType
+                            ? Expression.Unbox(param1, type)
+                            : Expression.Convert(param1, type),
+                            param2);
+                        var lambda = Expression.Lambda<RefSerialize>(body, param1, param2).Compile();
+
+                        this.serialize2 = lambda;
+                    }
+                    {
+                        // public static void Serialize<T>(T obj, Stream stream)
+                        var serialize = methods.First(x => x.Name == "Serialize"
+                            && x.GetParameters().Length == 2
+                            && !x.GetParameters()[1].ParameterType.IsByRef).MakeGenericMethod(type);
+
+                        var param1 = Expression.Parameter(typeof(object), "obj");
+                        var param2 = Expression.Parameter(typeof(Stream), "stream");
+
+                        var body = Expression.Call(serialize, ti.IsValueType
+                            ? Expression.Unbox(param1, type)
+                            : Expression.Convert(param1, type),
+                            param2);
+                        var lambda = Expression.Lambda<Action<object, Stream>>(body, param1, param2).Compile();
+
+                        this.serialize3 = lambda;
+                    }
+
+                    {
+                        // public static T Deserialize<T>(byte[] bytes)
+                        var deserialize = methods.First(x => x.Name == "Deserialize" && x.GetParameters()[0].ParameterType == typeof(byte[])).MakeGenericMethod(type);
+
+                        var param1 = Expression.Parameter(typeof(byte[]), "bytes");
+                        var body = Expression.Convert(Expression.Call(deserialize, param1), typeof(object));
+                        var lambda = Expression.Lambda<Func<byte[], object>>(body, param1).Compile();
+
+                        this.deserialize1 = lambda;
+                    }
+                    {
+                        // public static T Deserialize<T>(Stream stream)
+                        var deserialize = methods.First(x => x.Name == "Deserialize" && x.GetParameters()[0].ParameterType == typeof(Stream)).MakeGenericMethod(type);
+
+                        var param1 = Expression.Parameter(typeof(Stream), "stream");
+                        var body = Expression.Convert(Expression.Call(deserialize, param1), typeof(object));
+                        var lambda = Expression.Lambda<Func<Stream, object>>(body, param1).Compile();
+
+                        this.deserialize2 = lambda;
+                    }
+
+                    {
+                        // public static T Convert<T>(T obj)
+                        var convert = methods.First(x => x.Name == "Convert").MakeGenericMethod(type);
+
+                        var param1 = Expression.Parameter(typeof(object), "obj");
+                        var callConvert = Expression.Call(convert, ti.IsValueType
+                                ? Expression.Unbox(param1, type)
+                                : Expression.Convert(param1, type));
+                        var body = Expression.Convert(callConvert, typeof(object));
+                        var lambda = Expression.Lambda<Func<object, object>>(body, param1).Compile();
+
+                        this.convert = lambda;
+                    }
+                }
+            }
+
+        }
+
+#endif
     }
 }

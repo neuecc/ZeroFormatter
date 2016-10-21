@@ -448,7 +448,7 @@
           "ref/netstandard1.3/System.Collections.Concurrent.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/System.Collections.Concurrent.dll": {}
         }
       },
       "System.Collections.Immutable/1.2.0": {
@@ -2010,6 +2010,7 @@
         "framework": ".NETStandard,Version=v1.6",
         "dependencies": {
           "System.Collections": "4.0.11",
+          "System.Collections.Concurrent": "4.0.12",
           "System.Linq": "4.1.0",
           "System.Linq.Expressions": "4.1.0",
           "System.Reflection": "4.1.0",

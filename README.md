@@ -154,3 +154,8 @@ TODO:...
 
 https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/WireFormatEqualityComparers.cs
 https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/KeyTupleEqualityComparer.cs
+
+
+Cross Plaftorm
+---
+Currently No and I have no plans. Welcome to contribute to port other languages.

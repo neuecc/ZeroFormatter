@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZeroFormatter;
-
+using System.IO;
 
 [ZeroFormattable]
 public class MyClass
@@ -67,26 +67,33 @@ namespace Sandbox
             Console.WriteLine(serializeCast(t));
 
         }
+
+        static byte[] Huga<T>(T obj)
+        {
+            return null;
+        }
+
+        static void HUga<T>()
+        {
+            //Func<T, byte[]> invoke = Huga<T>;
+            //Func<object, byte[]> invoke2 = invoke;
+
+
+
+        }
+
         static void Main(string[] args)
         {
-            //Hoge<MyEnum>(MyEnum.Alle);
-            //return;
-
-
-            var mc = new MyClass
+            MemoryStream xs = new MemoryStream();
+            ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), new MyClass
             {
-                Age = 99,
-                FirstName = "hoge",
-                LastName = "huga",
-                List = new List<MogeMoge> { MogeMoge.Apple, MogeMoge.Orange, MogeMoge.Apple }
-            };
-                
-            var bytes = ZeroFormatter.ZeroFormatterSerializer.Serialize(mc);
-            var mc2 = ZeroFormatter.ZeroFormatterSerializer.Deserialize<MyClass>(bytes);
+                Age = 999
+            }, xs);
 
+            xs.Position = 0;
 
-            var huga = ZeroFormatterSerializer.Serialize(mc2);
-
+            var i = ZeroFormatterSerializer.Deserialize<MyClass>(xs);
+            Console.WriteLine(i.Age);
         }
     }
 }

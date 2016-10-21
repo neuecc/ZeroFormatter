@@ -22,6 +22,7 @@
 		"System.Threading": "4.0.11",
 		"System.Text.Encoding": "4.0.11",
 		"System.Text.Encoding.Extensions": "4.0.11",
+		"System.Collections.Concurrent": "4.0.12",
 		"ZeroFormatter.Interfaces.NETCore": "0.1.3"
 	},
 	"frameworks": {
