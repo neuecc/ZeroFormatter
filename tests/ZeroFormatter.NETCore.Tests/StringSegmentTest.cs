@@ -20,7 +20,7 @@ namespace ZeroFormatter.DotNetCore.Tests
             bw.Write("あいうえおかきくけこさしすえそなにぬねの");
 
             var actual = ms.ToArray();
-            var tracker = new DirtyTracker();
+            var tracker = new DirtyTracker(0);
             tracker.IsDirty.IsFalse();
             var segment = new CacheSegment<string>(tracker, new ArraySegment<byte>(actual));
 

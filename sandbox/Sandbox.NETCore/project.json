@@ -9,8 +9,8 @@
       "type": "platform",
       "version": "1.0.0"
     },
-    "ZeroFormatter.Interfaces.NETCore": "0.1.7",
-    "ZeroFormatter.NETCore": "0.1.7"
+    "ZeroFormatter.Interfaces.NETCore": "0.1.8",
+    "ZeroFormatter.NETCore": "0.1.8"
   },
 
   "frameworks": {

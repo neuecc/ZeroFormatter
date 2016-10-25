@@ -105,7 +105,7 @@ namespace Sandbox
             var hogehoge = ms.ToArray();
 
             int size;
-            var r = ZeroFormatter.Formatters.Formatter<MyClass>.Default.Deserialize(ref hogehoge, 2, new ZeroFormatter.Segments.DirtyTracker(), out size);
+            var r = ZeroFormatter.Formatters.Formatter<MyClass>.Default.Deserialize(ref hogehoge, 2, new ZeroFormatter.Segments.DirtyTracker(2), out size);
 
 
 

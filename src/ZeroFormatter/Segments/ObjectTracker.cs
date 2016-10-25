@@ -11,12 +11,6 @@ namespace ZeroFormatter.Segments
         public int RootOffset { get; private set; }
         public bool IsDirty { get; private set; }
 
-        public DirtyTracker()
-        {
-            // TODO:atode kesu:)
-            this.IsDirty = false;
-        }
-
         public DirtyTracker(int rootOffset)
         {
             this.RootOffset = rootOffset;

@@ -24,7 +24,7 @@ namespace ZeroFormatter.Tests
         [TestMethod]
         public void FixedListSegment()
         {
-            var tracker = new DirtyTracker();
+            var tracker = new DirtyTracker(0);
 
             var list = CreateFixedList(tracker);
 
@@ -104,7 +104,7 @@ namespace ZeroFormatter.Tests
         [TestMethod]
         public void VariableListSegment()
         {
-            var tracker = new DirtyTracker();
+            var tracker = new DirtyTracker(0);
 
             // "hoge", "あああ", "huga", "takotako", "chop", "かきくけこ", "!^ :a<>"
             var list = CraeteVariableList(tracker);

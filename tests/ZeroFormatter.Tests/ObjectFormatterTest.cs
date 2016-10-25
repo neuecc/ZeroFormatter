@@ -221,7 +221,7 @@ public class MyClass_ObjectSegment : MyClass, IZeroFormatterSegment
         [TestMethod]
         public void ObjectFormatter()
         {
-            var tracker = new DirtyTracker();
+            var tracker = new DirtyTracker(0);
             var mc = new MyClass
             {
                 Age = 999,

@@ -221,7 +221,7 @@ namespace ZeroFormatter.Tests
         [Fact]
         public void ObjectFormatter()
         {
-            var tracker = new DirtyTracker();
+            var tracker = new DirtyTracker(0);
             var mc = new MyClass
             {
                 Age = 999,
@@ -291,13 +291,13 @@ namespace ZeroFormatter.Tests
 
 
             var generatedFormatter = new MyClassFormatter();
-            var mc2 = generatedFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
+            var mc2 = generatedFormatter.Deserialize(ref bytes, 0, new DirtyTracker(0), out size);
 
             mc2.Age.Is(999);
             mc2.FirstName.Is("hogehoge");
             mc2.LastName.Is("tako");
 
-            var mc3 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
+            var mc3 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(0), out size);
             mc3.Age.Is(999);
             mc3.FirstName.Is("hogehoge");
             mc3.LastName.Is("tako");
@@ -308,7 +308,7 @@ namespace ZeroFormatter.Tests
 
             bytes = null;
             dynamicFormatter.Serialize(ref bytes, 0, mc3);
-            var mc4 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
+            var mc4 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(0), out size);
 
             mc4.Age.Is(9);
             mc4.LastName.Is("chop");

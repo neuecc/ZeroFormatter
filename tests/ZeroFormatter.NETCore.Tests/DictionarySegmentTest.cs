@@ -23,7 +23,7 @@ namespace ZeroFormatter.DotNetCore.Tests
             var bytes = ZeroFormatterSerializer.Serialize(sampleDict);
 
             int _;
-            return DictionarySegment<int, string>.Create(new DirtyTracker(), bytes, 0, out _);
+            return DictionarySegment<int, string>.Create(new DirtyTracker(0), bytes, 0, out _);
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace ZeroFormatter.DotNetCore.Tests
             Formatter<HashCollision>.Register(new TestFormatter());
             ZeroFormatterEqualityComparer<HashCollision>.Register(new HashCollisionEqualityComparer());
 
-            var dict = new DictionarySegment<HashCollision, int>(new DirtyTracker(), 5);
+            var dict = new DictionarySegment<HashCollision, int>(new DirtyTracker(0), 5);
             dict.Add(new HashCollision(10, 999), 6);
             dict.Add(new HashCollision(99, 999), 9);
 
