@@ -193,11 +193,11 @@ namespace ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (lastIndex + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 3, value.HogeMoge);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<IList<int>>(ref bytes, startOffset, offset, 4, value.MyList);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 3, value.HogeMoge);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<IList<int>>(ref bytes, startOffset, offset, 4, value.MyList);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, lastIndex);
             }

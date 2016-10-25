@@ -40,7 +40,7 @@ namespace <#= Namespace #>
 
                 offset += (8 + 4 * (<#= t.LastIndex #> + 1));
 <# foreach(var p in t.Properties) { #>
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<<#= p.Type #>>(ref bytes, startOffset, offset, <#= p.Index #>, value.<#= p.Name #>);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<<#= p.Type #>>(ref bytes, startOffset, offset, <#= p.Index #>, value.<#= p.Name #>);
 <# } #>
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, <#= t.LastIndex #>);

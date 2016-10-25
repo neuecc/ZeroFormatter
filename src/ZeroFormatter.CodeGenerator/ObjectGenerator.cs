@@ -98,7 +98,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write("                offset += ObjectSegmentHelper.SerialzieFromFormatter<");
+            this.Write("                offset += ObjectSegmentHelper.SerializeFromFormatter<");
             
             #line 43 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(p.Type));

@@ -125,11 +125,11 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
                 var startOffset = offset;
 
                 offset += (8 + 4 * (4 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>(ref bytes, startOffset, offset, 3, value.List);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::Sandbox.Shared.Bar.MogeMoge>(ref bytes, startOffset, offset, 4, value.Mone);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>(ref bytes, startOffset, offset, 3, value.List);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::Sandbox.Shared.Bar.MogeMoge>(ref bytes, startOffset, offset, 4, value.Mone);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 4);
             }
@@ -299,11 +299,11 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
                 var startOffset = offset;
 
                 offset += (8 + 4 * (4 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>(ref bytes, startOffset, offset, 3, value.List);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::Sandbox.Shared.Bar.MogeMoge>(ref bytes, startOffset, offset, 4, value.Mone);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>(ref bytes, startOffset, offset, 3, value.List);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::Sandbox.Shared.Bar.MogeMoge>(ref bytes, startOffset, offset, 4, value.Mone);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 4);
             }
@@ -491,11 +491,11 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
                 var startOffset = offset;
 
                 offset += (8 + 4 * (4 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>(ref bytes, startOffset, offset, 3, value.List);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::Sandbox.Shared.Foo.MogeMoge>(ref bytes, startOffset, offset, 4, value.Mone);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>(ref bytes, startOffset, offset, 3, value.List);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::Sandbox.Shared.Foo.MogeMoge>(ref bytes, startOffset, offset, 4, value.Mone);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 4);
             }
@@ -665,11 +665,11 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
                 var startOffset = offset;
 
                 offset += (8 + 4 * (4 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>(ref bytes, startOffset, offset, 3, value.List);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::Sandbox.Shared.Foo.MogeMoge>(ref bytes, startOffset, offset, 4, value.Mone);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>(ref bytes, startOffset, offset, 3, value.List);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::Sandbox.Shared.Foo.MogeMoge>(ref bytes, startOffset, offset, 4, value.Mone);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 4);
             }
@@ -857,7 +857,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 var startOffset = offset;
 
                 offset += (8 + 4 * (0 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty0);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty0);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 0);
             }
@@ -964,9 +964,9 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 var startOffset = offset;
 
                 offset += (8 + 4 * (2 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty0);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 1, value.MyProperty1);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.TypeCode>(ref bytes, startOffset, offset, 2, value.MyProperty2);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty0);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 1, value.MyProperty1);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.TypeCode>(ref bytes, startOffset, offset, 2, value.MyProperty2);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 2);
             }
@@ -1119,7 +1119,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (0 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 0);
             }
@@ -1226,14 +1226,14 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (7 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IDictionary<int, string>>(ref bytes, startOffset, offset, 0, value.MyProperty1);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IList<int>>(ref bytes, startOffset, offset, 1, value.MyProperty2);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IList<string>>(ref bytes, startOffset, offset, 2, value.MyProperty3);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Linq.ILookup<bool, int>>(ref bytes, startOffset, offset, 3, value.MyProperty4);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::ZeroFormatter.Tests.MyFormatClass>(ref bytes, startOffset, offset, 4, value.MyProperty5);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<byte[]>(ref bytes, startOffset, offset, 5, value.MyProperty6);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 6, value.MyProperty7);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IDictionary<string, int>>(ref bytes, startOffset, offset, 7, value.MyProperty8);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IDictionary<int, string>>(ref bytes, startOffset, offset, 0, value.MyProperty1);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<int>>(ref bytes, startOffset, offset, 1, value.MyProperty2);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<string>>(ref bytes, startOffset, offset, 2, value.MyProperty3);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Linq.ILookup<bool, int>>(ref bytes, startOffset, offset, 3, value.MyProperty4);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::ZeroFormatter.Tests.MyFormatClass>(ref bytes, startOffset, offset, 4, value.MyProperty5);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<byte[]>(ref bytes, startOffset, offset, 5, value.MyProperty6);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 6, value.MyProperty7);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IDictionary<string, int>>(ref bytes, startOffset, offset, 7, value.MyProperty8);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 7);
             }
@@ -1460,11 +1460,11 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (4 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 3, value.HogeMoge);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IList<int>>(ref bytes, startOffset, offset, 4, value.MyList);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 3, value.HogeMoge);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<int>>(ref bytes, startOffset, offset, 4, value.MyList);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 4);
             }
@@ -1634,11 +1634,11 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (5 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 1, value.MyProperty1);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 2, value.MyProperty2);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 3, value.MyProperty3);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IList<int>>(ref bytes, startOffset, offset, 4, value.MyProperty4);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<string>(ref bytes, startOffset, offset, 5, value.MyProperty5);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 1, value.MyProperty1);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 2, value.MyProperty2);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 3, value.MyProperty3);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<int>>(ref bytes, startOffset, offset, 4, value.MyProperty4);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 5, value.MyProperty5);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 5);
             }
@@ -1806,7 +1806,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (1 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 1, value.MyProperty1);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 1, value.MyProperty1);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 1);
             }
@@ -1913,7 +1913,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (3 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 3, value.MyProperty3);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 3, value.MyProperty3);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 3);
             }
@@ -2020,10 +2020,10 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (10 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 3, value.MyProperty3);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<double>(ref bytes, startOffset, offset, 7, value.MyProperty7);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int?>(ref bytes, startOffset, offset, 8, value.MyProperty8);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 10, value.MyProperty10);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 3, value.MyProperty3);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<double>(ref bytes, startOffset, offset, 7, value.MyProperty7);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int?>(ref bytes, startOffset, offset, 8, value.MyProperty8);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 10, value.MyProperty10);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 10);
             }
@@ -2172,8 +2172,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (1 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Hoge);
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::ZeroFormatter.Tests.RecMyClass>(ref bytes, startOffset, offset, 1, value.Rec);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Hoge);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::ZeroFormatter.Tests.RecMyClass>(ref bytes, startOffset, offset, 1, value.Rec);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 1);
             }
@@ -2297,7 +2297,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (0 + 1));
-                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(ref bytes, startOffset, offset, 0, value.KeyTupleDictionary);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(ref bytes, startOffset, offset, 0, value.KeyTupleDictionary);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 0);
             }
