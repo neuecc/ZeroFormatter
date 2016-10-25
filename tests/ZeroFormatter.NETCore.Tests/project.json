@@ -8,8 +8,8 @@
     "System.Dynamic.Runtime": "4.0.11",
     "xunit": "2.2.0-beta3-build3402",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "ZeroFormatter.Interfaces.NETCore": "1.0.0-*",
-    "ZeroFormatter.NETCore": "1.0.0-*"
+    "ZeroFormatter.Interfaces.NETCore": "0.1.7",
+    "ZeroFormatter.NETCore": "0.1.7"
   },
   "frameworks": {
     "netcoreapp1.0.1": {

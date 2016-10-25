@@ -373,7 +373,7 @@ namespace ZeroFormatter.Segments
         protected override int GetOffset(int index)
         {
             var array = originalBytes.Array;
-            return BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + (4 * index));
+            return tracker.RootOffset + BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + (4 * index));
         }
 
         public override T this[int index]

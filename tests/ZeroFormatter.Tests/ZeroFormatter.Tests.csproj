@@ -75,6 +75,7 @@
     <Compile Include="ListSegmentTest.cs" />
     <Compile Include="NonGenericTest.cs" />
     <Compile Include="ObjectFormatterTest.cs" />
+    <Compile Include="OffsetTest.cs" />
     <Compile Include="ReadOnlyTest.cs" />
     <Compile Include="RecursiveCheck.cs" />
     <Compile Include="StringSegmentTest.cs" />

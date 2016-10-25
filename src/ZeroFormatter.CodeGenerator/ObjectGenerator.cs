@@ -319,7 +319,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(", __binaryLastIndex, __extraFixedBytes, value);\r\n            }\r\n");
+            this.Write(", __binaryLastIndex, __extraFixedBytes, value, __tracker);\r\n            }\r\n");
             
             #line 92 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
  } else if(p.IsCacheSegment) { 
@@ -466,7 +466,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(", __binaryLastIndex));\r\n");
+            this.Write(", __binaryLastIndex, __tracker));\r\n");
             
             #line 131 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
  } else { 
@@ -494,7 +494,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(", __binaryLastIndex), __tracker, out __out);\r\n");
+            this.Write(", __binaryLastIndex, __tracker), __tracker, out __out);\r\n");
             
             #line 133 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
  } 
@@ -558,7 +558,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(", __binaryLastIndex, __originalBytes, __extraFixedBytes);\r\n");
+            this.Write(", __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);\r\n");
             
             #line 157 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
  } else if(p.IsCacheSegment) { 

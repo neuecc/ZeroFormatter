@@ -87,7 +87,7 @@ namespace <#= Namespace #>
             }
             <#= (p.IsSetProtected ? "protected " : "") + "set" #>
             {
-                ObjectSegmentHelper.SetFixedProperty<<#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, value);
+                ObjectSegmentHelper.SetFixedProperty<<#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, value, __tracker);
             }
 <# } else if(p.IsCacheSegment) { #>
             <#= (p.IsGetProtected ? "protected " : "") + "get" #>
@@ -127,9 +127,9 @@ namespace <#= Namespace #>
 <# foreach(var p in t.Properties) { #>
 <# if (p.IsFixedSize) { #>
 <# } else if(p.IsCacheSegment) { #>
-            _<#= p.Name #> = new CacheSegment<<#= p.Type #>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, <#= p.Index #>, __binaryLastIndex));
+            _<#= p.Name #> = new CacheSegment<<#= p.Type #>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, <#= p.Index #>, __binaryLastIndex, __tracker));
 <# } else { #>
-            _<#= p.Name #> = Formatter<<#= p.Type #>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, <#= p.Index #>, __binaryLastIndex), __tracker, out __out);
+            _<#= p.Name #> = Formatter<<#= p.Type #>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, <#= p.Index #>, __binaryLastIndex, __tracker), __tracker, out __out);
 <# } #>
 <# } #>
         }
@@ -153,7 +153,7 @@ namespace <#= Namespace #>
 
 <# foreach(var p in t.Properties) { #>
 <# if (p.IsFixedSize) { #>
-                offset += ObjectSegmentHelper.SerializeFixedLength<<#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, __binaryLastIndex, __originalBytes, __extraFixedBytes);
+                offset += ObjectSegmentHelper.SerializeFixedLength<<#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 <# } else if(p.IsCacheSegment) { #>
                 offset += ObjectSegmentHelper.SerializeCacheSegment<<#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, _<#= p.Name #>);
 <# } else { #>

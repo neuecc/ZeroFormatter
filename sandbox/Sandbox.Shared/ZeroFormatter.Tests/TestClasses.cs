@@ -160,4 +160,44 @@ namespace ZeroFormatter.Tests
         [Index(0)]
         public virtual IDictionary<KeyTuple<int, string>, MyClass> KeyTupleDictionary { get; set; }
     }
+
+    [ZeroFormattable]
+    public class OffsetType
+    {
+        [Index(0)]
+        public virtual int Dummy1 { get; set; }
+        [Index(1)]
+        public virtual string Dummy2 { get; set; }
+        [Index(2)]
+        public virtual IList<string> VariableSizeList { get; set; }
+        [Index(3)]
+        public virtual IDictionary<string, int> Dictionary { get; set; }
+        [Index(4)]
+        public virtual Offset2 ObjectProp { get; set; }
+    }
+
+    [ZeroFormattable]
+    public class Offset2
+    {
+        [Index(0)]
+        public virtual int Prop1 { get; set; }
+        [Index(1)]
+        public virtual string Prop2 { get; set; }
+    }
+
+
+    [ZeroFormattable]
+    public class TestBase
+    {
+        [Index(0)]
+        public virtual int MyProperty { get; set; }
+    }
+
+    [ZeroFormattable]
+    public class Test2 : TestBase
+    {
+        [Index(1)]
+        public virtual int MyProperty1 { get; set; }
+    }
+
 }

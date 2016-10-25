@@ -86,7 +86,32 @@ namespace Sandbox
 
         static void Main(string[] args)
         {
-            ZeroFormatter.Formatters.GenericFormatter.RegisterLookup<int, string>();
+
+            var mc = new MyClass
+            {
+                Age = 222,
+                FirstName = "a",
+                LastName = "bbb",
+                List = new [] { MogeMoge.Orange, MogeMoge.Apple },
+                Mone = MogeMoge.Apple
+            };
+
+            var bytes= ZeroFormatterSerializer.Serialize(mc);
+            var ms = new MemoryStream();
+            ms.WriteByte(0);
+            ms.WriteByte(0);
+            ms.Write(bytes, 0, bytes.Length);
+
+            var hogehoge = ms.ToArray();
+
+            int size;
+            var r = ZeroFormatter.Formatters.Formatter<MyClass>.Default.Deserialize(ref hogehoge, 2, new ZeroFormatter.Segments.DirtyTracker(), out size);
+
+
+
+
+            
+
         }
     }
 }

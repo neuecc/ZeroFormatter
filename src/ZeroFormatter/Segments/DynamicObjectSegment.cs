@@ -22,24 +22,24 @@ namespace ZeroFormatter.Segments
             return BinaryUtil.ReadInt32(ref array, originalBytes.Offset);
         }
 
-        public static int GetOffset(ArraySegment<byte> originalBytes, int index, int lastIndex)
+        public static int GetOffset(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)
         {
             if (index > lastIndex)
             {
                 return -1;
             }
             var array = originalBytes.Array;
-            return BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + 4 * index);
+            return tracker.RootOffset + BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + 4 * index);
         }
 
-        public static ArraySegment<byte> GetSegment(ArraySegment<byte> originalBytes, int index, int lastIndex)
+        public static ArraySegment<byte> GetSegment(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)
         {
             if (index > lastIndex)
             {
                 return default(ArraySegment<byte>); // note:very very dangerous.
             }
 
-            var offset = GetOffset(originalBytes, index, lastIndex);
+            var offset = GetOffset(originalBytes, index, lastIndex, tracker);
             if (index == lastIndex)
             {
                 var sliceLength = originalBytes.Offset + originalBytes.Count;
@@ -50,7 +50,7 @@ namespace ZeroFormatter.Segments
                 var nextIndex = index + 1;
                 do
                 {
-                    var nextOffset = GetOffset(originalBytes, nextIndex, lastIndex);
+                    var nextOffset = GetOffset(originalBytes, nextIndex, lastIndex, tracker);
                     if (nextOffset != 0)
                     {
                         return new ArraySegment<byte>(originalBytes.Array, offset, (nextOffset - offset));
@@ -63,7 +63,7 @@ namespace ZeroFormatter.Segments
             }
         }
 
-        public static int SerializeFixedLength<T>(ref byte[] targetBytes, int startOffset, int offset, int index, int lastIndex, ArraySegment<byte> originalBytes, byte[] extraBytes)
+        public static int SerializeFixedLength<T>(ref byte[] targetBytes, int startOffset, int offset, int index, int lastIndex, ArraySegment<byte> originalBytes, byte[] extraBytes, DirtyTracker tracker)
         {
             BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset);
 
@@ -71,7 +71,7 @@ namespace ZeroFormatter.Segments
             var len = formatter.GetLength();
 
             BinaryUtil.EnsureCapacity(ref targetBytes, offset, len.Value);
-            var readOffset = GetOffset(originalBytes, index, lastIndex);
+            var readOffset = GetOffset(originalBytes, index, lastIndex, tracker);
             if (readOffset != -1)
             {
                 Buffer.BlockCopy(originalBytes.Array, readOffset, targetBytes, offset, len.Value);
@@ -106,7 +106,7 @@ namespace ZeroFormatter.Segments
             {
                 var array = bytes.Array;
                 int _;
-                return Formatter<T>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex), tracker, out _);
+                return Formatter<T>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex, tracker), tracker, out _);
             }
             else
             {
@@ -117,12 +117,12 @@ namespace ZeroFormatter.Segments
             }
         }
 
-        public static void SetFixedProperty<T>(ArraySegment<byte> bytes, int index, int lastIndex, byte[] extraBytes, T value)
+        public static void SetFixedProperty<T>(ArraySegment<byte> bytes, int index, int lastIndex, byte[] extraBytes, T value, DirtyTracker tracker)
         {
             if (index <= lastIndex)
             {
                 var array = bytes.Array;
-                Formatter<T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex), value);
+                Formatter<T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex, tracker), value);
             }
             else
             {
@@ -432,6 +432,8 @@ namespace ZeroFormatter.Segments
             generator.Emit(OpCodes.Ldc_I4, index);
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Ldfld, lastIndex);
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Ldfld, tracker);
             generator.Emit(OpCodes.Call, GetSegment);
             generator.Emit(OpCodes.Newobj, field.FieldType.GetTypeInfo().GetConstructors().First());
             generator.Emit(OpCodes.Stfld, field);
@@ -446,6 +448,8 @@ namespace ZeroFormatter.Segments
             generator.Emit(OpCodes.Ldc_I4, index);
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Ldfld, lastIndex);
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Ldfld, tracker);
             generator.Emit(OpCodes.Call, GetOffset);
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Ldfld, tracker);
@@ -497,6 +501,8 @@ namespace ZeroFormatter.Segments
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldfld, extraBytes);
                 generator.Emit(OpCodes.Ldarg_1);
+                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldfld, trackerField);
                 generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SetFixedProperty").MakeGenericMethod(getMethod.ReturnType));
                 generator.Emit(OpCodes.Ret);
 
@@ -651,6 +657,8 @@ namespace ZeroFormatter.Segments
                             generator.Emit(OpCodes.Ldfld, originalBytesField);
                             generator.Emit(OpCodes.Ldarg_0);
                             generator.Emit(OpCodes.Ldfld, extraBytes);
+                            generator.Emit(OpCodes.Ldarg_0);
+                            generator.Emit(OpCodes.Ldfld, trackerField);
                             generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeFixedLength").MakeGenericMethod(prop.PropertyInfo.PropertyType));
                         }
                         else if (prop.IsCacheSegment)

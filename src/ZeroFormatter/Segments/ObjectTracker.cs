@@ -7,17 +7,27 @@ namespace ZeroFormatter.Segments
     public sealed class DirtyTracker
     {
         readonly DirtyTracker parent;
+
+        public int RootOffset { get; private set; }
         public bool IsDirty { get; private set; }
 
         public DirtyTracker()
         {
-            IsDirty = false;
+            // TODO:atode kesu:)
+            this.IsDirty = false;
+        }
+
+        public DirtyTracker(int rootOffset)
+        {
+            this.RootOffset = rootOffset;
+            this.IsDirty = false;
         }
 
         DirtyTracker(DirtyTracker parent)
         {
             this.parent = parent;
             IsDirty = parent.IsDirty;
+            RootOffset = parent.RootOffset;
         }
 
         public void Dirty()

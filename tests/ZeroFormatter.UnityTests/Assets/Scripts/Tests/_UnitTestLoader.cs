@@ -20,6 +20,8 @@ namespace ZeroFormatter.Tests
             UnitTest.RegisterAllMethods<NullCheckTest>();
             UnitTest.RegisterAllMethods<ObjectFormatterTest>();
             UnitTest.RegisterAllMethods<StringSegmentTest>();
+            UnitTest.RegisterAllMethods<InheritanceTest>();
+            UnitTest.RegisterAllMethods<OffsetTest>();
         }
     }
 }
