@@ -22,6 +22,7 @@ namespace ZeroFormatter.Tests
             UnitTest.RegisterAllMethods<StringSegmentTest>();
             UnitTest.RegisterAllMethods<InheritanceTest>();
             UnitTest.RegisterAllMethods<OffsetTest>();
+            UnitTest.RegisterAllMethods<BlockSerializeTest>();
         }
     }
 }

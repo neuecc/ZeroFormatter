@@ -29,7 +29,7 @@ public class MyClass
     [Index(4)]
     public virtual MogeMoge Mone { get; set; }
 
-   
+
 }
 
 namespace Sandbox
@@ -92,25 +92,29 @@ namespace Sandbox
                 Age = 222,
                 FirstName = "a",
                 LastName = "bbb",
-                List = new [] { MogeMoge.Orange, MogeMoge.Apple },
-                Mone = MogeMoge.Apple
+                List = new[] { MogeMoge.Orange, MogeMoge.Apple },
+                Mone = MogeMoge.Orange
             };
 
-            var bytes= ZeroFormatterSerializer.Serialize(mc);
-            var ms = new MemoryStream();
-            ms.WriteByte(0);
-            ms.WriteByte(0);
-            ms.Write(bytes, 0, bytes.Length);
+            var bytes1 = ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), mc);
 
-            var hogehoge = ms.ToArray();
+            mc.Age = 999;
+            mc.FirstName = "hugahuga";
+            var bytes2 = ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), mc);
 
-            int size;
-            var r = ZeroFormatter.Formatters.Formatter<MyClass>.Default.Deserialize(ref hogehoge, 2, new ZeroFormatter.Segments.DirtyTracker(2), out size);
+            mc.Age = 3;
+            mc.LastName = "tetete";
+            mc.List[1] = MogeMoge.Orange;
+            mc.Mone = MogeMoge.Apple;
+            var bytes3 = ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), mc);
 
 
+            var block = bytes1.Concat(bytes2).Concat(bytes3).ToArray(); // slow:)
 
+            var a = ZeroFormatterSerializer.Deserialize<MyClass>(block);
+            var b = ZeroFormatterSerializer.Deserialize<MyClass>(block, bytes1.Length);
+            var c = ZeroFormatterSerializer.Deserialize<MyClass>(block, bytes1.Length + bytes2.Length);
 
-            
 
         }
     }

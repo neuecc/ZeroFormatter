@@ -78,6 +78,15 @@ namespace ZeroFormatter
             return formatter.Deserialize(ref bytes, 0, new DirtyTracker(0), out _);
         }
 
+        public static T Deserialize<T>(byte[] bytes, int offset)
+        {
+            var formatter = Formatter<T>.Default;
+            if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
+
+            int _;
+            return formatter.Deserialize(ref bytes, offset, new DirtyTracker(offset), out _);
+        }
+
         public static T Deserialize<T>(Stream stream)
         {
             var ms = stream as MemoryStream;
@@ -172,9 +181,14 @@ namespace ZeroFormatter
                 return serializes.GetOrAdd(type, t => new CompiledMethods(t)).deserialize1.Invoke(bytes);
             }
 
+            public static object Deserialize(Type type, byte[] bytes, int offset)
+            {
+                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).deserialize2.Invoke(bytes, offset);
+            }
+
             public static object Deserialize(Type type, Stream stream)
             {
-                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).deserialize2.Invoke(stream);
+                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).deserialize3.Invoke(stream);
             }
 
             public static object Convert(Type type, object obj)
@@ -195,7 +209,8 @@ namespace ZeroFormatter
                 public readonly RefSerialize serialize2;
                 public readonly Action<object, Stream> serialize3;
                 public readonly Func<byte[], object> deserialize1;
-                public readonly Func<Stream, object> deserialize2;
+                public readonly Func<byte[], int, object> deserialize2;
+                public readonly Func<Stream, object> deserialize3;
                 public readonly Func<object, object> convert;
 
                 public CompiledMethods(Type type)
@@ -261,6 +276,17 @@ namespace ZeroFormatter
                         this.deserialize1 = lambda;
                     }
                     {
+                        // public static T Deserialize<T>(byte[] bytes, int offset)
+                        var deserialize = methods.First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2).MakeGenericMethod(type);
+
+                        var param1 = Expression.Parameter(typeof(byte[]), "bytes");
+                        var param2 = Expression.Parameter(typeof(int), "offset");
+                        var body = Expression.Convert(Expression.Call(deserialize, param1, param2), typeof(object));
+                        var lambda = Expression.Lambda<Func<byte[], int, object>>(body, param1, param2).Compile();
+
+                        this.deserialize2 = lambda;
+                    }
+                    {
                         // public static T Deserialize<T>(Stream stream)
                         var deserialize = methods.First(x => x.Name == "Deserialize" && x.GetParameters()[0].ParameterType == typeof(Stream)).MakeGenericMethod(type);
 
@@ -268,7 +294,7 @@ namespace ZeroFormatter
                         var body = Expression.Convert(Expression.Call(deserialize, param1), typeof(object));
                         var lambda = Expression.Lambda<Func<Stream, object>>(body, param1).Compile();
 
-                        this.deserialize2 = lambda;
+                        this.deserialize3 = lambda;
                     }
 
                     {

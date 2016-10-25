@@ -30,6 +30,11 @@ namespace ZeroFormatter.Tests
                 ((int)ZeroFormatterSerializer.NonGeneric.Convert(typeof(int), 9999)).Is(9999);
 
                 ZeroFormatterSerializer.NonGeneric.IsFormattedObject(9999).IsFalse();
+
+                ms = new MemoryStream();
+                ms.Position = 5;
+                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(int), 444, ms);
+                ((int)ZeroFormatterSerializer.NonGeneric.Deserialize(typeof(int), ms.ToArray(), 5)).Is(444);
             }
 
             {
@@ -50,6 +55,11 @@ namespace ZeroFormatter.Tests
 
                 ZeroFormatterSerializer.NonGeneric.IsFormattedObject(new MyClass()).IsFalse();
                 ZeroFormatterSerializer.NonGeneric.IsFormattedObject(converted).IsTrue();
+
+                ms = new MemoryStream();
+                ms.Position = 5;
+                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), new MyClass { Age = 3333 }, ms);
+                ((MyClass)ZeroFormatterSerializer.NonGeneric.Deserialize(typeof(MyClass), ms.ToArray(), 5)).Age.Is(3333);
             }
         }
     }

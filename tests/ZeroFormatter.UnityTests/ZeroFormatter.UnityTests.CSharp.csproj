@@ -83,6 +83,7 @@
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\Assert.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\ChainingAssertion.Unity.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\UnitTestRunner.cs" />
+    <Compile Include="Assets\Scripts\Tests\BlockSerializeTest.cs" />
     <Compile Include="Assets\Scripts\Tests\InheritanceTest.cs" />
     <Compile Include="Assets\Scripts\Tests\OffsetTest.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Shim.cs" />

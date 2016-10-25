@@ -65,6 +65,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="BlockSerializeTest.cs" />
     <Compile Include="ChainingAssertion.MSTest.cs" />
     <Compile Include="InheritanceTest.cs" />
     <Compile Include="KeyTupleFormatterTest.cs" />
@@ -88,6 +89,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\sandbox\Sandbox.Shared\Sandbox.Shared.csproj">
+      <Project>{944F22D3-20B1-4F6D-83FA-9331CD4ADF75}</Project>
+      <Name>Sandbox.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\ZeroFormatter.Interfaces\ZeroFormatter.Interfaces.csproj">
       <Project>{c051f473-427f-4062-94fb-cae3fa460fc8}</Project>
       <Name>ZeroFormatter.Interfaces</Name>
