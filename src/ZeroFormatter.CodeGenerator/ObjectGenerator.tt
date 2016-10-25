@@ -9,7 +9,7 @@
 #pragma warning disable 168
 namespace <#= Namespace #>
 {
-    using System;
+    using global::System;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;

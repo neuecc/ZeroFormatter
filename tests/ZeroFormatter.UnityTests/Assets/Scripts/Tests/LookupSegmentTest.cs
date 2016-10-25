@@ -1,21 +1,18 @@
 ﻿using System;
+using RuntimeUnitTestToolkit;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using ZeroFormatter.Segments;
+
+
 
 namespace ZeroFormatter.Tests
 {
     [TestClass]
     public class LookupSegmentTest
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new LookupSegmentTest();
-
-            UnitTestRoot.AddTest("LookupSegmentTest", "LookupSegment", test.LookupSegment);
-        }
-
+        
         [TestMethod]
         public void LookupSegment()
         {

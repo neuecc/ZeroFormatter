@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RuntimeUnitTestToolkit;
+
 using System;
 using System.IO;
 using System.Text;
@@ -9,13 +11,6 @@ namespace ZeroFormatter.Tests
     [TestClass]
     public class StringSegmentTest
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new StringSegmentTest();
-
-            UnitTestRoot.AddTest("StringSegmentTest", "String", test.String);
-        }
 
         [TestMethod]
         public void String()

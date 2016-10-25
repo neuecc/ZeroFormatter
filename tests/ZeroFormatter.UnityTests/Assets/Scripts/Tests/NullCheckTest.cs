@@ -1,4 +1,6 @@
 ﻿using System;
+using RuntimeUnitTestToolkit;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +10,7 @@ namespace ZeroFormatter.Tests
     [TestClass]
     public class NullCheckTest
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new NullCheckTest();
-
-            UnitTestRoot.AddTest("NullCheckTest", "NullCheck", test.NullCheck);
-            UnitTestRoot.AddTest("NullCheckTest", "NullCheck2", test.NullCheck2);
-        }
+ 
 
         [TestMethod]
         public void NullCheck()

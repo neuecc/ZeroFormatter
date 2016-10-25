@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>ZeroFormatter</id>
-        <version>0.1.5</version>
+        <version>0.1.6</version>
         <title>ZeroFormatter</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
@@ -17,10 +17,10 @@
         </frameworkAssemblies>
         <dependencies>
             <group targetFramework=".NETFramework4.5">
-                <dependency id="ZeroFormatter.Interfaces" version="0.1.5" />
+                <dependency id="ZeroFormatter.Interfaces" version="0.1.6" />
             </group>
             <group targetFramework=".NETStandard1.6">
-                <dependency id="ZeroFormatter.Interfaces" version="0.1.5" />
+                <dependency id="ZeroFormatter.Interfaces" version="0.1.6" />
                 <dependency id="System.Reflection.Emit" version="4.0.1" />
                 <dependency id="System.Runtime" version="4.1.0" />
                 <dependency id="System.Runtime.Extensions" version="4.1.0" />

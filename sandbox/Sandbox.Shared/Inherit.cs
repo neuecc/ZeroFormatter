@@ -18,5 +18,11 @@ namespace Sandbox.Shared
     {
         [Index(1)]
         public virtual int MyProperty1 { get; set; }
+
+
+        [Index(2)]
+        public virtual TypeCode MyProperty2 { get; set; }
     }
+
+    
 }

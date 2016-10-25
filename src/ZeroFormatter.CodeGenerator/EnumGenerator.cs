@@ -36,9 +36,9 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write("\r\n{\r\n    using System;\r\n    using System.Collections.Generic;\r\n    using global::" +
-                    "ZeroFormatter.Formatters;\r\n    using global::ZeroFormatter.Internal;\r\n    using " +
-                    "global::ZeroFormatter.Segments;\r\n\r\n");
+            this.Write("\r\n{\r\n    using global::System;\r\n    using global::System.Collections.Generic;\r\n  " +
+                    "  using global::ZeroFormatter.Formatters;\r\n    using global::ZeroFormatter.Inter" +
+                    "nal;\r\n    using global::ZeroFormatter.Segments;\r\n\r\n");
             
             #line 18 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
  foreach(var t in Types) {  

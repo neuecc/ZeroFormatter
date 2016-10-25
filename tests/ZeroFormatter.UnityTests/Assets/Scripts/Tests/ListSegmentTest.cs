@@ -3,21 +3,13 @@ using System;
 using System.Collections.Generic;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
+using RuntimeUnitTestToolkit;
 
 namespace ZeroFormatter.Tests
 {
     [TestClass]
     public class ListSegmentTest
     {
-
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new ListSegmentTest();
-
-            UnitTestRoot.AddTest("ListSegmentTest", "FixedListSegment", test.FixedListSegment);
-            UnitTestRoot.AddTest("ListSegmentTest", "VariableListSegment", test.VariableListSegment);
-        }
 
         FixedListSegment<int> CreateFixedList(DirtyTracker tracker)
         {

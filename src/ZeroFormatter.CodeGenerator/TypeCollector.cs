@@ -20,86 +20,79 @@ namespace ZeroFormatter.CodeGenerator
                 typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly);
 
         ILookup<TypeKind, INamedTypeSymbol> targetTypes;
+        List<EnumType> enumContainer;
+        List<ObjectSegmentType> objectContainer;
+        List<GenericType> genericTypeContainer;
+        HashSet<string> alreadyCollected;
 
         public TypeCollector(string csProjPath)
         {
             this.csProjPath = csProjPath;
 
-            // Collect immediate:)
             var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath).GetAwaiter().GetResult();
-            this.targetTypes = compilation.GetNamedTypeSymbols()
+            targetTypes = compilation.GetNamedTypeSymbols()
                 .Where(x => (x.TypeKind == TypeKind.Enum)
                     || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null))
                 .ToLookup(x => x.TypeKind);
         }
 
-        public EnumGenerator[] CreateEnumGenerators()
+        void Init()
         {
-            var generator = targetTypes[TypeKind.Enum]
-                .GroupBy(x => x.ContainingNamespace.ToDisplayString())
-                .OrderBy(x => x.Key)
+            enumContainer = new List<CodeGenerator.EnumType>();
+            objectContainer = new List<CodeGenerator.ObjectSegmentType>();
+            genericTypeContainer = new List<CodeGenerator.GenericType>();
+            alreadyCollected = new HashSet<string>();
+        }
+
+        public void Visit(out EnumGenerator[] enumGenerators, out ObjectGenerator[] objectGenerators, out GenericType[] genericTypes)
+        {
+            Init(); // cleanup field.
+
+            foreach (var item in targetTypes[TypeKind.Enum])
+            {
+                CollectEnum(item);
+            }
+            foreach (var item in targetTypes[TypeKind.Class])
+            {
+                CollectObjectSegment(item);
+            }
+
+            enumGenerators = enumContainer.Distinct()
+               .GroupBy(x => x.Namespace)
+               .OrderBy(x => x.Key)
                 .Select(x => new EnumGenerator
                 {
                     Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
-                    Types = x.Select(y => new EnumType
-                    {
-                        Name = y.Name,
-                        FullName = y.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                        UnderlyingType = y.EnumUnderlyingType.ToDisplayString(binaryWriteFormat),
-                        Length = GetEnumSize(y.EnumUnderlyingType)
-                    })
-                    .ToArray()
+                    Types = x.ToArray()
                 })
                 .ToArray();
 
-            return generator;
+            objectGenerators = objectContainer.GroupBy(x => x.Namespace)
+               .Select(x => new ObjectGenerator
+               {
+                   Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
+                   Types = x.ToArray(),
+               })
+               .ToArray();
+
+            genericTypes = genericTypeContainer.Distinct().OrderBy(x => x).ToArray();
         }
 
-        public Tuple<ObjectGenerator[], GenericType[]> CreateObjectGenerators()
+        void CollectEnum(INamedTypeSymbol symbol)
         {
-            var container = new List<ObjectSegmentType>();
-            var genericTypeContainer = new List<GenericType>();
-            var alreadyCollected = new HashSet<string>();
-
-            foreach (var item in targetTypes[TypeKind.Class])
+            var type = new EnumType
             {
-                CollectObjectSegment(item, container, genericTypeContainer, alreadyCollected);
-            }
+                Name = symbol.Name,
+                FullName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                Namespace = symbol.ContainingNamespace.ToDisplayString(),
+                UnderlyingType = symbol.EnumUnderlyingType.ToDisplayString(binaryWriteFormat),
+                Length = GetEnumSize(symbol.EnumUnderlyingType)
+            };
 
-            var generator = container.GroupBy(x => x.Namespace)
-                .Select(x => new ObjectGenerator
-                {
-                    Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
-                    Types = x.ToArray(),
-                })
-                .ToArray();
-
-            var t = Tuple.Create(generator, genericTypeContainer.Distinct().OrderBy(x => x.Type).ToArray());
-            return t;
+            enumContainer.Add(type);
         }
 
-        static int GetEnumSize(INamedTypeSymbol enumUnderlyingType)
-        {
-            switch (enumUnderlyingType.SpecialType)
-            {
-                case SpecialType.System_SByte:
-                case SpecialType.System_Byte:
-                    return 1;
-                case SpecialType.System_Int16:
-                case SpecialType.System_UInt16:
-                    return 2;
-                case SpecialType.System_Int32:
-                case SpecialType.System_UInt32:
-                    return 4;
-                case SpecialType.System_Int64:
-                case SpecialType.System_UInt64:
-                    return 8;
-                default:
-                    throw new ArgumentException("UnderlyingType is not Enum. :" + enumUnderlyingType?.ToDisplayString());
-            }
-        }
-
-        static void CollectObjectSegment(INamedTypeSymbol type, List<ObjectSegmentType> typeContainer, List<GenericType> genericTypeContainer, HashSet<string> alreadyCollected)
+        void CollectObjectSegment(INamedTypeSymbol type)
         {
             if (type == null)
             {
@@ -115,6 +108,7 @@ namespace ZeroFormatter.CodeGenerator
             }
             if (type.TypeKind == TypeKind.Enum)
             {
+                CollectEnum(type);
                 return;
             }
             if (type.IsGenericType)
@@ -124,7 +118,7 @@ namespace ZeroFormatter.CodeGenerator
 
                 if (genericTypeString == "T?")
                 {
-                    CollectObjectSegment(type.TypeArguments[0] as INamedTypeSymbol, typeContainer, genericTypeContainer, alreadyCollected);
+                    CollectObjectSegment(type.TypeArguments[0] as INamedTypeSymbol);
                     return;
                 }
                 else if (genericTypeString == "System.Collections.Generic.List<>")
@@ -163,7 +157,7 @@ namespace ZeroFormatter.CodeGenerator
 
                     foreach (var t in type.TypeArguments)
                     {
-                        CollectObjectSegment(t as INamedTypeSymbol, typeContainer, genericTypeContainer, alreadyCollected);
+                        CollectObjectSegment(t as INamedTypeSymbol);
                     }
                     return;
                 }
@@ -181,7 +175,6 @@ namespace ZeroFormatter.CodeGenerator
             {
                 throw new Exception($"Type must needs parameterless constructor. {type.Name}. Location:{type.Locations[0]}");
             }
-
 
             var list = new List<ObjectSegmentType.PropertyTuple>();
 
@@ -244,7 +237,7 @@ namespace ZeroFormatter.CodeGenerator
                     if (namedType != null) // if <T> is unnamed type, it can't analyze.
                     {
                         // Recursive
-                        CollectObjectSegment(namedType, typeContainer, genericTypeContainer, alreadyCollected);
+                        CollectObjectSegment(namedType);
                     }
                 }
 
@@ -264,7 +257,7 @@ namespace ZeroFormatter.CodeGenerator
                 list.Add(prop);
             }
 
-            typeContainer.Add(new ObjectSegmentType
+            objectContainer.Add(new ObjectSegmentType
             {
                 Name = type.Name,
                 FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
@@ -272,6 +265,27 @@ namespace ZeroFormatter.CodeGenerator
                 LastIndex = list.Select(x => x.Index).DefaultIfEmpty(0).Max(),
                 Properties = list.OrderBy(x => x.Index).ToArray(),
             });
+        }
+
+        static int GetEnumSize(INamedTypeSymbol enumUnderlyingType)
+        {
+            switch (enumUnderlyingType.SpecialType)
+            {
+                case SpecialType.System_SByte:
+                case SpecialType.System_Byte:
+                    return 1;
+                case SpecialType.System_Int16:
+                case SpecialType.System_UInt16:
+                    return 2;
+                case SpecialType.System_Int32:
+                case SpecialType.System_UInt32:
+                    return 4;
+                case SpecialType.System_Int64:
+                case SpecialType.System_UInt64:
+                    return 8;
+                default:
+                    throw new ArgumentException("UnderlyingType is not Enum. :" + enumUnderlyingType?.ToDisplayString());
+            }
         }
     }
 }

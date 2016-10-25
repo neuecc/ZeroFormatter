@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RuntimeUnitTestToolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,6 @@ namespace ZeroFormatter.Tests
     [TestClass]
     public class DictionaryFormatterTest
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new DictionaryFormatterTest();
-
-            UnitTestRoot.AddTest("DictionaryFormatterTest", "DictionarySerialize", test.DictionarySerialize);
-        }
-
         [TestMethod]
         public void DictionarySerialize()
         {

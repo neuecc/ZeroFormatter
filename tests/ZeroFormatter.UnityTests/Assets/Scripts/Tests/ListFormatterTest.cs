@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using RuntimeUnitTestToolkit;
 
 namespace ZeroFormatter.Tests
 {
@@ -10,21 +11,11 @@ namespace ZeroFormatter.Tests
     public class ListFormatterTest
     {
 
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new ListFormatterTest();
-
-            UnitTestRoot.AddTest("ListFormatterTest", "ArrayCannotSerialize", test.ArrayCannotSerialize);
-            UnitTestRoot.AddTest("ListFormatterTest", "FixedList", test.FixedList);
-            UnitTestRoot.AddTest("ListFormatterTest", "VariableList", test.VariableList);
-        }
-
         [TestMethod]
         public void ArrayCannotSerialize()
         {
             var xs = new[] { 12, 431, 426, 76, 373, 7, 53, 563, 563 };
-            AssertEx.Catch<Exception>(() => ZeroFormatterSerializer.Serialize(xs)).Message.Contains("Array does not support");
+            Assert.Catch<Exception>(() => ZeroFormatterSerializer.Serialize(xs)).Message.Contains("Array does not support");
         }
 
         [TestMethod]
@@ -56,7 +47,7 @@ namespace ZeroFormatter.Tests
             {
                 IList<int> xs = new int[0];
                 var result = ZeroFormatterSerializer.Serialize(xs);
-                ZeroFormatterSerializer.Deserialize<IList<int>>(result).IsZero();
+                ZeroFormatterSerializer.Deserialize<IList<int>>(result).IsEmpty();
             }
         }
 

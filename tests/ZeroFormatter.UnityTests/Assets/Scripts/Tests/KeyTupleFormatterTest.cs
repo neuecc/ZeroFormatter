@@ -2,20 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RuntimeUnitTestToolkit;
 
 namespace ZeroFormatter.Tests
 {
     [TestClass]
     public class KeyTupleFormatterTest
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new KeyTupleFormatterTest();
-
-            UnitTestRoot.AddTest("KeyTupleFormatterTest", "KeyTupleFormatter", test.KeyTupleFormatter);
-        }
-
+      
         [TestMethod]
         public void KeyTupleFormatter()
         {

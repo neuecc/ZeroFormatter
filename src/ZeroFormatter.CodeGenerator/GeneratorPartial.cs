@@ -12,12 +12,23 @@ namespace ZeroFormatter.CodeGenerator
         public EnumType[] Types { get; set; }
     }
 
-    public class EnumType
+    public class EnumType : IEquatable<EnumType>
     {
         public string Name { get; set; }
         public string FullName { get; set; }
+        public string Namespace { get; set; }
         public string UnderlyingType { get; set; }
         public int Length { get; set; }
+
+        public bool Equals(EnumType other)
+        {
+            return FullName == other.FullName;
+        }
+
+        public override int GetHashCode()
+        {
+            return FullName.GetHashCode();
+        }
     }
 
 
@@ -75,20 +86,24 @@ namespace ZeroFormatter.CodeGenerator
         public bool UnuseUnityAttribute { get; set; }
     }
 
-    public class GenericType : IEqualityComparer<GenericType>
+    public class GenericType : IEquatable<GenericType>, IComparable<GenericType>
     {
         public GenericTypeKind TypeKind { get; set; }
-        public string Type { get; set; }
         public string ElementTypes { get; set; } // ", " joined
 
-        public bool Equals(GenericType x, GenericType y)
+        public bool Equals(GenericType other)
         {
-            return (x.TypeKind == y.TypeKind) && (x.Type == y.Type);
+            return (this.TypeKind == other.TypeKind) && (this.ElementTypes == other.ElementTypes);
         }
 
-        public int GetHashCode(GenericType obj)
+        public override int GetHashCode()
         {
-            return Tuple.Create(obj.TypeKind, obj.Type).GetHashCode();
+            return Tuple.Create(this.TypeKind, this.ElementTypes).GetHashCode();
+        }
+
+        public int CompareTo(GenericType other)
+        {
+            return Comparer<Tuple<GenericTypeKind, string>>.Default.Compare(Tuple.Create(TypeKind, ElementTypes), Tuple.Create(other.TypeKind, other.ElementTypes));
         }
     }
 

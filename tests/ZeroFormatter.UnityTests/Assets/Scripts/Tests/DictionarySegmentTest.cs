@@ -8,19 +8,14 @@ using ZeroFormatter.Comparers;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
+using RuntimeUnitTestToolkit;
 
 namespace ZeroFormatter.Tests
 {
     [TestClass]
     public class DictionarySegmentTest
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new DictionarySegmentTest();
 
-            UnitTestRoot.AddTest("DictionarySegmentTest", "DictionarySegment", test.DictionarySegment);
-        }
 
         DictionarySegment<int, string> CreateFresh()
         {
@@ -72,7 +67,7 @@ namespace ZeroFormatter.Tests
 
             dict.Clear();
             dict.Count.Is(0);
-            dict.ToArray().IsZero();
+            dict.ToArray().IsEmpty();
             dict.Add(1234, "aaaa");
             dict.Add(-1, "mainus one");
             dict.Add(9991, "hogehoge one");

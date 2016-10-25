@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RuntimeUnitTestToolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,31 +10,7 @@ namespace ZeroFormatter.Tests
     // bool, byte, sbyte, float, double, short, ushort, int uint, long, ulong) + Nullable
     public class FormatterTest
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new FormatterTest();
-
-            UnitTestRoot.AddTest("FormatterTest", "Bool", test.Bool);
-            UnitTestRoot.AddTest("FormatterTest", "Byte", test.Byte);
-            UnitTestRoot.AddTest("FormatterTest", "SByte", test.SByte);
-            UnitTestRoot.AddTest("FormatterTest", "Float", test.Float);
-            UnitTestRoot.AddTest("FormatterTest", "Double", test.Double);
-            UnitTestRoot.AddTest("FormatterTest", "Short", test.Short);
-            UnitTestRoot.AddTest("FormatterTest", "UShort", test.UShort);
-            UnitTestRoot.AddTest("FormatterTest", "Int", test.Int);
-            UnitTestRoot.AddTest("FormatterTest", "UInt", test.UInt);
-            UnitTestRoot.AddTest("FormatterTest", "Long", test.Long);
-            UnitTestRoot.AddTest("FormatterTest", "ULong", test.ULong);
-            UnitTestRoot.AddTest("FormatterTest", "String", test.String);
-            UnitTestRoot.AddTest("FormatterTest", "Char", test.Char);
-            UnitTestRoot.AddTest("FormatterTest", "Decimal", test.Decimal);
-            UnitTestRoot.AddTest("FormatterTest", "Timespan", test.TimeSpan);
-            UnitTestRoot.AddTest("FormatterTest", "Datetime", test.Datetime);
-            UnitTestRoot.AddTest("FormatterTest", "ByteArray", test.ByteArray);
-            UnitTestRoot.AddTest("FormatterTest", "EnumFormatTest", test.EnumFormatTest);
-        }
-
+   
         public void Bool()
         {
             {

@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RuntimeUnitTestToolkit;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +14,7 @@ namespace ZeroFormatter.Tests
     [TestClass]
     public class ObjectFormatterTest
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Register()
-        {
-            var test = new ObjectFormatterTest();
-
-            UnitTestRoot.AddTest("ObjectFormatterTest", "ObjectFormatter", test.ObjectFormatter);
-            UnitTestRoot.AddTest("ObjectFormatterTest", "SkipIndexTest", test.SkipIndexTest);
-            UnitTestRoot.AddTest("ObjectFormatterTest", "BinaryDoubleWrite", test.BinaryDoubleWrite);
-        }
-
+        
 
         [TestMethod]
         public void ObjectFormatter()

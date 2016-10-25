@@ -4,9 +4,9 @@
 #pragma warning disable 168
 namespace ZeroFormatter.Internal
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Linq;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
@@ -30,6 +30,9 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Foo.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMoge2Formatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Foo.MogeMoge2?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.NullableMogeMoge2Formatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMoge2EqualityComparer());
+            ZeroFormatter.Formatters.Formatter<global::System.TypeCode>.Register(new ZeroFormatter.DynamicObjectSegments.System.TypeCodeFormatter());
+            ZeroFormatter.Formatters.Formatter<global::System.TypeCode?>.Register(new ZeroFormatter.DynamicObjectSegments.System.NullableTypeCodeFormatter());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::System.TypeCode>.Register(new ZeroFormatter.DynamicObjectSegments.System.TypeCodeEqualityComparer());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.IntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.IntEnumFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.IntEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableIntEnumFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.IntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.IntEnumEqualityComparer());
@@ -71,15 +74,15 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.RecMyClass>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.RecMyClassFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.KeyTupleCheck>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.KeyTupleCheckFormatter());
             // Generics
+            ZeroFormatter.Formatters.GenericFormatter.RegisterKeyTuple<int, string>();
             ZeroFormatter.Formatters.GenericFormatter.RegisterList<global::Sandbox.Shared.Bar.MogeMoge>();
             ZeroFormatter.Formatters.GenericFormatter.RegisterList<global::Sandbox.Shared.Foo.MogeMoge>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<int, string>();
             ZeroFormatter.Formatters.GenericFormatter.RegisterList<int>();
             ZeroFormatter.Formatters.GenericFormatter.RegisterList<string>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterLookup<bool, int>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<string, int>();
             ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterKeyTuple<int, string>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<int, string>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<string, int>();
+            ZeroFormatter.Formatters.GenericFormatter.RegisterLookup<bool, int>();
         }
     }
 }
@@ -93,7 +96,7 @@ namespace ZeroFormatter.Internal
 #pragma warning disable 168
 namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
 {
-    using System;
+    using global::System;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
@@ -459,7 +462,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
 #pragma warning disable 168
 namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
 {
-    using System;
+    using global::System;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
@@ -825,7 +828,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
 #pragma warning disable 168
 namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 {
-    using System;
+    using global::System;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
@@ -960,11 +963,12 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             {
                 var startOffset = offset;
 
-                offset += (8 + 4 * (1 + 1));
+                offset += (8 + 4 * (2 + 1));
                 offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty0);
                 offset += ObjectSegmentHelper.SerialzieFromFormatter<int>(ref bytes, startOffset, offset, 1, value.MyProperty1);
+                offset += ObjectSegmentHelper.SerialzieFromFormatter<global::System.TypeCode>(ref bytes, startOffset, offset, 2, value.MyProperty2);
 
-                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 1);
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 2);
             }
         }
 
@@ -982,7 +986,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 
     public class InheritObjectSegment : global::Sandbox.Shared.Inherit, IZeroFormatterSegment
     {
-        static readonly int[] __elementSizes = new int[]{ 4, 4 };
+        static readonly int[] __elementSizes = new int[]{ 4, 4, 4 };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
@@ -1016,6 +1020,19 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             }
         }
 
+        // 2
+        public override global::System.TypeCode MyProperty2
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<global::System.TypeCode>(__originalBytes, 2, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<global::System.TypeCode>(__originalBytes, 2, __binaryLastIndex, __extraFixedBytes, value);
+            }
+        }
+
 
         public InheritObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
@@ -1026,7 +1043,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
             this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
 
-            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 1, __elementSizes);
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 2, __elementSizes);
 
         }
 
@@ -1045,12 +1062,13 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             if (__extraFixedBytes != null || __tracker.IsDirty)
             {
                 var startOffset = offset;
-                offset += (8 + 4 * (1 + 1));
+                offset += (8 + 4 * (2 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes);
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 1, __binaryLastIndex, __originalBytes, __extraFixedBytes);
+                offset += ObjectSegmentHelper.SerializeFixedLength<global::System.TypeCode>(ref targetBytes, startOffset, offset, 2, __binaryLastIndex, __originalBytes, __extraFixedBytes);
 
-                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 2);
             }
             else
             {
@@ -1072,7 +1090,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 #pragma warning disable 168
 namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 {
-    using System;
+    using global::System;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
@@ -2378,8 +2396,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 #pragma warning disable 168
 namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
 {
-    using System;
-    using System.Collections.Generic;
+    using global::System;
+    using global::System.Collections.Generic;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
@@ -2526,8 +2544,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
 #pragma warning disable 168
 namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
 {
-    using System;
-    using System.Collections.Generic;
+    using global::System;
+    using global::System.Collections.Generic;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
@@ -2672,10 +2690,93 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 168
+namespace ZeroFormatter.DynamicObjectSegments.System
+{
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
+
+
+    public class TypeCodeFormatter : Formatter<global::System.TypeCode>
+    {
+        public override int? GetLength()
+        {
+            return 4;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::System.TypeCode value)
+        {
+            return BinaryUtil.WriteInt32(ref bytes, offset, (Int32)value);
+        }
+
+        public override global::System.TypeCode Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 4;
+            return (global::System.TypeCode)BinaryUtil.ReadInt32(ref bytes, offset);
+        }
+    }
+
+    public class NullableTypeCodeFormatter : Formatter<global::System.TypeCode?>
+    {
+        public override int? GetLength()
+        {
+            return 5;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::System.TypeCode? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset + 1, (Int32)value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
+            }
+
+            return 5;
+        }
+
+        public override global::System.TypeCode? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 5;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
+
+            return (global::System.TypeCode)BinaryUtil.ReadInt32(ref bytes, offset + 1);
+        }
+    }
+
+    public class TypeCodeEqualityComparer : IEqualityComparer<global::System.TypeCode>
+    {
+        public bool Equals(global::System.TypeCode x, global::System.TypeCode y)
+        {
+            return (Int32)x == (Int32)y;
+        }
+
+        public int GetHashCode(global::System.TypeCode x)
+        {
+            return (int)x;
+        }
+    }
+
+
+}
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
 namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 {
-    using System;
-    using System.Collections.Generic;
+    using global::System;
+    using global::System.Collections.Generic;
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
