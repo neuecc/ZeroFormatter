@@ -235,7 +235,7 @@ namespace ZeroFormatter.Analyzer
             if (callFromProperty == null)
             {
                 var definedIndexes = new HashSet<int>();
-                foreach (var member in type.GetMembers().OfType<IPropertySymbol>())
+                foreach (var member in type.GetAllMembers().OfType<IPropertySymbol>())
                 {
                     VerifyProperty(context, member, alreadyAnalyzed, definedIndexes);
                 }

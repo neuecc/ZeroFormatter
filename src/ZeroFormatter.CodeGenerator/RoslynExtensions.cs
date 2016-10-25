@@ -28,7 +28,7 @@ namespace ZeroFormatter.CodeGenerator
 
                 var csProjRoot = Path.GetDirectoryName(csprojPath);
                 var framworkRoot = Path.GetDirectoryName(typeof(object).Assembly.Location);
-                
+
                 foreach (var item in xElem.Descendants(ns + "Reference"))
                 {
                     var hintPath = item.Element(ns + "HintPath")?.Value;
@@ -142,6 +142,19 @@ namespace ZeroFormatter.CodeGenerator
                 }
             }
             return false;
+        }
+
+        public static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol)
+        {
+            var t = symbol;
+            while (t != null)
+            {
+                foreach (var item in t.GetMembers())
+                {
+                    yield return item;
+                }
+                t = t.BaseType;
+            }
         }
     }
 }

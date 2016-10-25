@@ -186,7 +186,8 @@ namespace ZeroFormatter.CodeGenerator
             var list = new List<ObjectSegmentType.PropertyTuple>();
 
             var definedIndexes = new HashSet<int>();
-            foreach (var property in type.GetMembers().OfType<IPropertySymbol>())
+
+            foreach (var property in type.GetAllMembers().OfType<IPropertySymbol>())
             {
                 if (property.DeclaredAccessibility != Accessibility.Public)
                 {
@@ -269,7 +270,7 @@ namespace ZeroFormatter.CodeGenerator
                 FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 Namespace = type.ContainingNamespace.ToDisplayString(),
                 LastIndex = list.Select(x => x.Index).DefaultIfEmpty(0).Max(),
-                Properties = list.ToArray(),
+                Properties = list.OrderBy(x => x.Index).ToArray(),
             });
         }
     }

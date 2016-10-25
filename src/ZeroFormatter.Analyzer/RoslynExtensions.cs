@@ -89,5 +89,18 @@ namespace ZeroFormatter.Analyzer
                 .First()
                 .WithFormat();
         }
+
+        public static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol)
+        {
+            var t = symbol;
+            while (t != null)
+            {
+                foreach (var item in t.GetMembers())
+                {
+                    yield return item;
+                }
+                t = t.BaseType;
+            }
+        }
     }
 }

@@ -42,7 +42,7 @@ namespace ZeroFormatter.Analyzer
 
             var targetType = model.GetDeclaredSymbol(property)?.ContainingType;
             if (targetType == null) return;
-            if (targetType.GetMembers().Length == 0) return;
+            if (!targetType.GetAllMembers().OfType<IPropertySymbol>().Any()) return;
 
             var action = CodeAction.Create("Add IndexAttribute and Set 'virtual'", c => AddIndexAttributeAndSetVirtual(context.Document, targetType, c));
 
@@ -53,7 +53,7 @@ namespace ZeroFormatter.Analyzer
         {
             var editor = await DocumentEditor.CreateAsync(document);
 
-            var targets = type.GetMembers().OfType<IPropertySymbol>()
+            var targets = type.GetAllMembers().OfType<IPropertySymbol>()
                 .Where(x => x.GetAttributes().FindAttributeShortName(ZeroFormatterAnalyzer.IgnoreShortName) == null)
                 .ToArray();
 
