@@ -1,10 +1,12 @@
 ﻿#if !UNITY
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 
@@ -14,11 +16,21 @@ namespace ZeroFormatter.Formatters
 
     internal static class DynamicObjectDescriptor
     {
-        public static Tuple<int, PropertyInfo>[] GetProperties(Type type)
+        public static Tuple<int, PropertyInfo>[] GetProperties(Type type, bool isClass)
         {
-            if (!type.GetTypeInfo().IsClass)
+            if (isClass)
             {
-                throw new InvalidOperationException("Type must be class. " + type.Name);
+                if (!type.GetTypeInfo().IsClass)
+                {
+                    throw new InvalidOperationException("Type must be class. " + type.Name);
+                }
+            }
+            else
+            {
+                if (!type.GetTypeInfo().IsValueType)
+                {
+                    throw new InvalidOperationException("Type must be class. " + type.Name);
+                }
             }
 
             if (type.GetTypeInfo().GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() == null)
@@ -26,9 +38,12 @@ namespace ZeroFormatter.Formatters
                 throw new InvalidOperationException("Type must mark ZeroFormattableAttribute. " + type.Name);
             }
 
-            if (!type.GetTypeInfo().GetConstructors().Any(x => x.GetParameters().Length == 0))
+            if (isClass)
             {
-                throw new InvalidOperationException("Type must needs parameterless constructor. " + type.Name);
+                if (!type.GetTypeInfo().GetConstructors().Any(x => x.GetParameters().Length == 0))
+                {
+                    throw new InvalidOperationException("Type must needs parameterless constructor. " + type.Name);
+                }
             }
 
             var dict = new Dictionary<int, PropertyInfo>();
@@ -50,9 +65,12 @@ namespace ZeroFormatter.Formatters
                     throw new InvalidOperationException("Public property's accessor must needs both public/protected get and set." + type.Name + "." + item.Name);
                 }
 
-                if (!getMethod.IsVirtual || !setMethod.IsVirtual)
+                if (isClass)
                 {
-                    throw new InvalidOperationException("Public property's accessor must be virtual. " + type.Name + "." + item.Name);
+                    if (!getMethod.IsVirtual || !setMethod.IsVirtual)
+                    {
+                        throw new InvalidOperationException("Public property's accessor must be virtual. " + type.Name + "." + item.Name);
+                    }
                 }
 
                 if (dict.ContainsKey(index.Index))
@@ -60,6 +78,7 @@ namespace ZeroFormatter.Formatters
                     throw new InvalidOperationException("IndexAttribute can not allow duplicate. " + type.Name + "." + item.Name + ", Index:" + index.Index);
                 }
 
+                VerifyProeprtyType(item);
                 dict[index.Index] = item;
             }
 
@@ -92,130 +111,396 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    public class DynamicObjectFormatter<T> : Formatter<T>
+    internal static class DynamicObjectFormatter
     {
-        internal delegate int PropertyDeserializer(ref byte[] bytes, int startOffset, int currentOffset, int index, T self);
-        internal delegate T FactoryFunc(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize);
-
-        readonly int lastIndex;
-        readonly Tuple<int, PropertyDeserializer>[] deserializers;
-        readonly FactoryFunc factory;
-
-        public DynamicObjectFormatter()
+        public static object Create<T>()
         {
-            // Create descriptor.
-            var type = typeof(T);
+            var t = typeof(T);
+            var ti = t.GetTypeInfo();
+            if (ti.IsValueType) throw new InvalidOperationException("Type must be Class. " + t.Name);
 
-            this.lastIndex = -1;
-            var list = new List<Tuple<int, PropertyDeserializer>>();
+            var properties = DynamicObjectDescriptor.GetProperties(t, true);
+            var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, t, properties);
+            var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
 
-            //BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * 1), offset);
-            //offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.LastName);
-            foreach (var p in DynamicObjectDescriptor.GetProperties(type))
+            return formatter;
+        }
+
+        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, Tuple<int, PropertyInfo>[] propertyInfos)
+        {
+            var typeBuilder = builder.DefineType(
+               DynamicAssemblyHolder.ModuleName + "." + elementType.FullName + "$Formatter",
+               TypeAttributes.Public,
+               typeof(Formatter<>).MakeGenericType(elementType));
+
+            // public override int? GetLength()
             {
-                var propInfo = p.Item2;
-                var index = p.Item1;
+                var method = typeBuilder.DefineMethod("GetLength", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    typeof(int?),
+                    Type.EmptyTypes);
 
-                var propType = propInfo.PropertyType;
-                var formatterType = typeof(Formatter<>).MakeGenericType(propType);
-                var formatterGet = formatterType.GetTypeInfo().GetProperty("Default").GetGetMethod();
-                var serializeMethod = formatterType.GetTypeInfo().GetMethod("Serialize");
+                var il = method.GetILGenerator();
 
-                var headerSize = Expression.Constant(8, typeof(int));
-                var intSize = Expression.Constant(4, typeof(int));
-                var arg1 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
-                var arg2 = Expression.Parameter(typeof(int), "startOffset");
-                var arg3 = Expression.Parameter(typeof(int), "currentOffset");
-                var arg4 = Expression.Parameter(typeof(int), "index");
-                var arg5 = Expression.Parameter(type, "self");
+                il.DeclareLocal(typeof(int?));
 
-                var writeInt32 = Expression.Call(typeof(BinaryUtil).GetTypeInfo().GetMethod("WriteInt32"),
-                    arg1,
-                    Expression.Add(arg2, Expression.Add(headerSize, Expression.Multiply(intSize, arg4))),
-                    arg3);
+                il.Emit(OpCodes.Ldloca_S, (byte)0);
+                il.Emit(OpCodes.Initobj, typeof(int?));
+                il.Emit(OpCodes.Ldloc_0);
+                il.Emit(OpCodes.Ret);
+            }
+            // public override int Serialize(ref byte[] bytes, int offset, T value)
+            {
+                var method = typeBuilder.DefineMethod("Serialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    typeof(int),
+                    new Type[] { typeof(byte[]).MakeByRefType(), typeof(int), elementType });
 
-                var formatterSerialize = Expression.Call(Expression.Call(formatterGet), serializeMethod, arg1, arg3, Expression.Property(arg5, propInfo));
+                var il = method.GetILGenerator();
 
-                var body = Expression.Block(writeInt32, formatterSerialize);
-                var lambda = Expression.Lambda<PropertyDeserializer>(body, arg1, arg2, arg3, arg4, arg5);
-                var deserializerFunc = lambda.Compile();
+                var labelA = il.DefineLabel();
+                var labelB = il.DefineLabel();
+                il.DeclareLocal(typeof(IZeroFormatterSegment));
+                il.DeclareLocal(typeof(int));
 
-                list.Add(Tuple.Create(index, deserializerFunc));
+                il.Emit(OpCodes.Ldarg_3);
+                il.Emit(OpCodes.Isinst, typeof(IZeroFormatterSegment));
+                il.Emit(OpCodes.Stloc_0);
+                il.Emit(OpCodes.Ldloc_0);
+                il.Emit(OpCodes.Brfalse, labelA);
 
-                this.lastIndex = index;
+                // if(segment != null)
+                {
+                    il.Emit(OpCodes.Ldloc_0);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Call, typeof(IZeroFormatterSegment).GetTypeInfo().GetMethod("Serialize"));
+                    il.Emit(OpCodes.Ret);
+                }
+                // else if(value == null)
+                {
+                    il.MarkLabel(labelA);
+                    il.Emit(OpCodes.Ldarg_3);
+                    il.Emit(OpCodes.Brtrue, labelB);
+
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldc_I4_M1);
+                    il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("WriteInt32"));
+                    il.Emit(OpCodes.Pop);
+                    il.Emit(OpCodes.Ldc_I4_4);
+                    il.Emit(OpCodes.Ret);
+                }
+                // else
+                {
+                    il.MarkLabel(labelB);
+
+                    var schemaLastIndex = propertyInfos.Select(x => x.Item1).LastOrDefault();
+                    var calcedBeginOffset = 8 + (4 * (schemaLastIndex + 1));
+
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Stloc_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldc_I4, calcedBeginOffset);
+                    il.Emit(OpCodes.Add);
+                    il.Emit(OpCodes.Starg_S, (byte)2);
+                    foreach (var item in propertyInfos)
+                    {
+                        il.Emit(OpCodes.Ldarg_2);
+                        il.Emit(OpCodes.Ldarg_1);
+                        il.Emit(OpCodes.Ldloc_1);
+                        il.Emit(OpCodes.Ldarg_2);
+                        il.Emit(OpCodes.Ldc_I4, item.Item1);
+                        il.Emit(OpCodes.Ldarg_3);
+                        il.Emit(OpCodes.Callvirt, item.Item2.GetGetMethod());
+                        il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeFromFormatter").MakeGenericMethod(item.Item2.PropertyType));
+                        il.Emit(OpCodes.Add);
+                        il.Emit(OpCodes.Starg_S, (byte)2);
+                    }
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldloc_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldc_I4, schemaLastIndex);
+                    il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("WriteSize"));
+                    il.Emit(OpCodes.Ret);
+                }
+            }
+            // public override T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+            {
+                var method = typeBuilder.DefineMethod("Deserialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    elementType,
+                    new[] { typeof(byte[]).MakeByRefType(), typeof(int), typeof(DirtyTracker), typeof(int).MakeByRefType() });
+
+                var il = method.GetILGenerator();
+
+                il.DeclareLocal(typeof(ArraySegment<byte>));
+                var labelA = il.DefineLabel();
+
+                il.Emit(OpCodes.Ldarg_S, (byte)4);
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Ldarg_2);
+                il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("ReadInt32"));
+                il.Emit(OpCodes.Stind_I4);
+
+                il.Emit(OpCodes.Ldarg_S, (byte)4);
+                il.Emit(OpCodes.Ldind_I4);
+                il.Emit(OpCodes.Ldc_I4_M1);
+                il.Emit(OpCodes.Bne_Un_S, labelA);
+
+                // if...
+                {
+                    il.Emit(OpCodes.Ldarg_S, (byte)4);
+                    il.Emit(OpCodes.Ldc_I4_4);
+                    il.Emit(OpCodes.Stind_I4);
+                    il.Emit(OpCodes.Ldnull);
+                    il.Emit(OpCodes.Ret);
+                }
+                // else...
+                {
+                    il.MarkLabel(labelA);
+
+                    il.Emit(OpCodes.Ldloca_S, (byte)0);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldind_Ref);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldarg_S, (byte)4);
+                    il.Emit(OpCodes.Ldind_I4);
+                    il.Emit(OpCodes.Call, typeof(ArraySegment<byte>).GetTypeInfo().GetConstructor(new[] { typeof(byte[]), typeof(int), typeof(int) }));
+
+                    il.Emit(OpCodes.Ldarg_3);
+                    il.Emit(OpCodes.Ldloc_0);
+                    var ti = typeof(DynamicObjectSegmentBuilder<>).MakeGenericType(elementType).GetTypeInfo().GetMethod("GetProxyType").Invoke(null, null) as TypeInfo;
+                    il.Emit(OpCodes.Newobj, ti.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) }));
+                    il.Emit(OpCodes.Ret);
+                }
             }
 
-            this.deserializers = list.ToArray();
+            return typeBuilder.CreateTypeInfo();
+        }
+    }
 
-            // create factory
-            // new MyClass_ObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+    public static class DynamicStructFormatter
+    {
+        // create dynamic struct Formatter<T>
+        public static object Create<T>()
+        {
+            var t = typeof(T);
+            var ti = t.GetTypeInfo();
+            if (!ti.IsValueType) throw new InvalidOperationException("Type must be ValueType. " + t.Name);
+
+            var elementType = ti.IsNullable() ? ti.GetGenericArguments()[0] : t;
+
+            var properties = DynamicObjectDescriptor.GetProperties(elementType, false);
+            var length = ValidateAndCalculateLength(elementType, properties);
+            var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, elementType, length, properties.Select(x => x.Item2).ToArray());
+            var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
+
+            if (ti.IsNullable())
             {
-                var objectSegment = DynamicObjectSegmentBuilder<T>.GetProxyType();
-                var ctorInfo = objectSegment.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) });
-                var arraySegmentCtor = typeof(ArraySegment<byte>).GetTypeInfo().GetConstructor(new[] { typeof(byte[]), typeof(int), typeof(int) });
-
-                var arg1 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
-                var arg2 = Expression.Parameter(typeof(int), "offset");
-                var arg3 = Expression.Parameter(typeof(DirtyTracker), "tracker");
-                var arg4 = Expression.Parameter(typeof(int).MakeByRefType(), "byteSize");
-
-                var newArraySegment = Expression.New(arraySegmentCtor, arg1, arg2, arg4);
-
-                var lambda = Expression.Lambda<FactoryFunc>(Expression.New(ctorInfo, arg3, newArraySegment), arg1, arg2, arg3, arg4);
-                this.factory = lambda.Compile();
+                return Activator.CreateInstance(typeof(DynamicNullableStructFormatter<>).MakeGenericType(elementType), new[] { formatter });
             }
+            else
+            {
+                return formatter;
+            }
+        }
+
+        static int? ValidateAndCalculateLength(Type t, IEnumerable<Tuple<int, PropertyInfo>> source)
+        {
+            var isNullable = false;
+            var lengthSum = 0;
+
+            var constructorTypes = new List<Type>();
+            var expected = 0;
+            foreach (var item in source)
+            {
+                if (item.Item1 != expected) throw new InvalidOperationException("Struct index must be started with 0 and be sequential. Type: " + t.FullName + " InvalidIndex:" + item.Item1);
+                expected++;
+
+                var formatter = typeof(Formatter<>).MakeGenericType(item.Item2.PropertyType).GetTypeInfo().GetProperty("Default");
+                var len = (formatter.GetGetMethod().Invoke(null, Type.EmptyTypes) as IFormatter).GetLength();
+                if (len != null)
+                {
+                    lengthSum += len.Value;
+                }
+                else
+                {
+                    isNullable = true;
+                }
+
+                constructorTypes.Add(item.Item2.PropertyType);
+            }
+
+            var info = t.GetTypeInfo().GetConstructor(constructorTypes.ToArray());
+            if (info == null)
+            {
+                throw new InvalidOperationException("Struct needs full parameter constructor of index property types. Type:" + t.FullName);
+            }
+
+            return isNullable ? (int?)null : lengthSum;
+        }
+
+        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, int? length, PropertyInfo[] propertyInfos)
+        {
+            var typeBuilder = builder.DefineType(
+                DynamicAssemblyHolder.ModuleName + "." + elementType.FullName + "$Formatter",
+                TypeAttributes.Public,
+                typeof(Formatter<>).MakeGenericType(elementType));
+
+            // public override int? GetLength()
+            {
+                var method = typeBuilder.DefineMethod("GetLength", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    typeof(int?),
+                    Type.EmptyTypes);
+
+                var il = method.GetILGenerator();
+                if (length == null)
+                {
+                    il.DeclareLocal(typeof(int?));
+
+                    il.Emit(OpCodes.Ldloca_S, (byte)0);
+                    il.Emit(OpCodes.Initobj, typeof(int?));
+                    il.Emit(OpCodes.Ldloc_0);
+                    il.Emit(OpCodes.Ret);
+                }
+                else
+                {
+                    il.Emit(OpCodes.Ldc_I4, length.Value);
+                    il.Emit(OpCodes.Newobj, typeof(int?).GetTypeInfo().GetConstructor(new[] { typeof(int) }));
+                    il.Emit(OpCodes.Ret);
+                }
+            }
+            // public override int Serialize(ref byte[] bytes, int offset, T value)
+            {
+                var method = typeBuilder.DefineMethod("Serialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    typeof(int),
+                    new Type[] { typeof(byte[]).MakeByRefType(), typeof(int), elementType });
+
+                var il = method.GetILGenerator();
+
+                il.DeclareLocal(typeof(int)); // startOffset
+
+                il.Emit(OpCodes.Ldarg_2);
+                il.Emit(OpCodes.Stloc_0);
+                foreach (var item in propertyInfos)
+                {
+                    var formatter = typeof(Formatter<>).MakeGenericType(item.PropertyType);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Call, formatter.GetTypeInfo().GetProperty("Default").GetGetMethod());
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldarga_S, (byte)3);
+                    il.Emit(OpCodes.Call, item.GetGetMethod());
+                    il.Emit(OpCodes.Callvirt, formatter.GetTypeInfo().GetMethod("Serialize"));
+                    il.Emit(OpCodes.Add);
+                    il.Emit(OpCodes.Starg_S, (byte)2);
+                }
+
+                // offset - startOffset;
+                il.Emit(OpCodes.Ldarg_2);
+                il.Emit(OpCodes.Ldloc_0);
+                il.Emit(OpCodes.Sub);
+                il.Emit(OpCodes.Ret);
+            }
+            //// public override T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+            {
+                var method = typeBuilder.DefineMethod("Deserialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    elementType,
+                    new[] { typeof(byte[]).MakeByRefType(), typeof(int), typeof(DirtyTracker), typeof(int).MakeByRefType() });
+
+                var il = method.GetILGenerator();
+
+                il.DeclareLocal(typeof(int)); // size
+                foreach (var item in propertyInfos)
+                {
+                    il.DeclareLocal(item.PropertyType); // item1, item2...
+                }
+                il.DeclareLocal(elementType); // result
+
+                il.Emit(OpCodes.Ldarg_S, (byte)4);
+                il.Emit(OpCodes.Ldc_I4_0);
+                il.Emit(OpCodes.Stind_I4);
+                for (int i = 0; i < propertyInfos.Length; i++)
+                {
+                    var item = propertyInfos[i];
+
+                    var formatter = typeof(Formatter<>).MakeGenericType(item.PropertyType);
+                    il.Emit(OpCodes.Call, formatter.GetTypeInfo().GetProperty("Default").GetGetMethod());
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldarg_3);
+                    il.Emit(OpCodes.Ldloca_S, (byte)0);
+                    il.Emit(OpCodes.Callvirt, formatter.GetTypeInfo().GetMethod("Deserialize"));
+                    il.Emit(OpCodes.Stloc, i + 1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldloc_0);
+                    il.Emit(OpCodes.Add);
+                    il.Emit(OpCodes.Starg_S, (byte)2);
+                    il.Emit(OpCodes.Ldarg_S, (byte)4);
+                    il.Emit(OpCodes.Dup);
+                    il.Emit(OpCodes.Ldind_I4);
+                    il.Emit(OpCodes.Ldloc_0);
+                    il.Emit(OpCodes.Add);
+                    il.Emit(OpCodes.Stind_I4);
+                }
+
+                for (int i = 0; i < propertyInfos.Length; i++)
+                {
+                    il.Emit(OpCodes.Ldloc, i);
+                }
+
+                var constructor = elementType.GetTypeInfo().GetConstructor(propertyInfos.Select(x => x.PropertyType).ToArray());
+                il.Emit(OpCodes.Newobj, constructor);
+                il.Emit(OpCodes.Ret);
+            }
+
+            return typeBuilder.CreateTypeInfo();
+        }
+    }
+
+    internal class DynamicNullableStructFormatter<T> : Formatter<T?>
+        where T : struct
+    {
+        readonly Formatter<T> innerFormatter;
+
+        public DynamicNullableStructFormatter(Formatter<T> innerFormatter)
+        {
+            this.innerFormatter = innerFormatter;
         }
 
         public override int? GetLength()
         {
-            return null;
+            var len = innerFormatter.GetLength();
+            return (len == null) ? null : len + 1;
         }
 
-        public override int Serialize(ref byte[] bytes, int offset, T value)
+        public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
-            var segment = value as IZeroFormatterSegment;
-            if (segment != null)
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
             {
-                return segment.Serialize(ref bytes, offset);
-            }
-            else if (value == null)
-            {
-                BinaryUtil.WriteInt32(ref bytes, offset, -1);
-                return 4;
+                var startOffset = offset;
+                offset += 1;
+                offset += innerFormatter.Serialize(ref bytes, offset, value.Value);
+                return offset - startOffset;
             }
             else
             {
-                var startOffset = offset;
-                offset += (8 + 4 * (lastIndex + 1));
-
-                for (int i = 0; i < deserializers.Length; i++)
-                {
-                    offset += deserializers[i].Item2(ref bytes, startOffset, offset, deserializers[i].Item1, value);
-                }
-
-                var writeSize = offset - startOffset;
-                BinaryUtil.WriteInt32(ref bytes, startOffset, writeSize);
-                BinaryUtil.WriteInt32(ref bytes, startOffset + 4, lastIndex);
-
-                return writeSize;
+                return 1;
             }
         }
 
-        public override T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public override T? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            if (offset == -1)
-            {
-                byteSize = 0;
-                return default(T);
-            }
+            byteSize = 1;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
 
-            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
-            if (byteSize == -1)
-            {
-                byteSize = 4;
-                return default(T); // T is class so default(T) is null.
-            }
-            return factory(ref bytes, offset, tracker, out byteSize);
+            offset += 1;
+
+            int size;
+            var v = innerFormatter.Deserialize(ref bytes, offset, tracker, out size);
+            byteSize += size;
+
+            return new Nullable<T>(v);
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZeroFormatter;
 using System.IO;
+using ZeroFormatter.Segments;
 
 [ZeroFormattable]
 public class MyClass
@@ -34,6 +35,15 @@ public class MyClass
 
 namespace Sandbox
 {
+
+
+    [ZeroFormattable]
+    public class Simple
+    {
+        [Index(0)]
+        public virtual int I { get; set; }
+    }
+
     public enum MogeMoge
     {
         Apple, Orange
@@ -84,38 +94,69 @@ namespace Sandbox
 
         }
 
+
         static void Main(string[] args)
         {
 
-            var mc = new MyClass
+            var ff = ZeroFormatter.Formatters.Formatter<MyClass>.Default;
+
+            var rrrr = typeof(Console).GetMethods().Where(x=>x.Name == "WriteLine");
+
+
+            
+            Console.WriteLine(ff.GetType().FullName);
+
+
+            var bs = ZeroFormatter.ZeroFormatterSerializer.Serialize(new MyClass
             {
-                Age = 222,
-                FirstName = "a",
-                LastName = "bbb",
-                List = new[] { MogeMoge.Orange, MogeMoge.Apple },
+                Age = 1,
+                FirstName = "hoge",
+                LastName = "tako",
+                List = new List<MogeMoge>(),
                 Mone = MogeMoge.Orange
-            };
+            });
 
-            var bytes1 = ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), mc);
+            //var bs = Enumerable.Range(1, 100).Select(x => (byte)x).ToArray();
 
-            mc.Age = 999;
-            mc.FirstName = "hugahuga";
-            var bytes2 = ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), mc);
+            bs = ZeroFormatterSerializer.Serialize(new Simple { I = 9999 });
 
-            mc.Age = 3;
-            mc.LastName = "tetete";
-            mc.List[1] = MogeMoge.Orange;
-            mc.Mone = MogeMoge.Apple;
-            var bytes3 = ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), mc);
+            //bs = ZeroFormatterSerializer.Serialize((Simple)null);
+
+            //var f = ZeroFormatter.ZeroFormatterSerializer.Deserialize<Simple>(bs);
 
 
-            var block = bytes1.Concat(bytes2).Concat(bytes3).ToArray(); // slow:)
-
-            var a = ZeroFormatterSerializer.Deserialize<MyClass>(block);
-            var b = ZeroFormatterSerializer.Deserialize<MyClass>(block, bytes1.Length);
-            var c = ZeroFormatterSerializer.Deserialize<MyClass>(block, bytes1.Length + bytes2.Length);
+            var simpleFormatter = ZeroFormatter.Formatters.Formatter<Simple>.Default;
+            var size = 0;
 
 
+            var ___ = simpleFormatter.Deserialize(ref bs, 0, new DirtyTracker(0), out size);
+
+
+            //var huga = f.GetType().GetConstructors()[0].Invoke(new object[] { new DirtyTracker(0), new ArraySegment<byte>(bs) });
+
+            //Console.WriteLine(f.FirstName);
+            //ZeroFormatter.ZeroFormatterSerializer.Deserialize<MyStruct?>(f);
+
+
+            //var d = ZeroFormatter.Formatters.Formatter<MyStruct>.Default;
+
+            //var ff = ZeroFormatter.Formatters.Formatter<MyStruct?>.Default;
+
+            //Console.WriteLine(ff.GetLength());
+        }
+    }
+
+    [ZeroFormattable]
+    public struct MyStruct
+    {
+        [Index(0)]
+        public int MyProperty1 { get; set; }
+        [Index(1)]
+        public int MyProperty2 { get; set; }
+        public MyStruct(int x, int y)
+        {
+            MyProperty1 = x;
+            MyProperty2 = y;
         }
     }
 }

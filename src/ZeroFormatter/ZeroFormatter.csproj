@@ -79,6 +79,7 @@
     </Compile>
     <Compile Include="Formatters\StringFormatter.cs" />
     <Compile Include="Internal\BinaryUtil.cs" />
+    <Compile Include="Internal\DynamicAssembly.cs" />
     <Compile Include="Internal\HashHelper.cs" />
     <Compile Include="Comparers\ZeroFormatterEqualityComparer.cs" />
     <Compile Include="Internal\PseudoTypeInfo.cs" />

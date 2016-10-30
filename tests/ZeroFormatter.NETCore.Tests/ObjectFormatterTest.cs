@@ -277,7 +277,7 @@ namespace ZeroFormatter.Tests
         [Fact]
         public void DynamicFormatterTest()
         {
-            var dynamicFormatter = new DynamicObjectFormatter<MyClass>();
+            var dynamicFormatter = Formatters.Formatter<MyClass>.Default;
 
             byte[] bytes = null;
             var size = dynamicFormatter.Serialize(ref bytes, 0, new MyClass

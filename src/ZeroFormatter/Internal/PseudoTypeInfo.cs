@@ -35,6 +35,11 @@ namespace ZeroFormatter.Internal
                 return type.IsGenericType;
             }
         }
+
+        public bool IsNullable()
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
     }
 
     internal static class TypeInfoExtensions
@@ -47,3 +52,14 @@ namespace ZeroFormatter.Internal
 }
 
 #endif
+
+namespace ZeroFormatter.Internal
+{
+    internal static class ReflectionExtensions
+    {
+        public static bool IsNullable(this System.Reflection.TypeInfo type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(System.Nullable<>);
+        }
+    }
+}

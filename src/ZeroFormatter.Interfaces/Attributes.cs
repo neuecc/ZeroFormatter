@@ -4,7 +4,7 @@ namespace ZeroFormatter
 {
     // We need to use Analyazer so can't use DataContractAttribute.
 
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
     public class ZeroFormattableAttribute : Attribute
     {
     }

@@ -366,6 +366,12 @@ namespace ZeroFormatter.Formatters
                     {
                         throw new InvalidOperationException("Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary.");
                     }
+
+                    // custom nullable struct
+                    else if (t.GetGenericTypeDefinition() == typeof(Nullable<>) && ti.GetGenericArguments()[0].GetTypeInfo().IsValueType)
+                    {
+                        formatter = DynamicStructFormatter.Create<T>();
+                    }
                 }
 
                 else if (t.IsArray)
@@ -375,7 +381,14 @@ namespace ZeroFormatter.Formatters
 
                 else if (ti.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() != null)
                 {
-                    formatter = new DynamicObjectFormatter<T>();
+                    if (ti.IsValueType)
+                    {
+                        formatter = DynamicStructFormatter.Create<T>();
+                    }
+                    else
+                    {
+                        formatter = DynamicObjectFormatter.Create<T>();
+                    }
                 }
 
 #endif

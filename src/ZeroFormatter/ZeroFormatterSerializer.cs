@@ -312,7 +312,6 @@ namespace ZeroFormatter
                     }
                 }
             }
-
         }
 
 #endif

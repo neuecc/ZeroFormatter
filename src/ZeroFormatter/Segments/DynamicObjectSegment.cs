@@ -194,17 +194,13 @@ namespace ZeroFormatter.Segments
     {
         public const string ModuleName = "ZeroFormatter.DynamicObjectSegments";
 
-        public static readonly Lazy<ModuleBuilder> Module = new Lazy<ModuleBuilder>(() => MakeDynamicAssembly(), true);
+        readonly static DynamicAssembly assembly;
 
-        public static object ModuleLock = new object(); // be careful!
+        public static ModuleBuilder Module { get { return assembly.ModuleBuilder; } }
 
-        static ModuleBuilder MakeDynamicAssembly()
+        static DynamicAssemblyHolder()
         {
-            var assemblyName = new AssemblyName(ModuleName);
-            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule(ModuleName);
-
-            return moduleBuilder;
+            assembly = new DynamicAssembly(ModuleName);
         }
     }
 
@@ -239,11 +235,8 @@ namespace ZeroFormatter.Segments
         static TypeInfo Build()
         {
             TypeInfo generatedType;
-            lock (DynamicAssemblyHolder.ModuleLock)
-            {
-                var moduleBuilder = DynamicAssemblyHolder.Module.Value;
-                generatedType = GenerateObjectSegmentImplementation(moduleBuilder);
-            }
+            var moduleBuilder = DynamicAssemblyHolder.Module;
+            generatedType = GenerateObjectSegmentImplementation(moduleBuilder);
             return generatedType;
         }
 
@@ -292,7 +285,7 @@ namespace ZeroFormatter.Segments
             var list = new List<PropertyTuple>();
 
             // getproperties contains verify.
-            foreach (var p in DynamicObjectDescriptor.GetProperties(typeof(T)))
+            foreach (var p in DynamicObjectDescriptor.GetProperties(typeof(T), true))
             {
                 var propInfo = p.Item2;
                 var index = p.Item1;
