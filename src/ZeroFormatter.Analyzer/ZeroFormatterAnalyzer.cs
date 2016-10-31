@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System;
 
 namespace ZeroFormatter.Analyzer
 {
@@ -19,12 +20,6 @@ namespace ZeroFormatter.Analyzer
         internal const string ZeroFormattableAttributeShortName = "ZeroFormattableAttribute";
         internal const string IndexAttributeShortName = "IndexAttribute";
         internal const string IgnoreShortName = "IgnoreFormatAttribute";
-
-        internal static readonly DiagnosticDescriptor TypeMustBeClass = new DiagnosticDescriptor(
-            id: DiagnosticIdBase + "_" + nameof(TypeMustBeClass), title: Title, category: Category,
-            messageFormat: "Type must be class. {0}.", // type.Name
-            description: "Type must be class.",
-            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor TypeMustBeZeroFormattable = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(TypeMustBeZeroFormattable), title: Title, category: Category,
@@ -86,8 +81,19 @@ namespace ZeroFormatter.Analyzer
             description: "Type must needs parameterless constructor.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
+        internal static readonly DiagnosticDescriptor StructIndexMustBeStartedWithZeroAndSequential = new DiagnosticDescriptor(
+            id: DiagnosticIdBase + "_" + nameof(StructIndexMustBeStartedWithZeroAndSequential), title: Title, category: Category,
+            messageFormat: "Struct index must be started with 0 and be sequential. Type: {0}, InvalidIndex: {1}", //  type.Name, index
+            description: "Struct index must be started with 0 and be sequential.",
+            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+
+        internal static readonly DiagnosticDescriptor StructMustNeedsSameConstructorWithIndexes = new DiagnosticDescriptor(
+            id: DiagnosticIdBase + "_" + nameof(StructIndexMustBeStartedWithZeroAndSequential), title: Title, category: Category,
+            messageFormat: "Struct needs full parameter constructor of index property types. Type: {0}", //  type.Name
+            description: "Struct needs full parameter constructor of index property types.",
+            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+
         static readonly ImmutableArray<DiagnosticDescriptor> supportedDiagnostics = ImmutableArray.Create(
-            TypeMustBeClass,
             TypeMustBeZeroFormattable,
             PublicPropertyNeedsIndex,
             PublicPropertyNeedsGetAndSetAccessor,
@@ -97,7 +103,10 @@ namespace ZeroFormatter.Analyzer
             ListNotSupport,
             ArrayNotSupport,
             IndexIsTooLarge,
-            TypeMustNeedsParameterlessConstructor);
+            TypeMustNeedsParameterlessConstructor,
+            StructIndexMustBeStartedWithZeroAndSequential,
+            StructMustNeedsSameConstructorWithIndexes
+            );
 
         static readonly HashSet<string> AllowTypes = new HashSet<string>
         {
@@ -130,17 +139,17 @@ namespace ZeroFormatter.Analyzer
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration);
+            context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration);
         }
 
         static void Analyze(SyntaxNodeAnalysisContext context)
         {
             var model = context.SemanticModel;
 
-            var classDeclaration = context.Node as ClassDeclarationSyntax;
-            if (classDeclaration == null) return;
+            var typeDeclaration = context.Node as TypeDeclarationSyntax;
+            if (typeDeclaration == null) return;
 
-            var declaredSymbol = model.GetDeclaredSymbol(classDeclaration);
+            var declaredSymbol = model.GetDeclaredSymbol(typeDeclaration);
             if (declaredSymbol == null) return;
 
             // Analysing Target is only [ZeroFormattable] class, allows ShortName
@@ -152,7 +161,7 @@ namespace ZeroFormatter.Analyzer
             var reportContext = new DiagnosticsReportContext(context);
 
             // Start RootType
-            VerifyType(reportContext, classDeclaration.GetLocation(), declaredSymbol, new HashSet<ITypeSymbol>(), null);
+            VerifyType(reportContext, typeDeclaration.GetLocation(), declaredSymbol, new HashSet<ITypeSymbol>(), null);
 
             reportContext.ReportAll();
         }
@@ -216,13 +225,7 @@ namespace ZeroFormatter.Analyzer
                 return;
             }
 
-            if (type.IsValueType)
-            {
-                context.Add(Diagnostic.Create(TypeMustBeClass, callerLocation, type.Locations, type.Name));
-                return;
-            }
-
-            if (namedType != null)
+            if (namedType != null && !namedType.IsValueType)
             {
                 if (!namedType.Constructors.Any(x => x.Parameters.Length == 0))
                 {
@@ -238,6 +241,51 @@ namespace ZeroFormatter.Analyzer
                 foreach (var member in type.GetAllMembers().OfType<IPropertySymbol>())
                 {
                     VerifyProperty(context, member, alreadyAnalyzed, definedIndexes);
+                }
+
+                if (type.IsValueType && context.Diagnostics.Count == 0)
+                {
+                    var indexes = new List<Tuple<int, IPropertySymbol>>();
+                    foreach (var item in type.GetMembers().OfType<IPropertySymbol>())
+                    {
+                        var indexAttr = item.GetAttributes().FindAttributeShortName(IndexAttributeShortName);
+                        if (indexAttr != null)
+                        {
+                            var index = (int)indexAttr.ConstructorArguments[0].Value;
+                            indexes.Add(Tuple.Create(index, item));
+                        }
+                    }
+                    indexes = indexes.OrderBy(x => x.Item1).ToList();
+
+                    var expected = 0;
+                    foreach (var item in indexes)
+                    {
+                        if (item.Item1 != expected)
+                        {
+                            context.Add(Diagnostic.Create(StructIndexMustBeStartedWithZeroAndSequential, callerLocation, type.Locations, type.Name, item.Item1));
+                            return;
+                        }
+                        expected++;
+                    }
+
+                    var foundConstructor = false;
+                    var ctors = (type as INamedTypeSymbol)?.Constructors;
+                    foreach (var ctor in ctors)
+                    {
+                        var isMatch = indexes.Select(x => x.Item2.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
+                            .SequenceEqual(ctor.Parameters.Select(x => x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
+                        if (isMatch)
+                        {
+                            foundConstructor = true;
+                        }
+                    }
+                    if (!foundConstructor && indexes.Count != 0)
+                    {
+                        context.Add(Diagnostic.Create(StructMustNeedsSameConstructorWithIndexes, callerLocation, type.Locations, type.Name));
+                        return;
+                    }
+
+                    return;
                 }
             }
         }
@@ -255,7 +303,7 @@ namespace ZeroFormatter.Analyzer
                 return;
             }
 
-            if (!property.IsVirtual)
+            if (!property.IsVirtual && !property.ContainingType.IsValueType)
             {
                 context.Add(Diagnostic.Create(PublicPropertyMustBeVirtual, property.Locations[0], property.ContainingType?.Name, property.Name));
                 return;

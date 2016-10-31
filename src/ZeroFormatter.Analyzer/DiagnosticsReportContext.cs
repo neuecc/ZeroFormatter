@@ -15,6 +15,8 @@ namespace ZeroFormatter.Analyzer
         readonly List<Diagnostic> diagnostics = new List<Diagnostic>();
         readonly SyntaxNodeAnalysisContext context;
 
+        public IReadOnlyList<Diagnostic> Diagnostics => diagnostics;
+
         public DiagnosticsReportContext(SyntaxNodeAnalysisContext context)
         {
             this.context = context;

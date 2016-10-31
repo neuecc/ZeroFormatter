@@ -11,29 +11,36 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using ZeroFormatter;
 
 [ZeroFormattable]
 [Serializable]
 [ProtoContract]
+[DataContract]
 public class Person : IEquatable<Person>
 {
     [Index(0)]
     [MessagePackMember(0)]
     [ProtoMember(1)]
+    [DataMember]
     public virtual int Age { get; set; }
     [Index(1)]
     [MessagePackMember(1)]
     [ProtoMember(2)]
+    [DataMember]
     public virtual string FirstName { get; set; }
     [Index(2)]
     [MessagePackMember(2)]
     [ProtoMember(3)]
+    [DataMember]
     public virtual string LastName { get; set; }
     [Index(3)]
     [MessagePackMember(3)]
     [ProtoMember(4)]
+    [DataMember]
     public virtual Sex Sex { get; set; }
 
     public bool Equals(Person other)
@@ -68,6 +75,8 @@ class Program
         SerializeProtobuf(p); SerializeProtobuf(l);
         SerializeMsgPack(p); SerializeMsgPack(l);
         SerializeJsonNet(p); SerializeJsonNet(l);
+        SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
+        SerializeDataContract(p); SerializeDataContract(l);
 
         dryRun = false;
 
@@ -78,18 +87,24 @@ class Program
         var b = SerializeProtobuf(p); Console.WriteLine();
         var c = SerializeMsgPack(p); Console.WriteLine();
         var d = SerializeJsonNet(p); Console.WriteLine();
+        var e = SerializeBinaryFormatter(p); Console.WriteLine();
+        var f = SerializeDataContract(p); Console.WriteLine();
 
         Console.WriteLine("Large Array"); Console.WriteLine();
 
-        var e = SerializeZeroFormatter(l); Console.WriteLine();
-        var f = SerializeProtobuf(l); Console.WriteLine();
-        var g = SerializeMsgPack(l); Console.WriteLine();
-        var h = SerializeJsonNet(l); Console.WriteLine();
+        var g = SerializeZeroFormatter(l); Console.WriteLine();
+        var h = SerializeProtobuf(l); Console.WriteLine();
+        var i = SerializeMsgPack(l); Console.WriteLine();
+        var j = SerializeJsonNet(l); Console.WriteLine();
+        var k = SerializeBinaryFormatter(l); Console.WriteLine();
+        var l_ = SerializeDataContract(l); Console.WriteLine();
 
-        Validate("ZeroFormatter", p, l, a, e);
-        Validate("protobuf-net", p, l, b, f);
-        Validate("MsgPack-CLI", p, l, c, g);
-        Validate("JSON.NET", p, l, d, h);
+        Validate("ZeroFormatter", p, l, a, g);
+        Validate("protobuf-net", p, l, b, h);
+        Validate("MsgPack-CLI", p, l, c, i);
+        Validate("JSON.NET", p, l, d, j);
+        Validate("BinaryFormatter", p, l, e, k);
+        Validate("DataContract", p, l, f, l_);
     }
 
     static void Validate(string label, Person original, IList<Person> originalList, Person copy, IList<Person> copyList)
@@ -279,6 +294,86 @@ class Program
         return copy;
     }
 
+    static T SerializeBinaryFormatter<T>(T original)
+    {
+        Console.WriteLine("BinaryFormatter");
+
+        var serializer = new BinaryFormatter();
+        T copy = default(T);
+        MemoryStream stream = null;
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                serializer.Serialize(stream = new MemoryStream(), original);
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream.Position = 0;
+                copy = (T)serializer.Deserialize(stream);
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                serializer.Serialize(stream = new MemoryStream(), copy);
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
+        }
+
+        return copy;
+    }
+
+    static T SerializeDataContract<T>(T original)
+    {
+        Console.WriteLine("DataContractSerializer");
+
+        T copy = default(T);
+        MemoryStream stream = null;
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                new DataContractSerializer(typeof(T)).WriteObject(stream = new MemoryStream(), original);
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream.Position = 0;
+                copy = (T)new DataContractSerializer(typeof(T)).ReadObject(stream);
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                new DataContractSerializer(typeof(T)).WriteObject(stream = new MemoryStream(), copy);
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
+        }
+
+        return copy;
+    }
     struct Measure : IDisposable
     {
         string label;
