@@ -154,7 +154,15 @@ TODO:...
 | DictionaryEntry | [hashCode:int(4)][next:int(4)][key:TKey][value:TValue] | substructure of Dictionary | 
 | MultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] |  represents `ILookup<TKey, TElement>`, if byteSize == -1, indicates null | 
 | GroupingSegment | [key:TKey] [hashCode:int(4)][elements:`VariableSizeList<TElement>`] | substructure of MultiDictionary
-| Object | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | define from `[ZeroFormattable]` class. if byteSize = -1, indicates null |
+
+**Object Format**
+
+Object is variant of Variable Length Format that can define user own format. Layout is `[byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...]`. If byteSize = -1, indicates null.
+
+**Struct Format**
+
+Struct is variant of both Fixed Length or Variable Length format. If all properties... TODO:... 
+
 
 **EqualityComparer**
 
@@ -167,3 +175,12 @@ https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/
 Cross Plaftorm
 ---
 Currently No and I have no plans. Welcome to contribute to port other languages.
+
+Performance Tips
+---
+
+
+Extensibility
+---
+
+
