@@ -2,6 +2,8 @@
 // Install-Package Newtonsoft.Json -Pre
 // Install-Package protobuf-net -Pre
 // Install-Package ZeroFormatter -Pre
+// Install-Package FsPickler.CSharp -Pre
+// Install-Package FSharp.Core -Pre
 
 using MsgPack.Serialization;
 using Newtonsoft.Json;
@@ -75,6 +77,7 @@ class Program
         SerializeProtobuf(p); SerializeProtobuf(l);
         SerializeMsgPack(p); SerializeMsgPack(l);
         SerializeJsonNet(p); SerializeJsonNet(l);
+        SerializeFsPickler(p); SerializeFsPickler(l);
         SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
         SerializeDataContract(p); SerializeDataContract(l);
 
@@ -87,24 +90,27 @@ class Program
         var b = SerializeProtobuf(p); Console.WriteLine();
         var c = SerializeMsgPack(p); Console.WriteLine();
         var d = SerializeJsonNet(p); Console.WriteLine();
-        var e = SerializeBinaryFormatter(p); Console.WriteLine();
-        var f = SerializeDataContract(p); Console.WriteLine();
+        var e = SerializeFsPickler(p); Console.WriteLine();
+        var f = SerializeBinaryFormatter(p); Console.WriteLine();
+        var g = SerializeDataContract(p); Console.WriteLine();
 
         Console.WriteLine("Large Array"); Console.WriteLine();
 
-        var g = SerializeZeroFormatter(l); Console.WriteLine();
-        var h = SerializeProtobuf(l); Console.WriteLine();
-        var i = SerializeMsgPack(l); Console.WriteLine();
-        var j = SerializeJsonNet(l); Console.WriteLine();
-        var k = SerializeBinaryFormatter(l); Console.WriteLine();
-        var l_ = SerializeDataContract(l); Console.WriteLine();
+        var A = SerializeZeroFormatter(l); Console.WriteLine();
+        var B = SerializeProtobuf(l); Console.WriteLine();
+        var C = SerializeMsgPack(l); Console.WriteLine();
+        var D = SerializeJsonNet(l); Console.WriteLine();
+        var E = SerializeFsPickler(l); Console.WriteLine();
+        var F = SerializeBinaryFormatter(l); Console.WriteLine();
+        var G = SerializeDataContract(l); Console.WriteLine();
 
-        Validate("ZeroFormatter", p, l, a, g);
-        Validate("protobuf-net", p, l, b, h);
-        Validate("MsgPack-CLI", p, l, c, i);
-        Validate("JSON.NET", p, l, d, j);
-        Validate("BinaryFormatter", p, l, e, k);
-        Validate("DataContract", p, l, f, l_);
+        Validate("ZeroFormatter", p, l, a, A);
+        Validate("protobuf-net", p, l, b, B);
+        Validate("MsgPack-CLI", p, l, c, C);
+        Validate("JSON.NET", p, l, d, D);
+        Validate("FsPickler", p, l, e, E);
+        Validate("BinaryFormatter", p, l, f, F);
+        Validate("DataContract", p, l, g, G);
     }
 
     static void Validate(string label, Person original, IList<Person> originalList, Person copy, IList<Person> copyList)
@@ -374,6 +380,49 @@ class Program
 
         return copy;
     }
+
+    static T SerializeFsPickler<T>(T original)
+    {
+        Console.WriteLine("FsPickler");
+
+        T copy = default(T);
+        MemoryStream stream = null;
+        var serializer = MBrace.CsPickler.CsPickler.CreateBinarySerializer();
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                serializer.Serialize<T>(stream = new MemoryStream(), original, leaveOpen: true);
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream.Position = 0;
+                copy = serializer.Deserialize<T>(stream, leaveOpen: true);
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                serializer.Serialize<T>(stream = new MemoryStream(), copy, leaveOpen: true);
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
+        }
+
+        return copy;
+    }
+
+
     struct Measure : IDisposable
     {
         string label;
