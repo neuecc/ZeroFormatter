@@ -91,19 +91,6 @@ namespace ZeroFormatter.Formatters
 
         static void VerifyProeprtyType(PropertyInfo property)
         {
-            if (property.PropertyType.GetTypeInfo().IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-            {
-                throw new InvalidOperationException("Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary. " + property.DeclaringType.Name + "." + property.PropertyType.Name);
-            }
-            else if (property.PropertyType.GetTypeInfo().IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
-            {
-                throw new InvalidOperationException("List does not support in ZeroFormatter because List have to deserialize all objects. You can use IList<T> instead of List. " + property.DeclaringType.Name + "." + property.PropertyType.Name);
-            }
-            else if (property.PropertyType.IsArray && property.PropertyType != typeof(byte[]))
-            {
-                throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[]. " + property.DeclaringType.Name + "." + property.PropertyType.Name);
-            }
-
             var formatter = typeof(Formatter<>).MakeGenericType(property.PropertyType).GetTypeInfo().GetProperty("Default").GetValue(null, null);
             var error = formatter as IErrorFormatter;
             if (error != null)
