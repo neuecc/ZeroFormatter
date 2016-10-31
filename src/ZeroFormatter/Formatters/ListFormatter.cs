@@ -92,7 +92,7 @@ namespace ZeroFormatter.Formatters
                     for (int i = 0; i < array.Length; i++)
                     {
                         var size = formatter.Serialize(ref bytes, offset, array[i]);
-                        BinaryUtil.WriteInt32Unsafe(bytes, indexStartOffset + i * 4, offset);
+                        BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset);
                         offset += size;
                     }
                 }
@@ -104,7 +104,7 @@ namespace ZeroFormatter.Formatters
                         for (int i = 0; i < list.Count; i++)
                         {
                             var size = formatter.Serialize(ref bytes, offset, list[i]);
-                            BinaryUtil.WriteInt32Unsafe(bytes, indexStartOffset + i * 4, offset);
+                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset);
                             offset += size;
                         }
                     }
@@ -114,17 +114,17 @@ namespace ZeroFormatter.Formatters
                         foreach (var item in value)
                         {
                             var size = formatter.Serialize(ref bytes, offset, item);
-                            BinaryUtil.WriteInt32Unsafe(bytes, indexStartOffset + count * 4, offset);
+                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + count * 4, offset);
                             offset += size;
                             count++;
                         }
                     }
                 }
 
-                BinaryUtil.WriteInt32Unsafe(bytes, startoffset + 4, value.Count);
+                BinaryUtil.WriteInt32Unsafe(ref bytes, startoffset + 4, value.Count);
 
                 var totalBytes = offset - startoffset;
-                BinaryUtil.WriteInt32Unsafe(bytes, startoffset, totalBytes);
+                BinaryUtil.WriteInt32Unsafe(ref bytes, startoffset, totalBytes);
 
                 return totalBytes;
             }

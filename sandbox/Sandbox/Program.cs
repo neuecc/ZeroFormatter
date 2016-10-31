@@ -100,36 +100,43 @@ namespace Sandbox
 
             var ff = ZeroFormatter.Formatters.Formatter<MyClass>.Default;
 
-            var rrrr = typeof(Console).GetMethods().Where(x=>x.Name == "WriteLine");
+            //var rrrr = typeof(Console).GetMethods().Where(x=>x.Name == "WriteLine");
+
+            //var bytes = null;
+            //ff.Serialize(
 
 
-            
-            Console.WriteLine(ff.GetType().FullName);
+            //Console.WriteLine(ff.GetType().FullName);
 
 
-            var bs = ZeroFormatter.ZeroFormatterSerializer.Serialize(new MyClass
-            {
-                Age = 1,
-                FirstName = "hoge",
-                LastName = "tako",
-                List = new List<MogeMoge>(),
-                Mone = MogeMoge.Orange
-            });
+            //var bs = ZeroFormatter.ZeroFormatterSerializer.Serialize(new MyClass
+            //{
+            //    Age = 1,
+            //    FirstName = "hoge",
+            //    LastName = "tako",
+            //    List = new List<MogeMoge>(),
+            //    Mone = MogeMoge.Orange
+            //});
 
             //var bs = Enumerable.Range(1, 100).Select(x => (byte)x).ToArray();
 
-            bs = ZeroFormatterSerializer.Serialize(new Simple { I = 9999 });
-
-            //bs = ZeroFormatterSerializer.Serialize((Simple)null);
-
-            //var f = ZeroFormatter.ZeroFormatterSerializer.Deserialize<Simple>(bs);
+            var ctor = ff.GetType().GetConstructors();
 
 
-            var simpleFormatter = ZeroFormatter.Formatters.Formatter<Simple>.Default;
-            var size = 0;
+            //ctor.Invoke(null);
+
+            var bs = ZeroFormatterSerializer.Serialize(new Simple { I = 9999 });
+
+            ////bs = ZeroFormatterSerializer.Serialize((Simple)null);
+
+            ////var f = ZeroFormatter.ZeroFormatterSerializer.Deserialize<Simple>(bs);
 
 
-            var ___ = simpleFormatter.Deserialize(ref bs, 0, new DirtyTracker(0), out size);
+            //var simpleFormatter = ZeroFormatter.Formatters.Formatter<Simple>.Default;
+            //var size = 0;
+
+
+            //var ___ = simpleFormatter.Deserialize(ref bs, 0, new DirtyTracker(0), out size);
 
 
             //var huga = f.GetType().GetConstructors()[0].Invoke(new object[] { new DirtyTracker(0), new ArraySegment<byte>(bs) });

@@ -410,6 +410,10 @@ namespace ZeroFormatter.Formatters
             Default = (Formatter<T>)formatter;
         }
 
+        public Formatter()
+        {
+        }
+
         public static void Register(Formatter<T> formatter)
         {
             defaultFormatter = formatter;
