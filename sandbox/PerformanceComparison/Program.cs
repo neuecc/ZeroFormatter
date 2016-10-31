@@ -65,12 +65,12 @@ class Program
     {
         var p = new Person
         {
-            Age = 99,
+            Age = 9999,
             FirstName = "hoge",
             LastName = "huga",
             Sex = Sex.Male,
         };
-        IList<Person> l = Enumerable.Range(1, 1000).Select(x => new Person { Age = x, FirstName = "a", LastName = "b", Sex = Sex.Female }).ToArray();
+        IList<Person> l = Enumerable.Range(1000, 1000).Select(x => new Person { Age = x, FirstName = "abc", LastName = "def", Sex = Sex.Female }).ToArray();
 
         Console.WriteLine("Warming-up");
         SerializeZeroFormatter(p); SerializeZeroFormatter(l);
