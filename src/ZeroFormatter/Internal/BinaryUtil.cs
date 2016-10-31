@@ -178,6 +178,17 @@ namespace ZeroFormatter.Internal
             return 4;
         }
 
+        /// <summary>
+        /// Unsafe! do not ensure capacity and don't return size.
+        /// </summary>
+        public static void WriteInt32Unsafe(byte[] bytes, int offset, int value)
+        {
+            bytes[offset] = (byte)value;
+            bytes[offset + 1] = (byte)(value >> 8);
+            bytes[offset + 2] = (byte)(value >> 16);
+            bytes[offset + 3] = (byte)(value >> 24);
+        }
+
         public static int ReadInt32(ref byte[] bytes, int offset)
         {
             return bytes[offset]

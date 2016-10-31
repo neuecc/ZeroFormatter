@@ -1,0 +1,341 @@
+﻿// Install-Package MsgPack.Cli -Pre
+// Install-Package Newtonsoft.Json -Pre
+// Install-Package protobuf-net -Pre
+// Install-Package ZeroFormatter -Pre
+
+using MsgPack.Serialization;
+using Newtonsoft.Json;
+using ProtoBuf;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using ZeroFormatter;
+
+[ZeroFormattable]
+[Serializable]
+[ProtoContract]
+public class Person : IEquatable<Person>
+{
+    [Index(0)]
+    [MessagePackMember(0)]
+    [ProtoMember(1)]
+    public virtual int Age { get; set; }
+    [Index(1)]
+    [MessagePackMember(1)]
+    [ProtoMember(2)]
+    public virtual string FirstName { get; set; }
+    [Index(2)]
+    [MessagePackMember(2)]
+    [ProtoMember(3)]
+    public virtual string LastName { get; set; }
+    [Index(3)]
+    [MessagePackMember(3)]
+    [ProtoMember(4)]
+    public virtual Sex Sex { get; set; }
+
+    public bool Equals(Person other)
+    {
+        return Age == other.Age && FirstName == other.FirstName && LastName == other.LastName && Sex == other.Sex;
+    }
+}
+
+public enum Sex
+{
+    Unknown, Male, Female,
+}
+
+class Program
+{
+    const int Iteration = 10000;
+    static bool dryRun = true;
+
+    static void Main(string[] args)
+    {
+        var p = new Person
+        {
+            Age = 99,
+            FirstName = "hoge",
+            LastName = "huga",
+            Sex = Sex.Male,
+        };
+        IList<Person> l = Enumerable.Range(1, 1000).Select(x => new Person { Age = x, FirstName = "a", LastName = "b", Sex = Sex.Female }).ToArray();
+
+        Console.WriteLine("Warming-up");
+        SerializeZeroFormatter(p); SerializeZeroFormatter(l);
+        SerializeProtobuf(p); SerializeProtobuf(l);
+        SerializeMsgPack(p); SerializeMsgPack(l);
+        SerializeJsonNet(p); SerializeJsonNet(l);
+
+        dryRun = false;
+
+        Console.WriteLine();
+        Console.WriteLine("Small Object"); Console.WriteLine();
+
+        var a = SerializeZeroFormatter(p); Console.WriteLine();
+        var b = SerializeProtobuf(p); Console.WriteLine();
+        var c = SerializeMsgPack(p); Console.WriteLine();
+        var d = SerializeJsonNet(p); Console.WriteLine();
+
+        Console.WriteLine("Large Array"); Console.WriteLine();
+
+        var e = SerializeZeroFormatter(l); Console.WriteLine();
+        var f = SerializeProtobuf(l); Console.WriteLine();
+        var g = SerializeMsgPack(l); Console.WriteLine();
+        var h = SerializeJsonNet(l); Console.WriteLine();
+
+        Validate("ZeroFormatter", p, l, a, e);
+        Validate("protobuf-net", p, l, b, f);
+        Validate("MsgPack-CLI", p, l, c, g);
+        Validate("JSON.NET", p, l, d, h);
+    }
+
+    static void Validate(string label, Person original, IList<Person> originalList, Person copy, IList<Person> copyList)
+    {
+        if (!EqualityComparer<Person>.Default.Equals(original, copy)) Console.WriteLine(label + " Invalid Deserialize Small Object");
+        if (!originalList.SequenceEqual(copyList)) Console.WriteLine(label + " Invalid Deserialize Large Array");
+    }
+
+    static T SerializeZeroFormatter<T>(T original)
+    {
+        Console.WriteLine("ZeroFormatter");
+
+        T copy = default(T);
+        byte[] bytes = null;
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                bytes = ZeroFormatterSerializer.Serialize(original);
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                copy = ZeroFormatterSerializer.Deserialize<T>(bytes);
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                bytes = ZeroFormatterSerializer.Serialize(copy);
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(bytes.Length)));
+        }
+
+        return copy;
+    }
+
+    static T SerializeProtobuf<T>(T original)
+    {
+        Console.WriteLine("protobuf-net");
+
+        T copy = default(T);
+        MemoryStream stream = null;
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                ProtoBuf.Serializer.Serialize<T>(stream = new MemoryStream(), original);
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream.Position = 0;
+                copy = ProtoBuf.Serializer.Deserialize<T>(stream);
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                ProtoBuf.Serializer.Serialize<T>(stream = new MemoryStream(), copy);
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
+        }
+
+        return copy;
+    }
+
+    static T SerializeMsgPack<T>(T original)
+    {
+        Console.WriteLine("MsgPack-CLI");
+
+        T copy = default(T);
+        byte[] bytes = null;
+
+        // Note:We should check MessagePackSerializer.Get<T>() on every iteration
+        // But currenly MsgPack-Cli has bug of get serializer
+        // https://github.com/msgpack/msgpack-cli/issues/191
+        // so, get serializer at first.
+        // and If enum serialization options to ByUnderlyingValue, gets more fast but we check default option only.
+
+        var serializer = MessagePackSerializer.Get<T>();
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                bytes = serializer.PackSingleObject(original);
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                copy = serializer.UnpackSingleObject(bytes);
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                bytes = serializer.PackSingleObject(copy);
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(bytes.Length)));
+        }
+
+        return copy;
+    }
+
+    static T SerializeJsonNet<T>(T original)
+    {
+        Console.WriteLine("JSON.NET");
+
+        var jsonSerializer = new JsonSerializer();
+        T copy = default(T);
+        MemoryStream stream = null;
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream = new MemoryStream();
+                using (var tw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                using (var jw = new JsonTextWriter(tw))
+                {
+                    jsonSerializer.Serialize(jw, original);
+                }
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream.Position = 0;
+                using (var tr = new StreamReader(stream, Encoding.UTF8, false, 1024, true))
+                using (var jr = new JsonTextReader(tr))
+                {
+                    copy = jsonSerializer.Deserialize<T>(jr);
+                }
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream = new MemoryStream();
+                using (var tw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                using (var jw = new JsonTextWriter(tw))
+                {
+                    jsonSerializer.Serialize(jw, copy);
+                }
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
+        }
+
+        return copy;
+    }
+
+    struct Measure : IDisposable
+    {
+        string label;
+        Stopwatch s;
+
+        public Measure(string label)
+        {
+            this.label = label;
+            this.s = Stopwatch.StartNew();
+        }
+
+        public void Dispose()
+        {
+            s.Stop();
+            if (!dryRun)
+            {
+                Console.WriteLine($"{ label,15}   {s.Elapsed.TotalMilliseconds} ms");
+            }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+        }
+    }
+
+    static string ToHumanReadableSize(long size)
+    {
+        return ToHumanReadableSize(new Nullable<long>(size));
+    }
+
+    static string ToHumanReadableSize(long? size)
+    {
+        if (size == null) return "NULL";
+
+        double bytes = size.Value;
+
+        if (bytes <= 1024) return bytes.ToString("f2") + " B";
+
+        bytes = bytes / 1024;
+        if (bytes <= 1024) return bytes.ToString("f2") + " KB";
+
+        bytes = bytes / 1024;
+        if (bytes <= 1024) return bytes.ToString("f2") + " MB";
+
+        bytes = bytes / 1024;
+        if (bytes <= 1024) return bytes.ToString("f2") + " GB";
+
+        bytes = bytes / 1024;
+        if (bytes <= 1024) return bytes.ToString("f2") + " TB";
+
+        bytes = bytes / 1024;
+        if (bytes <= 1024) return bytes.ToString("f2") + " PB";
+
+        bytes = bytes / 1024;
+        if (bytes <= 1024) return bytes.ToString("f2") + " EB";
+
+        bytes = bytes / 1024;
+        return bytes + " ZB";
+    }
+}
