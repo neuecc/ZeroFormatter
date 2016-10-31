@@ -10,7 +10,7 @@
 
     public static partial class ZeroFormatterInitializer
     {
-        // hand register
+        // hand register test
 
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void HandRegisterd()
@@ -22,16 +22,16 @@
             Formatter<IDictionary<int, string>>.Register(new DictionaryFormatter<int, string>());
             Formatter<DictionaryEntry<int, string>>.Register(new DictionaryEntryFormatter<int, string>());
 
-            GenericFormatter.RegisterDictionary<int, int>();
-            GenericFormatter.RegisterDictionary<string, string>();
-            GenericFormatter.RegisterDictionary<int, string>();
-            GenericFormatter.RegisterList<int?>();
-            GenericFormatter.RegisterList<double>();
-            GenericFormatter.RegisterList<double?>();
-            GenericFormatter.RegisterList<string>();
+            Formatter.RegisterDictionary<int, int>();
+            Formatter.RegisterDictionary<string, string>();
+            Formatter.RegisterDictionary<int, string>();
+            Formatter.RegisterList<int?>();
+            Formatter.RegisterList<double>();
+            Formatter.RegisterList<double?>();
+            Formatter.RegisterList<string>();
 
-            GenericFormatter.RegisterLookup<bool, int>();
-            GenericFormatter.RegisterLookup<int, int>();
+            Formatter.RegisterLookup<bool, int>();
+            Formatter.RegisterLookup<int, int>();
         }
     }
 }

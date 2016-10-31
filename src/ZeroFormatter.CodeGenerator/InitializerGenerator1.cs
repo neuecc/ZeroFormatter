@@ -200,7 +200,7 @@ namespace ZeroFormatter.Internal
             
             #line default
             #line hidden
-            this.Write("            ZeroFormatter.Formatters.GenericFormatter.RegisterKeyTuple<");
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<");
             
             #line 48 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
@@ -214,7 +214,7 @@ namespace ZeroFormatter.Internal
             
             #line default
             #line hidden
-            this.Write("            ZeroFormatter.Formatters.GenericFormatter.RegisterList<");
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterList<");
             
             #line 50 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
@@ -228,7 +228,7 @@ namespace ZeroFormatter.Internal
             
             #line default
             #line hidden
-            this.Write("            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<");
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterDictionary<");
             
             #line 52 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
@@ -242,7 +242,7 @@ namespace ZeroFormatter.Internal
             
             #line default
             #line hidden
-            this.Write("            ZeroFormatter.Formatters.GenericFormatter.RegisterLookup<");
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLookup<");
             
             #line 54 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));

@@ -392,11 +392,6 @@ namespace ZeroFormatter.Formatters
                 }
 
 #endif
-
-                else
-                {
-                    formatter = new ErrorFormatter<T>();
-                }
             }
             catch (InvalidOperationException ex)
             {
@@ -405,6 +400,27 @@ namespace ZeroFormatter.Formatters
             catch (Exception ex)
             {
                 formatter = new ErrorFormatter<T>(ex);
+            }
+
+            // resolver
+            if (formatter == null || formatter is ErrorFormatter<T>)
+            {
+                try
+                {
+                    var resolvedFormatter = Formatter.ResolveFormatter<T>();
+                    if (resolvedFormatter != null)
+                    {
+                        formatter = (Formatter<T>)resolvedFormatter;
+                    }
+                    else if (formatter == null)
+                    {
+                        formatter = new ErrorFormatter<T>();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    formatter = new ErrorFormatter<T>(ex);
+                }
             }
 
             Default = (Formatter<T>)formatter;
@@ -425,8 +441,29 @@ namespace ZeroFormatter.Formatters
         public abstract T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize);
     }
 
-    public static class GenericFormatter
+    public static class Formatter
     {
+        static List<Func<Type, object>> formatterResolver = new List<Func<Type, object>>();
+
+        public static void AppendFormatterResolver(Func<Type, object> formatterResolver)
+        {
+            Formatter.formatterResolver.Add(formatterResolver);
+        }
+
+        internal static object ResolveFormatter<T>()
+        {
+            var t = typeof(T);
+            foreach (var item in formatterResolver)
+            {
+                var resolved = item(t);
+                if (resolved != null)
+                {
+                    return resolved;
+                }
+            }
+            return null;
+        }
+
         public static void RegisterLookup<TKey, TElement>()
         {
             if (Formatter<ILookup<TKey, TElement>>.Default is IErrorFormatter)

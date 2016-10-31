@@ -45,13 +45,13 @@ namespace ZeroFormatter.Internal
             // Generics
 <# foreach(var g in GenericTypes) { #>
 <# if (g.TypeKind == GenericTypeKind.KeyTuple) { #>
-            ZeroFormatter.Formatters.GenericFormatter.RegisterKeyTuple<<#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<<#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.List) { #>
-            ZeroFormatter.Formatters.GenericFormatter.RegisterList<<#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterList<<#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Dictionary) { #>
-            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<<#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterDictionary<<#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Lookup) { #>
-            ZeroFormatter.Formatters.GenericFormatter.RegisterLookup<<#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterLookup<<#= g.ElementTypes #>>();
 <# } } #>
         }
     }

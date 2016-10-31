@@ -105,15 +105,15 @@ namespace ZeroFormatter.Internal
                 ZeroFormatter.Formatters.Formatter<global::UnityEngine.Vector2?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<global::UnityEngine.Vector2>(structFormatter));
             }
             // Generics
-            ZeroFormatter.Formatters.GenericFormatter.RegisterKeyTuple<int, string>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterList<global::Sandbox.Shared.Bar.MogeMoge>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterList<global::Sandbox.Shared.Foo.MogeMoge>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterList<int>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterList<string>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<int, string>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterDictionary<string, int>();
-            ZeroFormatter.Formatters.GenericFormatter.RegisterLookup<bool, int>();
+            ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<int, string>();
+            ZeroFormatter.Formatters.Formatter.RegisterList<global::Sandbox.Shared.Bar.MogeMoge>();
+            ZeroFormatter.Formatters.Formatter.RegisterList<global::Sandbox.Shared.Foo.MogeMoge>();
+            ZeroFormatter.Formatters.Formatter.RegisterList<int>();
+            ZeroFormatter.Formatters.Formatter.RegisterList<string>();
+            ZeroFormatter.Formatters.Formatter.RegisterDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>();
+            ZeroFormatter.Formatters.Formatter.RegisterDictionary<int, string>();
+            ZeroFormatter.Formatters.Formatter.RegisterDictionary<string, int>();
+            ZeroFormatter.Formatters.Formatter.RegisterLookup<bool, int>();
         }
     }
 }

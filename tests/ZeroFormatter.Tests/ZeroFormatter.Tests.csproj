@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="BlockSerializeTest.cs" />
     <Compile Include="ChainingAssertion.MSTest.cs" />
+    <Compile Include="ExtensibilityTest.cs" />
     <Compile Include="InheritanceTest.cs" />
     <Compile Include="KeyTupleFormatterTest.cs" />
     <Compile Include="DictionarySegmentTest.cs" />
