@@ -1,0 +1,55 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+namespace <#= Namespace #>
+{
+    using global::System;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
+
+<# foreach(var t in Types) {  #>
+    public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
+    {
+        public override int? GetLength()
+        {
+            return <#= t.ElementFixedSizes.Any(x => x == 0)  ? "null" : t.ElementFixedSizes.Sum().ToString() #>;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, <#= t.FullName #> value)
+        {
+            var startOffset = offset;
+<# foreach(var p in t.Properties) { #>
+            offset += Formatter<<#= p.Type #>>.Default.Serialize(ref bytes, offset, value.<#= p.Name #>);
+<# } #>
+            return offset - startOffset;
+        }
+
+        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 0;
+            int size;
+<# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
+            var item<#= i #> = Formatter<<#= p.Type #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+<# } #>
+            
+            return new <#= t.FullName #>(<#= string.Join(", ",  t.Properties.Select((_, i)=> "item" + i).ToArray()) #>);
+        }
+    }
+
+<# } #>
+
+}
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612

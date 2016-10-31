@@ -64,6 +64,24 @@ namespace ZeroFormatter.CodeGenerator
                 return GetLength(namedSymbol.EnumUnderlyingType);
             }
 
+            if (namedSymbol.IsValueType)
+            {
+                var sum = 0;
+                foreach (var member in namedSymbol.GetMembers().OfType<IPropertySymbol>())
+                {
+                    var attr = member.GetAttributes().FindAttributeShortName(TypeCollector.IndexAttributeShortName);
+                    if (attr == null) continue;
+
+                    var size = GetLength(member.Type);
+                    if (size == null)
+                    {
+                        return null;
+                    }
+                    sum += size.Value;
+                }
+                return sum;
+            }
+
             return null;
         }
 
@@ -86,6 +104,10 @@ namespace ZeroFormatter.CodeGenerator
             else if ((symbol as INamedTypeSymbol)?.IsNullable() ?? false)
             {
                 return CanAcceptCacheSegment((symbol as INamedTypeSymbol).TypeArguments[0]);
+            }
+            else if (symbol.IsValueType)
+            {
+                return true;
             }
 
             return false;

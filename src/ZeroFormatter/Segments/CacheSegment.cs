@@ -6,7 +6,7 @@ using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Segments
 {
-    // for KeyTuple, String, byte[]
+    // for KeyTuple, String, byte[] and struct.
     internal static class CacheSegment
     {
         public static bool CanAccept(Type type)
@@ -32,6 +32,11 @@ namespace ZeroFormatter.Segments
                     return true;
                 }
             }
+            else if (ti.IsValueType)
+            {
+                return true;
+            }
+            
 
             return false;
         }

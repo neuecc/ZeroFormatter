@@ -184,6 +184,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KnownFormatterSpec.cs" />
     <Compile Include="RoslynExtensions.cs" />
+    <Compile Include="StructGenerator.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>StructGenerator.tt</DependentUpon>
+    </Compile>
     <Compile Include="TypeCollector.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +207,10 @@
     <Content Include="ObjectGenerator.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ObjectGenerator.cs</LastGenOutput>
+    </Content>
+    <Content Include="StructGenerator.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>StructGenerator.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

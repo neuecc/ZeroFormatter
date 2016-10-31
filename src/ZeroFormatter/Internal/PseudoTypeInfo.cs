@@ -36,6 +36,14 @@ namespace ZeroFormatter.Internal
             }
         }
 
+        public bool IsValueType
+        {
+            get
+            {
+                return type.IsValueType;
+            }
+        }
+
         public bool IsNullable()
         {
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
@@ -52,6 +60,8 @@ namespace ZeroFormatter.Internal
 }
 
 #endif
+#if !UNITY
+
 
 namespace ZeroFormatter.Internal
 {
@@ -63,3 +73,5 @@ namespace ZeroFormatter.Internal
         }
     }
 }
+
+#endif

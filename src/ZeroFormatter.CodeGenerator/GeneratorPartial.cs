@@ -31,8 +31,13 @@ namespace ZeroFormatter.CodeGenerator
         }
     }
 
-
     public partial class ObjectGenerator
+    {
+        public string Namespace { get; set; }
+        public ObjectSegmentType[] Types { get; set; }
+    }
+
+    public partial class StructGenerator
     {
         public string Namespace { get; set; }
         public ObjectSegmentType[] Types { get; set; }
@@ -81,6 +86,7 @@ namespace ZeroFormatter.CodeGenerator
     public partial class InitializerGenerator
     {
         public ObjectGenerator[] Objects { get; set; }
+        public StructGenerator[] Structs { get; set; }
         public EnumGenerator[] Enums { get; set; }
         public GenericType[] GenericTypes { get; set; }
         public bool UnuseUnityAttribute { get; set; }

@@ -1,18 +1,19 @@
-﻿#if !UNITY
-
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Reflection.Emit;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
+
+#if !UNITY
+using System.Reflection;
+using System.Reflection.Emit;
+#endif
 
 namespace ZeroFormatter.Formatters
 {
     // Layout: [int byteSize][lastIndex][indexOffset:int...][t format...], byteSize == -1 is null.
+
+#if !UNITY
 
     internal static class DynamicObjectDescriptor
     {
@@ -60,9 +61,12 @@ namespace ZeroFormatter.Formatters
                 var getMethod = item.GetGetMethod(true);
                 var setMethod = item.GetSetMethod(true);
 
-                if (getMethod == null || setMethod == null || getMethod.IsPrivate || setMethod.IsPrivate)
+                if (isClass)
                 {
-                    throw new InvalidOperationException("Public property's accessor must needs both public/protected get and set." + type.Name + "." + item.Name);
+                    if (getMethod == null || setMethod == null || getMethod.IsPrivate || setMethod.IsPrivate)
+                    {
+                        throw new InvalidOperationException("Public property's accessor must needs both public/protected get and set." + type.Name + "." + item.Name);
+                    }
                 }
 
                 if (isClass)
@@ -320,7 +324,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    public static class DynamicStructFormatter
+    internal static class DynamicStructFormatter
     {
         // create dynamic struct Formatter<T>
         public static object Create<T>()
@@ -333,7 +337,7 @@ namespace ZeroFormatter.Formatters
             {
                 var elementType = ti.GetGenericArguments()[0];
                 var formatter = typeof(Formatter<>).MakeGenericType(elementType).GetTypeInfo().GetProperty("Default").GetGetMethod().Invoke(null, null);
-                return Activator.CreateInstance(typeof(DynamicNullableStructFormatter<>).MakeGenericType(elementType), new[] { formatter });
+                return Activator.CreateInstance(typeof(NullableStructFormatter<>).MakeGenericType(elementType), new[] { formatter });
             }
             else
             {
@@ -501,12 +505,14 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class DynamicNullableStructFormatter<T> : Formatter<T?>
+#endif
+
+    public class NullableStructFormatter<T> : Formatter<T?>
         where T : struct
     {
         readonly Formatter<T> innerFormatter;
 
-        public DynamicNullableStructFormatter(Formatter<T> innerFormatter)
+        public NullableStructFormatter(Formatter<T> innerFormatter)
         {
             this.innerFormatter = innerFormatter;
         }
@@ -550,4 +556,3 @@ namespace ZeroFormatter.Formatters
     }
 }
 
-#endif

@@ -10,9 +10,9 @@ namespace ZeroFormatter.CodeGenerator
     {
         readonly string csProjPath;
 
-        const string ZeroFormattableAttributeShortName = "ZeroFormattableAttribute";
-        const string IndexAttributeShortName = "IndexAttribute";
-        const string IgnoreAttributeShortName = "IgnoreFormatAttribute";
+        public const string ZeroFormattableAttributeShortName = "ZeroFormattableAttribute";
+        public const string IndexAttributeShortName = "IndexAttribute";
+        public const string IgnoreAttributeShortName = "IgnoreFormatAttribute";
 
         static readonly SymbolDisplayFormat binaryWriteFormat = new SymbolDisplayFormat(
                 genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
@@ -21,6 +21,7 @@ namespace ZeroFormatter.CodeGenerator
 
         ILookup<TypeKind, INamedTypeSymbol> targetTypes;
         List<EnumType> enumContainer;
+        List<ObjectSegmentType> structContainer;
         List<ObjectSegmentType> objectContainer;
         List<GenericType> genericTypeContainer;
         HashSet<string> alreadyCollected;
@@ -32,7 +33,9 @@ namespace ZeroFormatter.CodeGenerator
             var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath).GetAwaiter().GetResult();
             targetTypes = compilation.GetNamedTypeSymbols()
                 .Where(x => (x.TypeKind == TypeKind.Enum)
-                    || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null))
+                    || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null)
+                    || ((x.TypeKind == TypeKind.Struct) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null)
+                    )
                 .ToLookup(x => x.TypeKind);
         }
 
@@ -40,11 +43,12 @@ namespace ZeroFormatter.CodeGenerator
         {
             enumContainer = new List<CodeGenerator.EnumType>();
             objectContainer = new List<CodeGenerator.ObjectSegmentType>();
+            structContainer = new List<CodeGenerator.ObjectSegmentType>();
             genericTypeContainer = new List<CodeGenerator.GenericType>();
             alreadyCollected = new HashSet<string>();
         }
 
-        public void Visit(out EnumGenerator[] enumGenerators, out ObjectGenerator[] objectGenerators, out GenericType[] genericTypes)
+        public void Visit(out EnumGenerator[] enumGenerators, out ObjectGenerator[] objectGenerators, out StructGenerator[] structGenerators, out GenericType[] genericTypes)
         {
             Init(); // cleanup field.
 
@@ -53,6 +57,10 @@ namespace ZeroFormatter.CodeGenerator
                 CollectEnum(item);
             }
             foreach (var item in targetTypes[TypeKind.Class])
+            {
+                CollectObjectSegment(item);
+            }
+            foreach (var item in targetTypes[TypeKind.Struct])
             {
                 CollectObjectSegment(item);
             }
@@ -67,8 +75,18 @@ namespace ZeroFormatter.CodeGenerator
                 })
                 .ToArray();
 
-            objectGenerators = objectContainer.GroupBy(x => x.Namespace)
+            objectGenerators = objectContainer
+               .GroupBy(x => x.Namespace)
                .Select(x => new ObjectGenerator
+               {
+                   Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
+                   Types = x.ToArray(),
+               })
+               .ToArray();
+
+            structGenerators = structContainer
+               .GroupBy(x => x.Namespace)
+               .Select(x => new StructGenerator
                {
                    Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
                    Types = x.ToArray(),
@@ -167,13 +185,53 @@ namespace ZeroFormatter.CodeGenerator
             {
                 throw new Exception($"Type must mark ZeroFormattableAttribute. {type.Name}.  Location:{type.Locations[0]}");
             }
-            if (type.IsValueType)
+
+            if (!type.IsValueType)
             {
-                throw new Exception($"Type must be class. {type.Name}. Location:{type.Locations[0]}");
+                if (!type.Constructors.Any(x => x.Parameters.Length == 0))
+                {
+                    throw new Exception($"Type must needs parameterless constructor. {type.Name}. Location:{type.Locations[0]}");
+                }
             }
-            if (!type.Constructors.Any(x => x.Parameters.Length == 0))
+            else
             {
-                throw new Exception($"Type must needs parameterless constructor. {type.Name}. Location:{type.Locations[0]}");
+                var indexes = new List<Tuple<int, IPropertySymbol>>();
+                foreach (var item in type.GetMembers().OfType<IPropertySymbol>())
+                {
+                    var indexAttr = item.GetAttributes().FindAttributeShortName(IndexAttributeShortName);
+                    if (indexAttr != null)
+                    {
+                        var index = (int)indexAttr.ConstructorArguments[0].Value;
+                        indexes.Add(Tuple.Create(index, item));
+                    }
+                }
+                indexes = indexes.OrderBy(x => x.Item1).ToList();
+
+                var expected = 0;
+                foreach (var item in indexes)
+                {
+                    if (item.Item1 != expected)
+                    {
+                        throw new Exception($"Struct index must be started with 0 and be sequential. Type: {type.Name}, InvalidIndex: {item.Item1}");
+                    }
+                    expected++;
+                }
+
+                var foundConstructor = false;
+                var ctors = (type as INamedTypeSymbol)?.Constructors;
+                foreach (var ctor in ctors)
+                {
+                    var isMatch = indexes.Select(x => x.Item2.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
+                        .SequenceEqual(ctor.Parameters.Select(x => x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
+                    if (isMatch)
+                    {
+                        foundConstructor = true;
+                    }
+                }
+                if (!foundConstructor && indexes.Count != 0)
+                {
+                    throw new Exception($"Struct needs full parameter constructor of index property types. Type: {type.Name}");
+                }
             }
 
             var list = new List<ObjectSegmentType.PropertyTuple>();
@@ -193,9 +251,12 @@ namespace ZeroFormatter.CodeGenerator
                     continue;
                 }
 
-                if (!property.IsVirtual)
+                if (!type.IsValueType)
                 {
-                    throw new Exception($"Public property's accessor must be virtual. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
+                    if (!property.IsVirtual)
+                    {
+                        throw new Exception($"Public property's accessor must be virtual. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
+                    }
                 }
 
                 var indexAttr = attributes.FindAttributeShortName(IndexAttributeShortName);
@@ -215,11 +276,14 @@ namespace ZeroFormatter.CodeGenerator
                     throw new Exception($"IndexAttribute can not allow duplicate. {type.Name}.{property.Name}, Index:{index.Value} Location:{type.Locations[0]}");
                 }
 
-                if (property.GetMethod == null || property.SetMethod == null
-                    || property.GetMethod.DeclaredAccessibility == Accessibility.Private
-                    || property.SetMethod.DeclaredAccessibility == Accessibility.Private)
+                if (!type.IsValueType)
                 {
-                    throw new Exception($"Public property's accessor must needs both public/protected get and set. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
+                    if (property.GetMethod == null || property.SetMethod == null
+                        || property.GetMethod.DeclaredAccessibility == Accessibility.Private
+                        || property.SetMethod.DeclaredAccessibility == Accessibility.Private)
+                    {
+                        throw new Exception($"Public property's accessor must needs both public/protected get and set. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
+                    }
                 }
 
                 if (property.Type.TypeKind == TypeKind.Array)
@@ -257,14 +321,23 @@ namespace ZeroFormatter.CodeGenerator
                 list.Add(prop);
             }
 
-            objectContainer.Add(new ObjectSegmentType
+            var segment = new ObjectSegmentType
             {
                 Name = type.Name,
                 FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 Namespace = type.ContainingNamespace.ToDisplayString(),
                 LastIndex = list.Select(x => x.Index).DefaultIfEmpty(0).Max(),
                 Properties = list.OrderBy(x => x.Index).ToArray(),
-            });
+            };
+
+            if (type.IsValueType)
+            {
+                structContainer.Add(segment);
+            }
+            else
+            {
+                objectContainer.Add(segment);
+            }
         }
 
         static int GetEnumSize(INamedTypeSymbol enumUnderlyingType)

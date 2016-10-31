@@ -77,6 +77,33 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.OffsetType>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.OffsetTypeFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.TestBase>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.TestBaseFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.Test2>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.Test2Formatter());
+            ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.IncludeStruct>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.IncludeStructFormatter());
+            // Structs
+            {
+                var structFormatter = new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.MyStructFixedFormatter();
+                ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.MyStructFixed>.Register(structFormatter);
+                ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.MyStructFixed?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<global::ZeroFormatter.Tests.MyStructFixed>(structFormatter));
+            }
+            {
+                var structFormatter = new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.MyStructVariableFormatter();
+                ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.MyStructVariable>.Register(structFormatter);
+                ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.MyStructVariable?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<global::ZeroFormatter.Tests.MyStructVariable>(structFormatter));
+            }
+            {
+                var structFormatter = new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.MyVectorFormatter();
+                ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.MyVector>.Register(structFormatter);
+                ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.MyVector?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<global::ZeroFormatter.Tests.MyVector>(structFormatter));
+            }
+            {
+                var structFormatter = new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.MyNonVectorFormatter();
+                ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.MyNonVector>.Register(structFormatter);
+                ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.MyNonVector?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<global::ZeroFormatter.Tests.MyNonVector>(structFormatter));
+            }
+            {
+                var structFormatter = new ZeroFormatter.DynamicObjectSegments.UnityEngine.Vector2Formatter();
+                ZeroFormatter.Formatters.Formatter<global::UnityEngine.Vector2>.Register(structFormatter);
+                ZeroFormatter.Formatters.Formatter<global::UnityEngine.Vector2?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<global::UnityEngine.Vector2>(structFormatter));
+            }
             // Generics
             ZeroFormatter.Formatters.GenericFormatter.RegisterKeyTuple<int, string>();
             ZeroFormatter.Formatters.GenericFormatter.RegisterList<global::Sandbox.Shared.Bar.MogeMoge>();
@@ -2915,6 +2942,324 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             {
                 return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
             }
+        }
+    }
+
+    public class IncludeStructFormatter : Formatter<global::ZeroFormatter.Tests.IncludeStruct>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.IncludeStruct value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (1 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::ZeroFormatter.Tests.MyStructFixed>(ref bytes, startOffset, offset, 0, value.MyProperty0);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::ZeroFormatter.Tests.MyStructVariable>(ref bytes, startOffset, offset, 1, value.MyProperty1);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 1);
+            }
+        }
+
+        public override global::ZeroFormatter.Tests.IncludeStruct Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new IncludeStructObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class IncludeStructObjectSegment : global::ZeroFormatter.Tests.IncludeStruct, IZeroFormatterSegment
+    {
+        static readonly int[] __elementSizes = new int[]{ 16, 0 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+        readonly CacheSegment<global::ZeroFormatter.Tests.MyStructVariable> _MyProperty1;
+
+        // 0
+        public override global::ZeroFormatter.Tests.MyStructFixed MyProperty0
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<global::ZeroFormatter.Tests.MyStructFixed>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<global::ZeroFormatter.Tests.MyStructFixed>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+            }
+        }
+
+        // 1
+        public override global::ZeroFormatter.Tests.MyStructVariable MyProperty1
+        {
+            get
+            {
+                return _MyProperty1.Value;
+            }
+            set
+            {
+                _MyProperty1.Value = value;
+            }
+        }
+
+
+        public IncludeStructObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+            int __out;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 1, __elementSizes);
+
+            _MyProperty1 = new CacheSegment<global::ZeroFormatter.Tests.MyStructVariable>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (1 + 1));
+
+                offset += ObjectSegmentHelper.SerializeFixedLength<global::ZeroFormatter.Tests.MyStructFixed>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::ZeroFormatter.Tests.MyStructVariable>(ref targetBytes, startOffset, offset, 1, _MyProperty1);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+
+}
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
+{
+    using global::System;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
+
+    public class MyStructFixedFormatter : Formatter<global::ZeroFormatter.Tests.MyStructFixed>
+    {
+        public override int? GetLength()
+        {
+            return 16;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyStructFixed value)
+        {
+            var startOffset = offset;
+            offset += Formatter<int>.Default.Serialize(ref bytes, offset, value.MyProperty1);
+            offset += Formatter<long>.Default.Serialize(ref bytes, offset, value.MyProperty2);
+            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.MyProperty3);
+            return offset - startOffset;
+        }
+
+        public override global::ZeroFormatter.Tests.MyStructFixed Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 0;
+            int size;
+            var item0 = Formatter<int>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            var item1 = Formatter<long>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            var item2 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            
+            return new global::ZeroFormatter.Tests.MyStructFixed(item0, item1, item2);
+        }
+    }
+
+    public class MyStructVariableFormatter : Formatter<global::ZeroFormatter.Tests.MyStructVariable>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyStructVariable value)
+        {
+            var startOffset = offset;
+            offset += Formatter<int>.Default.Serialize(ref bytes, offset, value.MyProperty1);
+            offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.MyProperty2);
+            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.MyProperty3);
+            return offset - startOffset;
+        }
+
+        public override global::ZeroFormatter.Tests.MyStructVariable Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 0;
+            int size;
+            var item0 = Formatter<int>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            var item1 = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            var item2 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            
+            return new global::ZeroFormatter.Tests.MyStructVariable(item0, item1, item2);
+        }
+    }
+
+    public class MyVectorFormatter : Formatter<global::ZeroFormatter.Tests.MyVector>
+    {
+        public override int? GetLength()
+        {
+            return 8;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyVector value)
+        {
+            var startOffset = offset;
+            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.X);
+            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.Y);
+            return offset - startOffset;
+        }
+
+        public override global::ZeroFormatter.Tests.MyVector Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 0;
+            int size;
+            var item0 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            var item1 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            
+            return new global::ZeroFormatter.Tests.MyVector(item0, item1);
+        }
+    }
+
+    public class MyNonVectorFormatter : Formatter<global::ZeroFormatter.Tests.MyNonVector>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyNonVector value)
+        {
+            var startOffset = offset;
+            offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.X);
+            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.Y);
+            return offset - startOffset;
+        }
+
+        public override global::ZeroFormatter.Tests.MyNonVector Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 0;
+            int size;
+            var item0 = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            var item1 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            
+            return new global::ZeroFormatter.Tests.MyNonVector(item0, item1);
+        }
+    }
+
+
+}
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
+{
+    using global::System;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
+
+    public class Vector2Formatter : Formatter<global::UnityEngine.Vector2>
+    {
+        public override int? GetLength()
+        {
+            return 8;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::UnityEngine.Vector2 value)
+        {
+            var startOffset = offset;
+            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.x);
+            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.y);
+            return offset - startOffset;
+        }
+
+        public override global::UnityEngine.Vector2 Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 0;
+            int size;
+            var item0 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            var item1 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+            
+            return new global::UnityEngine.Vector2(item0, item1);
         }
     }
 

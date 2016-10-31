@@ -86,6 +86,7 @@
     <Compile Include="Assets\Scripts\Tests\BlockSerializeTest.cs" />
     <Compile Include="Assets\Scripts\Tests\InheritanceTest.cs" />
     <Compile Include="Assets\Scripts\Tests\OffsetTest.cs" />
+    <Compile Include="Assets\Scripts\Tests\StructTest.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Shim.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Tuple.cs" />
     <Compile Include="Assets\Scripts\Tests\DictionaryFormatterTest.cs" />

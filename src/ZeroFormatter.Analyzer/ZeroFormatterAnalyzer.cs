@@ -333,12 +333,15 @@ namespace ZeroFormatter.Analyzer
                 context.Add(Diagnostic.Create(IndexIsTooLarge, property.Locations[0], index.Value, property.Name));
             }
 
-            if (property.GetMethod == null || property.SetMethod == null
-                || property.GetMethod.DeclaredAccessibility == Accessibility.Private
-                || property.SetMethod.DeclaredAccessibility == Accessibility.Private)
+            if (!property.ContainingType.IsValueType)
             {
-                context.Add(Diagnostic.Create(PublicPropertyNeedsGetAndSetAccessor, property.Locations[0], property.ContainingType?.Name, property.Name));
-                return;
+                if (property.GetMethod == null || property.SetMethod == null
+                    || property.GetMethod.DeclaredAccessibility == Accessibility.Private
+                    || property.SetMethod.DeclaredAccessibility == Accessibility.Private)
+                {
+                    context.Add(Diagnostic.Create(PublicPropertyNeedsGetAndSetAccessor, property.Locations[0], property.ContainingType?.Name, property.Name));
+                    return;
+                }
             }
 
             if (property.Type.TypeKind == TypeKind.Array)

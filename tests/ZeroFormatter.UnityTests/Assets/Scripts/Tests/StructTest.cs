@@ -1,57 +1,10 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using RuntimeUnitTestToolkit;
+using System;
 
 namespace ZeroFormatter.Tests
 {
-    [TestClass]
     public class StructTest
     {
-        [ZeroFormattable]
-        public struct MyStructFixed
-        {
-            [Index(0)]
-            public int MyProperty1 { get; private set; }
-            [Index(1)]
-            public long MyProperty2 { get; private set; }
-            [Index(2)]
-            public float MyProperty3 { get; private set; }
-
-            public MyStructFixed(int x, long y, float z)
-            {
-                MyProperty1 = x;
-                MyProperty2 = y;
-                MyProperty3 = z;
-            }
-        }
-
-        [ZeroFormattable]
-        public struct MyStructVariable
-        {
-            [Index(0)]
-            public int MyProperty1 { get; private set; }
-            [Index(1)]
-            public string MyProperty2 { get; private set; }
-            [Index(2)]
-            public float MyProperty3 { get; private set; }
-
-            public MyStructVariable(int x, string y, float z)
-            {
-                MyProperty1 = x;
-                MyProperty2 = y;
-                MyProperty3 = z;
-            }
-        }
-
-        [ZeroFormattable]
-        public class IncludeStruct
-        {
-            [Index(0)]
-            public virtual MyStructFixed MyProperty0 { get; set; }
-            [Index(1)]
-            public virtual MyStructVariable MyProperty1 { get; set; }
-        }
-
-        [TestMethod]
         public void Struct()
         {
             {
@@ -99,7 +52,6 @@ namespace ZeroFormatter.Tests
             }
         }
 
-        [TestMethod]
         public void Includestruct()
         {
             var xs = ZeroFormatterSerializer.Convert(new IncludeStruct
@@ -115,6 +67,15 @@ namespace ZeroFormatter.Tests
             xs.MyProperty1.MyProperty1.Is(100);
             xs.MyProperty1.MyProperty2.Is("hogehoge");
             xs.MyProperty1.MyProperty3.Is(-123.43f);
+        }
+
+        public void Vector2()
+        {
+            var v = new UnityEngine.Vector2(15.5f, 20.49f);
+            var v2 = ZeroFormatterSerializer.Convert(v);
+
+            v2.x.Is(v.x);
+            v2.y.Is(v.y);
         }
     }
 }

@@ -34,6 +34,14 @@ namespace ZeroFormatter.Internal
 <# foreach(var g in Objects) { foreach(var t in g.Types) {   #>
             ZeroFormatter.Formatters.Formatter<<#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>Formatter());
 <# } } #>
+            // Structs
+<# foreach(var g in Structs) { foreach(var t in g.Types) {   #>
+            {
+                var structFormatter = new <#= g.Namespace + "." + t.Name #>Formatter();
+                ZeroFormatter.Formatters.Formatter<<#= t.FullName #>>.Register(structFormatter);
+                ZeroFormatter.Formatters.Formatter<<#= t.FullName #>?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<<#= t.FullName #>>(structFormatter));
+            }
+<# } } #>
             // Generics
 <# foreach(var g in GenericTypes) { #>
 <# if (g.TypeKind == GenericTypeKind.KeyTuple) { #>

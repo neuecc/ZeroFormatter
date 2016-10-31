@@ -200,4 +200,78 @@ namespace ZeroFormatter.Tests
         public virtual int MyProperty1 { get; set; }
     }
 
+    [ZeroFormattable]
+    public struct MyVector
+    {
+        [Index(0)]
+        public float X { get; private set; }
+        [Index(1)]
+        public float Y { get;private set; }
+
+        public MyVector(float x, float y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+    }
+
+    [ZeroFormattable]
+    public struct MyNonVector
+    {
+        [Index(0)]
+        public string X { get; private set; }
+        [Index(1)]
+        public float Y { get; private set; }
+
+        public MyNonVector(string x, float y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+    }
+
+    [ZeroFormattable]
+    public struct MyStructFixed
+    {
+        [Index(0)]
+        public int MyProperty1 { get; private set; }
+        [Index(1)]
+        public long MyProperty2 { get; private set; }
+        [Index(2)]
+        public float MyProperty3 { get; private set; }
+
+        public MyStructFixed(int x, long y, float z)
+        {
+            MyProperty1 = x;
+            MyProperty2 = y;
+            MyProperty3 = z;
+        }
+    }
+
+    [ZeroFormattable]
+    public struct MyStructVariable
+    {
+        [Index(0)]
+        public int MyProperty1 { get; private set; }
+        [Index(1)]
+        public string MyProperty2 { get; private set; }
+        [Index(2)]
+        public float MyProperty3 { get; private set; }
+
+        public MyStructVariable(int x, string y, float z)
+        {
+            MyProperty1 = x;
+            MyProperty2 = y;
+            MyProperty3 = z;
+        }
+    }
+
+    [ZeroFormattable]
+    public class IncludeStruct
+    {
+        [Index(0)]
+        public virtual MyStructFixed MyProperty0 { get; set; }
+        [Index(1)]
+        public virtual MyStructVariable MyProperty1 { get; set; }
+    }
 }
