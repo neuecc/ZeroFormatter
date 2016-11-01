@@ -14,7 +14,7 @@ namespace Sandbox.Shared
     }
 
     [ZeroFormattable]
-    public class Inherit: InheritBase
+    public class Inherit : InheritBase
     {
         [Index(1)]
         public virtual int MyProperty1 { get; set; }
@@ -24,5 +24,12 @@ namespace Sandbox.Shared
         public virtual TypeCode MyProperty2 { get; set; }
     }
 
-    
+
+    [ZeroFormattable]
+    public class FooBarBaz
+    {
+        [Index(0)]
+        public virtual IList<byte[]> HugaHuga { get; set; }
+    }
+
 }

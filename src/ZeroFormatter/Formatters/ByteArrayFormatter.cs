@@ -23,7 +23,7 @@ namespace ZeroFormatter.Formatters
 
             var writeSize = value.Length;
             BinaryUtil.EnsureCapacity(ref bytes, offset, writeSize + 4);
-            BinaryUtil.WriteInt32(ref bytes, offset, value.Length);
+            BinaryUtil.WriteInt32Unsafe(ref bytes, offset, value.Length);
             Buffer.BlockCopy(value, 0, bytes, offset + 4, writeSize);
 
             return writeSize + 4;
