@@ -51,7 +51,7 @@ public class Person : IEquatable<Person>
     }
 }
 
-public enum Sex
+public enum Sex : sbyte
 {
     Unknown, Male, Female,
 }
@@ -80,6 +80,7 @@ class Program
         SerializeFsPickler(p); SerializeFsPickler(l);
         SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
         SerializeDataContract(p); SerializeDataContract(l);
+        SerializeSingleFlatBuffers(); SerializeArrayFlatBuffers();
 
         dryRun = false;
 
@@ -93,6 +94,7 @@ class Program
         var e = SerializeFsPickler(p); Console.WriteLine();
         var f = SerializeBinaryFormatter(p); Console.WriteLine();
         var g = SerializeDataContract(p); Console.WriteLine();
+        var h = SerializeSingleFlatBuffers(); Console.WriteLine();
 
         Console.WriteLine("Large Array"); Console.WriteLine();
 
@@ -103,6 +105,7 @@ class Program
         var E = SerializeFsPickler(l); Console.WriteLine();
         var F = SerializeBinaryFormatter(l); Console.WriteLine();
         var G = SerializeDataContract(l); Console.WriteLine();
+        var H = SerializeArrayFlatBuffers(); Console.WriteLine();
 
         Validate("ZeroFormatter", p, l, a, A);
         Validate("protobuf-net", p, l, b, B);
@@ -111,6 +114,7 @@ class Program
         Validate("FsPickler", p, l, e, E);
         Validate("BinaryFormatter", p, l, f, F);
         Validate("DataContract", p, l, g, G);
+        ValidateFlatBuffers(p, l, h, H);
     }
 
     static void Validate(string label, Person original, IList<Person> originalList, Person copy, IList<Person> copyList)
@@ -422,6 +426,125 @@ class Program
         return copy;
     }
 
+    static FlatBuffersObject.Person SerializeSingleFlatBuffers()
+    {
+        Console.WriteLine("FlatBuffers");
+
+        FlatBuffersObject.Person copy = default(FlatBuffersObject.Person);
+        byte[] bytes = null;
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                var builder = new FlatBuffers.FlatBufferBuilder(1);
+
+                var person = FlatBuffersObject.Person.CreatePerson(builder, 9999, builder.CreateString("hoge"), builder.CreateString("huga"), FlatBuffersObject.Sex.Male);
+                builder.Finish(person.Value);
+
+                bytes = builder.SizedByteArray();
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                copy = FlatBuffersObject.Person.GetRootAsPerson(new FlatBuffers.ByteBuffer(bytes));
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                var bb = copy.ByteBuffer;
+                var newbytes = new byte[bb.Length];
+                Buffer.BlockCopy(bb.Data, 0, newbytes, 0, bb.Length);
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(bytes.Length)));
+        }
+
+        return copy;
+    }
+
+    static FlatBuffersObject.PersonVector SerializeArrayFlatBuffers()
+    {
+        Console.WriteLine("FlatBuffers");
+
+        FlatBuffersObject.PersonVector copy = default(FlatBuffersObject.PersonVector);
+        byte[] bytes = null;
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                var builder = new FlatBuffers.FlatBufferBuilder(1);
+
+                Func<FlatBuffers.Offset<FlatBuffersObject.Person>[]> makeVector = () =>
+                {
+                    var array = new FlatBuffers.Offset<FlatBuffersObject.Person>[1000];
+                    var count = 0;
+                    for (int j = 1000; j < 2000; j++)
+                    {
+                        var person = FlatBuffersObject.Person.CreatePerson(builder, j, builder.CreateString("abc"), builder.CreateString("def"), FlatBuffersObject.Sex.Female);
+                        array[count++] = person;
+                    }
+                    return array;
+                };
+
+                var personVector = FlatBuffersObject.PersonVector.CreatePersonVector(builder, FlatBuffersObject.PersonVector.CreateListVector(builder, makeVector()));
+                builder.Finish(personVector.Value);
+
+                bytes = builder.SizedByteArray();
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                copy = FlatBuffersObject.PersonVector.GetRootAsPersonVector(new FlatBuffers.ByteBuffer(bytes));
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                var bb = copy.ByteBuffer;
+                var newbytes = new byte[bb.Length];
+                Buffer.BlockCopy(bb.Data, 0, newbytes, 0, bb.Length);
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(bytes.Length)));
+        }
+
+        return copy;
+    }
+
+    static void ValidateFlatBuffers(Person original, IList<Person> list, FlatBuffersObject.Person p, FlatBuffersObject.PersonVector l)
+    {
+        if (!(p.Age == original.Age && p.FirstName == original.FirstName && p.LastName == original.LastName && (sbyte)p.Sex == (sbyte)original.Sex))
+        {
+            throw new Exception("Validation failed");
+        }
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (!(l.GetList(i).Age == list[i].Age && l.GetList(i).FirstName == list[i].FirstName && l.GetList(i).LastName == list[i].LastName && (sbyte)l.GetList(i).Sex == (sbyte)list[i].Sex))
+            {
+                throw new Exception("Validation failed");
+            }
+        }
+    }
 
     struct Measure : IDisposable
     {

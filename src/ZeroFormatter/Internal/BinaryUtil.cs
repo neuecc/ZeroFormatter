@@ -111,170 +111,171 @@ namespace ZeroFormatter.Internal
         {
             EnsureCapacity(ref bytes, offset, 4);
 
-            uint num = *(uint*)(&value);
-            bytes[offset] = (byte)num;
-            bytes[offset + 1] = (byte)(num >> 8);
-            bytes[offset + 2] = (byte)(num >> 16);
-            bytes[offset + 3] = (byte)(num >> 24);
+            fixed (byte* ptr = bytes)
+            {
+                *(float*)(ptr + offset) = value;
+            }
 
             return 4;
         }
 
         public static unsafe float ReadSingle(ref byte[] bytes, int offset)
         {
-            uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
-            return *(float*)(&num);
+            fixed (byte* ptr = bytes)
+            {
+                return *(float*)(ptr + offset);
+            }
         }
 
         public static unsafe int WriteDouble(ref byte[] bytes, int offset, double value)
         {
             EnsureCapacity(ref bytes, offset, 8);
 
-            ulong num = (ulong)(*(long*)(&value));
-            bytes[offset] = (byte)num;
-            bytes[offset + 1] = (byte)(num >> 8);
-            bytes[offset + 2] = (byte)(num >> 16);
-            bytes[offset + 3] = (byte)(num >> 24);
-            bytes[offset + 4] = (byte)(num >> 32);
-            bytes[offset + 5] = (byte)(num >> 40);
-            bytes[offset + 6] = (byte)(num >> 48);
-            bytes[offset + 7] = (byte)(num >> 56);
+            fixed (byte* ptr = bytes)
+            {
+                *(double*)(ptr + offset) = value;
+            }
 
             return 8;
         }
 
         public static unsafe double ReadDouble(ref byte[] bytes, int offset)
         {
-            uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
-            ulong num2 = (ulong)((int)bytes[offset + 4] | (int)bytes[offset + 5] << 8 | (int)bytes[offset + 6] << 16 | (int)bytes[offset + 7] << 24) << 32 | (ulong)num;
-            return *(double*)(&num2);
+            fixed (byte* ptr = bytes)
+            {
+                return *(double*)(ptr + offset);
+            }
         }
 
-        public static short WriteInt16(ref byte[] bytes, int offset, short value)
+        public static unsafe int WriteInt16(ref byte[] bytes, int offset, short value)
         {
             EnsureCapacity(ref bytes, offset, 2);
 
-            bytes[offset] = (byte)value;
-            bytes[offset + 1] = (byte)(value >> 8);
+            fixed (byte* ptr = bytes)
+            {
+                *(short*)(ptr + offset) = value;
+            }
 
             return 2;
         }
 
-        public static short ReadInt16(ref byte[] bytes, int offset)
+        public static unsafe short ReadInt16(ref byte[] bytes, int offset)
         {
-            return (short)(bytes[offset]
-                + (bytes[offset + 1] << 8));
+            fixed (byte* ptr = bytes)
+            {
+                return *(short*)(ptr + offset);
+            }
         }
 
-        public static int WriteInt32(ref byte[] bytes, int offset, int value)
+        public static unsafe int WriteInt32(ref byte[] bytes, int offset, int value)
         {
             EnsureCapacity(ref bytes, offset, 4);
 
-            bytes[offset] = (byte)value;
-            bytes[offset + 1] = (byte)(value >> 8);
-            bytes[offset + 2] = (byte)(value >> 16);
-            bytes[offset + 3] = (byte)(value >> 24);
+            fixed (byte* ptr = bytes)
+            {
+                *(int*)(ptr + offset) = value;
+            }
 
             return 4;
         }
 
         /// <summary>
-        /// Unsafe! do not ensure capacity and don't return size.
+        /// Unsafe! don't ensure capacity and don't return size.
         /// </summary>
-        public static void WriteInt32Unsafe(ref byte[] bytes, int offset, int value)
+        public static unsafe void WriteInt32Unsafe(ref byte[] bytes, int offset, int value)
         {
-            bytes[offset] = (byte)value;
-            bytes[offset + 1] = (byte)(value >> 8);
-            bytes[offset + 2] = (byte)(value >> 16);
-            bytes[offset + 3] = (byte)(value >> 24);
+            fixed (byte* ptr = bytes)
+            {
+                *(int*)(ptr + offset) = value;
+            }
         }
 
-        public static int ReadInt32(ref byte[] bytes, int offset)
+        public static unsafe int ReadInt32(ref byte[] bytes, int offset)
         {
-            return bytes[offset]
-                + (bytes[offset + 1] << 8)
-                + (bytes[offset + 2] << 16)
-                + (bytes[offset + 3] << 24);
+            fixed (byte* ptr = bytes)
+            {
+                return *(int*)(ptr + offset);
+            }
         }
 
-        public static int WriteInt64(ref byte[] bytes, int offset, long value)
+        public static unsafe int WriteInt64(ref byte[] bytes, int offset, long value)
         {
             EnsureCapacity(ref bytes, offset, 8);
 
-            bytes[offset] = (byte)value;
-            bytes[offset + 1] = (byte)(value >> 8);
-            bytes[offset + 2] = (byte)(value >> 16);
-            bytes[offset + 3] = (byte)(value >> 24);
-            bytes[offset + 4] = (byte)(value >> 32);
-            bytes[offset + 5] = (byte)(value >> 40);
-            bytes[offset + 6] = (byte)(value >> 48);
-            bytes[offset + 7] = (byte)(value >> 56);
+            fixed (byte* ptr = bytes)
+            {
+                *(long*)(ptr + offset) = value;
+            }
 
             return 8;
         }
 
-        public static long ReadInt64(ref byte[] bytes, int offset)
+        public static unsafe long ReadInt64(ref byte[] bytes, int offset)
         {
-            uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
-            return (long)((ulong)((int)bytes[offset + 4] | (int)bytes[offset + 5] << 8 | (int)bytes[offset + 6] << 16 | (int)bytes[offset + 7] << 24) << 32 | (ulong)num);
+            fixed (byte* ptr = bytes)
+            {
+                return *(long*)(ptr + offset);
+            }
         }
 
-        public static short WriteUInt16(ref byte[] bytes, int offset, ushort value)
+        public static unsafe int WriteUInt16(ref byte[] bytes, int offset, ushort value)
         {
             EnsureCapacity(ref bytes, offset, 2);
 
-            bytes[offset] = (byte)value;
-            bytes[offset + 1] = (byte)(value >> 8);
+            fixed (byte* ptr = bytes)
+            {
+                *(ushort*)(ptr + offset) = value;
+            }
 
             return 2;
         }
 
-        public static ushort ReadUInt16(ref byte[] bytes, int offset)
+        public static unsafe ushort ReadUInt16(ref byte[] bytes, int offset)
         {
-            return (ushort)(bytes[offset]
-                + (bytes[offset + 1] << 8));
+            fixed (byte* ptr = bytes)
+            {
+                return *(ushort*)(ptr + offset);
+            }
         }
 
-        public static int WriteUInt32(ref byte[] bytes, int offset, uint value)
+        public static unsafe int WriteUInt32(ref byte[] bytes, int offset, uint value)
         {
             EnsureCapacity(ref bytes, offset, 4);
 
-            bytes[offset] = (byte)value;
-            bytes[offset + 1] = (byte)(value >> 8);
-            bytes[offset + 2] = (byte)(value >> 16);
-            bytes[offset + 3] = (byte)(value >> 24);
+            fixed (byte* ptr = bytes)
+            {
+                *(uint*)(ptr + offset) = value;
+            }
 
             return 4;
         }
 
-        public static uint ReadUInt32(ref byte[] bytes, int offset)
+        public static unsafe uint ReadUInt32(ref byte[] bytes, int offset)
         {
-            return (uint)((int)bytes[offset]
-                + ((int)bytes[offset + 1] << 8)
-                + ((int)bytes[offset + 2] << 16)
-                + ((int)bytes[offset + 3] << 24));
+            fixed (byte* ptr = bytes)
+            {
+                return *(uint*)(ptr + offset);
+            }
         }
 
-        public static int WriteUInt64(ref byte[] bytes, int offset, ulong value)
+        public static unsafe int WriteUInt64(ref byte[] bytes, int offset, ulong value)
         {
             EnsureCapacity(ref bytes, offset, 8);
 
-            bytes[offset] = (byte)value;
-            bytes[offset + 1] = (byte)(value >> 8);
-            bytes[offset + 2] = (byte)(value >> 16);
-            bytes[offset + 3] = (byte)(value >> 24);
-            bytes[offset + 4] = (byte)(value >> 32);
-            bytes[offset + 5] = (byte)(value >> 40);
-            bytes[offset + 6] = (byte)(value >> 48);
-            bytes[offset + 7] = (byte)(value >> 56);
+            fixed (byte* ptr = bytes)
+            {
+                *(ulong*)(ptr + offset) = value;
+            }
 
             return 8;
         }
 
-        public static ulong ReadUInt64(ref byte[] bytes, int offset)
+        public static unsafe ulong ReadUInt64(ref byte[] bytes, int offset)
         {
-            uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
-            return (ulong)((int)bytes[offset + 4] | (int)bytes[offset + 5] << 8 | (int)bytes[offset + 6] << 16 | (int)bytes[offset + 7] << 24) << 32 | (ulong)num;
+            fixed (byte* ptr = bytes)
+            {
+                return *(ulong*)(ptr + offset);
+            }
         }
 
         public static int WriteChar(ref byte[] bytes, int offset, char value)

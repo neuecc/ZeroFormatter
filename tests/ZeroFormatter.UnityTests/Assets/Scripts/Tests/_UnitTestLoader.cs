@@ -11,6 +11,7 @@ namespace ZeroFormatter.Tests
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Register()
         {
+            UnitTest.RegisterAllMethods<BinaryUtilTest>();
             UnitTest.RegisterAllMethods<DictionaryFormatterTest>();
             UnitTest.RegisterAllMethods<DictionarySegmentTest>();
             UnitTest.RegisterAllMethods<FormatterTest>();

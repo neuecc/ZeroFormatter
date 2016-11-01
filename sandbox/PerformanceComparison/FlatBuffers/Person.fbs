@@ -1,0 +1,16 @@
+namespace FlatBuffersObject;
+
+enum Sex:byte { Unknown = 0, Male, Female = 2 }
+
+table Person {
+  age:int;
+  firstName:string;
+  lastName:string;
+  sex:Sex;
+}
+
+table PersonVector {
+    list:[Person];
+}
+
+root_type Person;

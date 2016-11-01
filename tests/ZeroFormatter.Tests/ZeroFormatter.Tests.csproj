@@ -65,6 +65,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="BinaryUtilTest.cs" />
     <Compile Include="BlockSerializeTest.cs" />
     <Compile Include="ChainingAssertion.MSTest.cs" />
     <Compile Include="ExtensibilityTest.cs" />
