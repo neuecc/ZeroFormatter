@@ -160,7 +160,7 @@ namespace ZeroFormatter.Segments
 
         public bool CanDirectCopy()
         {
-            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes.Array != null);
         }
 
         public ArraySegment<byte> GetBufferReference()
@@ -330,7 +330,7 @@ namespace ZeroFormatter.Segments
 
         public bool CanDirectCopy()
         {
-            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes.Array != null);
         }
 
         public ArraySegment<byte> GetBufferReference()

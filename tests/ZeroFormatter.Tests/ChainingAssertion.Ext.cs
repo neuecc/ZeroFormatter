@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestTools.UnitTesting
 {
     public static partial class AssertEx
     {
-        public static void IsZero<T>(this IEnumerable<T> source)
+        public static void IsEmpty<T>(this IEnumerable<T> source)
         {
             source.Any().IsFalse();
         }

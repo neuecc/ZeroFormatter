@@ -121,7 +121,7 @@ namespace ZeroFormatter.Formatters
                     }
                 }
 
-                BinaryUtil.WriteInt32Unsafe(ref bytes, startoffset + 4, value.Count);
+                BinaryUtil.WriteInt32(ref bytes, startoffset + 4, value.Count);
 
                 var totalBytes = offset - startoffset;
                 BinaryUtil.WriteInt32Unsafe(ref bytes, startoffset, totalBytes);

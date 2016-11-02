@@ -56,12 +56,6 @@ namespace ZeroFormatter.Segments
 
         internal static DictionarySegment<TKey, TValue> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
-            if (offset == -1)
-            {
-                byteSize = 0;
-                return null;
-            }
-
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSize == -1)
             {
@@ -446,7 +440,7 @@ namespace ZeroFormatter.Segments
 
         public bool CanDirectCopy()
         {
-            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes.Array != null);
         }
 
         public ArraySegment<byte> GetBufferReference()

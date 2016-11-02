@@ -46,7 +46,7 @@ namespace ZeroFormatter.Tests
             {
                 IList<int> xs = new int[0];
                 var result = ZeroFormatterSerializer.Serialize(xs);
-                ZeroFormatterSerializer.Deserialize<IList<int>>(result).IsZero();
+                ZeroFormatterSerializer.Deserialize<IList<int>>(result).IsEmpty();
             }
         }
 

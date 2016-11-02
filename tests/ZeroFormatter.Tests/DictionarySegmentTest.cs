@@ -67,7 +67,7 @@ namespace ZeroFormatter.Tests
 
             dict.Clear();
             dict.Count.Is(0);
-            dict.ToArray().IsZero();
+            dict.ToArray().IsEmpty();
             dict.Add(1234, "aaaa");
             dict.Add(-1, "mainus one");
             dict.Add(9991, "hogehoge one");

@@ -29,7 +29,9 @@ namespace ZeroFormatter.Segments
                 return -1;
             }
             var array = originalBytes.Array;
-            return tracker.RootOffset + BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + 4 * index);
+            var readOffset = BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + 4 * index);
+            if (readOffset == 0) return -1;
+            return tracker.RootOffset + readOffset;
         }
 
         public static ArraySegment<byte> GetSegment(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)

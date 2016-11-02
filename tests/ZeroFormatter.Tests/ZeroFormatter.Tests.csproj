@@ -68,6 +68,7 @@
     <Compile Include="BinaryUtilTest.cs" />
     <Compile Include="BlockSerializeTest.cs" />
     <Compile Include="ChainingAssertion.MSTest.cs" />
+    <Compile Include="EmptyCheckTest.cs" />
     <Compile Include="ExtensibilityTest.cs" />
     <Compile Include="InheritanceTest.cs" />
     <Compile Include="KeyTupleFormatterTest.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="LookupSegmentTest.cs" />
     <Compile Include="NullCheckTest.cs" />
     <Compile Include="StructTest.cs" />
+    <Compile Include="VersiongTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChainingAssertion.Ext.cs" />

@@ -222,12 +222,6 @@ namespace ZeroFormatter.Segments
 
         internal static FixedListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
-            if (offset == -1)
-            {
-                byteSize = 0;
-                return null;
-            }
-
             var formatter = Formatters.Formatter<T>.Default;
             var formatterLength = formatter.GetLength();
             if (formatterLength == null) throw new InvalidOperationException("T should be fixed length. Type: " + typeof(T).Name);
@@ -304,7 +298,7 @@ namespace ZeroFormatter.Segments
 
         public bool CanDirectCopy()
         {
-            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes.Array != null);
         }
 
         public ArraySegment<byte> GetBufferReference()
@@ -345,12 +339,6 @@ namespace ZeroFormatter.Segments
     {
         internal static VariableListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
-            if (offset == -1)
-            {
-                byteSize = 0;
-                return null;
-            }
-
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSize == -1)
             {
@@ -417,7 +405,7 @@ namespace ZeroFormatter.Segments
 
         public bool CanDirectCopy()
         {
-            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes != null);
+            return (tracker == null) ? false : !tracker.IsDirty && (originalBytes.Array != null);
         }
 
         public ArraySegment<byte> GetBufferReference()
