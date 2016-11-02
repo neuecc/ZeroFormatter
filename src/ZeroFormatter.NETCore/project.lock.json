@@ -359,7 +359,7 @@
           "ref/netstandard1.3/System.Threading.Tasks.dll": {}
         }
       },
-      "ZeroFormatter.Interfaces.NETCore/0.2.5": {
+      "ZeroFormatter.Interfaces.NETCore/0.2.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
@@ -2000,7 +2000,7 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "ZeroFormatter.Interfaces.NETCore/0.2.5": {
+    "ZeroFormatter.Interfaces.NETCore/0.2.6": {
       "type": "project",
       "path": "../ZeroFormatter.Interfaces.NETCore/project.json",
       "msbuildProject": "../ZeroFormatter.Interfaces.NETCore/ZeroFormatter.Interfaces.NETCore.xproj"
@@ -2021,7 +2021,7 @@
       "System.Text.Encoding >= 4.0.11",
       "System.Text.Encoding.Extensions >= 4.0.11",
       "System.Threading >= 4.0.11",
-      "ZeroFormatter.Interfaces.NETCore >= 0.2.5"
+      "ZeroFormatter.Interfaces.NETCore >= 0.2.6"
     ],
     ".NETStandard,Version=v1.6": []
   },

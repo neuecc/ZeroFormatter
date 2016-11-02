@@ -48,22 +48,12 @@ namespace Sandbox.DotNetCore
 
         public static void Main(string[] args)
         {
-            var mc = new Test
+            var methods = typeof(ZeroFormatterSerializer).GetTypeInfo().GetMethods();
+
+            foreach (var item in methods)
             {
-                MyProperty1 = 100,
-                MyProperty2 = new[] { 1, 10, 100 },
-                MyProperty3 = new Dictionary<KeyTuple<int, string>, int> { { KeyTuple.Create(10, "a"), 100 } },
-                MyProperty4 = "hogehoge"
-            };
-
-            var converted = ZeroFormatterSerializer.Convert(mc);
-
-            Console.WriteLine(converted.GetType().FullName);
-
-            Console.WriteLine(converted.MyProperty1);
-            Console.WriteLine(string.Join(", ", converted.MyProperty2));
-            Console.WriteLine(converted.MyProperty3[KeyTuple.Create(10, "a")]);
-            Console.WriteLine(converted.MyProperty4);
+                Console.WriteLine(item.Name + ":" + string.Join(", ", item.GetParameters().Select(x => x.Name)));
+            }
 
         }
     }

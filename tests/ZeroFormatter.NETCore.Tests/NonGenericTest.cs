@@ -18,11 +18,11 @@ namespace ZeroFormatter.Tests
                 ((int)ZeroFormatterSerializer.NonGeneric.Deserialize(typeof(int), xs)).Is(100);
 
                 byte[] bytes = null;
-                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(int), 200, ref bytes);
+                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(int), ref bytes, 0, 200);
                 ((int)ZeroFormatterSerializer.NonGeneric.Deserialize(typeof(int), bytes)).Is(200);
 
                 var ms = new MemoryStream();
-                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(int), 999, ms);
+                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(int), ms, 999);
                 ms.Position = 0;
                 ((int)ZeroFormatterSerializer.NonGeneric.Deserialize(typeof(int), ms)).Is(999);
 
@@ -36,11 +36,11 @@ namespace ZeroFormatter.Tests
                 ((MyClass)ZeroFormatterSerializer.NonGeneric.Deserialize(typeof(MyClass), xs)).Age.Is(100);
 
                 byte[] bytes = null;
-                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), new MyClass { Age = 200 }, ref bytes);
+                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), ref bytes, 0, new MyClass { Age = 200 });
                 ((MyClass)ZeroFormatterSerializer.NonGeneric.Deserialize(typeof(MyClass), bytes)).Age.Is(200);
 
                 var ms = new MemoryStream();
-                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), new MyClass { Age = 999 }, ms);
+                ZeroFormatterSerializer.NonGeneric.Serialize(typeof(MyClass), ms, new MyClass { Age = 999 });
                 ms.Position = 0;
                 ((MyClass)ZeroFormatterSerializer.NonGeneric.Deserialize(typeof(MyClass), ms)).Age.Is(999);
 

@@ -27,7 +27,7 @@ namespace ZeroFormatter.Tests
             var ms = new MemoryStream();
             ms.Position = 99; // skip to...
 
-            ZeroFormatterSerializer.Serialize(ot, ms);
+            ZeroFormatterSerializer.Serialize(ms, ot);
             var originalBytes = ms.ToArray();
             // var originalBytes = ZeroFormatterSerializer.Serialize(ot);
 

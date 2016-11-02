@@ -10,7 +10,7 @@ using Sandbox.Shared;
 namespace ZeroFormatter.Tests
 {
     [TestClass]
-    public class VersiongTest
+    public class VersioningTest
     {
         [TestMethod]
         public void MyTestMethod()
