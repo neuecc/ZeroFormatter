@@ -16,19 +16,6 @@ namespace Sandbox.Shared
         public virtual int MyProperty3 { get; set; }
     }
 
-    [ZeroFormattable]
-    public class Small
-    {
-        [Index(0)]
-        public virtual int MyProperty0 { get; set; }
-        [Index(1)]
-        public virtual string MyProperty1 { get; set; }
-
-        [Index(2)]
-        public virtual IList<int> MyProperty2 { get; set; }
-        [Index(3)]
-        public virtual int MyProperty3 { get; set; }
-    }
 
     [ZeroFormattable]
     public class Large
@@ -37,11 +24,19 @@ namespace Sandbox.Shared
         public virtual int MyProperty0 { get; set; }
         [Index(3)]
         public virtual int MyProperty3 { get; set; }
-        [Index(4)]
-        public virtual IList<string> MyProperty4 { get; set; }
+
+
         [Index(5)]
         public virtual long MyProperty5 { get; set; }
-        [Index(6)]
+        [Index(7)]
         public virtual string MyProperty6 { get; set; }
+        [Index(10)]
+        public virtual IList<int> MyProperty10 { get; set; }
+        [Index(11)]
+        public virtual ILookup<bool, int> MyProperty11 { get; set; }
+        [Index(13)]
+        public virtual IList<string> MyProperty13 { get; set; }
+        [Index(15)]
+        public virtual IDictionary<string, int> MyProperty15 { get; set; }
     }
 }

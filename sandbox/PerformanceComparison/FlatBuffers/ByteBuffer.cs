@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-//#define UNSAFE_BYTEBUFFER  // uncomment this line to use faster ByteBuffer
+#define UNSAFE_BYTEBUFFER  // uncomment this line to use faster ByteBuffer
 
 using System;
 

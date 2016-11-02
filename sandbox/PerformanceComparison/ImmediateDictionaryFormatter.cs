@@ -8,10 +8,18 @@ namespace PerformanceComparison
 {
     public static class ImmediateDictionaryResolver
     {
-        public static void Register()
+        public static void Register(bool overwriteIDictionaryFormatter = false)
         {
             ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(x =>
             {
+                if (overwriteIDictionaryFormatter)
+                {
+                    if (x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+                    {
+                        return Activator.CreateInstance(typeof(ImmediateDictionaryFormatter<,>).MakeGenericType(x.GenericTypeArguments));
+                    }
+                }
+
                 if (x.IsGenericType && x.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {
                     return Activator.CreateInstance(typeof(ImmediateDictionaryFormatter<,>).MakeGenericType(x.GenericTypeArguments));

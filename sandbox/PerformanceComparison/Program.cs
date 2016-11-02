@@ -479,25 +479,25 @@ class Program
         FlatBuffersObject.PersonVector copy = default(FlatBuffersObject.PersonVector);
         byte[] bytes = null;
 
+        Func<FlatBuffers.FlatBufferBuilder, FlatBuffers.Offset<FlatBuffersObject.Person>[]> makeVector = b =>
+        {
+            var array = new FlatBuffers.Offset<FlatBuffersObject.Person>[1000];
+            var count = 0;
+            for (int j = 1000; j < 2000; j++)
+            {
+                var person = FlatBuffersObject.Person.CreatePerson(b, j, b.CreateString("abc"), b.CreateString("def"), FlatBuffersObject.Sex.Female);
+                array[count++] = person;
+            }
+            return array;
+        };
+
         using (new Measure("Serialize"))
         {
             for (int i = 0; i < Iteration; i++)
             {
                 var builder = new FlatBuffers.FlatBufferBuilder(1);
 
-                Func<FlatBuffers.Offset<FlatBuffersObject.Person>[]> makeVector = () =>
-                {
-                    var array = new FlatBuffers.Offset<FlatBuffersObject.Person>[1000];
-                    var count = 0;
-                    for (int j = 1000; j < 2000; j++)
-                    {
-                        var person = FlatBuffersObject.Person.CreatePerson(builder, j, builder.CreateString("abc"), builder.CreateString("def"), FlatBuffersObject.Sex.Female);
-                        array[count++] = person;
-                    }
-                    return array;
-                };
-
-                var personVector = FlatBuffersObject.PersonVector.CreatePersonVector(builder, FlatBuffersObject.PersonVector.CreateListVector(builder, makeVector()));
+                var personVector = FlatBuffersObject.PersonVector.CreatePersonVector(builder, FlatBuffersObject.PersonVector.CreateListVector(builder, makeVector(builder)));
                 builder.Finish(personVector.Value);
 
                 bytes = builder.SizedByteArray();

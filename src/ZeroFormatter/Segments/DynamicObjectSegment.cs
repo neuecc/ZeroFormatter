@@ -36,33 +36,24 @@ namespace ZeroFormatter.Segments
 
         public static ArraySegment<byte> GetSegment(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)
         {
-            if (index > lastIndex)
+            var offset = GetOffset(originalBytes, index, lastIndex, tracker);
+            if (offset == -1)
             {
                 return default(ArraySegment<byte>); // note:very very dangerous.
             }
 
-            var offset = GetOffset(originalBytes, index, lastIndex, tracker);
-            if (index == lastIndex)
-            {
-                var sliceLength = originalBytes.Offset + originalBytes.Count;
-                return new ArraySegment<byte>(originalBytes.Array, offset, (sliceLength - offset));
-            }
-            else
-            {
-                var nextIndex = index + 1;
-                do
-                {
-                    var nextOffset = GetOffset(originalBytes, nextIndex, lastIndex, tracker);
-                    if (nextOffset != 0)
-                    {
-                        return new ArraySegment<byte>(originalBytes.Array, offset, (nextOffset - offset));
-                    }
-                } while (nextIndex++ < lastIndex); // if reached over the lastIndex, ge
+            var sliceLength = originalBytes.Offset + originalBytes.Count;
+            return new ArraySegment<byte>(originalBytes.Array, offset, (sliceLength - offset));
+        }
 
+        public static T DeserializeSegment<T>(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)
+        {
+            var offset = ObjectSegmentHelper.GetOffset(originalBytes, index, lastIndex, tracker);
+            if (offset == -1) return default(T);
 
-                var sliceLength = originalBytes.Offset + originalBytes.Count;
-                return new ArraySegment<byte>(originalBytes.Array, offset, (sliceLength - offset));
-            }
+            int size;
+            var array = originalBytes.Array;
+            return Formatter<T>.Default.Deserialize(ref array, offset, tracker, out size);
         }
 
         public static int SerializeFixedLength<T>(ref byte[] targetBytes, int startOffset, int offset, int index, int lastIndex, ArraySegment<byte> originalBytes, byte[] extraBytes, DirtyTracker tracker)
@@ -332,41 +323,41 @@ namespace ZeroFormatter.Segments
             method.SetReturnType(typeof(void));
             method.SetParameters(typeof(DirtyTracker), typeof(ArraySegment<byte>));
 
-            var generator = method.GetILGenerator();
+            var il = method.GetILGenerator();
 
-            generator.DeclareLocal(typeof(byte[]));
-            generator.DeclareLocal(typeof(int));
-            generator.DeclareLocal(typeof(int[]));
+            il.DeclareLocal(typeof(byte[]));
+            il.DeclareLocal(typeof(int));
+            il.DeclareLocal(typeof(int[]));
 
             // ctor
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Call, baseCtor);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Call, baseCtor);
 
             // Local Var( var array = originalBytes.Array; )
-            generator.Emit(OpCodes.Ldarga_S, (byte)2);
-            generator.Emit(OpCodes.Call, ArraySegmentArrayGet);
-            generator.Emit(OpCodes.Stloc_0);
+            il.Emit(OpCodes.Ldarga_S, (byte)2);
+            il.Emit(OpCodes.Call, ArraySegmentArrayGet);
+            il.Emit(OpCodes.Stloc_0);
 
             // Assign Field Common
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldarg_2);
-            generator.Emit(OpCodes.Stfld, originalBytesField);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldarg_2);
+            il.Emit(OpCodes.Stfld, originalBytesField);
 
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldarg_1);
-            generator.Emit(OpCodes.Callvirt, CreateChild);
-            generator.Emit(OpCodes.Dup);
-            generator.Emit(OpCodes.Starg_S, (byte)1);
-            generator.Emit(OpCodes.Stfld, trackerField);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldarg_1);
+            il.Emit(OpCodes.Callvirt, CreateChild);
+            il.Emit(OpCodes.Dup);
+            il.Emit(OpCodes.Starg_S, (byte)1);
+            il.Emit(OpCodes.Stfld, trackerField);
 
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldloca_S, (byte)0);
-            generator.Emit(OpCodes.Ldarga_S, (byte)2);
-            generator.Emit(OpCodes.Call, ArraySegmentOffsetGet);
-            generator.Emit(OpCodes.Ldc_I4_4);
-            generator.Emit(OpCodes.Add);
-            generator.Emit(OpCodes.Call, ReadInt32);
-            generator.Emit(OpCodes.Stfld, lastIndexField);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldloca_S, (byte)0);
+            il.Emit(OpCodes.Ldarga_S, (byte)2);
+            il.Emit(OpCodes.Call, ArraySegmentOffsetGet);
+            il.Emit(OpCodes.Ldc_I4_4);
+            il.Emit(OpCodes.Add);
+            il.Emit(OpCodes.Call, ReadInt32);
+            il.Emit(OpCodes.Stfld, lastIndexField);
 
             var schemaLastIndex = properties.Select(x => x.Index).LastOrDefault();
             var dict = properties.Where(x => x.IsFixedSize).ToDictionary(x => x.Index, x => x.FixedSize);
@@ -378,14 +369,14 @@ namespace ZeroFormatter.Segments
                     elementSizes[i] = 0;
                 }
             }
-            EmitNewArray(generator, elementSizes);
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldfld, lastIndexField);
-            generator.Emit(OpCodes.Ldc_I4, schemaLastIndex);
-            generator.Emit(OpCodes.Ldloc_2);
-            generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("CreateExtraFixedBytes"));
-            generator.Emit(OpCodes.Stfld, extraFixedBytes);
+            EmitNewArray(il, elementSizes);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, lastIndexField);
+            il.Emit(OpCodes.Ldc_I4, schemaLastIndex);
+            il.Emit(OpCodes.Ldloc_2);
+            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("CreateExtraFixedBytes"));
+            il.Emit(OpCodes.Stfld, extraFixedBytes);
 
             foreach (var item in properties)
             {
@@ -393,64 +384,58 @@ namespace ZeroFormatter.Segments
 
                 if (item.IsCacheSegment)
                 {
-                    AssignCacheSegment(generator, item.Index, trackerField, lastIndexField, item.SegmentField);
+                    AssignCacheSegment(il, item.Index, trackerField, lastIndexField, item.SegmentField);
                 }
                 else
                 {
-                    AssignSegment(generator, item.Index, trackerField, lastIndexField, item.SegmentField);
+                    AssignSegment(il, item.Index, trackerField, lastIndexField, item.SegmentField);
                 }
             }
 
-            generator.Emit(OpCodes.Ret);
+            il.Emit(OpCodes.Ret);
         }
 
-        static void EmitNewArray(ILGenerator generator, int[] array)
+        static void EmitNewArray(ILGenerator il, int[] array)
         {
-            generator.Emit(OpCodes.Ldc_I4, array.Length);
-            generator.Emit(OpCodes.Newarr, typeof(int));
-            generator.Emit(OpCodes.Stloc_2);
+            il.Emit(OpCodes.Ldc_I4, array.Length);
+            il.Emit(OpCodes.Newarr, typeof(int));
+            il.Emit(OpCodes.Stloc_2);
             for (int i = 0; i < array.Length; i++)
             {
-                generator.Emit(OpCodes.Ldloc_2);
-                generator.Emit(OpCodes.Ldc_I4, i);
-                generator.Emit(OpCodes.Ldc_I4, array[i]);
-                generator.Emit(OpCodes.Stelem_I4);
+                il.Emit(OpCodes.Ldloc_2);
+                il.Emit(OpCodes.Ldc_I4, i);
+                il.Emit(OpCodes.Ldc_I4, array[i]);
+                il.Emit(OpCodes.Stelem_I4);
             }
         }
 
-        static void AssignCacheSegment(ILGenerator generator, int index, FieldInfo tracker, FieldInfo lastIndex, FieldInfo field)
+        static void AssignCacheSegment(ILGenerator il, int index, FieldInfo tracker, FieldInfo lastIndex, FieldInfo field)
         {
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldfld, tracker);
-            generator.Emit(OpCodes.Ldarg_2);
-            generator.Emit(OpCodes.Ldc_I4, index);
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldfld, lastIndex);
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldfld, tracker);
-            generator.Emit(OpCodes.Call, GetSegment);
-            generator.Emit(OpCodes.Newobj, field.FieldType.GetTypeInfo().GetConstructors().First());
-            generator.Emit(OpCodes.Stfld, field);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, tracker);
+            il.Emit(OpCodes.Ldarg_2);
+            il.Emit(OpCodes.Ldc_I4, index);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, lastIndex);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, tracker);
+            il.Emit(OpCodes.Call, GetSegment);
+            il.Emit(OpCodes.Newobj, field.FieldType.GetTypeInfo().GetConstructors().First());
+            il.Emit(OpCodes.Stfld, field);
         }
 
-        static void AssignSegment(ILGenerator generator, int index, FieldInfo tracker, FieldInfo lastIndex, FieldInfo field)
+        static void AssignSegment(ILGenerator il, int index, FieldInfo tracker, FieldInfo lastIndex, FieldInfo field)
         {
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Call, typeof(Formatter<>).MakeGenericType(field.FieldType).GetTypeInfo().GetProperty("Default").GetGetMethod());
-            generator.Emit(OpCodes.Ldloca_S, (byte)0);
-            generator.Emit(OpCodes.Ldarg_2);
-            generator.Emit(OpCodes.Ldc_I4, index);
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldfld, lastIndex);
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldfld, tracker);
-            generator.Emit(OpCodes.Call, GetOffset);
-            generator.Emit(OpCodes.Ldarg_0);
-            generator.Emit(OpCodes.Ldfld, tracker);
-            generator.Emit(OpCodes.Ldloca_S, (byte)1);
-            generator.Emit(OpCodes.Callvirt, typeof(Formatter<>).MakeGenericType(field.FieldType).GetTypeInfo().GetMethod("Deserialize"));
-            generator.Emit(OpCodes.Stfld, field);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldarg_2);
+            il.Emit(OpCodes.Ldc_I4, index);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, lastIndex);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, tracker);
+            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("DeserializeSegment").MakeGenericMethod(field.FieldType));
+            il.Emit(OpCodes.Stfld, field);
         }
 
         static void BuildFixedProperty(TypeBuilder type, FieldInfo originalBytesField, FieldInfo trackerField, FieldInfo binaryLastIndex, FieldInfo extraBytes, PropertyTuple property)
@@ -463,19 +448,19 @@ namespace ZeroFormatter.Segments
             {
                 var method = type.DefineMethod(getMethod.Name, getMethod.Attributes & ~MethodAttributes.NewSlot, getMethod.ReturnType, Type.EmptyTypes);
 
-                var generator = method.GetILGenerator();
+                var il = method.GetILGenerator();
 
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, originalBytesField);
-                generator.Emit(OpCodes.Ldc_I4, property.Index);
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, binaryLastIndex);
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, extraBytes);
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, trackerField);
-                generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("GetFixedProperty").MakeGenericMethod(getMethod.ReturnType));
-                generator.Emit(OpCodes.Ret);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, originalBytesField);
+                il.Emit(OpCodes.Ldc_I4, property.Index);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, binaryLastIndex);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, extraBytes);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, trackerField);
+                il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("GetFixedProperty").MakeGenericMethod(getMethod.ReturnType));
+                il.Emit(OpCodes.Ret);
 
                 prop.SetGetMethod(method);
             }
@@ -486,20 +471,20 @@ namespace ZeroFormatter.Segments
             {
                 var method = type.DefineMethod(setMethod.Name, setMethod.Attributes & ~MethodAttributes.NewSlot, null, new[] { setMethod.GetParameters()[0].ParameterType });
 
-                var generator = method.GetILGenerator();
+                var il = method.GetILGenerator();
 
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, originalBytesField);
-                generator.Emit(OpCodes.Ldc_I4, property.Index);
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, binaryLastIndex);
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, extraBytes);
-                generator.Emit(OpCodes.Ldarg_1);
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, trackerField);
-                generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SetFixedProperty").MakeGenericMethod(getMethod.ReturnType));
-                generator.Emit(OpCodes.Ret);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, originalBytesField);
+                il.Emit(OpCodes.Ldc_I4, property.Index);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, binaryLastIndex);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, extraBytes);
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, trackerField);
+                il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SetFixedProperty").MakeGenericMethod(getMethod.ReturnType));
+                il.Emit(OpCodes.Ret);
 
                 prop.SetSetMethod(method);
             }
@@ -515,12 +500,12 @@ namespace ZeroFormatter.Segments
             {
                 var method = type.DefineMethod(getMethod.Name, getMethod.Attributes & ~MethodAttributes.NewSlot, getMethod.ReturnType, Type.EmptyTypes);
 
-                var generator = method.GetILGenerator();
+                var il = method.GetILGenerator();
 
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, property.SegmentField);
-                generator.Emit(OpCodes.Callvirt, property.SegmentField.FieldType.GetTypeInfo().GetProperty("Value").GetGetMethod());
-                generator.Emit(OpCodes.Ret);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, property.SegmentField);
+                il.Emit(OpCodes.Callvirt, property.SegmentField.FieldType.GetTypeInfo().GetProperty("Value").GetGetMethod());
+                il.Emit(OpCodes.Ret);
 
                 prop.SetGetMethod(method);
             }
@@ -531,13 +516,13 @@ namespace ZeroFormatter.Segments
             {
                 var method = type.DefineMethod(setMethod.Name, setMethod.Attributes & ~MethodAttributes.NewSlot, null, new[] { setMethod.GetParameters()[0].ParameterType });
 
-                var generator = method.GetILGenerator();
+                var il = method.GetILGenerator();
 
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, property.SegmentField);
-                generator.Emit(OpCodes.Ldarg_1);
-                generator.Emit(OpCodes.Callvirt, property.SegmentField.FieldType.GetTypeInfo().GetProperty("Value").GetSetMethod());
-                generator.Emit(OpCodes.Ret);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, property.SegmentField);
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Callvirt, property.SegmentField.FieldType.GetTypeInfo().GetProperty("Value").GetSetMethod());
+                il.Emit(OpCodes.Ret);
 
                 prop.SetSetMethod(method);
             }
@@ -553,11 +538,11 @@ namespace ZeroFormatter.Segments
             {
                 var method = type.DefineMethod(getMethod.Name, getMethod.Attributes & ~MethodAttributes.NewSlot, getMethod.ReturnType, Type.EmptyTypes);
 
-                var generator = method.GetILGenerator();
+                var il = method.GetILGenerator();
 
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, property.SegmentField);
-                generator.Emit(OpCodes.Ret);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, property.SegmentField);
+                il.Emit(OpCodes.Ret);
 
                 prop.SetGetMethod(method);
             }
@@ -568,15 +553,15 @@ namespace ZeroFormatter.Segments
             {
                 var method = type.DefineMethod(setMethod.Name, setMethod.Attributes & ~MethodAttributes.NewSlot, null, new[] { setMethod.GetParameters()[0].ParameterType });
 
-                var generator = method.GetILGenerator();
+                var il = method.GetILGenerator();
 
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, trackerField);
-                generator.Emit(OpCodes.Callvirt, Dirty);
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldarg_1);
-                generator.Emit(OpCodes.Stfld, property.SegmentField);
-                generator.Emit(OpCodes.Ret);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, trackerField);
+                il.Emit(OpCodes.Callvirt, Dirty);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Stfld, property.SegmentField);
+                il.Emit(OpCodes.Ret);
 
                 prop.SetSetMethod(method);
             }
@@ -588,106 +573,106 @@ namespace ZeroFormatter.Segments
             // CanDirectCopy
             {
                 var method = type.DefineMethod("CanDirectCopy", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof(bool), Type.EmptyTypes);
-                var generator = method.GetILGenerator();
+                var il = method.GetILGenerator();
 
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, trackerField);
-                generator.Emit(OpCodes.Callvirt, IsDirty);
-                generator.Emit(OpCodes.Ldc_I4_0);
-                generator.Emit(OpCodes.Ceq);
-                generator.Emit(OpCodes.Ret);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, trackerField);
+                il.Emit(OpCodes.Callvirt, IsDirty);
+                il.Emit(OpCodes.Ldc_I4_0);
+                il.Emit(OpCodes.Ceq);
+                il.Emit(OpCodes.Ret);
             }
             // GetBufferReference
             {
                 var method = type.DefineMethod("GetBufferReference", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof(ArraySegment<byte>), Type.EmptyTypes);
-                var generator = method.GetILGenerator();
+                var il = method.GetILGenerator();
 
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, originalBytesField);
-                generator.Emit(OpCodes.Ret);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, originalBytesField);
+                il.Emit(OpCodes.Ret);
             }
             // Serialize
             {
                 var method = type.DefineMethod("Serialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof(int), new[] { typeof(byte[]).MakeByRefType(), typeof(int) });
-                var generator = method.GetILGenerator();
+                var il = method.GetILGenerator();
 
-                generator.DeclareLocal(typeof(int));
-                var labelA = generator.DefineLabel();
-                var labelB = generator.DefineLabel();
+                il.DeclareLocal(typeof(int));
+                var labelA = il.DefineLabel();
+                var labelB = il.DefineLabel();
 
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, extraBytes);
-                generator.Emit(OpCodes.Brtrue, labelA);
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldfld, trackerField);
-                generator.Emit(OpCodes.Callvirt, IsDirty);
-                generator.Emit(OpCodes.Brfalse, labelB);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, extraBytes);
+                il.Emit(OpCodes.Brtrue, labelA);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, trackerField);
+                il.Emit(OpCodes.Callvirt, IsDirty);
+                il.Emit(OpCodes.Brfalse, labelB);
                 // if
                 {
                     var schemaLastIndex = properties.Select(x => x.Index).LastOrDefault();
                     var calcedBeginOffset = 8 + (4 * (schemaLastIndex + 1));
 
-                    generator.MarkLabel(labelA);
-                    generator.Emit(OpCodes.Ldarg_2);
-                    generator.Emit(OpCodes.Stloc_0); // startOffset
-                    generator.Emit(OpCodes.Ldarg_2);
-                    generator.Emit(OpCodes.Ldc_I4, calcedBeginOffset);
-                    generator.Emit(OpCodes.Add);
+                    il.MarkLabel(labelA);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Stloc_0); // startOffset
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldc_I4, calcedBeginOffset);
+                    il.Emit(OpCodes.Add);
 
                     foreach (var prop in properties)
                     {
-                        generator.Emit(OpCodes.Starg_S, (byte)2);
-                        generator.Emit(OpCodes.Ldarg_2);
-                        generator.Emit(OpCodes.Ldarg_1);
-                        generator.Emit(OpCodes.Ldloc_0);
-                        generator.Emit(OpCodes.Ldarg_2);
-                        generator.Emit(OpCodes.Ldc_I4, prop.Index);
+                        il.Emit(OpCodes.Starg_S, (byte)2);
+                        il.Emit(OpCodes.Ldarg_2);
+                        il.Emit(OpCodes.Ldarg_1);
+                        il.Emit(OpCodes.Ldloc_0);
+                        il.Emit(OpCodes.Ldarg_2);
+                        il.Emit(OpCodes.Ldc_I4, prop.Index);
 
                         // load field and call
                         if (prop.IsFixedSize)
                         {
-                            generator.Emit(OpCodes.Ldarg_0);
-                            generator.Emit(OpCodes.Ldfld, binaryLastIndexField);
-                            generator.Emit(OpCodes.Ldarg_0);
-                            generator.Emit(OpCodes.Ldfld, originalBytesField);
-                            generator.Emit(OpCodes.Ldarg_0);
-                            generator.Emit(OpCodes.Ldfld, extraBytes);
-                            generator.Emit(OpCodes.Ldarg_0);
-                            generator.Emit(OpCodes.Ldfld, trackerField);
-                            generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeFixedLength").MakeGenericMethod(prop.PropertyInfo.PropertyType));
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, binaryLastIndexField);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, originalBytesField);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, extraBytes);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, trackerField);
+                            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeFixedLength").MakeGenericMethod(prop.PropertyInfo.PropertyType));
                         }
                         else if (prop.IsCacheSegment)
                         {
-                            generator.Emit(OpCodes.Ldarg_0);
-                            generator.Emit(OpCodes.Ldfld, prop.SegmentField);
-                            generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeCacheSegment").MakeGenericMethod(prop.PropertyInfo.PropertyType));
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, prop.SegmentField);
+                            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeCacheSegment").MakeGenericMethod(prop.PropertyInfo.PropertyType));
                         }
                         else
                         {
-                            generator.Emit(OpCodes.Ldarg_0);
-                            generator.Emit(OpCodes.Ldfld, prop.SegmentField);
-                            generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeSegment").MakeGenericMethod(prop.PropertyInfo.PropertyType));
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, prop.SegmentField);
+                            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeSegment").MakeGenericMethod(prop.PropertyInfo.PropertyType));
                         }
-                        generator.Emit(OpCodes.Add);
+                        il.Emit(OpCodes.Add);
                     }
 
-                    generator.Emit(OpCodes.Starg_S, (byte)2);
-                    generator.Emit(OpCodes.Ldarg_1);
-                    generator.Emit(OpCodes.Ldloc_0);
-                    generator.Emit(OpCodes.Ldarg_2);
-                    generator.Emit(OpCodes.Ldc_I4, schemaLastIndex);
-                    generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("WriteSize"));
-                    generator.Emit(OpCodes.Ret);
+                    il.Emit(OpCodes.Starg_S, (byte)2);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldloc_0);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldc_I4, schemaLastIndex);
+                    il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("WriteSize"));
+                    il.Emit(OpCodes.Ret);
                 }
                 // else
                 {
-                    generator.MarkLabel(labelB);
-                    generator.Emit(OpCodes.Ldarg_0);
-                    generator.Emit(OpCodes.Ldfld, originalBytesField);
-                    generator.Emit(OpCodes.Ldarg_1);
-                    generator.Emit(OpCodes.Ldarg_2);
-                    generator.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("DirectCopyAll"));
-                    generator.Emit(OpCodes.Ret);
+                    il.MarkLabel(labelB);
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldfld, originalBytesField);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("DirectCopyAll"));
+                    il.Emit(OpCodes.Ret);
                 }
             }
         }

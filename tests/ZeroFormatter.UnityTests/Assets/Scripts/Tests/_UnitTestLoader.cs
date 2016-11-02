@@ -25,6 +25,7 @@ namespace ZeroFormatter.Tests
             UnitTest.RegisterAllMethods<OffsetTest>();
             UnitTest.RegisterAllMethods<BlockSerializeTest>();
             UnitTest.RegisterAllMethods<StructTest>();
+            UnitTest.RegisterAllMethods<VersiongTest>();
         }
     }
 }

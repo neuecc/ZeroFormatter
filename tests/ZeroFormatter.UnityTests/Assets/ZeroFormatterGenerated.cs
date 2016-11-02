@@ -66,7 +66,6 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Inherit>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InheritFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.FooBarBaz>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.FooBarBazFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Standard>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.StandardFormatter());
-            ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Small>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.SmallFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Large>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.LargeFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.MyFormatClass>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.MyFormatClassFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.AllNullClass>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.AllNullClassFormatter());
@@ -266,7 +265,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
         public MyClassObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -276,7 +274,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
 
             _FirstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
             _LastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex, __tracker));
-            _List = Formatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 3, __binaryLastIndex, __tracker), __tracker, out __out);
+            _List = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>(originalBytes, 3, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -440,7 +438,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
         public MyClass2ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -450,7 +447,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
 
             _FirstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
             _LastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex, __tracker));
-            _List = Formatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 3, __binaryLastIndex, __tracker), __tracker, out __out);
+            _List = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>(originalBytes, 3, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -632,7 +629,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
         public MyClassObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -642,7 +638,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
 
             _FirstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
             _LastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex, __tracker));
-            _List = Formatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 3, __binaryLastIndex, __tracker), __tracker, out __out);
+            _List = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>(originalBytes, 3, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -806,7 +802,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
         public MyClass2ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -816,7 +811,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
 
             _FirstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
             _LastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex, __tracker));
-            _List = Formatter<global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 3, __binaryLastIndex, __tracker), __tracker, out __out);
+            _List = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>(originalBytes, 3, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -938,7 +933,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         public InheritBaseObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -1073,7 +1067,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         public InheritObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -1184,7 +1177,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         public FooBarBazObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -1192,7 +1184,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 0, __elementSizes);
 
-            _HugaHuga = Formatter<global::System.Collections.Generic.IList<byte[]>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 0, __binaryLastIndex, __tracker), __tracker, out __out);
+            _HugaHuga = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<byte[]>>(originalBytes, 0, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -1306,7 +1298,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         public StandardObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -1334,163 +1325,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 offset += (8 + 4 * (3 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-
-                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 3);
-            }
-            else
-            {
-                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
-            }
-        }
-    }
-
-    public class SmallFormatter : Formatter<global::Sandbox.Shared.Small>
-    {
-        public override int? GetLength()
-        {
-            return null;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.Small value)
-        {
-            var segment = value as IZeroFormatterSegment;
-            if (segment != null)
-            {
-                return segment.Serialize(ref bytes, offset);
-            }
-            else if (value == null)
-            {
-                BinaryUtil.WriteInt32(ref bytes, offset, -1);
-                return 4;
-            }
-            else
-            {
-                var startOffset = offset;
-
-                offset += (8 + 4 * (3 + 1));
-                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty0);
-                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 1, value.MyProperty1);
-                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<int>>(ref bytes, startOffset, offset, 2, value.MyProperty2);
-                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 3, value.MyProperty3);
-
-                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 3);
-            }
-        }
-
-        public override global::Sandbox.Shared.Small Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
-        {
-            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
-            if (byteSize == -1)
-            {
-                byteSize = 4;
-                return null;
-            }
-            return new SmallObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
-        }
-    }
-
-    public class SmallObjectSegment : global::Sandbox.Shared.Small, IZeroFormatterSegment
-    {
-        static readonly int[] __elementSizes = new int[]{ 4, 0, 0, 4 };
-
-        readonly ArraySegment<byte> __originalBytes;
-        readonly DirtyTracker __tracker;
-        readonly int __binaryLastIndex;
-        readonly byte[] __extraFixedBytes;
-
-        readonly CacheSegment<string> _MyProperty1;
-        global::System.Collections.Generic.IList<int> _MyProperty2;
-
-        // 0
-        public override int MyProperty0
-        {
-            get
-            {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
-            }
-            set
-            {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value, __tracker);
-            }
-        }
-
-        // 1
-        public override string MyProperty1
-        {
-            get
-            {
-                return _MyProperty1.Value;
-            }
-            set
-            {
-                _MyProperty1.Value = value;
-            }
-        }
-
-        // 2
-        public override global::System.Collections.Generic.IList<int> MyProperty2
-        {
-            get
-            {
-                return _MyProperty2;
-            }
-            set
-            {
-                __tracker.Dirty();
-                _MyProperty2 = value;
-            }
-        }
-
-        // 3
-        public override int MyProperty3
-        {
-            get
-            {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, __tracker);
-            }
-            set
-            {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, value, __tracker);
-            }
-        }
-
-
-        public SmallObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
-        {
-            var __array = originalBytes.Array;
-            int __out;
-
-            this.__originalBytes = originalBytes;
-            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
-            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
-
-            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 3, __elementSizes);
-
-            _MyProperty1 = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
-            _MyProperty2 = Formatter<global::System.Collections.Generic.IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 2, __binaryLastIndex, __tracker), __tracker, out __out);
-        }
-
-        public bool CanDirectCopy()
-        {
-            return !__tracker.IsDirty;
-        }
-
-        public ArraySegment<byte> GetBufferReference()
-        {
-            return __originalBytes;
-        }
-
-        public int Serialize(ref byte[] targetBytes, int offset)
-        {
-            if (__extraFixedBytes != null || __tracker.IsDirty)
-            {
-                var startOffset = offset;
-                offset += (8 + 4 * (3 + 1));
-
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 1, _MyProperty1);
-                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<int>>(ref targetBytes, startOffset, offset, 2, _MyProperty2);
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 3);
@@ -1525,14 +1359,17 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             {
                 var startOffset = offset;
 
-                offset += (8 + 4 * (6 + 1));
+                offset += (8 + 4 * (15 + 1));
                 offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty0);
                 offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 3, value.MyProperty3);
-                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<string>>(ref bytes, startOffset, offset, 4, value.MyProperty4);
                 offset += ObjectSegmentHelper.SerializeFromFormatter<long>(ref bytes, startOffset, offset, 5, value.MyProperty5);
-                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 6, value.MyProperty6);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 7, value.MyProperty6);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<int>>(ref bytes, startOffset, offset, 10, value.MyProperty10);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Linq.ILookup<bool, int>>(ref bytes, startOffset, offset, 11, value.MyProperty11);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<string>>(ref bytes, startOffset, offset, 13, value.MyProperty13);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IDictionary<string, int>>(ref bytes, startOffset, offset, 15, value.MyProperty15);
 
-                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 6);
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 15);
             }
         }
 
@@ -1550,15 +1387,18 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 
     public class LargeObjectSegment : global::Sandbox.Shared.Large, IZeroFormatterSegment
     {
-        static readonly int[] __elementSizes = new int[]{ 4, 0, 0, 4, 0, 8, 0 };
+        static readonly int[] __elementSizes = new int[]{ 4, 0, 0, 4, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        global::System.Collections.Generic.IList<string> _MyProperty4;
         readonly CacheSegment<string> _MyProperty6;
+        global::System.Collections.Generic.IList<int> _MyProperty10;
+        global::System.Linq.ILookup<bool, int> _MyProperty11;
+        global::System.Collections.Generic.IList<string> _MyProperty13;
+        global::System.Collections.Generic.IDictionary<string, int> _MyProperty15;
 
         // 0
         public override int MyProperty0
@@ -1586,20 +1426,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             }
         }
 
-        // 4
-        public override global::System.Collections.Generic.IList<string> MyProperty4
-        {
-            get
-            {
-                return _MyProperty4;
-            }
-            set
-            {
-                __tracker.Dirty();
-                _MyProperty4 = value;
-            }
-        }
-
         // 5
         public override long MyProperty5
         {
@@ -1613,7 +1439,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             }
         }
 
-        // 6
+        // 7
         public override string MyProperty6
         {
             get
@@ -1626,20 +1452,78 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             }
         }
 
+        // 10
+        public override global::System.Collections.Generic.IList<int> MyProperty10
+        {
+            get
+            {
+                return _MyProperty10;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _MyProperty10 = value;
+            }
+        }
+
+        // 11
+        public override global::System.Linq.ILookup<bool, int> MyProperty11
+        {
+            get
+            {
+                return _MyProperty11;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _MyProperty11 = value;
+            }
+        }
+
+        // 13
+        public override global::System.Collections.Generic.IList<string> MyProperty13
+        {
+            get
+            {
+                return _MyProperty13;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _MyProperty13 = value;
+            }
+        }
+
+        // 15
+        public override global::System.Collections.Generic.IDictionary<string, int> MyProperty15
+        {
+            get
+            {
+                return _MyProperty15;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _MyProperty15 = value;
+            }
+        }
+
 
         public LargeObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
             this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
 
-            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 6, __elementSizes);
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 15, __elementSizes);
 
-            _MyProperty4 = Formatter<global::System.Collections.Generic.IList<string>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex, __tracker), __tracker, out __out);
-            _MyProperty6 = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 6, __binaryLastIndex, __tracker));
+            _MyProperty6 = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 7, __binaryLastIndex, __tracker));
+            _MyProperty10 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<int>>(originalBytes, 10, __binaryLastIndex, __tracker);
+            _MyProperty11 = ObjectSegmentHelper.DeserializeSegment<global::System.Linq.ILookup<bool, int>>(originalBytes, 11, __binaryLastIndex, __tracker);
+            _MyProperty13 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<string>>(originalBytes, 13, __binaryLastIndex, __tracker);
+            _MyProperty15 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(originalBytes, 15, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -1657,15 +1541,18 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             if (__extraFixedBytes != null || __tracker.IsDirty)
             {
                 var startOffset = offset;
-                offset += (8 + 4 * (6 + 1));
+                offset += (8 + 4 * (15 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<string>>(ref targetBytes, startOffset, offset, 4, _MyProperty4);
                 offset += ObjectSegmentHelper.SerializeFixedLength<long>(ref targetBytes, startOffset, offset, 5, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 6, _MyProperty6);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 7, _MyProperty6);
+                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<int>>(ref targetBytes, startOffset, offset, 10, _MyProperty10);
+                offset += ObjectSegmentHelper.SerializeSegment<global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 11, _MyProperty11);
+                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<string>>(ref targetBytes, startOffset, offset, 13, _MyProperty13);
+                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 15, _MyProperty15);
 
-                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 6);
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 15);
             }
             else
             {
@@ -1761,7 +1648,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public MyFormatClassObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -1980,7 +1866,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public AllNullClassObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -1988,14 +1873,14 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 7, __elementSizes);
 
-            _MyProperty1 = Formatter<global::System.Collections.Generic.IDictionary<int, string>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 0, __binaryLastIndex, __tracker), __tracker, out __out);
-            _MyProperty2 = Formatter<global::System.Collections.Generic.IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 1, __binaryLastIndex, __tracker), __tracker, out __out);
-            _MyProperty3 = Formatter<global::System.Collections.Generic.IList<string>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 2, __binaryLastIndex, __tracker), __tracker, out __out);
-            _MyProperty4 = Formatter<global::System.Linq.ILookup<bool, int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 3, __binaryLastIndex, __tracker), __tracker, out __out);
-            _MyProperty5 = Formatter<global::ZeroFormatter.Tests.MyFormatClass>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex, __tracker), __tracker, out __out);
+            _MyProperty1 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<int, string>>(originalBytes, 0, __binaryLastIndex, __tracker);
+            _MyProperty2 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<int>>(originalBytes, 1, __binaryLastIndex, __tracker);
+            _MyProperty3 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<string>>(originalBytes, 2, __binaryLastIndex, __tracker);
+            _MyProperty4 = ObjectSegmentHelper.DeserializeSegment<global::System.Linq.ILookup<bool, int>>(originalBytes, 3, __binaryLastIndex, __tracker);
+            _MyProperty5 = ObjectSegmentHelper.DeserializeSegment<global::ZeroFormatter.Tests.MyFormatClass>(originalBytes, 4, __binaryLastIndex, __tracker);
             _MyProperty6 = new CacheSegment<byte[]>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 5, __binaryLastIndex, __tracker));
             _MyProperty7 = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 6, __binaryLastIndex, __tracker));
-            _MyProperty8 = Formatter<global::System.Collections.Generic.IDictionary<string, int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 7, __binaryLastIndex, __tracker), __tracker, out __out);
+            _MyProperty8 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(originalBytes, 7, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -2162,7 +2047,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public MyClassObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -2172,7 +2056,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
             _FirstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
             _LastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex, __tracker));
-            _MyList = Formatter<global::System.Collections.Generic.IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex, __tracker), __tracker, out __out);
+            _MyList = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<int>>(originalBytes, 4, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -2335,7 +2219,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public SkipIndexObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -2343,7 +2226,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 5, __elementSizes);
 
-            _MyProperty4 = Formatter<global::System.Collections.Generic.IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex, __tracker), __tracker, out __out);
+            _MyProperty4 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<int>>(originalBytes, 4, __binaryLastIndex, __tracker);
             _MyProperty5 = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 5, __binaryLastIndex, __tracker));
         }
 
@@ -2448,7 +2331,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public OtherSchema1ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -2555,7 +2437,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public OtherSchema2ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -2704,7 +2585,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public OtherSchema3ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -2830,7 +2710,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public RecMyClassObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -2838,7 +2717,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 1, __elementSizes);
 
-            _Rec = Formatter<global::ZeroFormatter.Tests.RecMyClass>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 1, __binaryLastIndex, __tracker), __tracker, out __out);
+            _Rec = ObjectSegmentHelper.DeserializeSegment<global::ZeroFormatter.Tests.RecMyClass>(originalBytes, 1, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -2941,7 +2820,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public KeyTupleCheckObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -2949,7 +2827,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 0, __elementSizes);
 
-            _KeyTupleDictionary = Formatter<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 0, __binaryLastIndex, __tracker), __tracker, out __out);
+            _KeyTupleDictionary = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(originalBytes, 0, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -3064,7 +2942,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public Offset2ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -3236,7 +3113,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public OffsetTypeObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -3245,9 +3121,9 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 4, __elementSizes);
 
             _Dummy2 = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
-            _VariableSizeList = Formatter<global::System.Collections.Generic.IList<string>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 2, __binaryLastIndex, __tracker), __tracker, out __out);
-            _Dictionary = Formatter<global::System.Collections.Generic.IDictionary<string, int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 3, __binaryLastIndex, __tracker), __tracker, out __out);
-            _ObjectProp = Formatter<global::ZeroFormatter.Tests.Offset2>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex, __tracker), __tracker, out __out);
+            _VariableSizeList = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<string>>(originalBytes, 2, __binaryLastIndex, __tracker);
+            _Dictionary = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(originalBytes, 3, __binaryLastIndex, __tracker);
+            _ObjectProp = ObjectSegmentHelper.DeserializeSegment<global::ZeroFormatter.Tests.Offset2>(originalBytes, 4, __binaryLastIndex, __tracker);
         }
 
         public bool CanDirectCopy()
@@ -3351,7 +3227,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public TestBaseObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -3472,7 +3347,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public Test2ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -3595,7 +3469,6 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public IncludeStructObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();

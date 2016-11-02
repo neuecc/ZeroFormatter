@@ -99,12 +99,17 @@ namespace Sandbox
         {
             // var xs = ZeroFormatterSerializer.Serialize(1000);
 
+//            Encoding.UTF8.GetByteCount();
 
-            var xs = ZeroFormatterSerializer.Serialize("hogehogehugahuga");
+            var f = ZeroFormatter.Formatters.Formatter<IList<MyStruct>>.Default;
 
-            Console.WriteLine(xs);
+            Console.WriteLine(f.GetLength());
+            byte[] bytes = null;
+            f.Serialize(ref bytes, 0,new[] { new MyStruct { MyProperty1 = 10, MyProperty2 = 99 } });
+            Console.WriteLine(bytes.Length);
         }
     }
+    
 
     [ZeroFormattable]
     public struct MyStruct

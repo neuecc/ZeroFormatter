@@ -1,52 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using RuntimeUnitTestToolkit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using ZeroFormatter.Formatters;
-using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
+using Sandbox.Shared;
 
 namespace ZeroFormatter.Tests
 {
     [TestClass]
     public class VersiongTest
     {
-
-        [ZeroFormattable]
-        public class Standard
-        {
-            [Index(0)]
-            public virtual int MyProperty0 { get; set; }
-            [Index(3)]
-            public virtual int MyProperty3 { get; set; }
-        }
-
-
-        [ZeroFormattable]
-        public class Large
-        {
-            [Index(0)]
-            public virtual int MyProperty0 { get; set; }
-            [Index(3)]
-            public virtual int MyProperty3 { get; set; }
-
-
-            [Index(5)]
-            public virtual long MyProperty5 { get; set; }
-            [Index(7)]
-            public virtual string MyProperty6 { get; set; }
-            [Index(10)]
-            public virtual IList<int> MyProperty10 { get; set; }
-            [Index(11)]
-            public virtual ILookup<bool, int> MyProperty11 { get; set; }
-            [Index(13)]
-            public virtual IList<string> MyProperty13 { get; set; }
-            [Index(15)]
-            public virtual IDictionary<string, int> MyProperty15 { get; set; }
-        }
-
         [TestMethod]
         public void MyTestMethod()
         {
@@ -78,9 +43,9 @@ namespace ZeroFormatter.Tests
             convert.MyProperty3.Is(49);
             convert.MyProperty5.Is(999);
             convert.MyProperty6.Is("hugahuga");
-            convert.MyProperty10.Is(new List<int> { 1, 10, 100 });
-            convert.MyProperty11[true].Is(2, 4, 6, 8, 10);
-            convert.MyProperty13.Is(new List<string> { "a", "bcde" });
+            convert.MyProperty10.IsCollection(new List<int> { 1, 10, 100 });
+            convert.MyProperty11[true].IsCollection(2, 4, 6, 8, 10);
+            convert.MyProperty13.IsCollection(new List<string> { "a", "bcde" });
             convert.MyProperty15["3"].Is(3);
         }
     }

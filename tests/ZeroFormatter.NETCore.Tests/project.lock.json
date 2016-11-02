@@ -2489,7 +2489,7 @@
           "lib/netstandard1.1/xunit.runner.utility.dotnet.dll": {}
         }
       },
-      "ZeroFormatter.Interfaces.NETCore/0.2.4": {
+      "ZeroFormatter.Interfaces.NETCore/0.2.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
@@ -2502,7 +2502,7 @@
           "netstandard1.1/ZeroFormatter.Interfaces.NETCore.dll": {}
         }
       },
-      "ZeroFormatter.NETCore/0.2.4": {
+      "ZeroFormatter.NETCore/0.2.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.6",
         "dependencies": {
@@ -2519,7 +2519,7 @@
           "System.Text.Encoding": "4.0.11",
           "System.Text.Encoding.Extensions": "4.0.11",
           "System.Threading": "4.0.11",
-          "ZeroFormatter.Interfaces.NETCore": "0.2.4"
+          "ZeroFormatter.Interfaces.NETCore": "0.2.5"
         },
         "compile": {
           "netstandard1.6/ZeroFormatter.NETCore.dll": {}
@@ -7571,12 +7571,12 @@
         "xunit.runner.utility.nuspec"
       ]
     },
-    "ZeroFormatter.Interfaces.NETCore/0.2.4": {
+    "ZeroFormatter.Interfaces.NETCore/0.2.5": {
       "type": "project",
       "path": "../../src/ZeroFormatter.Interfaces.NETCore/project.json",
       "msbuildProject": "../../src/ZeroFormatter.Interfaces.NETCore/ZeroFormatter.Interfaces.NETCore.xproj"
     },
-    "ZeroFormatter.NETCore/0.2.4": {
+    "ZeroFormatter.NETCore/0.2.5": {
       "type": "project",
       "path": "../../src/ZeroFormatter.NETCore/project.json",
       "msbuildProject": "../../src/ZeroFormatter.NETCore/ZeroFormatter.NETCore.xproj"
@@ -7588,8 +7588,8 @@
       "NETStandard.Library >= 1.6.0",
       "System.Diagnostics.Contracts >= 4.0.1",
       "System.Dynamic.Runtime >= 4.0.11",
-      "ZeroFormatter.Interfaces.NETCore >= 0.2.4",
-      "ZeroFormatter.NETCore >= 0.2.4",
+      "ZeroFormatter.Interfaces.NETCore >= 0.2.5",
+      "ZeroFormatter.NETCore >= 0.2.5",
       "dotnet-test-xunit >= 2.2.0-preview2-build1029",
       "xunit >= 2.2.0-beta3-build3402"
     ],

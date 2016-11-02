@@ -150,6 +150,7 @@ namespace ZeroFormatter.Formatters
     [Preserve(AllMembers = true)]
     public class ReadOnlyListFormatter<T> : Formatter<IReadOnlyList<T>>
     {
+
         [Preserve]
         public ReadOnlyListFormatter()
         {
@@ -187,29 +188,83 @@ namespace ZeroFormatter.Formatters
                 }
 
                 offset += BinaryUtil.WriteInt32(ref bytes, offset, value.Count);
-                foreach (var item in value)
+
+                // Optimize iteration
+                var array = value as T[];
+                if (array != null)
                 {
-                    offset += formatter.Serialize(ref bytes, offset, item);
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        offset += formatter.Serialize(ref bytes, offset, array[i]);
+                    }
                 }
+                else
+                {
+                    var list = value as List<T>;
+                    if (list != null)
+                    {
+                        for (int i = 0; i < list.Count; i++)
+                        {
+                            offset += formatter.Serialize(ref bytes, offset, list[i]);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var item in value)
+                        {
+                            offset += formatter.Serialize(ref bytes, offset, item);
+                        }
+                    }
+                }
+
                 return writeSize;
             }
             else
             {
                 var startoffset = offset;
-
-                var count = 0;
+                var indexStartOffset = startoffset + 8;
                 offset = (startoffset + 8) + (value.Count * 4);
-                foreach (var item in value)
+
+                // Optimize iteration
+                var array = value as T[];
+                if (array != null)
                 {
-                    var size = formatter.Serialize(ref bytes, offset, item);
-                    BinaryUtil.WriteInt32(ref bytes, (startoffset + 8) + count * 4, offset);
-                    offset += size;
-                    count++;
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        var size = formatter.Serialize(ref bytes, offset, array[i]);
+                        BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset);
+                        offset += size;
+                    }
                 }
+                else
+                {
+                    var list = value as List<T>;
+                    if (list != null)
+                    {
+                        for (int i = 0; i < list.Count; i++)
+                        {
+                            var size = formatter.Serialize(ref bytes, offset, list[i]);
+                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset);
+                            offset += size;
+                        }
+                    }
+                    else
+                    {
+                        var count = 0;
+                        foreach (var item in value)
+                        {
+                            var size = formatter.Serialize(ref bytes, offset, item);
+                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + count * 4, offset);
+                            offset += size;
+                            count++;
+                        }
+                    }
+                }
+
                 BinaryUtil.WriteInt32(ref bytes, startoffset + 4, value.Count);
 
                 var totalBytes = offset - startoffset;
-                BinaryUtil.WriteInt32(ref bytes, startoffset, totalBytes);
+                BinaryUtil.WriteInt32Unsafe(ref bytes, startoffset, totalBytes);
 
                 return totalBytes;
             }

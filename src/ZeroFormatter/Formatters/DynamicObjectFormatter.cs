@@ -414,8 +414,17 @@ namespace ZeroFormatter.Formatters
 
                 il.DeclareLocal(typeof(int)); // startOffset
 
+                if (length != null)
+                {
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldc_I4, length.Value);
+                    il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("EnsureCapacity"));
+                }
+
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Stloc_0);
+
                 foreach (var item in propertyInfos)
                 {
                     var formatter = typeof(Formatter<>).MakeGenericType(item.PropertyType);
@@ -512,6 +521,12 @@ namespace ZeroFormatter.Formatters
 
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
+            var len = GetLength();
+            if (len != null)
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, len.Value);
+            }
+
             BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {

@@ -116,7 +116,6 @@ namespace <#= Namespace #>
         public <#= t.Name #>ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
-            int __out;
 
             this.__originalBytes = originalBytes;
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
@@ -129,7 +128,7 @@ namespace <#= Namespace #>
 <# } else if(p.IsCacheSegment) { #>
             _<#= p.Name #> = new CacheSegment<<#= p.Type #>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, <#= p.Index #>, __binaryLastIndex, __tracker));
 <# } else { #>
-            _<#= p.Name #> = Formatter<<#= p.Type #>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, <#= p.Index #>, __binaryLastIndex, __tracker), __tracker, out __out);
+            _<#= p.Name #> = ObjectSegmentHelper.DeserializeSegment<<#= p.Type #>>(originalBytes, <#= p.Index #>, __binaryLastIndex, __tracker);
 <# } #>
 <# } #>
         }
