@@ -20,7 +20,7 @@ namespace ZeroFormatter.Formatters
             }
 
             var stringSize = BinaryUtil.WriteString(ref bytes, offset + 4, value);
-            BinaryUtil.WriteInt32(ref bytes, offset, stringSize); // write size after encode.
+            BinaryUtil.WriteInt32Unsafe(ref bytes, offset, stringSize); // write size after encode, already ensured.
             return stringSize + 4;
         }
 

@@ -4,6 +4,7 @@
 // Install-Package ZeroFormatter -Pre
 // Install-Package FsPickler.CSharp -Pre
 // Install-Package FSharp.Core -Pre
+// Install-Package Jil -Pre
 
 using MsgPack.Serialization;
 using Newtonsoft.Json;
@@ -72,15 +73,16 @@ class Program
         };
         IList<Person> l = Enumerable.Range(1000, 1000).Select(x => new Person { Age = x, FirstName = "abc", LastName = "def", Sex = Sex.Female }).ToArray();
 
-        Console.WriteLine("Warming-up");
+        Console.WriteLine("Warming-up"); Console.WriteLine();
         SerializeZeroFormatter(p); SerializeZeroFormatter(l);
         SerializeProtobuf(p); SerializeProtobuf(l);
         SerializeMsgPack(p); SerializeMsgPack(l);
         SerializeJsonNet(p); SerializeJsonNet(l);
-        SerializeFsPickler(p); SerializeFsPickler(l);
-        SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
-        SerializeDataContract(p); SerializeDataContract(l);
-        SerializeSingleFlatBuffers(); SerializeArrayFlatBuffers();
+        SerializeJil(p); SerializeJil(l);
+        //SerializeFsPickler(p); SerializeFsPickler(l);
+        //SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
+        //SerializeDataContract(p); SerializeDataContract(l);
+        //SerializeSingleFlatBuffers(); SerializeArrayFlatBuffers();
 
         dryRun = false;
 
@@ -91,10 +93,11 @@ class Program
         var b = SerializeProtobuf(p); Console.WriteLine();
         var c = SerializeMsgPack(p); Console.WriteLine();
         var d = SerializeJsonNet(p); Console.WriteLine();
-        var e = SerializeFsPickler(p); Console.WriteLine();
-        var f = SerializeBinaryFormatter(p); Console.WriteLine();
-        var g = SerializeDataContract(p); Console.WriteLine();
-        var h = SerializeSingleFlatBuffers(); Console.WriteLine();
+        var e = SerializeJil(p); Console.WriteLine();
+        //var f = SerializeFsPickler(p); Console.WriteLine();
+        //var g = SerializeBinaryFormatter(p); Console.WriteLine();
+        //var h = SerializeDataContract(p); Console.WriteLine();
+        //var i = SerializeSingleFlatBuffers(); Console.WriteLine();
 
         Console.WriteLine("Large Array"); Console.WriteLine();
 
@@ -102,19 +105,21 @@ class Program
         var B = SerializeProtobuf(l); Console.WriteLine();
         var C = SerializeMsgPack(l); Console.WriteLine();
         var D = SerializeJsonNet(l); Console.WriteLine();
-        var E = SerializeFsPickler(l); Console.WriteLine();
-        var F = SerializeBinaryFormatter(l); Console.WriteLine();
-        var G = SerializeDataContract(l); Console.WriteLine();
-        var H = SerializeArrayFlatBuffers(); Console.WriteLine();
+        var E = SerializeJil(l); Console.WriteLine();
+        //var F = SerializeFsPickler(l); Console.WriteLine();
+        //var G = SerializeBinaryFormatter(l); Console.WriteLine();
+        //var H = SerializeDataContract(l); Console.WriteLine();
+        //var I = SerializeArrayFlatBuffers(); Console.WriteLine();
 
         Validate("ZeroFormatter", p, l, a, A);
         Validate("protobuf-net", p, l, b, B);
         Validate("MsgPack-CLI", p, l, c, C);
         Validate("JSON.NET", p, l, d, D);
-        Validate("FsPickler", p, l, e, E);
-        Validate("BinaryFormatter", p, l, f, F);
-        Validate("DataContract", p, l, g, G);
-        ValidateFlatBuffers(p, l, h, H);
+        Validate("Jil", p, l, e, E);
+        //Validate("FsPickler", p, l, f, F);
+        //Validate("BinaryFormatter", p, l, g, G);
+        //Validate("DataContract", p, l, h, H);
+        //ValidateFlatBuffers(p, l, i, I);
     }
 
     static void Validate(string label, Person original, IList<Person> originalList, Person copy, IList<Person> copyList)
@@ -292,6 +297,58 @@ class Program
                 using (var jw = new JsonTextWriter(tw))
                 {
                     jsonSerializer.Serialize(jw, copy);
+                }
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
+        }
+
+        return copy;
+    }
+
+    static T SerializeJil<T>(T original)
+    {
+        Console.WriteLine("Jil");
+
+        var jsonSerializer = new JsonSerializer();
+        T copy = default(T);
+        MemoryStream stream = null;
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream = new MemoryStream();
+                using (var tw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                {
+                    Jil.JSON.Serialize(original, tw);
+                }
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream.Position = 0;
+                using (var tr = new StreamReader(stream, Encoding.UTF8, false, 1024, true))
+                {
+                    copy = Jil.JSON.Deserialize<T>(tr);
+                }
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream = new MemoryStream();
+                using (var tw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                {
+                    Jil.JSON.Serialize(original, tw);
                 }
             }
         }
