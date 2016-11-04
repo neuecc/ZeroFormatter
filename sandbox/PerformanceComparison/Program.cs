@@ -79,10 +79,10 @@ class Program
         SerializeMsgPack(p); SerializeMsgPack(l);
         SerializeJsonNet(p); SerializeJsonNet(l);
         SerializeJil(p); SerializeJil(l);
-        //SerializeFsPickler(p); SerializeFsPickler(l);
-        //SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
-        //SerializeDataContract(p); SerializeDataContract(l);
-        //SerializeSingleFlatBuffers(); SerializeArrayFlatBuffers();
+        SerializeFsPickler(p); SerializeFsPickler(l);
+        SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
+        SerializeDataContract(p); SerializeDataContract(l);
+        SerializeSingleFlatBuffers(); SerializeArrayFlatBuffers();
 
         dryRun = false;
 
@@ -94,10 +94,10 @@ class Program
         var c = SerializeMsgPack(p); Console.WriteLine();
         var d = SerializeJsonNet(p); Console.WriteLine();
         var e = SerializeJil(p); Console.WriteLine();
-        //var f = SerializeFsPickler(p); Console.WriteLine();
-        //var g = SerializeBinaryFormatter(p); Console.WriteLine();
-        //var h = SerializeDataContract(p); Console.WriteLine();
-        //var i = SerializeSingleFlatBuffers(); Console.WriteLine();
+        var f = SerializeFsPickler(p); Console.WriteLine();
+        var g = SerializeBinaryFormatter(p); Console.WriteLine();
+        var h = SerializeDataContract(p); Console.WriteLine();
+        var i = SerializeSingleFlatBuffers(); Console.WriteLine();
 
         Console.WriteLine("Large Array"); Console.WriteLine();
 
@@ -106,20 +106,20 @@ class Program
         var C = SerializeMsgPack(l); Console.WriteLine();
         var D = SerializeJsonNet(l); Console.WriteLine();
         var E = SerializeJil(l); Console.WriteLine();
-        //var F = SerializeFsPickler(l); Console.WriteLine();
-        //var G = SerializeBinaryFormatter(l); Console.WriteLine();
-        //var H = SerializeDataContract(l); Console.WriteLine();
-        //var I = SerializeArrayFlatBuffers(); Console.WriteLine();
+        var F = SerializeFsPickler(l); Console.WriteLine();
+        var G = SerializeBinaryFormatter(l); Console.WriteLine();
+        var H = SerializeDataContract(l); Console.WriteLine();
+        var I = SerializeArrayFlatBuffers(); Console.WriteLine();
 
         Validate("ZeroFormatter", p, l, a, A);
         Validate("protobuf-net", p, l, b, B);
         Validate("MsgPack-CLI", p, l, c, C);
         Validate("JSON.NET", p, l, d, D);
         Validate("Jil", p, l, e, E);
-        //Validate("FsPickler", p, l, f, F);
-        //Validate("BinaryFormatter", p, l, g, G);
-        //Validate("DataContract", p, l, h, H);
-        //ValidateFlatBuffers(p, l, i, I);
+        Validate("FsPickler", p, l, f, F);
+        Validate("BinaryFormatter", p, l, g, G);
+        Validate("DataContract", p, l, h, H);
+        ValidateFlatBuffers(p, l, i, I);
     }
 
     static void Validate(string label, Person original, IList<Person> originalList, Person copy, IList<Person> copyList)
