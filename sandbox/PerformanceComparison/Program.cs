@@ -5,6 +5,7 @@
 // Install-Package FsPickler.CSharp -Pre
 // Install-Package FSharp.Core -Pre
 // Install-Package Jil -Pre
+// Install-Package Google.Protobuf -Pre
 
 using MsgPack.Serialization;
 using Newtonsoft.Json;
@@ -66,12 +67,12 @@ class Program
     {
         var p = new Person
         {
-            Age = 9999,
-            FirstName = "hoge",
-            LastName = "huga",
+            Age = 99999,
+            FirstName = "Windows",
+            LastName = "Server",
             Sex = Sex.Male,
         };
-        IList<Person> l = Enumerable.Range(1000, 1000).Select(x => new Person { Age = x, FirstName = "abc", LastName = "def", Sex = Sex.Female }).ToArray();
+        IList<Person> l = Enumerable.Range(1000, 1000).Select(x => new Person { Age = x, FirstName = "Windows", LastName = "Server", Sex = Sex.Female }).ToArray();
 
         Console.WriteLine("Warming-up"); Console.WriteLine();
         SerializeZeroFormatter(p); SerializeZeroFormatter(l);
@@ -83,11 +84,12 @@ class Program
         SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
         SerializeDataContract(p); SerializeDataContract(l);
         SerializeSingleFlatBuffers(); SerializeArrayFlatBuffers();
+        SerializeSingleProto3(p); SerializeArrayProto3(l);
 
         dryRun = false;
 
         Console.WriteLine();
-        Console.WriteLine("Small Object"); Console.WriteLine();
+        Console.WriteLine($"Small Object(int,string,string,enum) {Iteration} Iteration"); Console.WriteLine();
 
         var a = SerializeZeroFormatter(p); Console.WriteLine();
         var b = SerializeProtobuf(p); Console.WriteLine();
@@ -98,8 +100,9 @@ class Program
         var g = SerializeBinaryFormatter(p); Console.WriteLine();
         var h = SerializeDataContract(p); Console.WriteLine();
         var i = SerializeSingleFlatBuffers(); Console.WriteLine();
+        var j = SerializeSingleProto3(p); Console.WriteLine();
 
-        Console.WriteLine("Large Array"); Console.WriteLine();
+        Console.WriteLine($"Large Array(SmallObject[1000]) {Iteration} Iteration"); Console.WriteLine();
 
         var A = SerializeZeroFormatter(l); Console.WriteLine();
         var B = SerializeProtobuf(l); Console.WriteLine();
@@ -110,6 +113,7 @@ class Program
         var G = SerializeBinaryFormatter(l); Console.WriteLine();
         var H = SerializeDataContract(l); Console.WriteLine();
         var I = SerializeArrayFlatBuffers(); Console.WriteLine();
+        var J = SerializeArrayProto3(l); Console.WriteLine();
 
         Validate("ZeroFormatter", p, l, a, A);
         Validate("protobuf-net", p, l, b, B);
@@ -120,6 +124,7 @@ class Program
         Validate("BinaryFormatter", p, l, g, G);
         Validate("DataContract", p, l, h, H);
         ValidateFlatBuffers(p, l, i, I);
+        ValidateProto3(p, l, j, J);
     }
 
     static void Validate(string label, Person original, IList<Person> originalList, Person copy, IList<Person> copyList)
@@ -496,7 +501,7 @@ class Program
             {
                 var builder = new FlatBuffers.FlatBufferBuilder(1);
 
-                var person = FlatBuffersObject.Person.CreatePerson(builder, 9999, builder.CreateString("hoge"), builder.CreateString("huga"), FlatBuffersObject.Sex.Male);
+                var person = FlatBuffersObject.Person.CreatePerson(builder, 99999, builder.CreateString("Windows"), builder.CreateString("Server"), FlatBuffersObject.Sex.Male);
                 builder.Finish(person.Value);
 
                 bytes = builder.SizedByteArray();
@@ -542,7 +547,7 @@ class Program
             var count = 0;
             for (int j = 1000; j < 2000; j++)
             {
-                var person = FlatBuffersObject.Person.CreatePerson(b, j, b.CreateString("abc"), b.CreateString("def"), FlatBuffersObject.Sex.Female);
+                var person = FlatBuffersObject.Person.CreatePerson(b, j, b.CreateString("Windows"), b.CreateString("Server"), FlatBuffersObject.Sex.Female);
                 array[count++] = person;
             }
             return array;
@@ -597,6 +602,135 @@ class Program
         for (int i = 0; i < list.Count; i++)
         {
             if (!(l.GetList(i).Age == list[i].Age && l.GetList(i).FirstName == list[i].FirstName && l.GetList(i).LastName == list[i].LastName && (sbyte)l.GetList(i).Sex == (sbyte)list[i].Sex))
+            {
+                throw new Exception("Validation failed");
+            }
+        }
+    }
+
+    static Proto3Objects.Person SerializeSingleProto3(Person original)
+    {
+        Console.WriteLine("Google.Protobuf");
+
+        Proto3Objects.Person copy = default(Proto3Objects.Person);
+        MemoryStream stream = null;
+
+        var person = new Proto3Objects.Person
+        {
+            Age = original.Age,
+            FirstName = original.FirstName,
+            LastName = original.LastName,
+            Sex = (Proto3Objects.Sex)(int)original.Sex
+        };
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                using (var writeStream = new Google.Protobuf.CodedOutputStream(stream = new MemoryStream(), true))
+                {
+                    person.WriteTo(writeStream);
+                }
+            }
+        }
+
+        byte[] inputBytes = stream.ToArray();
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                copy = Proto3Objects.Person.Parser.ParseFrom(inputBytes);
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                using (var writeStream = new Google.Protobuf.CodedOutputStream(stream = new MemoryStream(), true))
+                {
+                    copy.WriteTo(writeStream);
+                }
+
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
+        }
+
+        return copy;
+    }
+
+    static Proto3Objects.PersonVector SerializeArrayProto3(IList<Person> original)
+    {
+        Console.WriteLine("Google.Protobuf");
+
+        Proto3Objects.PersonVector copy = default(Proto3Objects.PersonVector);
+        MemoryStream stream = null;
+
+        var person = new Proto3Objects.PersonVector();
+        person.List.AddRange(original.Select(x => new Proto3Objects.Person
+        {
+            Age = x.Age,
+            FirstName = x.FirstName,
+            LastName = x.LastName,
+            Sex = (Proto3Objects.Sex)(int)x.Sex
+        }));
+
+        using (new Measure("Serialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                using (var writeStream = new Google.Protobuf.CodedOutputStream(stream = new MemoryStream(), true))
+                {
+                    person.WriteTo(writeStream);
+                }
+            }
+        }
+
+        byte[] inputBytes = stream.ToArray();
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                copy = Proto3Objects.PersonVector.Parser.ParseFrom(inputBytes);
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                using (var writeStream = new Google.Protobuf.CodedOutputStream(stream = new MemoryStream(), true))
+                {
+                    copy.WriteTo(writeStream);
+                }
+
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
+        }
+
+        return copy;
+    }
+
+    static void ValidateProto3(Person original, IList<Person> list, Proto3Objects.Person p, Proto3Objects.PersonVector l)
+    {
+        if (!(p.Age == original.Age && p.FirstName == original.FirstName && p.LastName == original.LastName && (sbyte)p.Sex == (sbyte)original.Sex))
+        {
+            throw new Exception("Validation failed");
+        }
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (!(l.List[i].Age == list[i].Age && l.List[i].FirstName == list[i].FirstName && l.List[i].LastName == list[i].LastName && (sbyte)l.List[i].Sex == (sbyte)list[i].Sex))
             {
                 throw new Exception("Validation failed");
             }

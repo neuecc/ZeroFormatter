@@ -52,6 +52,10 @@
       <HintPath>..\..\packages\FsPickler.Json.3.2.0\lib\net45\FsPickler.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Google.Protobuf, Version=3.1.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Google.Protobuf.3.1.0\lib\net45\Google.Protobuf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Jil, Version=2.14.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Jil.2.14.5\lib\net45\Jil.dll</HintPath>
       <Private>True</Private>
@@ -87,6 +91,7 @@
     <Compile Include="FlatBuffers\ByteBuffer.cs" />
     <Compile Include="FlatBuffers\FlatBufferBuilder.cs" />
     <Compile Include="FlatBuffers\FlatBufferConstants.cs" />
+    <Compile Include="Protobuf3\Person.cs" />
     <None Include="FlatBuffers\Person.fbs" />
     <Compile Include="FlatBuffers\FlatBuffersObject\Person.cs" />
     <Compile Include="FlatBuffers\FlatBuffersObject\PersonVector.cs" />
@@ -96,6 +101,7 @@
     <Compile Include="FlatBuffers\Table.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Protobuf3\Person.proto" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -113,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FlatBuffers\flatc.exe" />
+    <Content Include="Protobuf3\protoc.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option csharp_namespace = "Proto3Objects";
+
+option optimize_for = SPEED;
+
+enum Sex {
+    Unknown = 0;
+    Male = 1;
+    Female = 2;
+}
+
+message Person {
+    int32 age = 1;
+    string firstName = 2;
+    string lastName = 3;
+    Sex sex = 4;
+}
+
+
+message PersonVector {
+    repeated Person list = 1;
+}
