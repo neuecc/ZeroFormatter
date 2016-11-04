@@ -37,7 +37,7 @@ namespace ZeroFormatter.Segments
         int freeCount;
         int freeList;
 
-        DictionarySegmentMode mode;
+        internal DictionarySegmentMode mode; // dangerous, be careful
         DirtyTracker tracker;
         ArraySegment<byte> originalBytes;
         readonly IEqualityComparer<TKey> comparer;

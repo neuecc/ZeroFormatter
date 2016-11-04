@@ -3,10 +3,12 @@ using System.Reflection;
 using System.Linq;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace ZeroFormatter.Segments
 {
-    // for KeyTuple, String, byte[] and struct.
+    // for KeyTuple, String, byte[], IDict, ILookup and struct.
     internal static class CacheSegment
     {
         public static bool CanAccept(Type type)
@@ -36,7 +38,19 @@ namespace ZeroFormatter.Segments
             {
                 return true;
             }
-            
+            else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            {
+                return true;
+            }
+            else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
+            {
+                return true;
+            }
+            else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(ILookup<,>))
+            {
+                return true;
+            }
+
 
             return false;
         }

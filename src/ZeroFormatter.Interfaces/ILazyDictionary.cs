@@ -38,6 +38,11 @@ namespace ZeroFormatter
 
 #endif
 
+        public static ILazyLookup<TKey, TElement> AsLazyLookup<TKey, TElement>(this ILookup<TKey, TElement> lookup)
+        {
+            return new DelegateLookup<TKey, TElement>(lookup);
+        }
+
         internal class DelegateDictionary<TKey, TValue> : IDictionary<TKey, TValue>, ILazyDictionary<TKey, TValue>
 #if !UNITY
             , ILazyReadOnlyDictionary<TKey, TValue>
@@ -168,6 +173,47 @@ namespace ZeroFormatter
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return dictionary.GetEnumerator();
+            }
+        }
+
+        internal class DelegateLookup<TKey, TElement> : ILookup<TKey, TElement>, ILazyLookup<TKey, TElement>
+        {
+            readonly ILookup<TKey, TElement> lookup;
+
+            public DelegateLookup(ILookup<TKey, TElement> lookup)
+            {
+                this.lookup = lookup;
+            }
+
+            public IEnumerable<TElement> this[TKey key]
+            {
+                get
+                {
+                    return lookup[key];
+                }
+            }
+
+            public int Count
+            {
+                get
+                {
+                    return lookup.Count;
+                }
+            }
+
+            public bool Contains(TKey key)
+            {
+                return lookup.Contains(key);
+            }
+
+            public IEnumerator<IGrouping<TKey, TElement>> GetEnumerator()
+            {
+                return lookup.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return lookup.GetEnumerator();
             }
         }
     }

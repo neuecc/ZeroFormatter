@@ -2,12 +2,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace ZeroFormatter.Tests
 {
     [TestClass]
     public class DictionaryFormatterTest
     {
+        [ZeroFormattable]
+        public class InDictionary
+        {
+            [Index(0)]
+            public virtual IDictionary<string, int> D1 { get; set; }
+            [Index(1)]
+            public virtual ILazyDictionary<string, int> D2 { get; set; }
+            [Index(2)]
+            public virtual IReadOnlyDictionary<string, int> D3 { get; set; }
+            [Index(3)]
+            public virtual ILazyReadOnlyDictionary<string, int> D4 { get; set; }
+        }
+
         [TestMethod]
         public void DictionarySerialize()
         {
@@ -42,6 +56,28 @@ namespace ZeroFormatter.Tests
                 v["z!?fdsf<>"].Is("hugazer0^-zsdf");
                 v["zfweb"].Is("linqfsd");
             }
+        }
+
+        [TestMethod]
+        public void Serialize2()
+        {
+            var d = new InDictionary
+            {
+                D1 = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } },
+                D2 = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } }.AsLazyDictionary(),
+                D3 = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } },
+                D4 = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } }.AsLazyReadOnlyDictionary(),
+            };
+
+            var c = ZeroFormatterSerializer.Convert(d);
+
+            var props = c.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            c.D1["a"].Is(1); c.D1["b"].Is(2);
+            c.D2["a"].Is(1); c.D2["b"].Is(2);
+            c.D2["a"].Is(1); c.D2["b"].Is(2);
+            c.D2["a"].Is(1); c.D2["b"].Is(2);
+
         }
     }
 }

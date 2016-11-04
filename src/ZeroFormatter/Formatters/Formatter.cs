@@ -323,6 +323,11 @@ namespace ZeroFormatter.Formatters
                         var formatterType = typeof(LookupFormatter<,>).MakeGenericType(ti.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
+                    else if (t.GetGenericTypeDefinition() == typeof(ILazyLookup<,>))
+                    {
+                        var formatterType = typeof(LazyLookupFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
                     else if (t.GetGenericTypeDefinition() == typeof(GroupingSegment<,>))
                     {
                         var formatterType = typeof(GroupingSegmentFormatter<,>).MakeGenericType(ti.GetGenericArguments());
@@ -473,6 +478,18 @@ namespace ZeroFormatter.Formatters
             if (Formatter<ILookup<TKey, TElement>>.Default is IErrorFormatter)
             {
                 Formatter<ILookup<TKey, TElement>>.Register(new LookupFormatter<TKey, TElement>());
+            }
+            if (Formatter<IList<TElement>>.Default is IErrorFormatter)
+            {
+                Formatter<IList<TElement>>.Register(new ListFormatter<TElement>());
+            }
+        }
+
+        public static void RegisterLazyLookup<TKey, TElement>()
+        {
+            if (Formatter<ILazyLookup<TKey, TElement>>.Default is IErrorFormatter)
+            {
+                Formatter<ILazyLookup<TKey, TElement>>.Register(new LazyLookupFormatter<TKey, TElement>());
             }
             if (Formatter<GroupingSegment<TKey, TElement>>.Default is IErrorFormatter)
             {

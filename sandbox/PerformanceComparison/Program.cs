@@ -216,7 +216,7 @@ class Program
         // and If enum serialization options to ByUnderlyingValue, gets more fast but we check default option only.
 
         var serializer = MessagePackSerializer.Get<T>();
-        
+
         using (new Measure("Serialize"))
         {
             for (int i = 0; i < Iteration; i++)

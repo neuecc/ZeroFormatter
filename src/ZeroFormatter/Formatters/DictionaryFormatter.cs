@@ -34,8 +34,8 @@ namespace ZeroFormatter.Formatters
                 return 4;
             }
 
-            var segment = value as IZeroFormatterSegment;
-            if (segment != null)
+            var segment = value as DictionarySegment<TKey,TValue>;
+            if (segment != null && segment.mode ==  DictionarySegmentMode.Immediate)
             {
                 return segment.Serialize(ref bytes, offset);
             }
@@ -83,7 +83,7 @@ namespace ZeroFormatter.Formatters
             }
 
             var dictionary = value as DictionarySegment<TKey, TValue>;
-            if (dictionary == null)
+            if (dictionary == null || dictionary.mode == DictionarySegmentMode.Immediate)
             {
                 dictionary = new DictionarySegment<TKey, TValue>(new DirtyTracker(offset), value.Count);
                 foreach (var item in value)
@@ -130,8 +130,8 @@ namespace ZeroFormatter.Formatters
                 return 4;
             }
 
-            var segment = value as IZeroFormatterSegment;
-            if (segment != null)
+            var segment = value as DictionarySegment<TKey, TValue>;
+            if (segment != null && segment.mode == DictionarySegmentMode.Immediate)
             {
                 return segment.Serialize(ref bytes, offset);
             }
@@ -179,7 +179,7 @@ namespace ZeroFormatter.Formatters
             }
 
             var dictionary = value as DictionarySegment<TKey, TValue>;
-            if (dictionary == null)
+            if (dictionary == null || dictionary.mode == DictionarySegmentMode.Immediate)
             {
                 dictionary = new DictionarySegment<TKey, TValue>(new DirtyTracker(offset), value.Count);
                 foreach (var item in value)
