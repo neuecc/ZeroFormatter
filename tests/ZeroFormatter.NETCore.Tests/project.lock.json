@@ -2493,6 +2493,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
+          "System.Linq": "4.1.0",
           "System.Runtime": "4.1.0"
         },
         "compile": {

@@ -7,13 +7,23 @@ using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Segments
 {
+    // Immediate
+    // [int count][(Key:Value)...], count == -1 is null
+
+    // LazyAll
     // [int byteSize][int count]
     // [IList<int> buckets][List<DictionaryEntry> entries]
     //  byteSize == -1 is null
 
-    public sealed class DictionarySegment<TKey, TValue> : IDictionary<TKey, TValue>, IZeroFormatterSegment
+    public enum DictionarySegmentMode
+    {
+        Immediate = 0,
+        LazyAll = 1
+    }
+
+    public sealed class DictionarySegment<TKey, TValue> : IDictionary<TKey, TValue>, IZeroFormatterSegment, ILazyDictionary<TKey, TValue>
 #if !UNITY
-        , IReadOnlyDictionary<TKey, TValue>
+        , IReadOnlyDictionary<TKey, TValue>, ILazyReadOnlyDictionary<TKey, TValue>
 #endif
     {
         #region SerializableStates
@@ -27,8 +37,9 @@ namespace ZeroFormatter.Segments
         int freeCount;
         int freeList;
 
-        readonly DirtyTracker tracker;
-        readonly ArraySegment<byte> originalBytes;
+        DictionarySegmentMode mode;
+        DirtyTracker tracker;
+        ArraySegment<byte> originalBytes;
         readonly IEqualityComparer<TKey> comparer;
 
         internal DictionarySegment(DirtyTracker tracker, int size)
@@ -52,18 +63,56 @@ namespace ZeroFormatter.Segments
 
             this.freeList = -1;
             this.freeCount = 0;
+
+            this.mode = DictionarySegmentMode.LazyAll;
         }
 
-        internal static DictionarySegment<TKey, TValue> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
+        internal static DictionarySegment<TKey, TValue> Create(DirtyTracker tracker, byte[] bytes, int offset, DictionarySegmentMode mode, out int byteSize)
         {
-            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
-            if (byteSize == -1)
+            var byteSizeOrCount = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSizeOrCount == -1)
             {
                 byteSize = 4;
                 return null;
             }
+            if (mode == DictionarySegmentMode.Immediate)
+            {
+                var originalOffset = offset;
 
-            return new DictionarySegment<TKey, TValue>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+                var dict = new DictionarySegment<TKey, TValue>(tracker, byteSizeOrCount);
+                var childTracker = dict.tracker;
+                dict.tracker = DirtyTracker.NullTracker; // don't do dirty
+
+                var keyFormatter = Formatter<TKey>.Default;
+                var valueFormatter = Formatter<TValue>.Default;
+
+                int size = 0;
+                byteSize = 4;
+                offset += 4;
+                for (int i = 0; i < byteSizeOrCount; i++)
+                {
+                    var key = keyFormatter.Deserialize(ref bytes, offset, tracker, out size);
+                    byteSize += size;
+                    offset += size;
+
+                    var value = valueFormatter.Deserialize(ref bytes, offset, tracker, out size);
+                    byteSize += size;
+                    offset += size;
+
+                    dict.Add(key, value);
+                }
+
+                dict.tracker = childTracker;
+                dict.originalBytes = new ArraySegment<byte>(bytes, originalOffset, byteSize);
+                dict.mode = DictionarySegmentMode.Immediate;
+
+                return dict;
+            }
+            else
+            {
+                byteSize = byteSizeOrCount;
+                return new DictionarySegment<TKey, TValue>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+            }
         }
 
         DictionarySegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
@@ -98,6 +147,8 @@ namespace ZeroFormatter.Segments
 
             this.freeList = -1;
             this.freeCount = 0;
+
+            this.mode = DictionarySegmentMode.LazyAll;
         }
 
         public int Count
@@ -458,27 +509,46 @@ namespace ZeroFormatter.Segments
             }
             else
             {
-                if (!(freeCount == 0 && freeList == -1))
+                if (mode == DictionarySegmentMode.LazyAll)
                 {
-                    Resize(count);
+                    if (!(freeCount == 0 && freeList == -1))
+                    {
+                        Resize(count);
+                    }
+
+                    var intListFormatter = Formatter<IList<int>>.Default;
+                    var entryListFormatter = Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default;
+
+                    var startOffset = offset;
+
+                    offset += 4;
+                    BinaryUtil.WriteInt32(ref bytes, offset, count);
+                    offset += 4;
+
+                    offset += intListFormatter.Serialize(ref bytes, offset, buckets);
+                    offset += entryListFormatter.Serialize(ref bytes, offset, entries);
+
+                    var totalBytes = offset - startOffset;
+                    BinaryUtil.WriteInt32(ref bytes, startOffset, totalBytes);
+
+                    return totalBytes;
                 }
+                else
+                {
+                    var startOffset = offset;
 
-                var intListFormatter = Formatter<IList<int>>.Default;
-                var entryListFormatter = Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default;
+                    var keyFormatter = Formatter<TKey>.Default;
+                    var valueFormatter = Formatter<TValue>.Default;
 
-                var startOffset = offset;
+                    offset += BinaryUtil.WriteInt32(ref bytes, offset, count);
+                    foreach (var item in this)
+                    {
+                        offset += keyFormatter.Serialize(ref bytes, offset, item.Key);
+                        offset += valueFormatter.Serialize(ref bytes, offset, item.Value);
+                    }
 
-                offset += 4;
-                BinaryUtil.WriteInt32(ref bytes, offset, count);
-                offset += 4;
-
-                offset += intListFormatter.Serialize(ref bytes, offset, buckets);
-                offset += entryListFormatter.Serialize(ref bytes, offset, entries);
-
-                var totalBytes = offset - startOffset;
-                BinaryUtil.WriteInt32(ref bytes, startOffset, totalBytes);
-
-                return totalBytes;
+                    return offset - startOffset;
+                }
             }
         }
     }

@@ -11,10 +11,10 @@ namespace ZeroFormatter.DotNetCore.Tests
         public void DictionarySerialize()
         {
             {
-                IDictionary<int, int> xs = new Dictionary<int, int> { { 1, 120 }, { 3431242, 532 }, { 32, 5 } };
+                ILazyDictionary<int, int> xs = new Dictionary<int, int> { { 1, 120 }, { 3431242, 532 }, { 32, 5 } }.AsLazyDictionary();
 
                 var r = ZeroFormatterSerializer.Serialize(xs);
-                var v = ZeroFormatterSerializer.Deserialize<IDictionary<int, int>>(r);
+                var v = ZeroFormatterSerializer.Deserialize<ILazyDictionary<int, int>>(r);
                 v.OrderBy(x => x.Key)
                     .Select(x => Tuple.Create(x.Key, x.Value))
                     .Is(

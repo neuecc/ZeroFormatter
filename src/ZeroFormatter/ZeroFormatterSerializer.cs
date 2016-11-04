@@ -126,12 +126,15 @@ namespace ZeroFormatter
             }
         }
 
-        public static T Convert<T>(T obj)
+        public static T Convert<T>(T obj, bool forceConvert = false)
         {
             var wrapper = obj as IZeroFormatterSegment;
-            if (wrapper != null && wrapper.CanDirectCopy())
+            if (!forceConvert)
             {
-                return obj;
+                if (wrapper != null && wrapper.CanDirectCopy())
+                {
+                    return obj;
+                }
             }
 
             return Deserialize<T>(Serialize(obj));
@@ -198,9 +201,9 @@ namespace ZeroFormatter
                 return serializes.GetOrAdd(type, t => new CompiledMethods(t)).deserialize3.Invoke(stream);
             }
 
-            public static object Convert(Type type, object obj)
+            public static object Convert(Type type, object obj, bool forceConvert = false)
             {
-                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).convert.Invoke(obj);
+                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).convert.Invoke(obj, forceConvert);
             }
 
             public static bool IsFormattedObject(object obj)
@@ -218,7 +221,7 @@ namespace ZeroFormatter
                 public readonly Func<byte[], object> deserialize1;
                 public readonly Func<byte[], int, object> deserialize2;
                 public readonly Func<Stream, object> deserialize3;
-                public readonly Func<object, object> convert;
+                public readonly Func<object, bool, object> convert;
 
                 public CompiledMethods(Type type)
                 {
@@ -304,11 +307,12 @@ namespace ZeroFormatter
                         var convert = methods.First(x => x.Name == "Convert").MakeGenericMethod(type);
 
                         var param1 = Expression.Parameter(typeof(object), "obj");
+                        var param2 = Expression.Parameter(typeof(bool), "forceConvert");
                         var callConvert = Expression.Call(convert, ti.IsValueType
                                 ? Expression.Unbox(param1, type)
-                                : Expression.Convert(param1, type));
+                                : Expression.Convert(param1, type), param2);
                         var body = Expression.Convert(callConvert, typeof(object));
-                        var lambda = Expression.Lambda<Func<object, object>>(body, param1).Compile();
+                        var lambda = Expression.Lambda<Func<object,bool, object>>(body, param1, param2).Compile();
 
                         this.convert = lambda;
                     }

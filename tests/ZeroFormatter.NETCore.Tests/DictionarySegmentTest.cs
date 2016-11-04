@@ -13,17 +13,17 @@ namespace ZeroFormatter.DotNetCore.Tests
     {
         DictionarySegment<int, string> CreateFresh()
         {
-            IDictionary<int, string> sampleDict = new Dictionary<int, string>()
+            ILazyDictionary<int, string> sampleDict = new Dictionary<int, string>()
             {
                 {1234, "aaaa" },
                 {-1, "mainasu" },
                 {-42432, "more mainasu" },
                 {99999, "plus plus" }
-            };
+            }.AsLazyDictionary();
             var bytes = ZeroFormatterSerializer.Serialize(sampleDict);
 
             int _;
-            return DictionarySegment<int, string>.Create(new DirtyTracker(0), bytes, 0, out _);
+            return DictionarySegment<int, string>.Create(new DirtyTracker(0), bytes, 0, DictionarySegmentMode.LazyAll, out _);
         }
 
         [Fact]

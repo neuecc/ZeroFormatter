@@ -6,6 +6,8 @@ namespace ZeroFormatter.Segments
 
     public sealed class DirtyTracker
     {
+        internal static readonly DirtyTracker NullTracker = new DirtyTracker(0);
+
         readonly DirtyTracker parent;
 
         public int RootOffset { get; private set; }

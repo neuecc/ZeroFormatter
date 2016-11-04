@@ -39,7 +39,6 @@ namespace ZeroFormatter.Formatters
 
             try
             {
-
                 // Primitive
                 if (t == typeof(Int16))
                 {
@@ -298,14 +297,21 @@ namespace ZeroFormatter.Formatters
                         var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
-
+                    else if (t.GetGenericTypeDefinition() == typeof(ILazyDictionary<,>))
+                    {
+                        var formatterType = typeof(LazyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
                     else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
                     {
                         var formatterType = typeof(ReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
-
-
+                    else if (t.GetGenericTypeDefinition() == typeof(ILazyReadOnlyDictionary<,>))
+                    {
+                        var formatterType = typeof(LazyReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
                     else if (t.GetGenericTypeDefinition() == typeof(DictionaryEntry<,>))
                     {
                         var formatterType = typeof(DictionaryEntryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
@@ -316,9 +322,7 @@ namespace ZeroFormatter.Formatters
                     {
                         var formatterType = typeof(LookupFormatter<,>).MakeGenericType(ti.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
-
                     }
-
                     else if (t.GetGenericTypeDefinition() == typeof(GroupingSegment<,>))
                     {
                         var formatterType = typeof(GroupingSegmentFormatter<,>).MakeGenericType(ti.GetGenericArguments());
@@ -497,6 +501,14 @@ namespace ZeroFormatter.Formatters
             if (Formatter<IDictionary<TKey, TValue>>.Default is IErrorFormatter)
             {
                 Formatter<IDictionary<TKey, TValue>>.Register(new DictionaryFormatter<TKey, TValue>());
+            }
+        }
+
+        public static void RegisterLazyDictionary<TKey, TValue>()
+        {
+            if (Formatter<ILazyDictionary<TKey, TValue>>.Default is IErrorFormatter)
+            {
+                Formatter<ILazyDictionary<TKey, TValue>>.Register(new LazyDictionaryFormatter<TKey, TValue>());
             }
             if (Formatter<DictionaryEntry<TKey, TValue>>.Default is IErrorFormatter)
             {

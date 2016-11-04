@@ -16,17 +16,17 @@ namespace ZeroFormatter.Tests
     {
         DictionarySegment<int, string> CreateFresh()
         {
-            IDictionary<int, string> sampleDict = new Dictionary<int, string>()
+            ILazyDictionary<int, string> sampleDict = new Dictionary<int, string>()
             {
                 {1234, "aaaa" },
                 {-1, "mainasu" },
                 {-42432, "more mainasu" },
                 {99999, "plus plus" }
-            };
+            }.AsLazyDictionary();
             var bytes = ZeroFormatterSerializer.Serialize(sampleDict);
 
             int _;
-            return DictionarySegment<int, string>.Create(new DirtyTracker(0), bytes, 0, out _);
+            return DictionarySegment<int, string>.Create(new DirtyTracker(0), bytes, 0, DictionarySegmentMode.LazyAll, out _);
         }
 
         [TestMethod]
@@ -98,6 +98,116 @@ namespace ZeroFormatter.Tests
 
             dict[new HashCollision(10, 999)].Is(6);
             dict[new HashCollision(99, 999)].Is(9);
+        }
+
+        [TestMethod]
+        public void ModeImmediate()
+        {
+            IDictionary<int, string> dict = new Dictionary<int, string>
+            {
+                {1, "a" },
+                {2, "b" },
+                {3, "c" }
+            };
+
+            var immediateLazySegment = ZeroFormatterSerializer.Convert(dict);
+            var segment = immediateLazySegment as IZeroFormatterSegment;
+
+            immediateLazySegment[1].Is("a");
+            immediateLazySegment[2].Is("b");
+            immediateLazySegment[3].Is("c");
+
+            segment.CanDirectCopy().IsTrue();
+            var moreSerialize = ZeroFormatterSerializer.Convert(immediateLazySegment, true);
+            (moreSerialize as IZeroFormatterSegment).CanDirectCopy().IsTrue();
+
+            moreSerialize.Add(10, "hugahuga");
+            (moreSerialize as IZeroFormatterSegment).CanDirectCopy().IsFalse();
+            moreSerialize[10].Is("hugahuga");
+
+            var lastSerialize = ZeroFormatterSerializer.Convert(moreSerialize, true);
+
+            immediateLazySegment[1].Is("a");
+            immediateLazySegment[2].Is("b");
+            immediateLazySegment[3].Is("c");
+            moreSerialize[10].Is("hugahuga");
+        }
+
+        [TestMethod]
+        public void ModeLazyAll()
+        {
+            ILazyDictionary<int, string> dict = new Dictionary<int, string>
+            {
+                {1, "a" },
+                {2, "b" },
+                {3, "c" }
+            }.AsLazyDictionary();
+
+            var immediateLazySegment = ZeroFormatterSerializer.Convert(dict);
+            var segment = immediateLazySegment as IZeroFormatterSegment;
+
+            immediateLazySegment[1].Is("a");
+            immediateLazySegment[2].Is("b");
+            immediateLazySegment[3].Is("c");
+
+            segment.CanDirectCopy().IsTrue();
+            var moreSerialize = ZeroFormatterSerializer.Convert(immediateLazySegment, true);
+            (moreSerialize as IZeroFormatterSegment).CanDirectCopy().IsTrue();
+
+            moreSerialize.Add(10, "hugahuga");
+            (moreSerialize as IZeroFormatterSegment).CanDirectCopy().IsFalse();
+            moreSerialize[10].Is("hugahuga");
+
+            var lastSerialize = ZeroFormatterSerializer.Convert(moreSerialize, true);
+
+            immediateLazySegment[1].Is("a");
+            immediateLazySegment[2].Is("b");
+            immediateLazySegment[3].Is("c");
+            moreSerialize[10].Is("hugahuga");
+        }
+
+        [TestMethod]
+        public void ModeImmediateReadOnly()
+        {
+            IReadOnlyDictionary<int, string> dict = new Dictionary<int, string>
+            {
+                {1, "a" },
+                {2, "b" },
+                {3, "c" }
+            };
+
+            var immediateLazySegment = ZeroFormatterSerializer.Convert(dict);
+            var segment = immediateLazySegment as IZeroFormatterSegment;
+
+            immediateLazySegment[1].Is("a");
+            immediateLazySegment[2].Is("b");
+            immediateLazySegment[3].Is("c");
+
+            segment.CanDirectCopy().IsTrue();
+            var moreSerialize = ZeroFormatterSerializer.Convert(immediateLazySegment, true);
+            (moreSerialize as IZeroFormatterSegment).CanDirectCopy().IsTrue();
+        }
+
+        [TestMethod]
+        public void ModeLazyAllReadOnly()
+        {
+            ILazyReadOnlyDictionary<int, string> dict = new Dictionary<int, string>
+            {
+                {1, "a" },
+                {2, "b" },
+                {3, "c" }
+            }.AsLazyReadOnlyDictionary();
+
+            var immediateLazySegment = ZeroFormatterSerializer.Convert(dict);
+            var segment = immediateLazySegment as IZeroFormatterSegment;
+
+            immediateLazySegment[1].Is("a");
+            immediateLazySegment[2].Is("b");
+            immediateLazySegment[3].Is("c");
+
+            segment.CanDirectCopy().IsTrue();
+            var moreSerialize = ZeroFormatterSerializer.Convert(immediateLazySegment, true);
+            (moreSerialize as IZeroFormatterSegment).CanDirectCopy().IsTrue();
         }
     }
 
