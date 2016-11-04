@@ -224,11 +224,11 @@ namespace ZeroFormatter.Internal
             this.Write(">();\r\n");
             
             #line 51 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
- } else if(g.TypeKind == GenericTypeKind.Dictionary) { 
+ } else if(g.TypeKind == GenericTypeKind.ReadOnlyList) { 
             
             #line default
             #line hidden
-            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterDictionary<");
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyList<");
             
             #line 52 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
@@ -238,11 +238,11 @@ namespace ZeroFormatter.Internal
             this.Write(">();\r\n");
             
             #line 53 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
- } else if(g.TypeKind == GenericTypeKind.Lookup) { 
+ } else if(g.TypeKind == GenericTypeKind.Dictionary) { 
             
             #line default
             #line hidden
-            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLookup<");
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterDictionary<");
             
             #line 54 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
@@ -252,6 +252,76 @@ namespace ZeroFormatter.Internal
             this.Write(">();\r\n");
             
             #line 55 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+ } else if(g.TypeKind == GenericTypeKind.ReadOnlyDictionary) { 
+            
+            #line default
+            #line hidden
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyDictionary<");
+            
+            #line 56 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
+            
+            #line default
+            #line hidden
+            this.Write(">();\r\n");
+            
+            #line 57 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+ } else if(g.TypeKind == GenericTypeKind.LazyDictionary) { 
+            
+            #line default
+            #line hidden
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<");
+            
+            #line 58 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
+            
+            #line default
+            #line hidden
+            this.Write(">();\r\n");
+            
+            #line 59 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+ } else if(g.TypeKind == GenericTypeKind.LazyReadOnlyDictionary) { 
+            
+            #line default
+            #line hidden
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLazyReadOnlyDictionary<");
+            
+            #line 60 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
+            
+            #line default
+            #line hidden
+            this.Write(">();\r\n");
+            
+            #line 61 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+ } else if(g.TypeKind == GenericTypeKind.Lookup) { 
+            
+            #line default
+            #line hidden
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLookup<");
+            
+            #line 62 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
+            
+            #line default
+            #line hidden
+            this.Write(">();\r\n");
+            
+            #line 63 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+ } else if(g.TypeKind == GenericTypeKind.LazyLookup) { 
+            
+            #line default
+            #line hidden
+            this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<");
+            
+            #line 64 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
+            
+            #line default
+            #line hidden
+            this.Write(">();\r\n");
+            
+            #line 65 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } } 
             
             #line default

@@ -149,9 +149,12 @@ namespace ZeroFormatter.CodeGenerator
                 }
                 else if (genericTypeString == "System.Collections.Generic.IList<>"
                       || genericTypeString == "System.Collections.Generic.IDictionary<,>"
+                      || genericTypeString == "ZeroFormatter.ILazyDictionary<,>"
                       || genericTypeString == "System.Collections.Generic.IReadOnlyList<>"
                       || genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>"
+                      || genericTypeString == "ZeroFormatter.ILazyReadOnlyDictionary<,>"
                       || genericTypeString == "System.Linq.ILookup<,>"
+                      || genericTypeString == "ZeroFormatter.ILazyLookup<,>"
                       || genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
                 {
                     var elementTypes = string.Join(", ", type.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
@@ -160,9 +163,29 @@ namespace ZeroFormatter.CodeGenerator
                     {
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.List, ElementTypes = elementTypes });
                     }
+                    else if (genericTypeString == "System.Collections.Generic.IReadOnlyList<>")
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.ReadOnlyList, ElementTypes = elementTypes });
+                    }
                     else if (genericTypeString == "System.Collections.Generic.IDictionary<,>")
                     {
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Dictionary, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>")
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.ReadOnlyDictionary, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString == "ZeroFormatter.ILazyDictionary<,>")
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.LazyDictionary, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString == "ZeroFormatter.ILazyReadOnlyDictionary<,>")
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.LazyReadOnlyDictionary, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString == "ZeroFormatter.ILazyLookup<,>")
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.LazyLookup, ElementTypes = elementTypes });
                     }
                     else if (genericTypeString == "System.Linq.ILookup<,>")
                     {
@@ -238,8 +261,16 @@ namespace ZeroFormatter.CodeGenerator
 
             var definedIndexes = new HashSet<int>();
 
-            foreach (var property in type.GetAllMembers().OfType<IPropertySymbol>())
+            foreach (var property in type.GetAllMembers())
             {
+                var propSymbol = property as IPropertySymbol;
+                var fieldSymbol = property as IFieldSymbol;
+
+                if ((propSymbol == null && fieldSymbol == null))
+                {
+                    continue;
+                }
+
                 if (property.DeclaredAccessibility != Accessibility.Public)
                 {
                     continue;
@@ -278,17 +309,24 @@ namespace ZeroFormatter.CodeGenerator
 
                 if (!type.IsValueType)
                 {
-                    if (property.GetMethod == null || property.SetMethod == null
-                        || property.GetMethod.DeclaredAccessibility == Accessibility.Private
-                        || property.SetMethod.DeclaredAccessibility == Accessibility.Private)
+                    if (propSymbol == null)
+                    {
+                        throw new Exception($"Class does not allow that field marks IndexAttribute. {type.Name }{property.Name}");
+                    }
+
+                    if (propSymbol.GetMethod == null || propSymbol.SetMethod == null
+                     || propSymbol.GetMethod.DeclaredAccessibility == Accessibility.Private
+                     || propSymbol.SetMethod.DeclaredAccessibility == Accessibility.Private)
                     {
                         throw new Exception($"Public property's accessor must needs both public/protected get and set. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
                     }
                 }
 
-                if (property.Type.TypeKind == TypeKind.Array)
+                var memberType = (propSymbol != null) ? propSymbol.Type : fieldSymbol.Type;
+
+                if (memberType.TypeKind == TypeKind.Array)
                 {
-                    var array = property.Type as IArrayTypeSymbol;
+                    var array = memberType as IArrayTypeSymbol;
                     var t = array.ElementType;
                     if (t.SpecialType != SpecialType.System_Byte) // allows byte[]
                     {
@@ -297,7 +335,7 @@ namespace ZeroFormatter.CodeGenerator
                 }
                 else
                 {
-                    var namedType = property.Type as INamedTypeSymbol;
+                    var namedType = memberType as INamedTypeSymbol;
                     if (namedType != null) // if <T> is unnamed type, it can't analyze.
                     {
                         // Recursive
@@ -305,16 +343,17 @@ namespace ZeroFormatter.CodeGenerator
                     }
                 }
 
-                var length = KnownFormatterSpec.GetLength(property.Type);
+                var length = KnownFormatterSpec.GetLength(memberType);
                 var prop = new ObjectSegmentType.PropertyTuple
                 {
                     Name = property.Name,
-                    Type = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                    Type = memberType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     Index = (int)index.Value,
-                    IsGetProtected = property.GetMethod.DeclaredAccessibility == Accessibility.Protected,
-                    IsSetProtected = property.SetMethod.DeclaredAccessibility == Accessibility.Protected,
+                    IsGetProtected = (propSymbol != null) ? propSymbol.GetMethod.DeclaredAccessibility == Accessibility.Protected : false,
+                    IsSetProtected = (propSymbol != null) ? propSymbol.SetMethod.DeclaredAccessibility == Accessibility.Protected : false,
                     FixedSize = length ?? 0,
-                    IsCacheSegment = KnownFormatterSpec.CanAcceptCacheSegment(property.Type),
+                    IsProperty = propSymbol != null,
+                    IsCacheSegment = KnownFormatterSpec.CanAcceptCacheSegment(memberType),
                     IsFixedSize = (length != null)
                 };
 

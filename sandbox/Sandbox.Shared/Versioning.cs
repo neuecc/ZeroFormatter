@@ -38,5 +38,7 @@ namespace Sandbox.Shared
         public virtual IList<string> MyProperty13 { get; set; }
         [Index(15)]
         public virtual IDictionary<string, int> MyProperty15 { get; set; }
+        [Index(20)]
+        public virtual int MyProperty20 { get; set; }
     }
 }

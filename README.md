@@ -150,14 +150,20 @@ TODO:...
 | KeyTuple? | [hasValue:bool(1)][Item1:T1, Item2:T2 ...] | T is T1 ~ T8 |
 | FixedSizeList | [length:int(4)][elements:T...] | represents `IList<T>` where T is fixed length format. if length = -1, indicates null
 | VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | represents `IList<T>` where T is variable length format. if length = -1, indicates null
-| Dictionary | [byteSize:int(4)][length:int(4)][buckets:`FixedSizeList<int>`][entries:`VariableSizeList<DictionaryEntry>`] | represents `IDictionary<TKey, TValue>`, if byteSize == -1, indicates null |
-| DictionaryEntry | [hashCode:int(4)][next:int(4)][key:TKey][value:TValue] | substructure of Dictionary | 
-| MultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] |  represents `ILookup<TKey, TElement>`, if byteSize == -1, indicates null | 
-| GroupingSegment | [key:TKey] [hashCode:int(4)][elements:`VariableSizeList<TElement>`] | substructure of MultiDictionary
+
 
 **Object Format**
 
 Object is variant of Variable Length Format that can define user own format. Layout is `[byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...]`. If byteSize = -1, indicates null.
+
+**Dictionary Format**
+
+| Dictionary | [length:int(4)][`(key:TKey, value:TValue)`...] | represents `IDictionary<TKey, TValue>`, if length == -1, indicates null |
+| MultiDictionary | [length:int(4)][`(key:TKey, elements:List<TElement>)`...] | represents `ILookup<TKey, TElement>`, if length == -1, indicates null |
+| LazyDictionary | [byteSize:int(4)][length:int(4)][buckets:`FixedSizeList<int>`][entries:`VariableSizeList<DictionaryEntry>`] | represents `ILazyDictionary<TKey, TValue>`, if byteSize == -1, indicates null |
+| DictionaryEntry | [hashCode:int(4)][next:int(4)][key:TKey][value:TValue] | substructure of LazyDictionary | 
+| LazyMultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] |  represents `ILazyLookup<TKey, TElement>`, if byteSize == -1, indicates null | 
+| GroupingSegment | [key:TKey] [hashCode:int(4)][elements:`VariableSizeList<TElement>`] | substructure of LazyMultiDictionary
 
 **Struct Format**
 

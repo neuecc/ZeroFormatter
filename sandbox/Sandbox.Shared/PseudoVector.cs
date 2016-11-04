@@ -8,9 +8,9 @@ namespace UnityEngine
     public struct Vector2
     {
         [Index(0)]
-        public float x { get; private set; }
+        public float x;
         [Index(1)]
-        public float y { get; private set; }
+        public float y;
 
         public Vector2(float x, float y)
         {

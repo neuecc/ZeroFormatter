@@ -42,10 +42,14 @@ namespace ZeroFormatter.Segments
             {
                 return true;
             }
+
+#if !UNITY
             else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
             {
                 return true;
             }
+
+#endif
             else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(ILookup<,>))
             {
                 return true;

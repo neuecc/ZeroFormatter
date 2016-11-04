@@ -14,7 +14,7 @@ namespace ZeroFormatter.Tests
     [TestClass]
     public class ObjectFormatterTest
     {
-        
+
 
         [TestMethod]
         public void ObjectFormatter()
@@ -112,7 +112,7 @@ namespace ZeroFormatter.Tests
             r4.MyProperty3 = 3;
             r4.MyProperty8 = 99999999;
             r4.MyProperty7 = 12345.12345;
-            
+
             r4.MyProperty10 = 54321;
 
             var moreBytes = ZeroFormatterSerializer.Serialize<OtherSchema3>(r4);
@@ -139,6 +139,64 @@ namespace ZeroFormatter.Tests
             newBytes = null;
             Formatter<double>.Default.Serialize(ref newBytes, 0, 12345.12345);
 
+
+
+        }
+
+        public void LazyFormatsTest()
+        {
+            var mc = new ZeroFormatter.Tests.LazyFormats()
+            {
+                D0 = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } },
+                D1 = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } }.AsLazyDictionary(),
+                D2 = Enumerable.Range(1, 5).ToLookup(x => x % 2 == 0),
+                D3 = Enumerable.Range(1, 5).ToLookup(x => x % 2 == 0).AsLazyLookup()
+            };
+
+            mc.D0["a"].Is(1); mc.D0["b"].Is(2);
+            mc.D1["a"].Is(1); mc.D1["b"].Is(2);
+            mc.D2[true].IsCollection(2, 4);
+            mc.D2[false].IsCollection(1, 3, 5);
+            mc.D3[true].IsCollection(2, 4);
+            mc.D3[false].IsCollection(1, 3, 5);
+        }
+
+
+        public void FooBar()
+        {
+            var foobar = new FooBar
+            {
+                BarMyClass = new Sandbox.Shared.Bar.MyClass
+                {
+                    Age = 999,
+                    FirstName = "huga",
+                    LastName = "last",
+                    List = new[] { Sandbox.Shared.Bar.MogeMoge.Apple },
+                    Mone = Sandbox.Shared.Bar.MogeMoge.Apple
+                },
+                FooMyClass = new Sandbox.Shared.Foo.MyClass
+                {
+                    Age = 9,
+                    FirstName = "foge",
+                    LastName = "none",
+                    List = new[] { Sandbox.Shared.Foo.MogeMoge.Orange },
+                    Mone = Sandbox.Shared.Foo.MogeMoge.Orange
+                },
+            };
+
+            var newFooBar = ZeroFormatterSerializer.Convert(foobar);
+
+            newFooBar.BarMyClass.Age.Is(999);
+            newFooBar.BarMyClass.FirstName.Is("huga");
+            newFooBar.BarMyClass.LastName.Is("last");
+            newFooBar.BarMyClass.List[0].Is(Sandbox.Shared.Bar.MogeMoge.Apple);
+            newFooBar.BarMyClass.Mone.Is(Sandbox.Shared.Bar.MogeMoge.Apple);
+
+            newFooBar.FooMyClass.Age.Is(9);
+            newFooBar.FooMyClass.FirstName.Is("foge");
+            newFooBar.FooMyClass.LastName.Is("none");
+            newFooBar.FooMyClass.List[0].Is(Sandbox.Shared.Foo.MogeMoge.Orange);
+            newFooBar.FooMyClass.Mone.Is(Sandbox.Shared.Foo.MogeMoge.Orange);
 
 
         }

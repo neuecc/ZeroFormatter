@@ -160,9 +160,9 @@ namespace ZeroFormatter.Tests
 
             var lastSerialize = ZeroFormatterSerializer.Convert(moreSerialize, true);
 
-            immediateLazySegment[1].Is("a");
-            immediateLazySegment[2].Is("b");
-            immediateLazySegment[3].Is("c");
+            lastSerialize[1].Is("a");
+            lastSerialize[2].Is("b");
+            lastSerialize[3].Is("c");
             moreSerialize[10].Is("hugahuga");
         }
 

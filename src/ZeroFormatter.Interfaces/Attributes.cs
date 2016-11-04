@@ -9,7 +9,7 @@ namespace ZeroFormatter
     {
     }
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public class IndexAttribute : Attribute
     {
         public int Index { get; private set; }
@@ -20,7 +20,7 @@ namespace ZeroFormatter
         }
     }
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public class IgnoreFormatAttribute : Attribute
     {
     }

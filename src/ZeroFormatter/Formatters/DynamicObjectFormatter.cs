@@ -15,9 +15,65 @@ namespace ZeroFormatter.Formatters
 
 #if !UNITY
 
+    internal class EmittableMemberInfo
+    {
+        readonly PropertyInfo propertyInfo;
+        readonly FieldInfo fieldInfo;
+
+        public bool IsProperty { get { return propertyInfo != null; } }
+        public bool IsField { get { return fieldInfo != null; } }
+
+        public PropertyInfo PropertyInfoUnsafe
+        {
+            get
+            {
+                if (!IsProperty) throw new InvalidOperationException();
+                return propertyInfo;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return (IsProperty) ? propertyInfo.Name : fieldInfo.Name;
+            }
+        }
+
+        public Type MemberType
+        {
+            get
+            {
+                return (IsProperty) ? propertyInfo.PropertyType : fieldInfo.FieldType;
+            }
+        }
+
+        public EmittableMemberInfo(PropertyInfo propertyInfo)
+        {
+            this.propertyInfo = propertyInfo;
+        }
+
+        public EmittableMemberInfo(FieldInfo fieldInfo)
+        {
+            this.fieldInfo = fieldInfo;
+        }
+
+        public void EmitLoadValue(ILGenerator il)
+        {
+            if (IsProperty)
+            {
+                il.Emit(OpCodes.Callvirt, propertyInfo.GetGetMethod());
+            }
+            else
+            {
+                il.Emit(OpCodes.Ldfld, fieldInfo);
+            }
+        }
+    }
+
     internal static class DynamicObjectDescriptor
     {
-        public static Tuple<int, PropertyInfo>[] GetProperties(Type type, bool isClass)
+        public static Tuple<int, EmittableMemberInfo>[] GetMembers(Type type, bool isClass)
         {
             if (isClass)
             {
@@ -47,7 +103,7 @@ namespace ZeroFormatter.Formatters
                 }
             }
 
-            var dict = new Dictionary<int, PropertyInfo>();
+            var dict = new Dictionary<int, EmittableMemberInfo>();
             foreach (var item in type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 if (item.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) continue;
@@ -82,16 +138,41 @@ namespace ZeroFormatter.Formatters
                     throw new InvalidOperationException("IndexAttribute can not allow duplicate. " + type.Name + "." + item.Name + ", Index:" + index.Index);
                 }
 
-                VerifyProeprtyType(item);
-                dict[index.Index] = item;
+                var info = new EmittableMemberInfo(item);
+                VerifyMember(info);
+                dict[index.Index] = info;
+            }
+
+            foreach (var item in type.GetTypeInfo().GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (item.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) continue;
+
+                var index = item.GetCustomAttributes(typeof(IndexAttribute), true).Cast<IndexAttribute>().FirstOrDefault();
+                if (index == null)
+                {
+                    throw new InvalidOperationException("Public field must mark IndexAttribute or IgnoreFormatAttribute. " + type.Name + "." + item.Name);
+                }
+                else if (isClass)
+                {
+                    throw new InvalidOperationException("Class does not allow that field marks IndexAttribute. " + type.Name + "." + item.Name);
+                }
+
+                if (dict.ContainsKey(index.Index))
+                {
+                    throw new InvalidOperationException("IndexAttribute can not allow duplicate. " + type.Name + "." + item.Name + ", Index:" + index.Index);
+                }
+
+                var info = new EmittableMemberInfo(item);
+                VerifyMember(info);
+                dict[index.Index] = info;
             }
 
             return dict.OrderBy(x => x.Key).Select(x => Tuple.Create(x.Key, x.Value)).ToArray();
         }
 
-        static void VerifyProeprtyType(PropertyInfo property)
+        static void VerifyMember(EmittableMemberInfo info)
         {
-            var formatter = typeof(Formatter<>).MakeGenericType(property.PropertyType).GetTypeInfo().GetProperty("Default").GetValue(null, null);
+            var formatter = typeof(Formatter<>).MakeGenericType(info.MemberType).GetTypeInfo().GetProperty("Default").GetValue(null, null);
             var error = formatter as IErrorFormatter;
             if (error != null)
             {
@@ -110,14 +191,14 @@ namespace ZeroFormatter.Formatters
             var ti = t.GetTypeInfo();
             if (ti.IsValueType) throw new InvalidOperationException("Type must be Class. " + t.Name);
 
-            var properties = DynamicObjectDescriptor.GetProperties(t, true);
-            var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, t, properties);
+            var members = DynamicObjectDescriptor.GetMembers(t, true);
+            var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, t, members);
             var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
 
             return formatter;
         }
 
-        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, Tuple<int, PropertyInfo>[] propertyInfos)
+        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, Tuple<int, EmittableMemberInfo>[] memberInfos)
         {
             var typeBuilder = builder.DefineType(
                DynamicAssemblyHolder.ModuleName + "." + elementType.FullName + "$Formatter",
@@ -125,10 +206,10 @@ namespace ZeroFormatter.Formatters
                typeof(Formatter<>).MakeGenericType(elementType));
 
             // field
-            var formattersInField = new List<Tuple<int, PropertyInfo, FieldBuilder>>();
-            foreach (var item in propertyInfos)
+            var formattersInField = new List<Tuple<int, EmittableMemberInfo, FieldBuilder>>();
+            foreach (var item in memberInfos)
             {
-                var field = typeBuilder.DefineField("<>" + item.Item2.Name + "Formatter", typeof(Formatter<>).MakeGenericType(item.Item2.PropertyType), FieldAttributes.Private | FieldAttributes.InitOnly);
+                var field = typeBuilder.DefineField("<>" + item.Item2.Name + "Formatter", typeof(Formatter<>).MakeGenericType(item.Item2.MemberType), FieldAttributes.Private | FieldAttributes.InitOnly);
                 formattersInField.Add(Tuple.Create(item.Item1, item.Item2, field));
             }
 
@@ -210,7 +291,7 @@ namespace ZeroFormatter.Formatters
                 {
                     il.MarkLabel(labelB);
 
-                    var schemaLastIndex = propertyInfos.Select(x => x.Item1).LastOrDefault();
+                    var schemaLastIndex = memberInfos.Select(x => x.Item1).LastOrDefault();
                     var calcedBeginOffset = 8 + (4 * (schemaLastIndex + 1));
 
                     il.Emit(OpCodes.Ldarg_2);
@@ -243,7 +324,7 @@ namespace ZeroFormatter.Formatters
                         il.Emit(OpCodes.Ldarg_1);
                         il.Emit(OpCodes.Ldarg_2);
                         il.Emit(OpCodes.Ldarg_3);
-                        il.Emit(OpCodes.Callvirt, item.Item2.GetGetMethod());
+                        item.Item2.EmitLoadValue(il);
                         il.Emit(OpCodes.Callvirt, item.Item3.FieldType.GetTypeInfo().GetMethod("Serialize"));
                         il.Emit(OpCodes.Add);
                         il.Emit(OpCodes.Starg_S, (byte)2);
@@ -330,16 +411,16 @@ namespace ZeroFormatter.Formatters
             {
                 var elementType = t;
 
-                var properties = DynamicObjectDescriptor.GetProperties(elementType, false);
-                var length = ValidateAndCalculateLength(elementType, properties);
-                var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, elementType, length, properties.Select(x => x.Item2).ToArray());
+                var members = DynamicObjectDescriptor.GetMembers(elementType, false);
+                var length = ValidateAndCalculateLength(elementType, members);
+                var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, elementType, length, members.Select(x => x.Item2).ToArray());
                 var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
 
                 return formatter;
             }
         }
 
-        static int? ValidateAndCalculateLength(Type t, IEnumerable<Tuple<int, PropertyInfo>> source)
+        static int? ValidateAndCalculateLength(Type t, IEnumerable<Tuple<int, EmittableMemberInfo>> source)
         {
             var isNullable = false;
             var lengthSum = 0;
@@ -351,7 +432,7 @@ namespace ZeroFormatter.Formatters
                 if (item.Item1 != expected) throw new InvalidOperationException("Struct index must be started with 0 and be sequential. Type: " + t.FullName + " InvalidIndex:" + item.Item1);
                 expected++;
 
-                var formatter = typeof(Formatter<>).MakeGenericType(item.Item2.PropertyType).GetTypeInfo().GetProperty("Default");
+                var formatter = typeof(Formatter<>).MakeGenericType(item.Item2.MemberType).GetTypeInfo().GetProperty("Default");
                 var len = (formatter.GetGetMethod().Invoke(null, Type.EmptyTypes) as IFormatter).GetLength();
                 if (len != null)
                 {
@@ -362,7 +443,7 @@ namespace ZeroFormatter.Formatters
                     isNullable = true;
                 }
 
-                constructorTypes.Add(item.Item2.PropertyType);
+                constructorTypes.Add(item.Item2.MemberType);
             }
 
             var info = t.GetTypeInfo().GetConstructor(constructorTypes.ToArray());
@@ -374,7 +455,7 @@ namespace ZeroFormatter.Formatters
             return isNullable ? (int?)null : lengthSum;
         }
 
-        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, int? length, PropertyInfo[] propertyInfos)
+        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, int? length, EmittableMemberInfo[] memberInfos)
         {
             var typeBuilder = builder.DefineType(
                 DynamicAssemblyHolder.ModuleName + "." + elementType.FullName + "$Formatter",
@@ -425,15 +506,15 @@ namespace ZeroFormatter.Formatters
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Stloc_0);
 
-                foreach (var item in propertyInfos)
+                foreach (var item in memberInfos)
                 {
-                    var formatter = typeof(Formatter<>).MakeGenericType(item.PropertyType);
+                    var formatter = typeof(Formatter<>).MakeGenericType(item.MemberType);
                     il.Emit(OpCodes.Ldarg_2);
                     il.Emit(OpCodes.Call, formatter.GetTypeInfo().GetProperty("Default").GetGetMethod());
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldarg_2);
                     il.Emit(OpCodes.Ldarga_S, (byte)3);
-                    il.Emit(OpCodes.Call, item.GetGetMethod());
+                    item.EmitLoadValue(il);
                     il.Emit(OpCodes.Callvirt, formatter.GetTypeInfo().GetMethod("Serialize"));
                     il.Emit(OpCodes.Add);
                     il.Emit(OpCodes.Starg_S, (byte)2);
@@ -454,20 +535,20 @@ namespace ZeroFormatter.Formatters
                 var il = method.GetILGenerator();
 
                 il.DeclareLocal(typeof(int)); // size
-                foreach (var item in propertyInfos)
+                foreach (var item in memberInfos)
                 {
-                    il.DeclareLocal(item.PropertyType); // item1, item2...
+                    il.DeclareLocal(item.MemberType); // item1, item2...
                 }
                 il.DeclareLocal(elementType); // result
 
                 il.Emit(OpCodes.Ldarg_S, (byte)4);
                 il.Emit(OpCodes.Ldc_I4_0);
                 il.Emit(OpCodes.Stind_I4);
-                for (int i = 0; i < propertyInfos.Length; i++)
+                for (int i = 0; i < memberInfos.Length; i++)
                 {
-                    var item = propertyInfos[i];
+                    var item = memberInfos[i];
 
-                    var formatter = typeof(Formatter<>).MakeGenericType(item.PropertyType);
+                    var formatter = typeof(Formatter<>).MakeGenericType(item.MemberType);
                     il.Emit(OpCodes.Call, formatter.GetTypeInfo().GetProperty("Default").GetGetMethod());
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldarg_2);
@@ -487,12 +568,12 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Stind_I4);
                 }
 
-                for (int i = 0; i < propertyInfos.Length; i++)
+                for (int i = 0; i < memberInfos.Length; i++)
                 {
                     il.Emit(OpCodes.Ldloc, i + 1);
                 }
 
-                var constructor = elementType.GetTypeInfo().GetConstructor(propertyInfos.Select(x => x.PropertyType).ToArray());
+                var constructor = elementType.GetTypeInfo().GetConstructor(memberInfos.Select(x => x.MemberType).ToArray());
                 il.Emit(OpCodes.Newobj, constructor);
                 il.Emit(OpCodes.Ret);
             }

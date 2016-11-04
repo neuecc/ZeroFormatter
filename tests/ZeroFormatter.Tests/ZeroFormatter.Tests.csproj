@@ -39,7 +39,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Unity|AnyCPU'">
     <OutputPath>bin\Unity\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;UNITY</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -95,7 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\sandbox\Sandbox.Shared\Sandbox.Shared.csproj">
-      <Project>{944F22D3-20B1-4F6D-83FA-9331CD4ADF75}</Project>
+      <Project>{944f22d3-20b1-4f6d-83fa-9331cd4adf75}</Project>
       <Name>Sandbox.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\ZeroFormatter.Interfaces\ZeroFormatter.Interfaces.csproj">

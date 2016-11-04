@@ -521,6 +521,18 @@ namespace ZeroFormatter.Formatters
             }
         }
 
+#if !UNITY
+
+        public static void RegisterReadOnlyDictionary<TKey, TValue>()
+        {
+            if (Formatter<IReadOnlyDictionary<TKey, TValue>>.Default is IErrorFormatter)
+            {
+                Formatter<IReadOnlyDictionary<TKey, TValue>>.Register(new ReadOnlyDictionaryFormatter<TKey, TValue>());
+            }
+        }
+
+#endif
+
         public static void RegisterLazyDictionary<TKey, TValue>()
         {
             if (Formatter<ILazyDictionary<TKey, TValue>>.Default is IErrorFormatter)
@@ -544,6 +556,18 @@ namespace ZeroFormatter.Formatters
                 Formatter<IList<T>>.Register(new ListFormatter<T>());
             }
         }
+
+#if !UNITY
+
+        public static void RegisterReadOnlyList<T>()
+        {
+            if (Formatter<IReadOnlyList<T>>.Default is IErrorFormatter)
+            {
+                Formatter<IReadOnlyList<T>>.Register(new ReadOnlyListFormatter<T>());
+            }
+        }
+
+#endif
 
         public static void RegisterKeyTuple<T1>()
         {

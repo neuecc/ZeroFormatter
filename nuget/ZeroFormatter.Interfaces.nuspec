@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>ZeroFormatter.Interfaces</id>
-        <version>0.2.6</version>
+        <version>0.2.7</version>
         <title>ZeroFormatter.Interfaces</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
@@ -19,14 +19,18 @@
             </group>
             <group targetFramework=".NETFramework3.5">
             </group>
+            <group targetFramework=".NETFramework4.5">
+            </group>
             <group targetFramework=".NETStandard1.1">
                 <dependency id="System.Runtime" version="4.1.0" />
+                <dependency id="System.Linq" version="4.1.0" />
             </group>
         </dependencies>
     </metadata>
     <files>
-        <file src="..\src\ZeroFormatter.Interfaces\bin\Release\ZeroFormatter.Interfaces.dll" target="lib\net35" />
-        <file src="..\src\ZeroFormatter.Interfaces\bin\Release\ZeroFormatter.Interfaces.dll" target="lib\net35-Unity Full v3.5" />
+        <file src="..\tests\ZeroFormatter.UnityTests\Assets\Dlls\ZeroFormatter.Interfaces.dll" target="lib\net35" />
+        <file src="..\tests\ZeroFormatter.UnityTests\Assets\Dlls\ZeroFormatter.Interfaces.dll" target="lib\net35-Unity Full v3.5" />
+        <file src="..\src\ZeroFormatter.Interfaces\bin\Release\ZeroFormatter.Interfaces.dll" target="lib\net45" />
         <file src="..\src\ZeroFormatter.Interfaces.NETCore\bin\Release\netstandard1.1\ZeroFormatter.Interfaces.dll" target="lib\netstandard1.1" />
         <file src="..\src\ZeroFormatter.CodeGenerator\bin\Release\*.*" target="tools\zfc\" exclude="*.pdb" />
     </files>

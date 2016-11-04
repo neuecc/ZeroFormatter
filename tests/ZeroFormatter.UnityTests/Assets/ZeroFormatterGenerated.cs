@@ -81,6 +81,8 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.TestBase>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.TestBaseFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.Test2>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.Test2Formatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.IncludeStruct>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.IncludeStructFormatter());
+            ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.LazyFormats>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.LazyFormatsFormatter());
+            ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.FooBar>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.FooBarFormatter());
             // Structs
             {
                 var structFormatter = new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.MyStructFixedFormatter();
@@ -117,7 +119,9 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>();
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<int, string>();
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<string, int>();
+            ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<string, int>();
             ZeroFormatter.Formatters.Formatter.RegisterLookup<bool, int>();
+            ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<bool, int>();
         }
     }
 }
@@ -1359,7 +1363,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             {
                 var startOffset = offset;
 
-                offset += (8 + 4 * (15 + 1));
+                offset += (8 + 4 * (20 + 1));
                 offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.MyProperty0);
                 offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 3, value.MyProperty3);
                 offset += ObjectSegmentHelper.SerializeFromFormatter<long>(ref bytes, startOffset, offset, 5, value.MyProperty5);
@@ -1368,8 +1372,9 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Linq.ILookup<bool, int>>(ref bytes, startOffset, offset, 11, value.MyProperty11);
                 offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IList<string>>(ref bytes, startOffset, offset, 13, value.MyProperty13);
                 offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IDictionary<string, int>>(ref bytes, startOffset, offset, 15, value.MyProperty15);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 20, value.MyProperty20);
 
-                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 15);
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 20);
             }
         }
 
@@ -1387,7 +1392,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 
     public class LargeObjectSegment : global::Sandbox.Shared.Large, IZeroFormatterSegment
     {
-        static readonly int[] __elementSizes = new int[]{ 4, 0, 0, 4, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        static readonly int[] __elementSizes = new int[]{ 4, 0, 0, 4, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
@@ -1396,9 +1401,9 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 
         readonly CacheSegment<string> _MyProperty6;
         global::System.Collections.Generic.IList<int> _MyProperty10;
-        global::System.Linq.ILookup<bool, int> _MyProperty11;
+        readonly CacheSegment<global::System.Linq.ILookup<bool, int>> _MyProperty11;
         global::System.Collections.Generic.IList<string> _MyProperty13;
-        global::System.Collections.Generic.IDictionary<string, int> _MyProperty15;
+        readonly CacheSegment<global::System.Collections.Generic.IDictionary<string, int>> _MyProperty15;
 
         // 0
         public override int MyProperty0
@@ -1471,12 +1476,11 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         {
             get
             {
-                return _MyProperty11;
+                return _MyProperty11.Value;
             }
             set
             {
-                __tracker.Dirty();
-                _MyProperty11 = value;
+                _MyProperty11.Value = value;
             }
         }
 
@@ -1499,12 +1503,24 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         {
             get
             {
-                return _MyProperty15;
+                return _MyProperty15.Value;
             }
             set
             {
-                __tracker.Dirty();
-                _MyProperty15 = value;
+                _MyProperty15.Value = value;
+            }
+        }
+
+        // 20
+        public override int MyProperty20
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 20, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 20, __binaryLastIndex, __extraFixedBytes, value, __tracker);
             }
         }
 
@@ -1517,13 +1533,13 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
             this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
 
-            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 15, __elementSizes);
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 20, __elementSizes);
 
             _MyProperty6 = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 7, __binaryLastIndex, __tracker));
             _MyProperty10 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<int>>(originalBytes, 10, __binaryLastIndex, __tracker);
-            _MyProperty11 = ObjectSegmentHelper.DeserializeSegment<global::System.Linq.ILookup<bool, int>>(originalBytes, 11, __binaryLastIndex, __tracker);
+            _MyProperty11 = new CacheSegment<global::System.Linq.ILookup<bool, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 11, __binaryLastIndex, __tracker));
             _MyProperty13 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<string>>(originalBytes, 13, __binaryLastIndex, __tracker);
-            _MyProperty15 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(originalBytes, 15, __binaryLastIndex, __tracker);
+            _MyProperty15 = new CacheSegment<global::System.Collections.Generic.IDictionary<string, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 15, __binaryLastIndex, __tracker));
         }
 
         public bool CanDirectCopy()
@@ -1541,18 +1557,19 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             if (__extraFixedBytes != null || __tracker.IsDirty)
             {
                 var startOffset = offset;
-                offset += (8 + 4 * (15 + 1));
+                offset += (8 + 4 * (20 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeFixedLength<long>(ref targetBytes, startOffset, offset, 5, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 7, _MyProperty6);
                 offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<int>>(ref targetBytes, startOffset, offset, 10, _MyProperty10);
-                offset += ObjectSegmentHelper.SerializeSegment<global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 11, _MyProperty11);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 11, _MyProperty11);
                 offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<string>>(ref targetBytes, startOffset, offset, 13, _MyProperty13);
-                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 15, _MyProperty15);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 15, _MyProperty15);
+                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 20, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
-                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 15);
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 20);
             }
             else
             {
@@ -1743,26 +1760,25 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        global::System.Collections.Generic.IDictionary<int, string> _MyProperty1;
+        readonly CacheSegment<global::System.Collections.Generic.IDictionary<int, string>> _MyProperty1;
         global::System.Collections.Generic.IList<int> _MyProperty2;
         global::System.Collections.Generic.IList<string> _MyProperty3;
-        global::System.Linq.ILookup<bool, int> _MyProperty4;
+        readonly CacheSegment<global::System.Linq.ILookup<bool, int>> _MyProperty4;
         global::ZeroFormatter.Tests.MyFormatClass _MyProperty5;
         readonly CacheSegment<byte[]> _MyProperty6;
         readonly CacheSegment<string> _MyProperty7;
-        global::System.Collections.Generic.IDictionary<string, int> _MyProperty8;
+        readonly CacheSegment<global::System.Collections.Generic.IDictionary<string, int>> _MyProperty8;
 
         // 0
         public override global::System.Collections.Generic.IDictionary<int, string> MyProperty1
         {
             get
             {
-                return _MyProperty1;
+                return _MyProperty1.Value;
             }
             set
             {
-                __tracker.Dirty();
-                _MyProperty1 = value;
+                _MyProperty1.Value = value;
             }
         }
 
@@ -1799,12 +1815,11 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         {
             get
             {
-                return _MyProperty4;
+                return _MyProperty4.Value;
             }
             set
             {
-                __tracker.Dirty();
-                _MyProperty4 = value;
+                _MyProperty4.Value = value;
             }
         }
 
@@ -1853,12 +1868,11 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         {
             get
             {
-                return _MyProperty8;
+                return _MyProperty8.Value;
             }
             set
             {
-                __tracker.Dirty();
-                _MyProperty8 = value;
+                _MyProperty8.Value = value;
             }
         }
 
@@ -1873,14 +1887,14 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 7, __elementSizes);
 
-            _MyProperty1 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<int, string>>(originalBytes, 0, __binaryLastIndex, __tracker);
+            _MyProperty1 = new CacheSegment<global::System.Collections.Generic.IDictionary<int, string>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 0, __binaryLastIndex, __tracker));
             _MyProperty2 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<int>>(originalBytes, 1, __binaryLastIndex, __tracker);
             _MyProperty3 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<string>>(originalBytes, 2, __binaryLastIndex, __tracker);
-            _MyProperty4 = ObjectSegmentHelper.DeserializeSegment<global::System.Linq.ILookup<bool, int>>(originalBytes, 3, __binaryLastIndex, __tracker);
+            _MyProperty4 = new CacheSegment<global::System.Linq.ILookup<bool, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 3, __binaryLastIndex, __tracker));
             _MyProperty5 = ObjectSegmentHelper.DeserializeSegment<global::ZeroFormatter.Tests.MyFormatClass>(originalBytes, 4, __binaryLastIndex, __tracker);
             _MyProperty6 = new CacheSegment<byte[]>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 5, __binaryLastIndex, __tracker));
             _MyProperty7 = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 6, __binaryLastIndex, __tracker));
-            _MyProperty8 = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(originalBytes, 7, __binaryLastIndex, __tracker);
+            _MyProperty8 = new CacheSegment<global::System.Collections.Generic.IDictionary<string, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 7, __binaryLastIndex, __tracker));
         }
 
         public bool CanDirectCopy()
@@ -1900,14 +1914,14 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
                 offset += (8 + 4 * (7 + 1));
 
-                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IDictionary<int, string>>(ref targetBytes, startOffset, offset, 0, _MyProperty1);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.IDictionary<int, string>>(ref targetBytes, startOffset, offset, 0, _MyProperty1);
                 offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<int>>(ref targetBytes, startOffset, offset, 1, _MyProperty2);
                 offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<string>>(ref targetBytes, startOffset, offset, 2, _MyProperty3);
-                offset += ObjectSegmentHelper.SerializeSegment<global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 3, _MyProperty4);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 3, _MyProperty4);
                 offset += ObjectSegmentHelper.SerializeSegment<global::ZeroFormatter.Tests.MyFormatClass>(ref targetBytes, startOffset, offset, 4, _MyProperty5);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<byte[]>(ref targetBytes, startOffset, offset, 5, _MyProperty6);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 6, _MyProperty7);
-                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 7, _MyProperty8);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 7, _MyProperty8);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 7);
             }
@@ -2800,19 +2814,18 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass> _KeyTupleDictionary;
+        readonly CacheSegment<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>> _KeyTupleDictionary;
 
         // 0
         public override global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass> KeyTupleDictionary
         {
             get
             {
-                return _KeyTupleDictionary;
+                return _KeyTupleDictionary.Value;
             }
             set
             {
-                __tracker.Dirty();
-                _KeyTupleDictionary = value;
+                _KeyTupleDictionary.Value = value;
             }
         }
 
@@ -2827,7 +2840,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 0, __elementSizes);
 
-            _KeyTupleDictionary = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(originalBytes, 0, __binaryLastIndex, __tracker);
+            _KeyTupleDictionary = new CacheSegment<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 0, __binaryLastIndex, __tracker));
         }
 
         public bool CanDirectCopy()
@@ -2847,7 +2860,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
                 offset += (8 + 4 * (0 + 1));
 
-                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(ref targetBytes, startOffset, offset, 0, _KeyTupleDictionary);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(ref targetBytes, startOffset, offset, 0, _KeyTupleDictionary);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
             }
@@ -3038,7 +3051,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
         readonly CacheSegment<string> _Dummy2;
         global::System.Collections.Generic.IList<string> _VariableSizeList;
-        global::System.Collections.Generic.IDictionary<string, int> _Dictionary;
+        readonly CacheSegment<global::System.Collections.Generic.IDictionary<string, int>> _Dictionary;
         global::ZeroFormatter.Tests.Offset2 _ObjectProp;
 
         // 0
@@ -3086,12 +3099,11 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         {
             get
             {
-                return _Dictionary;
+                return _Dictionary.Value;
             }
             set
             {
-                __tracker.Dirty();
-                _Dictionary = value;
+                _Dictionary.Value = value;
             }
         }
 
@@ -3122,7 +3134,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
             _Dummy2 = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
             _VariableSizeList = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IList<string>>(originalBytes, 2, __binaryLastIndex, __tracker);
-            _Dictionary = ObjectSegmentHelper.DeserializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(originalBytes, 3, __binaryLastIndex, __tracker);
+            _Dictionary = new CacheSegment<global::System.Collections.Generic.IDictionary<string, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 3, __binaryLastIndex, __tracker));
             _ObjectProp = ObjectSegmentHelper.DeserializeSegment<global::ZeroFormatter.Tests.Offset2>(originalBytes, 4, __binaryLastIndex, __tracker);
         }
 
@@ -3146,7 +3158,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 1, _Dummy2);
                 offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<string>>(ref targetBytes, startOffset, offset, 2, _VariableSizeList);
-                offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 3, _Dictionary);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 3, _Dictionary);
                 offset += ObjectSegmentHelper.SerializeSegment<global::ZeroFormatter.Tests.Offset2>(ref targetBytes, startOffset, offset, 4, _ObjectProp);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 4);
@@ -3498,6 +3510,294 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<global::ZeroFormatter.Tests.MyStructFixed>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeCacheSegment<global::ZeroFormatter.Tests.MyStructVariable>(ref targetBytes, startOffset, offset, 1, _MyProperty1);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class LazyFormatsFormatter : Formatter<global::ZeroFormatter.Tests.LazyFormats>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.LazyFormats value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (3 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IDictionary<string, int>>(ref bytes, startOffset, offset, 0, value.D0);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::ZeroFormatter.ILazyDictionary<string, int>>(ref bytes, startOffset, offset, 1, value.D1);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Linq.ILookup<bool, int>>(ref bytes, startOffset, offset, 2, value.D2);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::ZeroFormatter.ILazyLookup<bool, int>>(ref bytes, startOffset, offset, 3, value.D3);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 3);
+            }
+        }
+
+        public override global::ZeroFormatter.Tests.LazyFormats Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new LazyFormatsObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class LazyFormatsObjectSegment : global::ZeroFormatter.Tests.LazyFormats, IZeroFormatterSegment
+    {
+        static readonly int[] __elementSizes = new int[]{ 0, 0, 0, 0 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+        readonly CacheSegment<global::System.Collections.Generic.IDictionary<string, int>> _D0;
+        global::ZeroFormatter.ILazyDictionary<string, int> _D1;
+        readonly CacheSegment<global::System.Linq.ILookup<bool, int>> _D2;
+        global::ZeroFormatter.ILazyLookup<bool, int> _D3;
+
+        // 0
+        public override global::System.Collections.Generic.IDictionary<string, int> D0
+        {
+            get
+            {
+                return _D0.Value;
+            }
+            set
+            {
+                _D0.Value = value;
+            }
+        }
+
+        // 1
+        public override global::ZeroFormatter.ILazyDictionary<string, int> D1
+        {
+            get
+            {
+                return _D1;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _D1 = value;
+            }
+        }
+
+        // 2
+        public override global::System.Linq.ILookup<bool, int> D2
+        {
+            get
+            {
+                return _D2.Value;
+            }
+            set
+            {
+                _D2.Value = value;
+            }
+        }
+
+        // 3
+        public override global::ZeroFormatter.ILazyLookup<bool, int> D3
+        {
+            get
+            {
+                return _D3;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _D3 = value;
+            }
+        }
+
+
+        public LazyFormatsObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 3, __elementSizes);
+
+            _D0 = new CacheSegment<global::System.Collections.Generic.IDictionary<string, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 0, __binaryLastIndex, __tracker));
+            _D1 = ObjectSegmentHelper.DeserializeSegment<global::ZeroFormatter.ILazyDictionary<string, int>>(originalBytes, 1, __binaryLastIndex, __tracker);
+            _D2 = new CacheSegment<global::System.Linq.ILookup<bool, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex, __tracker));
+            _D3 = ObjectSegmentHelper.DeserializeSegment<global::ZeroFormatter.ILazyLookup<bool, int>>(originalBytes, 3, __binaryLastIndex, __tracker);
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (3 + 1));
+
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 0, _D0);
+                offset += ObjectSegmentHelper.SerializeSegment<global::ZeroFormatter.ILazyDictionary<string, int>>(ref targetBytes, startOffset, offset, 1, _D1);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 2, _D2);
+                offset += ObjectSegmentHelper.SerializeSegment<global::ZeroFormatter.ILazyLookup<bool, int>>(ref targetBytes, startOffset, offset, 3, _D3);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 3);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class FooBarFormatter : Formatter<global::ZeroFormatter.Tests.FooBar>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.FooBar value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (1 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::Sandbox.Shared.Foo.MyClass>(ref bytes, startOffset, offset, 0, value.FooMyClass);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::Sandbox.Shared.Bar.MyClass>(ref bytes, startOffset, offset, 1, value.BarMyClass);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 1);
+            }
+        }
+
+        public override global::ZeroFormatter.Tests.FooBar Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new FooBarObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class FooBarObjectSegment : global::ZeroFormatter.Tests.FooBar, IZeroFormatterSegment
+    {
+        static readonly int[] __elementSizes = new int[]{ 0, 0 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+        global::Sandbox.Shared.Foo.MyClass _FooMyClass;
+        global::Sandbox.Shared.Bar.MyClass _BarMyClass;
+
+        // 0
+        public override global::Sandbox.Shared.Foo.MyClass FooMyClass
+        {
+            get
+            {
+                return _FooMyClass;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _FooMyClass = value;
+            }
+        }
+
+        // 1
+        public override global::Sandbox.Shared.Bar.MyClass BarMyClass
+        {
+            get
+            {
+                return _BarMyClass;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _BarMyClass = value;
+            }
+        }
+
+
+        public FooBarObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 1, __elementSizes);
+
+            _FooMyClass = ObjectSegmentHelper.DeserializeSegment<global::Sandbox.Shared.Foo.MyClass>(originalBytes, 0, __binaryLastIndex, __tracker);
+            _BarMyClass = ObjectSegmentHelper.DeserializeSegment<global::Sandbox.Shared.Bar.MyClass>(originalBytes, 1, __binaryLastIndex, __tracker);
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (1 + 1));
+
+                offset += ObjectSegmentHelper.SerializeSegment<global::Sandbox.Shared.Foo.MyClass>(ref targetBytes, startOffset, offset, 0, _FooMyClass);
+                offset += ObjectSegmentHelper.SerializeSegment<global::Sandbox.Shared.Bar.MyClass>(ref targetBytes, startOffset, offset, 1, _BarMyClass);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
             }

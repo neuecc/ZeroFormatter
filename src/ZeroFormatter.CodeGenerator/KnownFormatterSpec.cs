@@ -109,6 +109,16 @@ namespace ZeroFormatter.CodeGenerator
             {
                 return true;
             }
+            else if ((symbol as INamedTypeSymbol)?.IsGenericType ?? false)
+            {
+                var genericTypeString = (symbol as INamedTypeSymbol).ConstructUnboundGenericType().ToDisplayString();
+                if (genericTypeString == "System.Collections.Generic.IDictionary<,>"
+                    || genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>"
+                    || genericTypeString == "System.Linq.ILookup<,>")
+                {
+                    return true;
+                }
+            }
 
             return false;
         }

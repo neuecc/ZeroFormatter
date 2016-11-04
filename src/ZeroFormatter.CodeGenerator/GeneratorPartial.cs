@@ -49,7 +49,7 @@ namespace ZeroFormatter.CodeGenerator
         public string FullName { get; set; }
         public string Namespace { get; set; }
         public int LastIndex { get; set; }
-        public PropertyTuple[] Properties { get; set; }
+        public PropertyTuple[] Properties { get; set; } // Property or Field:)
 
         public class PropertyTuple
         {
@@ -60,6 +60,7 @@ namespace ZeroFormatter.CodeGenerator
             public bool IsSetProtected { get; set; }
             public bool IsCacheSegment { get; set; }
             public bool IsFixedSize { get; set; }
+            public bool IsProperty { get; set; }
             public int FixedSize { get; set; }
         }
 
@@ -115,9 +116,14 @@ namespace ZeroFormatter.CodeGenerator
 
     public enum GenericTypeKind
     {
-        KeyTuple, // needs to create KeyTupleFormatter, KeyTupleEqualityComparer, NullableKeyTupleFormatter
-        List, // needs to create ListFormatter
-        Dictionary, // needs to create DictionaryFormatter, DictionaryEntryFormatter
-        Lookup, // needs to create LookupFormatter, GroupingSegmentFormatter
+        KeyTuple,
+        List,
+        ReadOnlyList,
+        Dictionary,
+        ReadOnlyDictionary,
+        LazyDictionary,
+        LazyReadOnlyDictionary,
+        Lookup,
+        LazyLookup
     }
 }

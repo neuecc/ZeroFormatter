@@ -97,19 +97,12 @@ namespace Sandbox
 
         static void Main(string[] args)
         {
-            // var xs = ZeroFormatterSerializer.Serialize(1000);
+            ZeroFormatterSerializer.Convert(new ErrorClass());
 
-//            Encoding.UTF8.GetByteCount();
-
-            var f = ZeroFormatter.Formatters.Formatter<IList<MyStruct>>.Default;
-
-            Console.WriteLine(f.GetLength());
-            byte[] bytes = null;
-            f.Serialize(ref bytes, 0,new[] { new MyStruct { MyProperty1 = 10, MyProperty2 = 99 } });
-            Console.WriteLine(bytes.Length);
+            
         }
     }
-    
+
 
     [ZeroFormattable]
     public struct MyStruct
@@ -123,6 +116,13 @@ namespace Sandbox
             MyProperty1 = x;
             MyProperty2 = y;
         }
+    }
+
+    [ZeroFormattable]
+    public class ErrorClass
+    {
+        [Index(0)]
+        public int MyProperty1;
     }
 }
 

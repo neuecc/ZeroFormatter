@@ -206,7 +206,7 @@ namespace ZeroFormatter.Tests
         [Index(0)]
         public float X { get; private set; }
         [Index(1)]
-        public float Y { get;private set; }
+        public float Y { get; private set; }
 
         public MyVector(float x, float y)
         {
@@ -273,5 +273,27 @@ namespace ZeroFormatter.Tests
         public virtual MyStructFixed MyProperty0 { get; set; }
         [Index(1)]
         public virtual MyStructVariable MyProperty1 { get; set; }
+    }
+
+    [ZeroFormattable]
+    public class LazyFormats
+    {
+        [Index(0)]
+        public virtual IDictionary<string, int> D0 { get; set; }
+        [Index(1)]
+        public virtual ILazyDictionary<string, int> D1 { get; set; }
+        [Index(2)]
+        public virtual ILookup<bool, int> D2 { get; set; }
+        [Index(3)]
+        public virtual ILazyLookup<bool, int> D3 { get; set; }
+    }
+
+    [ZeroFormattable]
+    public class FooBar
+    {
+        [Index(0)]
+        public virtual global::Sandbox.Shared.Foo.MyClass FooMyClass { get; set; }
+        [Index(1)]
+        public virtual global::Sandbox.Shared.Bar.MyClass BarMyClass { get; set; }
     }
 }

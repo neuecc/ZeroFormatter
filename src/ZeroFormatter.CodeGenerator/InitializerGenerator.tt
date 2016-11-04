@@ -48,10 +48,20 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<<#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.List) { #>
             ZeroFormatter.Formatters.Formatter.RegisterList<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.ReadOnlyList) { #>
+            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyList<<#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Dictionary) { #>
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.ReadOnlyDictionary) { #>
+            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyDictionary<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.LazyDictionary) { #>
+            ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.LazyReadOnlyDictionary) { #>
+            ZeroFormatter.Formatters.Formatter.RegisterLazyReadOnlyDictionary<<#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Lookup) { #>
             ZeroFormatter.Formatters.Formatter.RegisterLookup<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.LazyLookup) { #>
+            ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<<#= g.ElementTypes #>>();
 <# } } #>
         }
     }

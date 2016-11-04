@@ -45,6 +45,12 @@ namespace ZeroFormatter.Analyzer
             description: "Public property's accessor must be virtual.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
+        internal static readonly DiagnosticDescriptor ClassNotSupportPublicField = new DiagnosticDescriptor(
+            id: DiagnosticIdBase + "_" + nameof(ClassNotSupportPublicField), title: Title, category: Category,
+            messageFormat: "Class's public field is not supported. {0}.{1}.", // type.Name + "." + item.Name
+            description: "Class's public field is not supported.",
+            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+
         internal static readonly DiagnosticDescriptor IndexAttributeDuplicate = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(IndexAttributeDuplicate), title: Title, category: Category,
             messageFormat: "IndexAttribute can not allow duplicate. {0}.{1}, Index:{2}", // type.Name, item.Name index.Index
@@ -53,8 +59,8 @@ namespace ZeroFormatter.Analyzer
 
         internal static readonly DiagnosticDescriptor DictionaryNotSupport = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(DictionaryNotSupport), title: Title, category: Category,
-            messageFormat: "Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary. {0}.{1}.", // type.Name + "." + property.Name 
-            description: "Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary.",
+            messageFormat: "Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV>, ILazyDictionary<TK, TV> instead of Dictionary. {0}.{1}.", // type.Name + "." + property.Name 
+            description: "Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV>, ILazyDictionary<TK, TV> instead of Dictionary.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor ListNotSupport = new DiagnosticDescriptor(
@@ -98,6 +104,7 @@ namespace ZeroFormatter.Analyzer
             PublicPropertyNeedsIndex,
             PublicPropertyNeedsGetAndSetAccessor,
             PublicPropertyMustBeVirtual,
+            ClassNotSupportPublicField,
             IndexAttributeDuplicate,
             DictionaryNotSupport,
             ListNotSupport,
@@ -166,7 +173,7 @@ namespace ZeroFormatter.Analyzer
             reportContext.ReportAll();
         }
 
-        static void VerifyType(DiagnosticsReportContext context, Location callerLocation, ITypeSymbol type, HashSet<ITypeSymbol> alreadyAnalyzed, IPropertySymbol callFromProperty)
+        static void VerifyType(DiagnosticsReportContext context, Location callerLocation, ITypeSymbol type, HashSet<ITypeSymbol> alreadyAnalyzed, ISymbol callFromProperty)
         {
             if (!alreadyAnalyzed.Add(type))
             {
@@ -206,9 +213,12 @@ namespace ZeroFormatter.Analyzer
                 }
                 else if (genericTypeString == "System.Collections.Generic.IList<>"
                       || genericTypeString == "System.Collections.Generic.IDictionary<,>"
+                      || genericTypeString == "ZeroFormatter.ILazyDictionary<,>"
                       || genericTypeString == "System.Collections.Generic.IReadOnlyList<>"
                       || genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>"
+                      || genericTypeString == "ZeroFormatter.ILazyReadOnlyDictionary<,>"
                       || genericTypeString == "System.Linq.ILookup<,>"
+                      || genericTypeString == "ZeroFormatter.ILazyLookup<,>"
                       || genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
                 {
                     foreach (var t in namedType.TypeArguments)
@@ -242,17 +252,28 @@ namespace ZeroFormatter.Analyzer
                 {
                     VerifyProperty(context, member, alreadyAnalyzed, definedIndexes);
                 }
+                foreach (var member in type.GetAllMembers().OfType<IFieldSymbol>())
+                {
+                    VerifyField(context, member, alreadyAnalyzed, definedIndexes);
+                }
 
                 if (type.IsValueType && context.Diagnostics.Count == 0)
                 {
-                    var indexes = new List<Tuple<int, IPropertySymbol>>();
-                    foreach (var item in type.GetMembers().OfType<IPropertySymbol>())
+                    var indexes = new List<Tuple<int, ITypeSymbol>>();
+                    foreach (var item in type.GetMembers())
                     {
+                        var propSymbol = item as IPropertySymbol;
+                        var fieldSymbol = item as IFieldSymbol;
+                        if ((propSymbol == null && fieldSymbol == null))
+                        {
+                            continue;
+                        }
+
                         var indexAttr = item.GetAttributes().FindAttributeShortName(IndexAttributeShortName);
                         if (indexAttr != null)
                         {
                             var index = (int)indexAttr.ConstructorArguments[0].Value;
-                            indexes.Add(Tuple.Create(index, item));
+                            indexes.Add(Tuple.Create(index, (propSymbol != null) ? propSymbol.Type : fieldSymbol.Type));
                         }
                     }
                     indexes = indexes.OrderBy(x => x.Item1).ToList();
@@ -272,7 +293,7 @@ namespace ZeroFormatter.Analyzer
                     var ctors = (type as INamedTypeSymbol)?.Constructors;
                     foreach (var ctor in ctors)
                     {
-                        var isMatch = indexes.Select(x => x.Item2.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
+                        var isMatch = indexes.Select(x => x.Item2.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
                             .SequenceEqual(ctor.Parameters.Select(x => x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
                         if (isMatch)
                         {
@@ -361,6 +382,70 @@ namespace ZeroFormatter.Analyzer
             if (namedType != null) // if <T> is unnamed type, it can't analyze.
             {
                 VerifyType(context, property.Locations[0], property.Type, alreadyAnalyzed, property);
+            }
+        }
+
+        static void VerifyField(DiagnosticsReportContext context, IFieldSymbol field, HashSet<ITypeSymbol> alreadyAnalyzed, HashSet<int> definedIndexes)
+        {
+            if (field.DeclaredAccessibility != Accessibility.Public)
+            {
+                return;
+            }
+
+            var attributes = field.GetAttributes();
+            if (attributes.FindAttributeShortName(IgnoreShortName) != null)
+            {
+                return;
+            }
+
+            if (!field.ContainingType.IsValueType)
+            {
+                context.Add(Diagnostic.Create(ClassNotSupportPublicField, field.Locations[0], field.ContainingType?.Name, field.Name));
+                return;
+            }
+
+            var indexAttr = attributes.FindAttributeShortName(IndexAttributeShortName);
+            if (indexAttr == null || indexAttr.ConstructorArguments.Length == 0)
+            {
+                context.Add(Diagnostic.Create(PublicPropertyNeedsIndex, field.Locations[0], field.ContainingType?.Name, field.Name));
+                return;
+            }
+
+            var index = indexAttr.ConstructorArguments[0];
+            if (index.IsNull)
+            {
+                return; // null is normal compiler error.
+            }
+
+            if (!definedIndexes.Add((int)index.Value))
+            {
+                context.Add(Diagnostic.Create(IndexAttributeDuplicate, field.Locations[0], field.ContainingType?.Name, field.Name, index.Value));
+                return;
+            }
+
+            if ((int)index.Value >= 100)
+            {
+                context.Add(Diagnostic.Create(IndexIsTooLarge, field.Locations[0], index.Value, field.Name));
+            }
+
+
+            if (field.Type.TypeKind == TypeKind.Array)
+            {
+                var array = field.Type as IArrayTypeSymbol;
+                var t = array.ElementType;
+                if (t.SpecialType == SpecialType.System_Byte) // allows byte[]
+                {
+                    return;
+                }
+
+                context.Add(Diagnostic.Create(ArrayNotSupport, field.Locations[0], field.ContainingType?.Name, field.Name));
+                return;
+            }
+
+            var namedType = field.Type as INamedTypeSymbol;
+            if (namedType != null) // if <T> is unnamed type, it can't analyze.
+            {
+                VerifyType(context, field.Locations[0], field.Type, alreadyAnalyzed, field);
             }
         }
     }

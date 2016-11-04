@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sandbox.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,39 +15,6 @@ namespace ZeroFormatter.Tests
     public class VersiongTest
     {
 
-        [ZeroFormattable]
-        public class Standard
-        {
-            [Index(0)]
-            public virtual int MyProperty0 { get; set; }
-            [Index(3)]
-            public virtual int MyProperty3 { get; set; }
-        }
-
-
-        [ZeroFormattable]
-        public class Large
-        {
-            [Index(0)]
-            public virtual int MyProperty0 { get; set; }
-            [Index(3)]
-            public virtual int MyProperty3 { get; set; }
-
-
-            [Index(5)]
-            public virtual long MyProperty5 { get; set; }
-            [Index(7)]
-            public virtual string MyProperty6 { get; set; }
-            [Index(10)]
-            public virtual IList<int> MyProperty10 { get; set; }
-            [Index(11)]
-            public virtual ILookup<bool, int> MyProperty11 { get; set; }
-            [Index(13)]
-            public virtual IList<string> MyProperty13 { get; set; }
-            [Index(15)]
-            public virtual IDictionary<string, int> MyProperty15 { get; set; }
-        }
-
         [TestMethod]
         public void MyTestMethod()
         {
@@ -61,6 +29,7 @@ namespace ZeroFormatter.Tests
             large.MyProperty11.IsNull();
             large.MyProperty13.IsNull();
             large.MyProperty15.IsNull();
+            large.MyProperty20.Is(0);
 
             large.MyProperty0 = 99;
             large.MyProperty3 = 49;
@@ -70,6 +39,7 @@ namespace ZeroFormatter.Tests
             large.MyProperty11 = Enumerable.Range(1, 10).ToLookup(x => x % 2 == 0);
             large.MyProperty13 = new List<string> { "a", "bcde" };
             large.MyProperty15 = Enumerable.Range(1, 10).ToDictionary(x => x.ToString());
+            large.MyProperty20 = 999999;
 
             var convert = ZeroFormatterSerializer.Convert(large);
 
@@ -82,6 +52,7 @@ namespace ZeroFormatter.Tests
             convert.MyProperty11[true].Is(2, 4, 6, 8, 10);
             convert.MyProperty13.Is(new List<string> { "a", "bcde" });
             convert.MyProperty15["3"].Is(3);
+            convert.MyProperty20.Is(999999);
         }
     }
 }

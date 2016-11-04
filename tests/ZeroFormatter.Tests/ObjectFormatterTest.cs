@@ -197,7 +197,7 @@ namespace ZeroFormatter.Tests
             r4.MyProperty3 = 3;
             r4.MyProperty8 = 99999999;
             r4.MyProperty7 = 12345.12345;
-            
+
             r4.MyProperty10 = 54321;
 
             var moreBytes = ZeroFormatterSerializer.Serialize<OtherSchema3>(r4);
@@ -228,6 +228,46 @@ namespace ZeroFormatter.Tests
 
             var pureBytes = new byte[bytes.Length];
             var hogehogehoge = BinaryUtil.ReadDouble(ref pureBytes, 0);
+
+        }
+
+        [TestMethod]
+        public void FooBar()
+        {
+            var foobar = new FooBar
+            {
+                BarMyClass = new Sandbox.Shared.Bar.MyClass
+                {
+                    Age = 999,
+                    FirstName = "huga",
+                    LastName = "last",
+                    List = new[] { Sandbox.Shared.Bar.MogeMoge.Apple },
+                    Mone = Sandbox.Shared.Bar.MogeMoge.Apple
+                },
+                FooMyClass = new Sandbox.Shared.Foo.MyClass
+                {
+                    Age = 9,
+                    FirstName = "foge",
+                    LastName = "none",
+                    List = new[] { Sandbox.Shared.Foo.MogeMoge.Orange },
+                    Mone = Sandbox.Shared.Foo.MogeMoge.Orange
+                },
+            };
+
+            var newFooBar = ZeroFormatterSerializer.Convert(foobar);
+
+            newFooBar.BarMyClass.Age.Is(999);
+            newFooBar.BarMyClass.FirstName.Is("huga");
+            newFooBar.BarMyClass.LastName.Is("last");
+            newFooBar.BarMyClass.List[0].Is(Sandbox.Shared.Bar.MogeMoge.Apple);
+            newFooBar.BarMyClass.Mone.Is(Sandbox.Shared.Bar.MogeMoge.Apple);
+
+            newFooBar.FooMyClass.Age.Is(9);
+            newFooBar.FooMyClass.FirstName.Is("foge");
+            newFooBar.FooMyClass.LastName.Is("none");
+            newFooBar.FooMyClass.List[0].Is(Sandbox.Shared.Foo.MogeMoge.Orange);
+            newFooBar.FooMyClass.Mone.Is(Sandbox.Shared.Foo.MogeMoge.Orange);
+
 
         }
     }

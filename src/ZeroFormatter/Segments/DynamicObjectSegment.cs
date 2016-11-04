@@ -278,12 +278,12 @@ namespace ZeroFormatter.Segments
             var list = new List<PropertyTuple>();
 
             // getproperties contains verify.
-            foreach (var p in DynamicObjectDescriptor.GetProperties(typeof(T), true))
+            foreach (var p in DynamicObjectDescriptor.GetMembers(typeof(T), true))
             {
                 var propInfo = p.Item2;
                 var index = p.Item1;
 
-                var formatter = (IFormatter)typeof(Formatter<>).MakeGenericType(propInfo.PropertyType).GetTypeInfo().GetProperty("Default").GetValue(null, Type.EmptyTypes);
+                var formatter = (IFormatter)typeof(Formatter<>).MakeGenericType(propInfo.MemberType).GetTypeInfo().GetProperty("Default").GetValue(null, Type.EmptyTypes);
 
                 if (formatter == null)
                 {
@@ -292,20 +292,20 @@ namespace ZeroFormatter.Segments
 
                 if (formatter.GetLength() == null)
                 {
-                    if (CacheSegment.CanAccept(propInfo.PropertyType))
+                    if (CacheSegment.CanAccept(propInfo.MemberType))
                     {
-                        var fieldBuilder = typeBuilder.DefineField("<>_" + propInfo.Name, typeof(CacheSegment<>).MakeGenericType(propInfo.PropertyType), FieldAttributes.Private);
-                        list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo, IsFixedSize = false, SegmentField = fieldBuilder, IsCacheSegment = true });
+                        var fieldBuilder = typeBuilder.DefineField("<>_" + propInfo.Name, typeof(CacheSegment<>).MakeGenericType(propInfo.MemberType), FieldAttributes.Private);
+                        list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo.PropertyInfoUnsafe, IsFixedSize = false, SegmentField = fieldBuilder, IsCacheSegment = true });
                     }
                     else
                     {
-                        var fieldBuilder = typeBuilder.DefineField("<>_" + propInfo.Name, propInfo.PropertyType, FieldAttributes.Private);
-                        list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo, IsFixedSize = false, SegmentField = fieldBuilder });
+                        var fieldBuilder = typeBuilder.DefineField("<>_" + propInfo.Name, propInfo.MemberType, FieldAttributes.Private);
+                        list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo.PropertyInfoUnsafe, IsFixedSize = false, SegmentField = fieldBuilder });
                     }
                 }
                 else
                 {
-                    list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo, IsFixedSize = true, FixedSize = formatter.GetLength().Value });
+                    list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo.PropertyInfoUnsafe, IsFixedSize = true, FixedSize = formatter.GetLength().Value });
                 }
 
                 lastIndex = index;

@@ -116,5 +116,16 @@ namespace ZeroFormatter.Tests
             xs.MyProperty1.MyProperty2.Is("hogehoge");
             xs.MyProperty1.MyProperty3.Is(-123.43f);
         }
+
+        [TestMethod]
+        public void FieldStruct()
+        {
+            var xs = new UnityEngine.Vector2(100.4f, 200.5f);
+
+            var huga = ZeroFormatterSerializer.Convert(xs);
+
+            huga.x.Is(100.4f);
+            huga.y.Is(200.5f);
+        }
     }
 }
