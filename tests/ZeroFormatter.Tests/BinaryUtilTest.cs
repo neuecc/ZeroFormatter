@@ -87,6 +87,10 @@ namespace ZeroFormatter.Tests
             bytes = new byte[100];
             BinaryUtil.WriteUInt64(ref bytes, offset, UInt64.MaxValue).Is(8);
             BinaryUtil.ReadUInt64(ref bytes, offset).Is(UInt64.MaxValue);
+
+            bytes = new byte[100];
+            BinaryUtil.WriteBytes(ref bytes, offset, new[] { (byte)10, (byte)244, (byte)130 }).Is(3);
+            BinaryUtil.ReadBytes(ref bytes, offset, 3).Is((byte)10, (byte)244, (byte)130);
         }
     }
 }

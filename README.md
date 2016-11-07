@@ -1,38 +1,41 @@
 # ZeroFormatter
-Infinitly fast serializer for .NET and Unity.
+Fastest C# Serializer and Infinitly Fast Deserializer for .NET, .NET Core and Unity.
 
-(Work in progress..)
+(Work in progress...)
+
+Why use ZeroFormatter?
+---
+
+* Fastest C# Serializer, code is extremely tuned by both sides of implementation and binary layout(see: performance)
+* Deserialize/Reserialize is infinitly fast because formatter can access to serialized data without parsing/packing(see: architecture)
+* Strongly Typed and C# Code as schema, no needs to other IDL like `.proto`, `.fbs`...
+* Smart API, only to use `Serialize<T>` and `Deserialize<T>`
+* Native support of Dictionary, MultiDictionary(ILookup)
+* First-class support to Unity(IL2CPP), it's faster than native JsonUtility
+
+ZeroFormatter is similar as [FlatBuffers](http://google.github.io/flatbuffers/) but ZeroFormatter has clean API(FlatBuffers API is too ugly[see: sample](https://github.com/google/flatbuffers/blob/master/samples/SampleBinary.cs), we can not use reguraly) and C# specialized. If you need to performance such as Game, Distributed Computing, Microservices etc building by C#, ZeroFormatter will help you.
 
 Install
 ---
 for .NET, .NET Core
 
 * PM> Install-Package [ZeroFormatter](https://www.nuget.org/packages/ZeroFormatter)
-* PM> Install-Package [ZeroFormatter.Analyzer](https://www.nuget.org/packages/ZeroFormatter.Analyzer)
 
-for Unity
+for Unity(Interfaces can reference both .NET 3.5 and Unity for share types)
 
 * PM> Install-Package [ZeroFormatter.Interfaces](https://www.nuget.org/packages/ZeroFormatter.Interfaces/)
 * PM> Install-Package [ZeroFormatter.Unity](https://www.nuget.org/packages/ZeroFormatter.Unity)
 
-Interfaces can reference both .NET 3.5 and Unity.
+Visual Studio Analyzer
 
-ZeroFormatter.Unity is binary for Unity, it can 'not' use dynamic serializer generation but pre code generate helps it. Code Generator is located in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc\zfc.exe`.
+* PM> Install-Package [ZeroFormatter.Analyzer](https://www.nuget.org/packages/ZeroFormatter.Analyzer)
 
-```
-zfc arguments help:
-  -i, --input=VALUE          [required]Input path of analyze csproj
-  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
-  -s, --separate             [optional, default=false]Output files are separated
-  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
-```
-
-Why use ZeroFormatter?
+Quick Start
 ---
-* Access to serialized data without parsing/unpacking
-* Strongly Typed and Code as schema
-no needs to other IDL.
-* Native support for Dictionary, MultiDictionary(ILookup)
+Define class and mark as `[ZeroFormattable]`.
+
+
+
 
 Sample
 ---
@@ -79,6 +82,26 @@ class Program
 
 Serializable target must mark `ZeroFormattableAttribute`, there public property must be `virtual` and requires `IndexAttribute`.
 
+
+Analyzer
+---
+![image](https://cloud.githubusercontent.com/assets/46207/19561566/291e4fda-9714-11e6-9633-e330a1430318.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Supported Type
 ---
 Primitive, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<>`, `ILookup<>`, `byte[]`, `ZeroFormatter.KeyTuple` and there nullable.
@@ -87,11 +110,145 @@ Primitive, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`,
 
 Dictionary's key is native serialized in binary, but has limitation of keys. Key can use Primitive, Enum and ZeroFormatter.KeyTuple for mulitple keys.
 
-Analyzer
+
+Serialize Dictionary/Lookup
 ---
-![image](https://cloud.githubusercontent.com/assets/46207/19561566/291e4fda-9714-11e6-9633-e330a1430318.png)
 
 
+
+
+
+
+
+for Unity
+---
+ZeroFormatter.Unity works on all platforms(PC, Android, iOS, etc...). But it can 'not' use dynamic serializer generation for IL2CPP issue. But pre code generate helps it. Code Generator is located in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc\zfc.exe`.
+
+```
+zfc arguments help:
+  -i, --input=VALUE          [required]Input path of analyze csproj
+  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
+  -s, --separate             [optional, default=false]Output files are separated
+  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
+```
+
+Performance
+---
+Benchmarks comparing to other serializers.
+
+
+
+Architecture
+---
+
+
+Extensibility
+---
+ZeroFormatter can become custom binary layout framework. You can create own typed formatter. For example, add supports `Guid` and `Uri`.
+
+```csharp
+public class GuidFormatter : Formatter<Guid>
+{
+    public override int? GetLength()
+    {
+        // If size is fixed, return fixed size.
+        return 16;
+    }
+
+    public override int Serialize(ref byte[] bytes, int offset, Guid value)
+    {
+        // BinaryUtil is helpers of byte[] operation 
+        return BinaryUtil.WriteBytes(ref bytes, offset, value.ToByteArray());
+    }
+
+    public override Guid Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+    {
+        byteSize = 16;
+        var guidBytes = BinaryUtil.ReadBytes(ref bytes, offset, 16);
+        return new Guid(guidBytes);
+    }
+}
+
+public class UriFormatter : Formatter<Uri>
+{
+    public override int? GetLength()
+    {
+        // If size is variable, return null.
+        return null;
+    }
+
+    public override int Serialize(ref byte[] bytes, int offset, Uri value)
+    {
+        // Formatter<T> can get child serializer
+        return Formatter<string>.Default.Serialize(ref bytes, offset, value.ToString());
+    }
+
+    public override Uri Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+    {
+        var uriString = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out byteSize);
+        return (uriString == null) ? null : new Uri(uriString);
+    }
+}
+```
+
+You need to register formatter on application startup. 
+
+```csharp
+ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
+ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
+```
+
+One more case, how to create generic formatter. `KeyValuePair<TKey, TValue>` is also not suppoted type by default. Let's add support.
+
+```csharp
+public class KeyValuePairFormatter<TKey, TValue> : Formatter<KeyValuePair<TKey, TValue>>
+{
+    public override int? GetLength()
+    {
+        return null;
+    }
+
+    public override int Serialize(ref byte[] bytes, int offset, KeyValuePair<TKey, TValue> value)
+    {
+        var startOffset = offset;
+        offset += Formatter<TKey>.Default.Serialize(ref bytes, offset, value.Key);
+        offset += Formatter<TValue>.Default.Serialize(ref bytes, offset, value.Value);
+        return offset - startOffset;
+    }
+
+    public override KeyValuePair<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+    {
+        int size;
+        byteSize = 0;
+
+        var key = Formatter<TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
+        offset += size;
+        byteSize += size;
+
+        var value = Formatter<TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
+        offset += size;
+        byteSize += size;
+
+        return new KeyValuePair<TKey, TValue>(key, value);
+    }
+}
+```
+
+And register generic resolver on startup.
+
+```csharp
+ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
+{
+    if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+    {
+        var formatterType = typeof(KeyValuePairFormatter<,>).MakeGenericType(t.GetGenericArguments());
+        return Activator.CreateInstance(formatterType);
+    }
+
+    // return null means type is not supported.
+    return null;
+});
+```
 
 WireFormat Specification
 ---
@@ -180,13 +337,20 @@ https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/
 
 Cross Plaftorm
 ---
-Currently No and I have no plans. Welcome to contribute to port other languages.
+Currently No and I have no plans. Welcome to contribute port to other languages.
 
-Performance Tips
+Author Info
 ---
+Yoshifumi Kawai(a.k.a. neuecc) is a software developer in Japan.  
+He is the Director/CTO at Grani, Inc.  
+Grani is a top social game developer in Japan.  
+He is awarding Microsoft MVP for Visual C# since 2011.  
+He is known as the creator of [UniRx](http://github.com/neuecc/UniRx/)(Reactive Extensions for Unity)  
 
+Blog: https://medium.com/@neuecc (English)  
+Blog: http://neue.cc/ (Japanese)  
+Twitter: https://twitter.com/neuecc (Japanese)   
 
-Extensibility
+License
 ---
-
-
+This library is under the MIT License.

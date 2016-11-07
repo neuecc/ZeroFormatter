@@ -102,6 +102,20 @@ namespace ZeroFormatter.Internal
             return bytes[offset];
         }
 
+        public static int WriteBytes(ref byte[] bytes, int offset, byte[] value)
+        {
+            EnsureCapacity(ref bytes, offset, value.Length);
+            Buffer.BlockCopy(value, 0, bytes, offset, value.Length);
+            return value.Length;
+        }
+
+        public static byte[] ReadBytes(ref byte[] bytes, int offset, int count)
+        {
+            var dest = new byte[count];
+            Buffer.BlockCopy(bytes, offset, dest, 0, count);
+            return dest;
+        }
+
         public static int WriteSByte(ref byte[] bytes, int offset, sbyte value)
         {
             EnsureCapacity(ref bytes, offset, 1);
