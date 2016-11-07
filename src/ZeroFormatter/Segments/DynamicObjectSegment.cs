@@ -129,7 +129,7 @@ namespace ZeroFormatter.Segments
         {
             BinaryUtil.WriteInt32(ref targetBytes, startOffset + 4, lastIndex);
             var writeSize = lastOffset - startOffset;
-            BinaryUtil.WriteInt32(ref targetBytes, startOffset, writeSize);
+            BinaryUtil.WriteInt32Unsafe(ref targetBytes, startOffset, writeSize); // okay for use Unsafe.
             return writeSize;
         }
 

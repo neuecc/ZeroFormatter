@@ -206,12 +206,29 @@ namespace ZeroFormatter.Tests
         public void String()
         {
             {
-                var r = ZeroFormatterSerializer.Serialize("あいうえお");
-                ZeroFormatterSerializer.Deserialize<string>(r).Is("あいうえお");
+                // japanese-hiragana and surrogate pair kanji and emoji.
+                var r = ZeroFormatterSerializer.Serialize("あいうえお𠮷野家😀💓");
+                ZeroFormatterSerializer.Deserialize<string>(r).Is("あいうえお𠮷野家😀💓");
             }
             {
                 var r = ZeroFormatterSerializer.Serialize<string>(null);
                 ZeroFormatterSerializer.Deserialize<string>(r).IsNull();
+            }
+            {
+                var f = Formatters.Formatter<string>.Default;
+                byte[] b = null;
+                var size = f.Serialize(ref b, 0, "aiueo");
+                b.Length.Is(size); // just size
+                int size2;
+                f.Deserialize(ref b, 0, Segments.DirtyTracker.NullTracker, out size2).Is("aiueo");
+            }
+            {
+                var f = Formatters.Formatter<string>.Default;
+                byte[] b = new byte[20];
+                var size = f.Serialize(ref b, 5, "aiueo");
+                b.Length.IsNot(size); // not just size
+                int size2;
+                f.Deserialize(ref b, 5, Segments.DirtyTracker.NullTracker, out size2).Is("aiueo");
             }
         }
 

@@ -19,9 +19,22 @@ namespace ZeroFormatter.Formatters
                 return 4;
             }
 
-            var stringSize = BinaryUtil.WriteString(ref bytes, offset + 4, value);
-            BinaryUtil.WriteInt32Unsafe(ref bytes, offset, stringSize); // write size after encode, already ensured.
-            return stringSize + 4;
+            // Optimize for strict size
+            if (bytes == null && offset == 0)
+            {
+                var stringBytes = StringEncoding.UTF8.GetBytes(value);
+                var newBytes = new byte[stringBytes.Length + 4];
+                BinaryUtil.WriteInt32Unsafe(ref newBytes, 0, stringBytes.Length);
+                System.Buffer.BlockCopy(stringBytes, 0, newBytes, 4, stringBytes.Length);
+                bytes = newBytes;
+                return newBytes.Length;
+            }
+            else
+            {
+                var stringSize = BinaryUtil.WriteString(ref bytes, offset + 4, value);
+                BinaryUtil.WriteInt32Unsafe(ref bytes, offset, stringSize); // write size after encode, already ensured.
+                return stringSize + 4;
+            }
         }
 
         public override string Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
