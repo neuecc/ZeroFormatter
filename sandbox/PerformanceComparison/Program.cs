@@ -737,6 +737,26 @@ class Program
         }
     }
 
+    static void GenerateMsgPackSerializers()
+    {
+        var settings = new SerializerCodeGenerationConfiguration
+        {
+            OutputDirectory = Path.GetTempPath(),
+            SerializationMethod = SerializationMethod.Array,
+            Namespace = "Sandbox.Shared.GeneratedSerializers",
+            IsRecursive = true,
+            PreferReflectionBasedSerializer = false,
+            WithNullableSerializers = true,
+            EnumSerializationMethod = EnumSerializationMethod.ByName
+        };
+
+        var result = SerializerGenerator.GenerateSerializerSourceCodes(settings, typeof(Person));
+        foreach (var item in result)
+        {
+            Console.WriteLine(item.FilePath);
+        }
+    }
+
     struct Measure : IDisposable
     {
         string label;

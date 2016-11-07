@@ -78,12 +78,19 @@
     <Reference Include="ZeroFormatter.Interfaces">
       <HintPath>Assets\Dlls\ZeroFormatter.Interfaces.dll</HintPath>
     </Reference>
+    <Reference Include="MsgPack">
+      <HintPath>Assets\MsgPack\MsgPack.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\MsgPack\PersonSerializer.cs" />
+    <Compile Include="Assets\MsgPack\SexSerializer.cs" />
+    <Compile Include="Assets\MsgPack\System_Nullable_1_Sex_Serializer.cs" />
+    <Compile Include="Assets\MsgPack\System_Nullable_1_System_Int32_Serializer.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\Assert.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\ChainingAssertion.Unity.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\UnitTestRunner.cs" />
-    <Compile Include="Assets\Scripts\Tests\VersioningTest.cs" />
+    <Compile Include="Assets\Scripts\Tests\PerformanceTest.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Shim.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Tuple.cs" />
     <Compile Include="Assets\Scripts\Tests\BinatyUtilTest.cs" />
@@ -101,6 +108,7 @@
     <Compile Include="Assets\Scripts\Tests\OffsetTest.cs" />
     <Compile Include="Assets\Scripts\Tests\StringSegmentTest.cs" />
     <Compile Include="Assets\Scripts\Tests\StructTest.cs" />
+    <Compile Include="Assets\Scripts\Tests\VersioningTest.cs" />
     <Compile Include="Assets\Scripts\Tests\_UnitTestLoader.cs" />
     <Compile Include="Assets\ZeroFormatterGenerated.Additional.cs" />
     <Compile Include="Assets\ZeroFormatterGenerated.cs" />

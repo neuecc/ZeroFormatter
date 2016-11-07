@@ -40,6 +40,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -48,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Bar\MyClass.cs" />
     <Compile Include="Foo\MyClass.cs" />
+    <Compile Include="Perf.cs" />
     <Compile Include="PseudoVector.cs" />
     <Compile Include="Inherit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
