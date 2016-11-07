@@ -232,6 +232,11 @@ namespace RuntimeUnitTestToolkit
             var totalExecutionTime = new List<double>();
             foreach (var item2 in actionList.Value)
             {
+                // before start, cleanup
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+
                 logText.text += "<color=teal>" + item2.Key + "</color>\n";
                 yield return null;
 
