@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
 using System;
@@ -14,7 +15,7 @@ namespace ZeroFormatter.CodeGenerator
     // Utility and Extension methods for Roslyn
     internal static class RoslynExtensions
     {
-        public static async Task<Compilation> GetCompilationFromProject(string csprojPath)
+        public static async Task<Compilation> GetCompilationFromProject(string csprojPath, params string[] preprocessorSymbols)
         {
             // fucking workaround of resolve reference...
             var externalReferences = new List<PortableExecutableReference>();
@@ -55,6 +56,7 @@ namespace ZeroFormatter.CodeGenerator
             var workspace = MSBuildWorkspace.Create();
             var project = await workspace.OpenProjectAsync(csprojPath).ConfigureAwait(false);
             project = project.AddMetadataReferences(externalReferences); // workaround:)
+            project = project.WithParseOptions((project.ParseOptions as CSharpParseOptions).WithPreprocessorSymbols(preprocessorSymbols));
 
             var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
             return compilation;

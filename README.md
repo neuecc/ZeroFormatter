@@ -1,19 +1,18 @@
 # ZeroFormatter
 Fastest C# Serializer and Infinitly Fast Deserializer for .NET, .NET Core and Unity.
 
-(Work in progress...)
+![image](https://cloud.githubusercontent.com/assets/46207/20072942/ba760e70-a56d-11e6-918f-edf84f0187da.png)
 
 Why use ZeroFormatter?
 ---
-
-* Fastest C# Serializer, code is extremely tuned by both sides of implementation and binary layout(see: performance)
-* Deserialize/Reserialize is infinitly fast because formatter can access to serialized data without parsing/packing(see: architecture)
+* Fastest C# Serializer, code is extremely tuned by both sides of implementation and binary layout(see: [performance](https://github.com/neuecc/ZeroFormatter#performance))
+* Deserialize/Reserialize is infinitly fast because formatter can access to serialized data without parsing/packing(see: [architecture](https://github.com/neuecc/ZeroFormatter#architecture))
 * Strongly Typed and C# Code as schema, no needs to other IDL like `.proto`, `.fbs`...
 * Smart API, only to use `Serialize<T>` and `Deserialize<T>`
 * Native support of Dictionary, MultiDictionary(ILookup)
 * First-class support to Unity(IL2CPP), it's faster than native JsonUtility
 
-ZeroFormatter is similar as [FlatBuffers](http://google.github.io/flatbuffers/) but ZeroFormatter has clean API(FlatBuffers API is too ugly[see: sample](https://github.com/google/flatbuffers/blob/master/samples/SampleBinary.cs), we can not use reguraly) and C# specialized. If you need to performance such as Game, Distributed Computing, Microservices etc building by C#, ZeroFormatter will help you.
+ZeroFormatter is similar as [FlatBuffers](http://google.github.io/flatbuffers/) but ZeroFormatter has clean API(FlatBuffers API is too ugly, [see: sample](https://github.com/google/flatbuffers/blob/master/samples/SampleBinary.cs); we can not use reguraly) and C# specialized. If you need to performance such as Game, Distributed Computing, Microservices etc..., ZeroFormatter will help you.
 
 Install
 ---
@@ -122,7 +121,7 @@ Serialize Dictionary/Lookup
 
 for Unity
 ---
-ZeroFormatter.Unity works on all platforms(PC, Android, iOS, etc...). But it can 'not' use dynamic serializer generation for IL2CPP issue. But pre code generate helps it. Code Generator is located in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc\zfc.exe`.
+ZeroFormatter.Unity works on all platforms(PC, Android, iOS, etc...). But it can 'not' use dynamic serializer generation due to IL2CPP issue. But pre code generate helps it. Code Generator is located in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc\zfc.exe`. zfc is using [Roslyn](https://github.com/dotnet/roslyn) so analyze source code, pass the target `csproj`. 
 
 ```
 zfc arguments help:
@@ -132,9 +131,53 @@ zfc arguments help:
   -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
 ```
 
+Generated formatters must needs register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
+
+
+
+
+ZeroFormatter can not serialize Unity native types by default but you can make custom formatter by define pseudo type. For example create `Vector2` to ZeroFormatter target. 
+
+```csharp
+#if INCLUDE_ONLY_CODE_GENERATION
+
+using ZeroFormatter;
+
+namespace UnityEngine
+{
+    [ZeroFormattable]
+    public struct Vector2
+    {
+        [Index(0)]
+        public float x;
+        [Index(1)]
+        public float y;
+
+        public Vector2(float x, float y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
+}
+
+#endif
+```
+
+`INCLUDE_ONLY_CODE_GENERATION` is special symbol of zfc, include generator target but does not includes compile.
+
 Performance
 ---
 Benchmarks comparing to other serializers.
+
+![image](https://cloud.githubusercontent.com/assets/46207/20073287/fe1d6848-a56e-11e6-804e-b6e81d84f9f6.png)
+
+![image](https://cloud.githubusercontent.com/assets/46207/20073555/134df7d6-a570-11e6-8196-a90befed88a1.png)
+
+ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) and has infinitely fast deserializer.
+
+ 
+
 
 
 

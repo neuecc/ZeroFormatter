@@ -51,6 +51,21 @@ namespace ZeroFormatter.Tests
             public virtual MyStructVariable MyProperty1 { get; set; }
         }
 
+        [ZeroFormattable]
+        public struct FloatVector2
+        {
+            [Index(0)]
+            public float x;
+            [Index(1)]
+            public float y;
+
+            public FloatVector2(float x, float y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+        }
+
         [TestMethod]
         public void Struct()
         {
@@ -120,7 +135,7 @@ namespace ZeroFormatter.Tests
         [TestMethod]
         public void FieldStruct()
         {
-            var xs = new UnityEngine.Vector2(100.4f, 200.5f);
+            var xs = new FloatVector2(100.4f, 200.5f);
 
             var huga = ZeroFormatterSerializer.Convert(xs);
 

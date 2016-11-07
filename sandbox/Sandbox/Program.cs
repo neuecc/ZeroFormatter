@@ -31,9 +31,9 @@ public class MyClass
 
     [Index(4)]
     public virtual MogeMoge Mone { get; set; }
-
-
 }
+
+
 
 namespace Sandbox
 {
@@ -74,20 +74,20 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
-ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
+        ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
+        ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
 
 
-            ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
+        ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
+        {
+            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
             {
-                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
-                {
-                    var formatterType = typeof(KeyValuePairFormatter<,>).MakeGenericType(t.GetGenericArguments());
-                    return Activator.CreateInstance(formatterType);
-                }
+                var formatterType = typeof(KeyValuePairFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                return Activator.CreateInstance(formatterType);
+            }
 
-                return null;
-            });
+            return null;
+        });
 
 
             var my = new MyGuid()

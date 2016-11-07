@@ -1,4 +1,5 @@
-﻿#if !UNITY
+﻿#if INCLUDE_ONLY_CODE_GENERATION
+// include generator target but does not includes compile.
 
 using ZeroFormatter;
 
@@ -19,6 +20,5 @@ namespace UnityEngine
         }
     }
 }
-
 
 #endif

@@ -10,6 +10,8 @@ namespace ZeroFormatter.CodeGenerator
     {
         readonly string csProjPath;
 
+        const string CodegeneratorOnlyPreprocessorSymbol = "INCLUDE_ONLY_CODE_GENERATION";
+
         public const string ZeroFormattableAttributeShortName = "ZeroFormattableAttribute";
         public const string IndexAttributeShortName = "IndexAttribute";
         public const string IgnoreAttributeShortName = "IgnoreFormatAttribute";
@@ -30,7 +32,7 @@ namespace ZeroFormatter.CodeGenerator
         {
             this.csProjPath = csProjPath;
 
-            var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath).GetAwaiter().GetResult();
+            var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, CodegeneratorOnlyPreprocessorSymbol).GetAwaiter().GetResult();
             targetTypes = compilation.GetNamedTypeSymbols()
                 .Where(x => (x.TypeKind == TypeKind.Enum)
                     || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null)

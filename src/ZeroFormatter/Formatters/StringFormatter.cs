@@ -1,4 +1,5 @@
-﻿using ZeroFormatter.Internal;
+﻿using System.Text;
+using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
@@ -6,6 +7,8 @@ namespace ZeroFormatter.Formatters
     // Layout: [size:int][utf8bytes...], if size == -1 string is null.
     internal class StringFormatter : Formatter<string>
     {
+        static readonly Encoding encoding = StringEncoding.UTF8;
+
         public override int? GetLength()
         {
             return null;
@@ -22,12 +25,11 @@ namespace ZeroFormatter.Formatters
             // Optimize for strict size
             if (bytes == null && offset == 0)
             {
-                var stringBytes = StringEncoding.UTF8.GetBytes(value);
-                var newBytes = new byte[stringBytes.Length + 4];
-                BinaryUtil.WriteInt32Unsafe(ref newBytes, 0, stringBytes.Length);
-                System.Buffer.BlockCopy(stringBytes, 0, newBytes, 4, stringBytes.Length);
-                bytes = newBytes;
-                return newBytes.Length;
+                var byteCount = encoding.GetByteCount(value);
+                bytes = new byte[byteCount + 4];
+                BinaryUtil.WriteInt32Unsafe(ref bytes, 0, byteCount);
+                encoding.GetBytes(value, 0, value.Length, bytes, 4);
+                return bytes.Length;
             }
             else
             {
