@@ -72,7 +72,7 @@ namespace ZeroFormatter.CodeGenerator
                .OrderBy(x => x.Key)
                 .Select(x => new EnumGenerator
                 {
-                    Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
+                    Namespace = "ZeroFormatter.DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
                     Types = x.ToArray()
                 })
                 .ToArray();
@@ -81,7 +81,7 @@ namespace ZeroFormatter.CodeGenerator
                .GroupBy(x => x.Namespace)
                .Select(x => new ObjectGenerator
                {
-                   Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
+                   Namespace = "ZeroFormatter.DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
                    Types = x.ToArray(),
                })
                .ToArray();
@@ -90,7 +90,7 @@ namespace ZeroFormatter.CodeGenerator
                .GroupBy(x => x.Namespace)
                .Select(x => new StructGenerator
                {
-                   Namespace = "ZeroFormatter.DynamicObjectSegments." + x.Key,
+                   Namespace = "ZeroFormatter.DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
                    Types = x.ToArray(),
                })
                .ToArray();
@@ -104,7 +104,7 @@ namespace ZeroFormatter.CodeGenerator
             {
                 Name = symbol.Name,
                 FullName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                Namespace = symbol.ContainingNamespace.ToDisplayString(),
+                Namespace = symbol.ContainingNamespace.IsGlobalNamespace ? null : symbol.ContainingNamespace.ToDisplayString(),
                 UnderlyingType = symbol.EnumUnderlyingType.ToDisplayString(binaryWriteFormat),
                 Length = GetEnumSize(symbol.EnumUnderlyingType)
             };
@@ -366,7 +366,7 @@ namespace ZeroFormatter.CodeGenerator
             {
                 Name = type.Name,
                 FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                Namespace = type.ContainingNamespace.ToDisplayString(),
+                Namespace = type.ContainingNamespace.IsGlobalNamespace ? null : type.ContainingNamespace.ToDisplayString(),
                 LastIndex = list.Select(x => x.Index).DefaultIfEmpty(0).Max(),
                 Properties = list.OrderBy(x => x.Index).ToArray(),
             };

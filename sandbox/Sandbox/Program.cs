@@ -74,20 +74,20 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-        ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
-        ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
+            ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
+            ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
 
 
-        ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
-        {
-            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+            ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
             {
-                var formatterType = typeof(KeyValuePairFormatter<,>).MakeGenericType(t.GetGenericArguments());
-                return Activator.CreateInstance(formatterType);
-            }
+                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+                {
+                    var formatterType = typeof(KeyValuePairFormatter<,>).MakeGenericType(t.GetGenericArguments());
+                    return Activator.CreateInstance(formatterType);
+                }
 
-            return null;
-        });
+                return null;
+            });
 
 
             var my = new MyGuid()
@@ -146,37 +146,37 @@ namespace Sandbox
         }
     }
 
-public class KeyValuePairFormatter<TKey, TValue> : Formatter<KeyValuePair<TKey, TValue>>
-{
-    public override int? GetLength()
+    public class KeyValuePairFormatter<TKey, TValue> : Formatter<KeyValuePair<TKey, TValue>>
     {
-        return null;
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, KeyValuePair<TKey, TValue> value)
+        {
+            var startOffset = offset;
+            offset += Formatter<TKey>.Default.Serialize(ref bytes, offset, value.Key);
+            offset += Formatter<TValue>.Default.Serialize(ref bytes, offset, value.Value);
+            return offset - startOffset;
+        }
+
+        public override KeyValuePair<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            int size;
+            byteSize = 0;
+
+            var key = Formatter<TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+
+            var value = Formatter<TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+
+            return new KeyValuePair<TKey, TValue>(key, value);
+        }
     }
-
-    public override int Serialize(ref byte[] bytes, int offset, KeyValuePair<TKey, TValue> value)
-    {
-        var startOffset = offset;
-        offset += Formatter<TKey>.Default.Serialize(ref bytes, offset, value.Key);
-        offset += Formatter<TValue>.Default.Serialize(ref bytes, offset, value.Value);
-        return offset - startOffset;
-    }
-
-    public override KeyValuePair<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
-    {
-        int size;
-        byteSize = 0;
-
-        var key = Formatter<TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
-        offset += size;
-        byteSize += size;
-
-        var value = Formatter<TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
-        offset += size;
-        byteSize += size;
-
-        return new KeyValuePair<TKey, TValue>(key, value);
-    }
-}
 
 
     [ZeroFormattable]
