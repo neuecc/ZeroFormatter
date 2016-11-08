@@ -334,12 +334,14 @@ Object is variant of Variable Length Format that can define user own format. Lay
 
 **Dictionary Format**
 
+| Type | Layout | Note |
+| ---- | ------ | ---- |
 | Dictionary | [length:int(4)][`(key:TKey, value:TValue)`...] | represents `IDictionary<TKey, TValue>`, if length == -1, indicates null |
 | MultiDictionary | [length:int(4)][`(key:TKey, elements:List<TElement>)`...] | represents `ILookup<TKey, TElement>`, if length == -1, indicates null |
 | LazyDictionary | [byteSize:int(4)][length:int(4)][buckets:`FixedSizeList<int>`][entries:`VariableSizeList<DictionaryEntry>`] | represents `ILazyDictionary<TKey, TValue>`, if byteSize == -1, indicates null |
 | DictionaryEntry | [hashCode:int(4)][next:int(4)][key:TKey][value:TValue] | substructure of LazyDictionary | 
-| LazyMultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] |  represents `ILazyLookup<TKey, TElement>`, if byteSize == -1, indicates null | 
-| GroupingSegment | [key:TKey] [hashCode:int(4)][elements:`VariableSizeList<TElement>`] | substructure of LazyMultiDictionary
+| LazyMultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] | represents `ILazyLookup<TKey, TElement>`, if byteSize == -1, indicates null | 
+| GroupingSegment | [key:TKey] [hashCode:int(4)][elements:`VariableSizeList<TElement>`] | substructure of LazyMultiDictionary 
 
 **Struct Format**
 
