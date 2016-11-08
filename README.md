@@ -33,9 +33,6 @@ Quick Start
 ---
 Define class and mark as `[ZeroFormattable]`.
 
-
-
-
 Sample
 ---
 ```csharp
@@ -84,20 +81,7 @@ Serializable target must mark `ZeroFormattableAttribute`, there public property 
 
 Analyzer
 ---
-![image](https://cloud.githubusercontent.com/assets/46207/19561566/291e4fda-9714-11e6-9633-e330a1430318.png)
-
-
-
-
-
-
-
-
-
-
-
-
-
+![zeroformatteranalyzer](https://cloud.githubusercontent.com/assets/46207/20078766/3ea54f14-a585-11e6-9873-b99cb5d9efe5.gif)
 
 
 
@@ -112,11 +96,7 @@ Dictionary's key is native serialized in binary, but has limitation of keys. Key
 
 Serialize Dictionary/Lookup
 ---
-
-
-
-
-
+TODO:...
 
 
 for Unity
@@ -132,8 +112,6 @@ zfc arguments help:
 ```
 
 Generated formatters must needs register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
-
-
 
 
 ZeroFormatter can not serialize Unity native types by default but you can make custom formatter by define pseudo type. For example create `Vector2` to ZeroFormatter target. 
@@ -170,20 +148,18 @@ Performance
 ---
 Benchmarks comparing to other serializers.
 
-![image](https://cloud.githubusercontent.com/assets/46207/20073287/fe1d6848-a56e-11e6-804e-b6e81d84f9f6.png)
+![](https://cloud.githubusercontent.com/assets/46207/20078590/81b890aa-a584-11e6-838b-5f2a4f1a11f8.png)
 
-![image](https://cloud.githubusercontent.com/assets/46207/20073555/134df7d6-a570-11e6-8196-a90befed88a1.png)
+![](https://cloud.githubusercontent.com/assets/46207/20077970/f3ce8044-a581-11e6-909d-e30b2a33e991.png)
 
 ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) and has infinitely fast deserializer.
-
- 
-
 
 
 
 Architecture
 ---
 
+![](https://cloud.githubusercontent.com/assets/46207/20078613/9f9ddfda-a584-11e6-9d7c-b98f8a6ac70e.png)
 
 Extensibility
 ---
