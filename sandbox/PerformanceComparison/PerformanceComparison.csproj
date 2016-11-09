@@ -118,6 +118,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CSharpHtml.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="FlatBuffers\flatc.exe" />
     <Content Include="Protobuf3\protoc.exe" />
   </ItemGroup>

@@ -67,10 +67,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, <#= t.Name #>? value)
         {
             BinaryUtil.EnsureCapacity(ref bytes, offset, <#= tuple.Item2 + 1 #>);
-            BinaryUtil.WriteBooleanUnsafe(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
                 BinaryUtil.Write<#= t.Name #>(ref bytes, offset + 1, value.Value);
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
             }
 
             return <#= tuple.Item2 + 1 #>;

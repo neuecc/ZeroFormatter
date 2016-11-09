@@ -123,7 +123,7 @@ zfc arguments help:
   -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
 ```
 
-> Note:zfc.exe is currently only run on Windows. It is .NET Core's [Roslyn](https://github.com/dotnet/roslyn) workspace API limitation but I want to implements to all platforms...
+> Note: zfc.exe is currently only run on Windows. It is .NET Core's [Roslyn](https://github.com/dotnet/roslyn) workspace API limitation but I want to implements to all platforms...
 
 Generated formatters must needs register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
 
@@ -168,12 +168,14 @@ Benchmarks comparing to other serializers run on `Windows 10 Pro x64 Intel Core 
 Deserialize speed is infinitly fast(but of course it is **unfair**, ZeroFormatter's deserialize is delayed when access target field). Serialize speed is fair-comparison. ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) for sure. ZeroFormatter has many reasons why fast.
 
 * Serializer uses only `ref byte[]` and `int offset`, don't use MemoryStream(call MemoryStream api is overhead)
-* Don't using variable-length number when encode number so there has encode cost(for example; protobuf uses ZigZag Encoding)
+* Don't use variable-length number when encode number so there has encode cost(for example; protobuf uses ZigZag Encoding)
 * Acquire strict length of byte[] when knows final serialized length(for example; int, fixed-length list, string, etc...)
 * Avoid boxing all codes, all platforms(include Unity/IL2CPP)
+* Reduce native string encoder methods
+* Don't create intermediate utility instance(XxxWriter/Reader, XxxContext, etc...)
 * Heavyly tuned dynamic il code generation: [DynamicObjectFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/7e68883dc3365d2caf32279cf64f07427b94f109/src/ZeroFormatter/Formatters/DynamicObjectFormatter.cs#L186-L583)
 * Getting cached generated formatter on static generic field(don't use dictinary-cache because dictionary lookup is overhead): [Formatter.cs](https://github.com/neuecc/ZeroFormatter/blob/7e68883dc3365d2caf32279cf64f07427b94f109/src/ZeroFormatter/Formatters/Formatter.cs)
-* Enum serialize underlying value only and uses fastest cast technique: [EnumFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/7e68883dc3365d2caf32279cf64f07427b94f109/src/ZeroFormatter/Formatters/EnumFormatter.cs)
+* Enum serialize underlying value only and uses fastest cast technique: [EnumFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/57bd76e8121cd6421abda4d69ad677950df9d26f/src/ZeroFormatter/Formatters/EnumFormatter.cs)
 
 The result is achived from both sides of implementation and binary layout. ZeroFormatter's binary layout is tuned for serialize/deserialize speed(this is advantage than other serializer).
 
@@ -184,6 +186,13 @@ Result run on iPhone 6s Plus and IL2CPP build.
 ![](https://cloud.githubusercontent.com/assets/46207/20076797/281f7b78-a57d-11e6-8fbd-e83cc6b72025.png)
 
 ZeroFormatter is faster than JsonUtility so yes, faster than native serializer!
+
+**Single Integer(1), Vector3 Struct(float, float, float), Vector3[100], Large String(represents HTML)**
+
+![image](https://cloud.githubusercontent.com/assets/46207/20140302/c0f18dcc-a6cd-11e6-9bf2-17d11ce552e7.png)
+![image](https://cloud.githubusercontent.com/assets/46207/20140306/c6b1b0fc-a6cd-11e6-9193-303179d23764.png)
+
+ZeroFormatter is optimized for all types(small struct to large object!). I know why protobuf-net is slow on integer test, currently [protobuf-net's internal serialize method](https://github.com/mgravell/protobuf-net/blob/0d0bb407865600c7dad1b833a9a1f71ef48c7106/protobuf-net/Meta/TypeModel.cs#L210) has only `object value` so it causes boxing and critical for performance. Anyway ZeroFormatter's simple struct and struct array(struct array is serialized FixedSizeList format internally, it is faster than class array)'s serialization/deserialization speed is very fast that effective storing value to KeyValueStore(like Redis) or network gaming(transport many transform position), etc.
 
 Architecture
 ---

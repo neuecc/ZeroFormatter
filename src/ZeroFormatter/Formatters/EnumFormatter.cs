@@ -68,10 +68,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
             BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 3);
-            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
                 BinaryUtil.WriteInt16(ref bytes, offset + 1, serializeCast(value.Value));
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
             }
 
             return 3;
@@ -146,10 +150,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
             BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
-            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
                 BinaryUtil.WriteInt32(ref bytes, offset + 1, serializeCast(value.Value));
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
             }
 
             return 5;
@@ -224,10 +232,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
             BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 9);
-            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
                 BinaryUtil.WriteInt64(ref bytes, offset + 1, serializeCast(value.Value));
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
             }
 
             return 9;
@@ -302,10 +314,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
             BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 3);
-            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
                 BinaryUtil.WriteUInt16(ref bytes, offset + 1, serializeCast(value.Value));
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
             }
 
             return 3;
@@ -380,10 +396,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
             BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
-            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
                 BinaryUtil.WriteUInt32(ref bytes, offset + 1, serializeCast(value.Value));
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
             }
 
             return 5;
@@ -458,10 +478,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
             BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 9);
-            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
                 BinaryUtil.WriteUInt64(ref bytes, offset + 1, serializeCast(value.Value));
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
             }
 
             return 9;
@@ -536,10 +560,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
             BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 2);
-            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
                 BinaryUtil.WriteByte(ref bytes, offset + 1, serializeCast(value.Value));
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
             }
 
             return 2;
@@ -614,10 +642,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
             BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 2);
-            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
                 BinaryUtil.WriteSByte(ref bytes, offset + 1, serializeCast(value.Value));
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
             }
 
             return 2;

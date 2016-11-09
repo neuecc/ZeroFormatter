@@ -84,6 +84,22 @@ namespace ZeroFormatter.Internal
             bytes[offset] = (byte)(value ? 1 : 0);
         }
 
+        /// <summary>
+        /// Unsafe! don't ensure capacity and don't return size.
+        /// </summary>
+        public static void WriteBooleanTrueUnsafe(ref byte[] bytes, int offset)
+        {
+            bytes[offset] = (byte)(1);
+        }
+
+        /// <summary>
+        /// Unsafe! don't ensure capacity and don't return size.
+        /// </summary>
+        public static void WriteBooleanFalseUnsafe(ref byte[] bytes, int offset)
+        {
+            bytes[offset] = (byte)(0);
+        }
+
         public static bool ReadBoolean(ref byte[] bytes, int offset)
         {
             return (bytes[offset] == 0) ? false : true;
