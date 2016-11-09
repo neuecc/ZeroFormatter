@@ -160,15 +160,15 @@ namespace UnityEngine
 
 Performance
 ---
-Benchmarks comparing to other serializers run on `Windows 10 Pro x64 Intel Core i7-6700 3.40GHz, 32GB RAM`.
+Benchmarks comparing to other serializers run on `Windows 10 Pro x64 Intel Core i7-6700 3.40GHz, 32GB RAM`. Benchmark code is [here](https://github.com/neuecc/ZeroFormatter/tree/master/sandbox/PerformanceComparison) and full-result is [here](https://gist.github.com/neuecc/f786e7161e0af9578d717942372bc1f4).
 
 ![](https://cloud.githubusercontent.com/assets/46207/20078590/81b890aa-a584-11e6-838b-5f2a4f1a11f8.png)
 
 ![](https://cloud.githubusercontent.com/assets/46207/20077970/f3ce8044-a581-11e6-909d-e30b2a33e991.png)
 
-Deserialize speed is infinitly fast(but of course it is unfair, ZeroFormatter's deserialize is delayed when access target field). Serialize speed is fair-comparison. ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) for sure. ZeroFormatter has many reasons why fast.
+Deserialize speed is infinitly fast(but of course it is **unfair**, ZeroFormatter's deserialize is delayed when access target field). Serialize speed is fair-comparison. ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) for sure. ZeroFormatter has many reasons why fast.
 
-* Serialiezer uses only `ref byte[]` and `int offset`, don't use MemoryStream(call MemoryStream api is overhead)
+* Serializer uses only `ref byte[]` and `int offset`, don't use MemoryStream(call MemoryStream api is overhead)
 * Don't using variable-length number when encode number so there has encode cost(for example; protobuf uses ZigZag Encoding)
 * Acquire strict length of byte[] when knows final serialized length(for example; int, fixed-length list, string, etc...)
 * Avoid boxing all codes, all platforms(include Unity/IL2CPP)
@@ -188,6 +188,7 @@ ZeroFormatter is faster than JsonUtility so yes, faster than native serializer!
 
 Architecture
 ---
+TODO...
 
 ![](https://cloud.githubusercontent.com/assets/46207/20078613/9f9ddfda-a584-11e6-9d7c-b98f8a6ac70e.png)
 
