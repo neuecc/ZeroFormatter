@@ -89,14 +89,11 @@ namespace ZeroFormatter.Formatters
 
         public override int Serialize(ref byte[] bytes, int offset, T? value)
         {
+            BinaryUtil.EnsureCapacity(ref bytes, offset, offset + <#= tuple.Item2 + 1 #>);
             BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
             if (value.HasValue)
             {
                 BinaryUtil.Write<#= t.Name #>(ref bytes, offset + 1, serializeCast(value.Value));
-            }
-            else
-            {
-                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + <#= tuple.Item2 + 1 #>);
             }
 
             return <#= tuple.Item2 + 1 #>;
