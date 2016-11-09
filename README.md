@@ -166,10 +166,10 @@ Benchmarks comparing to other serializers run on `Windows 10 Pro x64 Intel Core 
 
 ![](https://cloud.githubusercontent.com/assets/46207/20077970/f3ce8044-a581-11e6-909d-e30b2a33e991.png)
 
-Deserialize speed is infinity fast(but of course it is unfair, ZeroFormatter's deserialize is delayed when access target field). Serialize speed is fair-comparison. ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) for sure. ZeroFormatter has many reasons why fast.
+Deserialize speed is infinitly fast(but of course it is unfair, ZeroFormatter's deserialize is delayed when access target field). Serialize speed is fair-comparison. ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) for sure. ZeroFormatter has many reasons why fast.
 
 * Serialiezer uses only `ref byte[]` and `int offset`, don't use MemoryStream(call MemoryStream api is overhead)
-* Don't using variable-length format when encode number so there has encode cost
+* Don't using variable-length number when encode number so there has encode cost(for example; protobuf uses ZigZag Encoding)
 * Acquire strict length of byte[] when knows final serialized length(for example; int, fixed-length list, string, etc...)
 * Avoid boxing all codes, all platforms(include Unity/IL2CPP)
 * Heavyly tuned dynamic il code generation: [DynamicObjectFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/7e68883dc3365d2caf32279cf64f07427b94f109/src/ZeroFormatter/Formatters/DynamicObjectFormatter.cs#L186-L583)
@@ -178,7 +178,9 @@ Deserialize speed is infinity fast(but of course it is unfair, ZeroFormatter's d
 
 The result is achived from both sides of implementation and binary layout. ZeroFormatter's binary layout is tuned for serialize/deserialize speed(this is advantage than other serializer).
 
-In Unity, run on iPhone 6s Plus and IL2CPP build.
+**In Unity**
+
+Result run on iPhone 6s Plus and IL2CPP build.
 
 ![](https://cloud.githubusercontent.com/assets/46207/20076797/281f7b78-a57d-11e6-8fbd-e83cc6b72025.png)
 
