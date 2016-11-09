@@ -286,7 +286,7 @@ WireFormat Specification
 ---
 **Fixed Length Format**
 
-Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlying type. DateTime, DateTimeOffset is serialized UniversalTime.
+Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlying type. DateTime, DateTimeOffset is serialized UniversalTime and serialized format is same as Protocol Buffers's [timestamp.proto](https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto).
 
 | Type | Layout |
 | ---- | ------ | 
@@ -361,21 +361,21 @@ Dictionary/MultiDictionary is eager evaluation. LazyDictionary/LazyMultiDictiona
 
 **EqualityComparer**
 
-TODO:...
+ZeroFormatter's EqualityComparer calculates stable hashCode for serialize LazyDictionary/LazyMultiDictionary. LazyDictionary and LazyMultiDictionary keys following there `GetHashCode` function. 
 
-https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/WireFormatEqualityComparers.cs
-https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/KeyTupleEqualityComparer.cs
-
+* [WireFormatEqualityComparers](https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/WireFormatEqualityComparers.cs)
+* [KeyTupleEqualityComparer](https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/KeyTupleEqualityComparer.cs)
 
 Cross Plaftorm
 ---
 Currently No and I have no plans. Welcome to contribute port to other languages, I want to help your work!
 
-ZeroFormatter spec  has three stages.
+ZeroFormatter spec  has fort stages.
 
-* Stage1: All format are eager-evaluation, does not support LazyDictionary/LazyMultiDictionary.
-* Stage2: FixedSizeList, VariableSizeList, Class support lazy-evaluation, does not support LazyDictionary/LazyMultiDictionary.
-* Stage3: Supporting LazyDictionary/LazyMultiDictionary
+* Stage1: All format are eager-evaluation, does not support Decimal, LazyDictionary/LazyMultiDictionary.
+* Stage2: FixedSizeList, VariableSizeList, Class support lazy-evaluation, does not support Decimal, LazyDictionary/LazyMultiDictionary.
+* Stage3: Supports Decimal, does not support LazyDictionary/LazyMultiDictionary.
+* Stage4: Supporting all format includes LazyDictionary/LazyMultiDictionary
 
 Author Info
 ---
