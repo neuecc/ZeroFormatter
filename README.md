@@ -286,7 +286,7 @@ WireFormat Specification
 ---
 **Fixed Length Format**
 
-Fixed Length formats is eager evaluation. Enum is serialized there underlying type. DateTime, DateTimeOffset is serialized convert to UniversalTime.
+Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlying type. DateTime, DateTimeOffset is serialized UniversalTime.
 
 | Type | Layout |
 | ---- | ------ | 
@@ -338,7 +338,7 @@ byte[], String, KeyTuple, KeyTuple? are eager evalution. FixedSizeList and Varia
 
 **Object Format**
 
-Object is defined user own type. Class is lazy evaluation which has index header. 
+Object is defined user own type. Class is lazy evaluation which has index header(variant of VariableSizeList in wireformat). 
 
 Struct is eager evaluation, if all property/field types are fixed length which struct is marked fixed-length, else variable-length.
 
