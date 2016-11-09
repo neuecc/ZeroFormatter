@@ -338,9 +338,7 @@ byte[], String, KeyTuple, KeyTuple? are eager evalution. FixedSizeList and Varia
 
 **Object Format**
 
-Object is defined user own type. Class is lazy evaluation which has index header(variant of VariableSizeList in wireformat). 
-
-Struct is eager evaluation, if all property/field types are fixed length which struct is marked fixed-length, else variable-length.
+Object is defined user own type. Class is lazy evaluation which has index header(variant of VariableSizeList in wireformat). Struct is eager evaluation, if all property/field types are fixed length which struct is marked fixed-length, else variable-length.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
@@ -350,7 +348,7 @@ Struct is eager evaluation, if all property/field types are fixed length which s
 
 **Dictionary Format**
 
-Dictionary/MultiDictionary is eager evaluation. LazyDictionary/LazyMultiDictionary is lazy evaluation.
+Dictionary/MultiDictionary is eager evaluation. LazyDictionary/LazyMultiDictionary is lazy evaluation. All format are variable-length.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
@@ -371,7 +369,13 @@ https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/
 
 Cross Plaftorm
 ---
-Currently No and I have no plans. Welcome to contribute port to other languages.
+Currently No and I have no plans. Welcome to contribute port to other languages, I want to help your work!
+
+ZeroFormatter spec  has three stages.
+
+* Stage1: All format are eager-evaluation, does not support LazyDictionary/LazyMultiDictionary.
+* Stage2: FixedSizeList, VariableSizeList, Class support lazy-evaluation, does not support LazyDictionary/LazyMultiDictionary.
+* Stage3: Supporting LazyDictionary/LazyMultiDictionary
 
 Author Info
 ---
