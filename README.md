@@ -284,6 +284,8 @@ ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
 
 WireFormat Specification
 ---
+All formats are always represented in little-endian. eager-evaluation is deserialized before access field. lazy-evaluation is delayed deserialize timing until property field.
+
 **Fixed Length Format**
 
 Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlying type. DateTime, DateTimeOffset is serialized UniversalTime and serialized format is same as Protocol Buffers's [timestamp.proto](https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto).
