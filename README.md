@@ -166,8 +166,11 @@ Benchmarks comparing to other serializers.
 
 ![](https://cloud.githubusercontent.com/assets/46207/20077970/f3ce8044-a581-11e6-909d-e30b2a33e991.png)
 
+![](https://cloud.githubusercontent.com/assets/46207/20076797/281f7b78-a57d-11e6-8fbd-e83cc6b72025.png)
+
 ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) and has infinitely fast deserializer.
 
+In Unity, ZeroFormatter is faster than JsonUtility(native serializer!).
 
 Architecture
 ---
