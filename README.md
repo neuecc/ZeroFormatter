@@ -20,7 +20,7 @@ for .NET, .NET Core
 
 * PM> Install-Package [ZeroFormatter](https://www.nuget.org/packages/ZeroFormatter)
 
-for Unity(Interfaces can reference both .NET 3.5 and Unity for share types)
+for Unity(Interfaces can reference both .NET 3.5 and Unity for share types), Unity binary is exists on [ZeroFormatter/Releases](https://github.com/neuecc/ZeroFormatter/releases) as well.
 
 * PM> Install-Package [ZeroFormatter.Interfaces](https://www.nuget.org/packages/ZeroFormatter.Interfaces/)
 * PM> Install-Package [ZeroFormatter.Unity](https://www.nuget.org/packages/ZeroFormatter.Unity)
@@ -123,8 +123,9 @@ zfc arguments help:
   -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
 ```
 
-Generated formatters must needs register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
+> Note:zfc.exe is currently only run on Windows. It is .NET Core's [Roslyn](https://github.com/dotnet/roslyn) workspace API limitation but I want to implements to all platforms...
 
+Generated formatters must needs register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
 
 ZeroFormatter can not serialize Unity native types by default but you can make custom formatter by define pseudo type. For example create `Vector2` to ZeroFormatter target. 
 
@@ -155,8 +156,6 @@ namespace UnityEngine
 ```
 
 `INCLUDE_ONLY_CODE_GENERATION` is special symbol of zfc, include generator target but does not includes compile.
-
-
 
 Performance
 ---
@@ -390,7 +389,7 @@ Cross Plaftorm
 ---
 Currently No and I have no plans. Welcome to contribute port to other languages, I want to help your work!
 
-ZeroFormatter spec  has fort stages.
+ZeroFormatter spec  has four stages.
 
 * Stage1: All format are eager-evaluation, does not support Decimal, LazyDictionary/LazyMultiDictionary.
 * Stage2: FixedSizeList, VariableSizeList, Class support lazy-evaluation, does not support Decimal, LazyDictionary/LazyMultiDictionary.
