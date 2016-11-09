@@ -94,9 +94,21 @@ Primitive, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`,
 Dictionary's key is native serialized in binary, but has limitation of keys. Key can use Primitive, Enum and ZeroFormatter.KeyTuple for mulitple keys.
 
 
+
+Object Define Rules
+---
+TODO...
+
+
 Serialize Dictionary/Lookup
 ---
 TODO:...
+
+
+
+Versioning
+---
+TODO...
 
 
 for Unity
@@ -144,6 +156,8 @@ namespace UnityEngine
 
 `INCLUDE_ONLY_CODE_GENERATION` is special symbol of zfc, include generator target but does not includes compile.
 
+
+
 Performance
 ---
 Benchmarks comparing to other serializers.
@@ -153,7 +167,6 @@ Benchmarks comparing to other serializers.
 ![](https://cloud.githubusercontent.com/assets/46207/20077970/f3ce8044-a581-11e6-909d-e30b2a33e991.png)
 
 ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) and has infinitely fast deserializer.
-
 
 
 Architecture
@@ -273,9 +286,7 @@ WireFormat Specification
 ---
 **Fixed Length Format**
 
-Fixed Length formats is ... (TODO:write description)
-
-Enum is serialized there underlying type.
+Fixed Length formats is eager evaluation. Enum is serialized there underlying type. DateTime, DateTimeOffset is serialized convert to UniversalTime.
 
 | Type | Layout |
 | ---- | ------ | 
@@ -312,27 +323,34 @@ Enum is serialized there underlying type.
 | DateTime? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
 | DateTimeOffset? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
 
-
 **Variable Length Format**
 
-TODO:...
-
+byte[], String, KeyTuple, KeyTuple? are eager evalution. FixedSizeList and VariableSizeList are lazy evaluation.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| byte[] | [length:int(4)][byte(length)] | if length = -1, indicates null |
+| byte[] | [length:int(4)][byte(length)] | if length = -1, indicates null, byte[] is mutable but can not track mutate(should not mutate). |
 | String | [length:int(4)][utf8Bytes:(length)] | if length = -1, indicates null |
 | KeyTuple | [Item1:T1, Item2:T2,...] | T is generic type, T1 ~ T8, mainly used for Dictionary Key |
 | KeyTuple? | [hasValue:bool(1)][Item1:T1, Item2:T2 ...] | T is T1 ~ T8 |
 | FixedSizeList | [length:int(4)][elements:T...] | represents `IList<T>` where T is fixed length format. if length = -1, indicates null
 | VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | represents `IList<T>` where T is variable length format. if length = -1, indicates null
 
-
 **Object Format**
 
-Object is variant of Variable Length Format that can define user own format. Layout is `[byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...]`. If byteSize = -1, indicates null.
+Object is defined user own type. Class is lazy evaluation which has index header. 
+
+Struct is eager evaluation, if all property/field types are fixed length which struct is marked fixed-length, else variable-length.
+
+| Type | Layout | Note |
+| ---- | ------ | ---- |
+| Class | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | if length = -1, indicates null, indexOffset = 0, indicates blank |
+| Struct | [Index1Item:T1, Index2Item:T2,...] | Index is required begin from 0 and sequential |
+| Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] ||
 
 **Dictionary Format**
+
+Dictionary/MultiDictionary is eager evaluation. LazyDictionary/LazyMultiDictionary is lazy evaluation.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
@@ -342,11 +360,6 @@ Object is variant of Variable Length Format that can define user own format. Lay
 | DictionaryEntry | [hashCode:int(4)][next:int(4)][key:TKey][value:TValue] | substructure of LazyDictionary | 
 | LazyMultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] | represents `ILazyLookup<TKey, TElement>`, if byteSize == -1, indicates null | 
 | GroupingSegment | [key:TKey] [hashCode:int(4)][elements:`VariableSizeList<TElement>`] | substructure of LazyMultiDictionary 
-
-**Struct Format**
-
-Struct is variant of both Fixed Length or Variable Length format. If all properties... TODO:... 
-
 
 **EqualityComparer**
 
