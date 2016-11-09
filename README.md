@@ -349,7 +349,7 @@ byte[], String, KeyTuple, KeyTuple? are eager evalution. FixedSizeList and Varia
 | Type | Layout | Note |
 | ---- | ------ | ---- |
 | byte[] | [length:int(4)][byte(length)] | if length = -1, indicates null, byte[] is mutable but can not track mutate(should not mutate). |
-| String | [length:int(4)][utf8Bytes:(length)] | if length = -1, indicates null |
+| String | [length:int(4)][utf8Bytes:(length)] | if length = -1, indicates null, the value is UTF8 encoded |
 | KeyTuple | [Item1:T1, Item2:T2,...] | T is generic type, T1 ~ T8, mainly used for Dictionary Key |
 | KeyTuple? | [hasValue:bool(1)][Item1:T1, Item2:T2 ...] | T is T1 ~ T8 |
 | FixedSizeList | [length:int(4)][elements:T...] | represents `IList<T>` where T is fixed length format. if length = -1, indicates null
