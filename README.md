@@ -155,6 +155,9 @@ namespace UnityEngine
 
 `INCLUDE_ONLY_CODE_GENERATION` is special symbol of zfc, include generator target but does not includes compile.
 
+
+TODO:...RegisterArray....
+
 Performance
 ---
 Benchmarks comparing to other serializers run on `Windows 10 Pro x64 Intel Core i7-6700 3.40GHz, 32GB RAM`. Benchmark code is [here](https://github.com/neuecc/ZeroFormatter/tree/master/sandbox/PerformanceComparison) and full-result is [here](https://gist.github.com/neuecc/f786e7161e0af9578d717942372bc1f4).

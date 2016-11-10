@@ -67,6 +67,7 @@ namespace ZeroFormatter.CodeGenerator
             var cmdArgs = new CommandlineArguments(args);
             if (!cmdArgs.IsParsed)
             {
+                new System.Threading.Tasks.Dataflow.ActionBlock<int>(x => Console.WriteLine(x));
                 return;
             }
 

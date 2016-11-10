@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>ZeroFormatter.Interfaces</id>
-        <version>1.0.1</version>
+        <version>1.1.1</version>
         <title>ZeroFormatter.Interfaces</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
         <projectUrl>https://github.com/neuecc/ZeroFormatter/</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Plain interfaces and KeyTuple of ZeroFormatter, it is used for define serializable targets.</description>
-        <releaseNotes>Initial Release.</releaseNotes>
+        <releaseNotes>Support sequence wireformat.</releaseNotes>
         <tags>ZeroFormatter, Serialization, Formatter, Serializer</tags>
         <frameworkAssemblies>
             <frameworkAssembly assemblyName="System" targetFramework=".NETFramework3.5" />
@@ -32,6 +32,6 @@
         <file src="..\tests\ZeroFormatter.UnityTests\Assets\Dlls\ZeroFormatter.Interfaces.dll" target="lib\net35-Unity Full v3.5" />
         <file src="..\src\ZeroFormatter.Interfaces\bin\Release\ZeroFormatter.Interfaces.dll" target="lib\net45" />
         <file src="..\src\ZeroFormatter.Interfaces.NETCore\bin\Release\netstandard1.1\ZeroFormatter.Interfaces.dll" target="lib\netstandard1.1" />
-        <file src="..\src\ZeroFormatter.CodeGenerator\bin\Release\*.*" target="tools\zfc\" exclude="*.pdb" />
+        <file src="zfc.exe" target="tools\" />
     </files>
 </package>

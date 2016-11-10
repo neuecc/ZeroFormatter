@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>ZeroFormatter.Analyzer</id>
-        <version>1.0.5.0</version>
+        <version>1.0.6.0</version>
         <title>ZeroFormatter.Analyzer</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
         <projectUrl>https://github.com/neuecc/ZeroFormatter/</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Analyzer of ZeroFormatter, verify rule for [ZeroFormattable] classes.</description>
-        <releaseNotes>Initial Release.</releaseNotes>
+        <releaseNotes>Support 1.1 WireFormat.</releaseNotes>
         <tags>ZeroFormatter, analyzers</tags>
         <frameworkAssemblies>
             <frameworkAssembly assemblyName="System" targetFramework="" />
