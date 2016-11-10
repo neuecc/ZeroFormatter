@@ -88,13 +88,11 @@ Analyzer
 
 Supported Type
 ---
-Primitive, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<>`, `ILookup<>`, `byte[]`, `ZeroFormatter.KeyTuple` and there nullable.
+Primitive, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<>`, `ILookup<>`, `ZeroFormatter.KeyTuple` and there nullable.
 
-`T[]`, `List<T>`, `Dictionary<TKey, TValue>` is not supported type. You should use `IList<>`, `IDictionary<>` instead.
+User defined `[ZeroFormattbale]` objects(class/struct), `T[]`, `List<T>`, `Dictionary<TKey, TValue>`, `Tuple`, `KeyValuePair` and `ICollection<T>` types.
 
-Dictionary's key is native serialized in binary, but has limitation of keys. Key can use Primitive, Enum and ZeroFormatter.KeyTuple for mulitple keys.
-
-
+LazyDictionary's key is native serialized in binary, but has limitation of keys. Key can use Primitive, Enum and ZeroFormatter.KeyTuple for mulitple keys.
 
 Object Define Rules
 ---
@@ -122,6 +120,7 @@ zfc arguments help:
   -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
   -s, --separate             [optional, default=false]Output files are separated
   -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
+  -t, --customTypes          [optional, default=empty]comma separated allows custom types
 ```
 
 > Note: zfc.exe is currently only run on Windows. It is .NET Core's [Roslyn](https://github.com/dotnet/roslyn) workspace API limitation but I want to implements to all platforms...
@@ -257,7 +256,7 @@ ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
 ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
 ```
 
-One more case, how to create generic formatter. `KeyValuePair<TKey, TValue>` is also not suppoted type by default. Let's add support.
+One more case, how to create generic formatter. For example, If implemnts `KeyValuePair<TKey, TValue>`?
 
 ```csharp
 public class KeyValuePairFormatter<TKey, TValue> : Formatter<KeyValuePair<TKey, TValue>>
@@ -354,14 +353,21 @@ Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlyi
 
 **Variable Length Format**
 
-byte[], String are eager evalution. FixedSizeList and VariableSizeList are lazy evaluation.
+String is eager evalution. FixedSizeList and VariableSizeList are lazy evaluation.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| byte[] | [length:int(4)][byte(length)] | if length = -1, indicates null, byte[] is mutable but can not track mutate(should not mutate). |
 | String | [length:int(4)][utf8Bytes:(length)] | if length = -1, indicates null, the value is UTF8 encoded |
 | FixedSizeList | [length:int(4)][elements:T...] | represents `IList<T>` where T is fixed length format. if length = -1, indicates null
 | VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | represents `IList<T>` where T is variable length format. if length = -1, indicates null
+
+**Sequence Format**
+
+Sequence is eager evaluation. If declared concrete types of collection, used this format.
+
+| Type | Layout | Note |
+| ---- | ------ | ---- |
+| `Sequence<T>` | [length:int(4)][elements:T...] | represents `T[]`, `List<T>` or all of `ICollection<T>` types. if length = -1, indicates null, byte[] is mutable but can not track mutate(should not mutate). |
 
 **Object Format**
 
@@ -379,7 +385,7 @@ Dictionary/MultiDictionary is eager evaluation. LazyDictionary/LazyMultiDictiona
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| Dictionary | [length:int(4)][`(key:TKey, value:TValue)`...] | represents `IDictionary<TKey, TValue>`, if length == -1, indicates null |
+| Dictionary | [length:int(4)][`(key:TKey, value:TValue)`...] | represents `Dictionary<TKey, TValue>` and `IDictionary<TKey, TValue>`, if length == -1, indicates null |
 | MultiDictionary | [length:int(4)][`(key:TKey, elements:List<TElement>)`...] | represents `ILookup<TKey, TElement>`, if length == -1, indicates null |
 | LazyDictionary | [byteSize:int(4)][length:int(4)][buckets:`FixedSizeList<int>`][entries:`VariableSizeList<DictionaryEntry>`] | represents `ILazyDictionary<TKey, TValue>`, if byteSize == -1, indicates null |
 | DictionaryEntry | [hashCode:int(4)][next:int(4)][key:TKey][value:TValue] | substructure of LazyDictionary | 

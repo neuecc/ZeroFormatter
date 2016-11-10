@@ -101,6 +101,11 @@ namespace ZeroFormatter.Tests
             jsonSingleBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(p2));
             jsonArrayBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(l2));
 
+            // vector?
+
+            MsgPack.Serialization.MessagePackSerializer.PrepareType<Vector3>();
+            MsgPack.Serialization.MessagePackSerializer.PrepareType<Vector3[]>();
+
             v3 = new Vector3 { x = 12345.12345f, y = 3994.35226f, z = 325125.52426f };
             v3Array = Enumerable.Range(1, 100).Select(_ => new Vector3 { x = 12345.12345f, y = 3994.35226f, z = 325125.52426f }).ToArray();
             zeroFormatterv3Bytes = ZeroFormatterSerializer.Serialize(v3);

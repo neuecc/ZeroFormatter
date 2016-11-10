@@ -4788,6 +4788,29 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
     public class MyStructFixedFormatter : Formatter<global::ZeroFormatter.Tests.MyStructFixed>
     {
+        readonly Formatter<int> formatter0;
+        readonly Formatter<long> formatter1;
+        readonly Formatter<float> formatter2;
+        
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter0.NoUseDirtyTracker
+                    && formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                ;
+            }
+        }
+
+        public MyStructFixedFormatter()
+        {
+            formatter0 = Formatter<int>.Default;
+            formatter1 = Formatter<long>.Default;
+            formatter2 = Formatter<float>.Default;
+            
+        }
+
         public override int? GetLength()
         {
             return 16;
@@ -4796,9 +4819,9 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyStructFixed value)
         {
             var startOffset = offset;
-            offset += Formatter<int>.Default.Serialize(ref bytes, offset, value.MyProperty1);
-            offset += Formatter<long>.Default.Serialize(ref bytes, offset, value.MyProperty2);
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.MyProperty3);
+            offset += formatter0.Serialize(ref bytes, offset, value.MyProperty1);
+            offset += formatter1.Serialize(ref bytes, offset, value.MyProperty2);
+            offset += formatter2.Serialize(ref bytes, offset, value.MyProperty3);
             return offset - startOffset;
         }
 
@@ -4806,13 +4829,13 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         {
             byteSize = 0;
             int size;
-            var item0 = Formatter<int>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item0 = formatter0.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item1 = Formatter<long>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
             
@@ -4822,6 +4845,29 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
     public class MyStructVariableFormatter : Formatter<global::ZeroFormatter.Tests.MyStructVariable>
     {
+        readonly Formatter<int> formatter0;
+        readonly Formatter<string> formatter1;
+        readonly Formatter<float> formatter2;
+        
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter0.NoUseDirtyTracker
+                    && formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                ;
+            }
+        }
+
+        public MyStructVariableFormatter()
+        {
+            formatter0 = Formatter<int>.Default;
+            formatter1 = Formatter<string>.Default;
+            formatter2 = Formatter<float>.Default;
+            
+        }
+
         public override int? GetLength()
         {
             return null;
@@ -4830,9 +4876,9 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyStructVariable value)
         {
             var startOffset = offset;
-            offset += Formatter<int>.Default.Serialize(ref bytes, offset, value.MyProperty1);
-            offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.MyProperty2);
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.MyProperty3);
+            offset += formatter0.Serialize(ref bytes, offset, value.MyProperty1);
+            offset += formatter1.Serialize(ref bytes, offset, value.MyProperty2);
+            offset += formatter2.Serialize(ref bytes, offset, value.MyProperty3);
             return offset - startOffset;
         }
 
@@ -4840,13 +4886,13 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         {
             byteSize = 0;
             int size;
-            var item0 = Formatter<int>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item0 = formatter0.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item1 = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
             
@@ -4856,6 +4902,26 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
     public class MyVectorFormatter : Formatter<global::ZeroFormatter.Tests.MyVector>
     {
+        readonly Formatter<float> formatter0;
+        readonly Formatter<float> formatter1;
+        
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter0.NoUseDirtyTracker
+                    && formatter1.NoUseDirtyTracker
+                ;
+            }
+        }
+
+        public MyVectorFormatter()
+        {
+            formatter0 = Formatter<float>.Default;
+            formatter1 = Formatter<float>.Default;
+            
+        }
+
         public override int? GetLength()
         {
             return 8;
@@ -4864,8 +4930,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyVector value)
         {
             var startOffset = offset;
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.X);
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.Y);
+            offset += formatter0.Serialize(ref bytes, offset, value.X);
+            offset += formatter1.Serialize(ref bytes, offset, value.Y);
             return offset - startOffset;
         }
 
@@ -4873,10 +4939,10 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         {
             byteSize = 0;
             int size;
-            var item0 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item0 = formatter0.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item1 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
             
@@ -4886,6 +4952,26 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
     public class MyNonVectorFormatter : Formatter<global::ZeroFormatter.Tests.MyNonVector>
     {
+        readonly Formatter<string> formatter0;
+        readonly Formatter<float> formatter1;
+        
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter0.NoUseDirtyTracker
+                    && formatter1.NoUseDirtyTracker
+                ;
+            }
+        }
+
+        public MyNonVectorFormatter()
+        {
+            formatter0 = Formatter<string>.Default;
+            formatter1 = Formatter<float>.Default;
+            
+        }
+
         public override int? GetLength()
         {
             return null;
@@ -4894,8 +4980,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyNonVector value)
         {
             var startOffset = offset;
-            offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.X);
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.Y);
+            offset += formatter0.Serialize(ref bytes, offset, value.X);
+            offset += formatter1.Serialize(ref bytes, offset, value.Y);
             return offset - startOffset;
         }
 
@@ -4903,10 +4989,10 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         {
             byteSize = 0;
             int size;
-            var item0 = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item0 = formatter0.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item1 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
             
@@ -4934,6 +5020,26 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
 
     public class Vector2Formatter : Formatter<global::UnityEngine.Vector2>
     {
+        readonly Formatter<float> formatter0;
+        readonly Formatter<float> formatter1;
+        
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter0.NoUseDirtyTracker
+                    && formatter1.NoUseDirtyTracker
+                ;
+            }
+        }
+
+        public Vector2Formatter()
+        {
+            formatter0 = Formatter<float>.Default;
+            formatter1 = Formatter<float>.Default;
+            
+        }
+
         public override int? GetLength()
         {
             return 8;
@@ -4942,8 +5048,8 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
         public override int Serialize(ref byte[] bytes, int offset, global::UnityEngine.Vector2 value)
         {
             var startOffset = offset;
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.x);
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.y);
+            offset += formatter0.Serialize(ref bytes, offset, value.x);
+            offset += formatter1.Serialize(ref bytes, offset, value.y);
             return offset - startOffset;
         }
 
@@ -4951,10 +5057,10 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
         {
             byteSize = 0;
             int size;
-            var item0 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item0 = formatter0.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item1 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
             
@@ -4964,6 +5070,29 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
 
     public class Vector3Formatter : Formatter<global::UnityEngine.Vector3>
     {
+        readonly Formatter<float> formatter0;
+        readonly Formatter<float> formatter1;
+        readonly Formatter<float> formatter2;
+        
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter0.NoUseDirtyTracker
+                    && formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                ;
+            }
+        }
+
+        public Vector3Formatter()
+        {
+            formatter0 = Formatter<float>.Default;
+            formatter1 = Formatter<float>.Default;
+            formatter2 = Formatter<float>.Default;
+            
+        }
+
         public override int? GetLength()
         {
             return 12;
@@ -4972,9 +5101,9 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
         public override int Serialize(ref byte[] bytes, int offset, global::UnityEngine.Vector3 value)
         {
             var startOffset = offset;
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.x);
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.y);
-            offset += Formatter<float>.Default.Serialize(ref bytes, offset, value.z);
+            offset += formatter0.Serialize(ref bytes, offset, value.x);
+            offset += formatter1.Serialize(ref bytes, offset, value.y);
+            offset += formatter2.Serialize(ref bytes, offset, value.z);
             return offset - startOffset;
         }
 
@@ -4982,13 +5111,13 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
         {
             byteSize = 0;
             int size;
-            var item0 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item0 = formatter0.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item1 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<float>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
             

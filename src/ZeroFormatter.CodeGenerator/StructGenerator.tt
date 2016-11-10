@@ -17,6 +17,31 @@ namespace <#= Namespace #>
 <# foreach(var t in Types) {  #>
     public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
     {
+<# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
+        readonly Formatter<<#= p.Type #>> formatter<#= i #>;
+<# } #>
+        
+<# if (t.Properties.Length != 0) { #>
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter0.NoUseDirtyTracker
+<# for(var i = 1; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
+                    && formatter<#= i #>.NoUseDirtyTracker
+<# } #>
+                ;
+            }
+        }
+<# } #>
+
+        public <#= t.Name #>Formatter()
+        {
+<# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
+            formatter<#= i #> = Formatter<<#= p.Type #>>.Default;
+<# } #>            
+        }
+
         public override int? GetLength()
         {
             return <#= t.ElementFixedSizes.Any(x => x == 0)  ? "null" : t.ElementFixedSizes.Sum().ToString() #>;
@@ -25,8 +50,8 @@ namespace <#= Namespace #>
         public override int Serialize(ref byte[] bytes, int offset, <#= t.FullName #> value)
         {
             var startOffset = offset;
-<# foreach(var p in t.Properties) { #>
-            offset += Formatter<<#= p.Type #>>.Default.Serialize(ref bytes, offset, value.<#= p.Name #>);
+<# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
+            offset += formatter<#= i #>.Serialize(ref bytes, offset, value.<#= p.Name #>);
 <# } #>
             return offset - startOffset;
         }
@@ -36,7 +61,7 @@ namespace <#= Namespace #>
             byteSize = 0;
             int size;
 <# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
-            var item<#= i #> = Formatter<<#= p.Type #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item<#= i #> = formatter<#= i #>.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 <# } #>
