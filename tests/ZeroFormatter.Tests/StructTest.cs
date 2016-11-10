@@ -52,6 +52,20 @@ namespace ZeroFormatter.Tests
         }
 
         [ZeroFormattable]
+        public struct KlassStruct
+        {
+            [Index(0)]
+            public MyClass t;
+
+            public KlassStruct(MyClass t)
+            {
+                this.t = t;
+            }
+        }
+
+        
+
+        [ZeroFormattable]
         public struct FloatVector2
         {
             [Index(0)]
@@ -141,6 +155,18 @@ namespace ZeroFormatter.Tests
 
             huga.x.Is(100.4f);
             huga.y.Is(200.5f);
+        }
+
+        [TestMethod]
+        public void NoUseDirtyTracker()
+        {
+            var f = ZeroFormatter.Formatters.Formatter<MyStructFixed>.Default;
+            f.NoUseDirtyTracker.IsTrue();
+
+            ZeroFormatter.Formatters.Formatter<MyClass>.Default.NoUseDirtyTracker.IsFalse();
+
+            var f2 = ZeroFormatter.Formatters.Formatter<KlassStruct>.Default;
+            f2.NoUseDirtyTracker.IsFalse();
         }
     }
 }

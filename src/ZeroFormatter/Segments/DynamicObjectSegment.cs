@@ -179,6 +179,43 @@ namespace ZeroFormatter.Segments
             BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * index), offset);
             return Formatter<T>.Default.Serialize(ref bytes, offset, value);
         }
+
+#if !UNITY
+
+        public static bool IsLazySegment(Type type)
+        {
+            var ti = type.GetTypeInfo();
+            // ObjectSegment
+            if (ti.IsClass && ti.GetCustomAttributes<ZeroFormattableAttribute>().Any())
+            {
+                return true;
+            }
+            if (ti.IsGenericType)
+            {
+                var genType = ti.GetGenericTypeDefinition();
+                // ListSegment
+                if (genType == typeof(IList<>))
+                {
+                    return true;
+                }
+                else if (genType == typeof(ILazyLookup<,>))
+                {
+                    return true;
+                }
+                else if (genType == typeof(ILazyDictionary<,>))
+                {
+                    return true;
+                }
+                else if (genType == typeof(ILazyReadOnlyDictionary<,>))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+#endif
     }
 
 #if !UNITY
@@ -292,8 +329,9 @@ namespace ZeroFormatter.Segments
 
                 if (formatter.GetLength() == null)
                 {
-                    if (CacheSegment.CanAccept(propInfo.MemberType))
+                    if (!ObjectSegmentHelper.IsLazySegment(propInfo.MemberType))
                     {
+                        // CacheSegment
                         var fieldBuilder = typeBuilder.DefineField("<>_" + propInfo.Name, typeof(CacheSegment<>).MakeGenericType(propInfo.MemberType), FieldAttributes.Private);
                         list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo.PropertyInfoUnsafe, IsFixedSize = false, SegmentField = fieldBuilder, IsCacheSegment = true });
                     }

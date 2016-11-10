@@ -48,6 +48,10 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<<#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.List) { #>
             ZeroFormatter.Formatters.Formatter.RegisterList<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.Array) { #>
+            ZeroFormatter.Formatters.Formatter.RegisterArray<<#= g.ElementTypes #>>();
+<# } else if(g.TypeKind == GenericTypeKind.Collection) { #>
+            ZeroFormatter.Formatters.Formatter.RegisterCollection<<#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.ReadOnlyList) { #>
             ZeroFormatter.Formatters.Formatter.RegisterReadOnlyList<<#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Dictionary) { #>

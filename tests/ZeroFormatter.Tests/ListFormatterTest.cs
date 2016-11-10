@@ -11,13 +11,6 @@ namespace ZeroFormatter.Tests
     public class ListFormatterTest
     {
         [TestMethod]
-        public void ArrayCannotSerialize()
-        {
-            var xs = new[] { 12, 431, 426, 76, 373, 7, 53, 563, 563 };
-            AssertEx.Catch<Exception>(() => ZeroFormatterSerializer.Serialize(xs)).Message.Contains("Array does not support");
-        }
-
-        [TestMethod]
         public void FixedList()
         {
             {

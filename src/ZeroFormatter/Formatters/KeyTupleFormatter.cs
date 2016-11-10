@@ -9,11 +9,26 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class KeyTupleFormatter<T1> : Formatter<KeyTuple<T1>>
+    internal class KeyTupleFormatter<T1> : Formatter<KeyTuple<T1>>
     {
+        readonly Formatter<T1> formatter1;
+        
+
         [Preserve]
         public KeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -24,7 +39,7 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, KeyTuple<T1> value)
         {
             var startOffset = offset;
-            offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Item1);
+            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
             return offset - startOffset;
         }
 
@@ -33,7 +48,7 @@ namespace ZeroFormatter.Formatters
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -42,11 +57,26 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class NullableKeyTupleFormatter<T1> : Formatter<KeyTuple<T1>?>
+    internal class NullableKeyTupleFormatter<T1> : Formatter<KeyTuple<T1>?>
     {
+        readonly Formatter<T1> formatter1;
+       
+
         [Preserve]
         public NullableKeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -61,7 +91,7 @@ namespace ZeroFormatter.Formatters
             {
                 var startOffset = offset;
                 offset += 1;
-                offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Value.Item1);
+                offset += this.formatter1.Serialize(ref bytes, offset, value.Value.Item1);
                 return offset - startOffset;
             }
             else
@@ -79,7 +109,7 @@ namespace ZeroFormatter.Formatters
             offset += 1;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -89,11 +119,29 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class KeyTupleFormatter<T1, T2> : Formatter<KeyTuple<T1, T2>>
+    internal class KeyTupleFormatter<T1, T2> : Formatter<KeyTuple<T1, T2>>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        
+
         [Preserve]
         public KeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -104,8 +152,8 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, KeyTuple<T1, T2> value)
         {
             var startOffset = offset;
-            offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Item1);
-            offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Item2);
+            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
+            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
             return offset - startOffset;
         }
 
@@ -114,10 +162,10 @@ namespace ZeroFormatter.Formatters
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -126,11 +174,29 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class NullableKeyTupleFormatter<T1, T2> : Formatter<KeyTuple<T1, T2>?>
+    internal class NullableKeyTupleFormatter<T1, T2> : Formatter<KeyTuple<T1, T2>?>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+       
+
         [Preserve]
         public NullableKeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -145,8 +211,8 @@ namespace ZeroFormatter.Formatters
             {
                 var startOffset = offset;
                 offset += 1;
-                offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Value.Item1);
-                offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Value.Item2);
+                offset += this.formatter1.Serialize(ref bytes, offset, value.Value.Item1);
+                offset += this.formatter2.Serialize(ref bytes, offset, value.Value.Item2);
                 return offset - startOffset;
             }
             else
@@ -164,10 +230,10 @@ namespace ZeroFormatter.Formatters
             offset += 1;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -177,11 +243,32 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class KeyTupleFormatter<T1, T2, T3> : Formatter<KeyTuple<T1, T2, T3>>
+    internal class KeyTupleFormatter<T1, T2, T3> : Formatter<KeyTuple<T1, T2, T3>>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        
+
         [Preserve]
         public KeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -192,9 +279,9 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, KeyTuple<T1, T2, T3> value)
         {
             var startOffset = offset;
-            offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Item1);
-            offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Item2);
-            offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Item3);
+            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
+            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
+            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
             return offset - startOffset;
         }
 
@@ -203,13 +290,13 @@ namespace ZeroFormatter.Formatters
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -218,11 +305,32 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class NullableKeyTupleFormatter<T1, T2, T3> : Formatter<KeyTuple<T1, T2, T3>?>
+    internal class NullableKeyTupleFormatter<T1, T2, T3> : Formatter<KeyTuple<T1, T2, T3>?>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+       
+
         [Preserve]
         public NullableKeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -237,9 +345,9 @@ namespace ZeroFormatter.Formatters
             {
                 var startOffset = offset;
                 offset += 1;
-                offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Value.Item1);
-                offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Value.Item2);
-                offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Value.Item3);
+                offset += this.formatter1.Serialize(ref bytes, offset, value.Value.Item1);
+                offset += this.formatter2.Serialize(ref bytes, offset, value.Value.Item2);
+                offset += this.formatter3.Serialize(ref bytes, offset, value.Value.Item3);
                 return offset - startOffset;
             }
             else
@@ -257,13 +365,13 @@ namespace ZeroFormatter.Formatters
             offset += 1;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -273,11 +381,35 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class KeyTupleFormatter<T1, T2, T3, T4> : Formatter<KeyTuple<T1, T2, T3, T4>>
+    internal class KeyTupleFormatter<T1, T2, T3, T4> : Formatter<KeyTuple<T1, T2, T3, T4>>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+        
+
         [Preserve]
         public KeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -288,10 +420,10 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, KeyTuple<T1, T2, T3, T4> value)
         {
             var startOffset = offset;
-            offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Item1);
-            offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Item2);
-            offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Item3);
-            offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Item4);
+            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
+            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
+            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
+            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
             return offset - startOffset;
         }
 
@@ -300,16 +432,16 @@ namespace ZeroFormatter.Formatters
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -318,11 +450,35 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class NullableKeyTupleFormatter<T1, T2, T3, T4> : Formatter<KeyTuple<T1, T2, T3, T4>?>
+    internal class NullableKeyTupleFormatter<T1, T2, T3, T4> : Formatter<KeyTuple<T1, T2, T3, T4>?>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+       
+
         [Preserve]
         public NullableKeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -337,10 +493,10 @@ namespace ZeroFormatter.Formatters
             {
                 var startOffset = offset;
                 offset += 1;
-                offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Value.Item1);
-                offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Value.Item2);
-                offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Value.Item3);
-                offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Value.Item4);
+                offset += this.formatter1.Serialize(ref bytes, offset, value.Value.Item1);
+                offset += this.formatter2.Serialize(ref bytes, offset, value.Value.Item2);
+                offset += this.formatter3.Serialize(ref bytes, offset, value.Value.Item3);
+                offset += this.formatter4.Serialize(ref bytes, offset, value.Value.Item4);
                 return offset - startOffset;
             }
             else
@@ -358,16 +514,16 @@ namespace ZeroFormatter.Formatters
             offset += 1;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -377,11 +533,38 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class KeyTupleFormatter<T1, T2, T3, T4, T5> : Formatter<KeyTuple<T1, T2, T3, T4, T5>>
+    internal class KeyTupleFormatter<T1, T2, T3, T4, T5> : Formatter<KeyTuple<T1, T2, T3, T4, T5>>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+        readonly Formatter<T5> formatter5;
+        
+
         [Preserve]
         public KeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+            this.formatter5 = Formatter<T5>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+                    && formatter5.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -392,11 +575,11 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, KeyTuple<T1, T2, T3, T4, T5> value)
         {
             var startOffset = offset;
-            offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Item1);
-            offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Item2);
-            offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Item3);
-            offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Item4);
-            offset += Formatter<T5>.Default.Serialize(ref bytes, offset, value.Item5);
+            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
+            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
+            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
+            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
+            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
             return offset - startOffset;
         }
 
@@ -405,19 +588,19 @@ namespace ZeroFormatter.Formatters
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -426,11 +609,38 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class NullableKeyTupleFormatter<T1, T2, T3, T4, T5> : Formatter<KeyTuple<T1, T2, T3, T4, T5>?>
+    internal class NullableKeyTupleFormatter<T1, T2, T3, T4, T5> : Formatter<KeyTuple<T1, T2, T3, T4, T5>?>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+        readonly Formatter<T5> formatter5;
+       
+
         [Preserve]
         public NullableKeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+            this.formatter5 = Formatter<T5>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+                    && formatter5.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -445,11 +655,11 @@ namespace ZeroFormatter.Formatters
             {
                 var startOffset = offset;
                 offset += 1;
-                offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Value.Item1);
-                offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Value.Item2);
-                offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Value.Item3);
-                offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Value.Item4);
-                offset += Formatter<T5>.Default.Serialize(ref bytes, offset, value.Value.Item5);
+                offset += this.formatter1.Serialize(ref bytes, offset, value.Value.Item1);
+                offset += this.formatter2.Serialize(ref bytes, offset, value.Value.Item2);
+                offset += this.formatter3.Serialize(ref bytes, offset, value.Value.Item3);
+                offset += this.formatter4.Serialize(ref bytes, offset, value.Value.Item4);
+                offset += this.formatter5.Serialize(ref bytes, offset, value.Value.Item5);
                 return offset - startOffset;
             }
             else
@@ -467,19 +677,19 @@ namespace ZeroFormatter.Formatters
             offset += 1;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -489,11 +699,41 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class KeyTupleFormatter<T1, T2, T3, T4, T5, T6> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>
+    internal class KeyTupleFormatter<T1, T2, T3, T4, T5, T6> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+        readonly Formatter<T5> formatter5;
+        readonly Formatter<T6> formatter6;
+        
+
         [Preserve]
         public KeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+            this.formatter5 = Formatter<T5>.Default;
+            this.formatter6 = Formatter<T6>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+                    && formatter5.NoUseDirtyTracker
+                    && formatter6.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -504,12 +744,12 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, KeyTuple<T1, T2, T3, T4, T5, T6> value)
         {
             var startOffset = offset;
-            offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Item1);
-            offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Item2);
-            offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Item3);
-            offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Item4);
-            offset += Formatter<T5>.Default.Serialize(ref bytes, offset, value.Item5);
-            offset += Formatter<T6>.Default.Serialize(ref bytes, offset, value.Item6);
+            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
+            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
+            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
+            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
+            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
+            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
             return offset - startOffset;
         }
 
@@ -518,22 +758,22 @@ namespace ZeroFormatter.Formatters
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -542,11 +782,41 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>
+    internal class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+        readonly Formatter<T5> formatter5;
+        readonly Formatter<T6> formatter6;
+       
+
         [Preserve]
         public NullableKeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+            this.formatter5 = Formatter<T5>.Default;
+            this.formatter6 = Formatter<T6>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+                    && formatter5.NoUseDirtyTracker
+                    && formatter6.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -561,12 +831,12 @@ namespace ZeroFormatter.Formatters
             {
                 var startOffset = offset;
                 offset += 1;
-                offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Value.Item1);
-                offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Value.Item2);
-                offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Value.Item3);
-                offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Value.Item4);
-                offset += Formatter<T5>.Default.Serialize(ref bytes, offset, value.Value.Item5);
-                offset += Formatter<T6>.Default.Serialize(ref bytes, offset, value.Value.Item6);
+                offset += this.formatter1.Serialize(ref bytes, offset, value.Value.Item1);
+                offset += this.formatter2.Serialize(ref bytes, offset, value.Value.Item2);
+                offset += this.formatter3.Serialize(ref bytes, offset, value.Value.Item3);
+                offset += this.formatter4.Serialize(ref bytes, offset, value.Value.Item4);
+                offset += this.formatter5.Serialize(ref bytes, offset, value.Value.Item5);
+                offset += this.formatter6.Serialize(ref bytes, offset, value.Value.Item6);
                 return offset - startOffset;
             }
             else
@@ -584,22 +854,22 @@ namespace ZeroFormatter.Formatters
             offset += 1;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -609,11 +879,44 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>
+    internal class KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+        readonly Formatter<T5> formatter5;
+        readonly Formatter<T6> formatter6;
+        readonly Formatter<T7> formatter7;
+        
+
         [Preserve]
         public KeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+            this.formatter5 = Formatter<T5>.Default;
+            this.formatter6 = Formatter<T6>.Default;
+            this.formatter7 = Formatter<T7>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+                    && formatter5.NoUseDirtyTracker
+                    && formatter6.NoUseDirtyTracker
+                    && formatter7.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -624,13 +927,13 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, KeyTuple<T1, T2, T3, T4, T5, T6, T7> value)
         {
             var startOffset = offset;
-            offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Item1);
-            offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Item2);
-            offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Item3);
-            offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Item4);
-            offset += Formatter<T5>.Default.Serialize(ref bytes, offset, value.Item5);
-            offset += Formatter<T6>.Default.Serialize(ref bytes, offset, value.Item6);
-            offset += Formatter<T7>.Default.Serialize(ref bytes, offset, value.Item7);
+            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
+            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
+            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
+            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
+            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
+            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
+            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
             return offset - startOffset;
         }
 
@@ -639,25 +942,25 @@ namespace ZeroFormatter.Formatters
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item7 = Formatter<T7>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -666,11 +969,44 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>
+    internal class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+        readonly Formatter<T5> formatter5;
+        readonly Formatter<T6> formatter6;
+        readonly Formatter<T7> formatter7;
+       
+
         [Preserve]
         public NullableKeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+            this.formatter5 = Formatter<T5>.Default;
+            this.formatter6 = Formatter<T6>.Default;
+            this.formatter7 = Formatter<T7>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+                    && formatter5.NoUseDirtyTracker
+                    && formatter6.NoUseDirtyTracker
+                    && formatter7.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -685,13 +1021,13 @@ namespace ZeroFormatter.Formatters
             {
                 var startOffset = offset;
                 offset += 1;
-                offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Value.Item1);
-                offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Value.Item2);
-                offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Value.Item3);
-                offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Value.Item4);
-                offset += Formatter<T5>.Default.Serialize(ref bytes, offset, value.Value.Item5);
-                offset += Formatter<T6>.Default.Serialize(ref bytes, offset, value.Value.Item6);
-                offset += Formatter<T7>.Default.Serialize(ref bytes, offset, value.Value.Item7);
+                offset += this.formatter1.Serialize(ref bytes, offset, value.Value.Item1);
+                offset += this.formatter2.Serialize(ref bytes, offset, value.Value.Item2);
+                offset += this.formatter3.Serialize(ref bytes, offset, value.Value.Item3);
+                offset += this.formatter4.Serialize(ref bytes, offset, value.Value.Item4);
+                offset += this.formatter5.Serialize(ref bytes, offset, value.Value.Item5);
+                offset += this.formatter6.Serialize(ref bytes, offset, value.Value.Item6);
+                offset += this.formatter7.Serialize(ref bytes, offset, value.Value.Item7);
                 return offset - startOffset;
             }
             else
@@ -709,25 +1045,25 @@ namespace ZeroFormatter.Formatters
             offset += 1;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item7 = Formatter<T7>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -737,11 +1073,47 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
+    internal class KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+        readonly Formatter<T5> formatter5;
+        readonly Formatter<T6> formatter6;
+        readonly Formatter<T7> formatter7;
+        readonly Formatter<TRest> formatter8;
+        
+
         [Preserve]
         public KeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+            this.formatter5 = Formatter<T5>.Default;
+            this.formatter6 = Formatter<T6>.Default;
+            this.formatter7 = Formatter<T7>.Default;
+            this.formatter8 = Formatter<TRest>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+                    && formatter5.NoUseDirtyTracker
+                    && formatter6.NoUseDirtyTracker
+                    && formatter7.NoUseDirtyTracker
+                    && formatter8.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -752,14 +1124,14 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest> value)
         {
             var startOffset = offset;
-            offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Item1);
-            offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Item2);
-            offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Item3);
-            offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Item4);
-            offset += Formatter<T5>.Default.Serialize(ref bytes, offset, value.Item5);
-            offset += Formatter<T6>.Default.Serialize(ref bytes, offset, value.Item6);
-            offset += Formatter<T7>.Default.Serialize(ref bytes, offset, value.Item7);
-            offset += Formatter<TRest>.Default.Serialize(ref bytes, offset, value.Rest);
+            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
+            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
+            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
+            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
+            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
+            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
+            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
+            offset += this.formatter8.Serialize(ref bytes, offset, value.Rest);
             return offset - startOffset;
         }
 
@@ -768,28 +1140,28 @@ namespace ZeroFormatter.Formatters
             byteSize = 0;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item7 = Formatter<T7>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item8 = Formatter<TRest>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
@@ -798,11 +1170,47 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>?>
+    internal class NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, TRest>?>
     {
+        readonly Formatter<T1> formatter1;
+        readonly Formatter<T2> formatter2;
+        readonly Formatter<T3> formatter3;
+        readonly Formatter<T4> formatter4;
+        readonly Formatter<T5> formatter5;
+        readonly Formatter<T6> formatter6;
+        readonly Formatter<T7> formatter7;
+        readonly Formatter<TRest> formatter8;
+       
+
         [Preserve]
         public NullableKeyTupleFormatter()
         {
+            this.formatter1 = Formatter<T1>.Default;
+            this.formatter2 = Formatter<T2>.Default;
+            this.formatter3 = Formatter<T3>.Default;
+            this.formatter4 = Formatter<T4>.Default;
+            this.formatter5 = Formatter<T5>.Default;
+            this.formatter6 = Formatter<T6>.Default;
+            this.formatter7 = Formatter<T7>.Default;
+            this.formatter8 = Formatter<TRest>.Default;
+   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+                    && formatter2.NoUseDirtyTracker
+                    && formatter3.NoUseDirtyTracker
+                    && formatter4.NoUseDirtyTracker
+                    && formatter5.NoUseDirtyTracker
+                    && formatter6.NoUseDirtyTracker
+                    && formatter7.NoUseDirtyTracker
+                    && formatter8.NoUseDirtyTracker
+        
+                ;
+            }
         }
 
         public override int? GetLength()
@@ -817,14 +1225,14 @@ namespace ZeroFormatter.Formatters
             {
                 var startOffset = offset;
                 offset += 1;
-                offset += Formatter<T1>.Default.Serialize(ref bytes, offset, value.Value.Item1);
-                offset += Formatter<T2>.Default.Serialize(ref bytes, offset, value.Value.Item2);
-                offset += Formatter<T3>.Default.Serialize(ref bytes, offset, value.Value.Item3);
-                offset += Formatter<T4>.Default.Serialize(ref bytes, offset, value.Value.Item4);
-                offset += Formatter<T5>.Default.Serialize(ref bytes, offset, value.Value.Item5);
-                offset += Formatter<T6>.Default.Serialize(ref bytes, offset, value.Value.Item6);
-                offset += Formatter<T7>.Default.Serialize(ref bytes, offset, value.Value.Item7);
-                offset += Formatter<TRest>.Default.Serialize(ref bytes, offset, value.Value.Rest);
+                offset += this.formatter1.Serialize(ref bytes, offset, value.Value.Item1);
+                offset += this.formatter2.Serialize(ref bytes, offset, value.Value.Item2);
+                offset += this.formatter3.Serialize(ref bytes, offset, value.Value.Item3);
+                offset += this.formatter4.Serialize(ref bytes, offset, value.Value.Item4);
+                offset += this.formatter5.Serialize(ref bytes, offset, value.Value.Item5);
+                offset += this.formatter6.Serialize(ref bytes, offset, value.Value.Item6);
+                offset += this.formatter7.Serialize(ref bytes, offset, value.Value.Item7);
+                offset += this.formatter8.Serialize(ref bytes, offset, value.Value.Rest);
                 return offset - startOffset;
             }
             else
@@ -842,28 +1250,28 @@ namespace ZeroFormatter.Formatters
             offset += 1;
             int size;
 
-            var item1 = Formatter<T1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item2 = Formatter<T2>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item3 = Formatter<T3>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item4 = Formatter<T4>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item5 = Formatter<T5>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item6 = Formatter<T6>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item7 = Formatter<T7>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var item8 = Formatter<TRest>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 

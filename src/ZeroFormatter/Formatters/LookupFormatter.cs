@@ -9,7 +9,7 @@ namespace ZeroFormatter.Formatters
     // ImmediateLookup
     // [int count][(Key, Value[])...], count == -1 is null
     [Preserve(AllMembers = true)]
-    public class LookupFormatter<TKey, TValue> : Formatter<ILookup<TKey, TValue>>
+    internal class LookupFormatter<TKey, TValue> : Formatter<ILookup<TKey, TValue>>
     {
         readonly Formatter<TKey> keyFormatter;
         readonly Formatter<IList<TValue>> valuesFormatter;
@@ -67,7 +67,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class LazyLookupFormatter<TKey, TValue> : Formatter<ILazyLookup<TKey, TValue>>
+    internal class LazyLookupFormatter<TKey, TValue> : Formatter<ILazyLookup<TKey, TValue>>
     {
         [Preserve]
         public LazyLookupFormatter()
@@ -104,7 +104,7 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    public class GroupingSegmentFormatter<TKey, TValue> : Formatter<GroupingSegment<TKey, TValue>>
+    internal class GroupingSegmentFormatter<TKey, TValue> : Formatter<GroupingSegment<TKey, TValue>>
     {
         [Preserve]
         public GroupingSegmentFormatter()

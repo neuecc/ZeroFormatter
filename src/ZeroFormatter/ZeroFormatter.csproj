@@ -55,12 +55,19 @@
   <ItemGroup>
     <Compile Include="Comparers\KeyTupleEqualityComparer.cs" />
     <Compile Include="Comparers\WireFormatEqualityComparers.cs" />
+    <Compile Include="Formatters\PrimitiveArrayFormatter.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PrimitiveArrayFormatter.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Formatters\SequenceFormatter.cs" />
     <Compile Include="Formatters\KeyTupleFormatter.cs">
       <DependentUpon>KeyTupleFormatter.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Comparers\EnumEqualityComparer.cs" />
+    <Compile Include="Formatters\KeyValuePairFormatter.cs" />
     <Compile Include="Formatters\LookupFormatter.cs" />
     <Compile Include="Formatters\EnumFormatter.cs">
       <AutoGen>True</AutoGen>
@@ -68,7 +75,6 @@
       <DependentUpon>EnumFormatter.tt</DependentUpon>
     </Compile>
     <Compile Include="Formatters\Formatter.cs" />
-    <Compile Include="Formatters\ByteArrayFormatter.cs" />
     <Compile Include="Formatters\DictionaryFormatter.cs" />
     <Compile Include="Formatters\ListFormatter.cs" />
     <Compile Include="Formatters\DynamicObjectFormatter.cs" />
@@ -78,6 +84,11 @@
       <DependentUpon>PrimitiveFormatter.tt</DependentUpon>
     </Compile>
     <Compile Include="Formatters\StringFormatter.cs" />
+    <Compile Include="Formatters\TupleFormatter.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TupleFormatter.tt</DependentUpon>
+    </Compile>
     <Compile Include="Internal\BinaryUtil.cs" />
     <Compile Include="Internal\DynamicAssembly.cs" />
     <Compile Include="Internal\HashHelper.cs" />
@@ -104,9 +115,17 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>EnumFormatter.cs</LastGenOutput>
     </Content>
+    <Content Include="Formatters\PrimitiveArrayFormatter.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>PrimitiveArrayFormatter.cs</LastGenOutput>
+    </Content>
     <Content Include="Formatters\PrimitiveFormatter.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>PrimitiveFormatter.cs</LastGenOutput>
+    </Content>
+    <Content Include="Formatters\TupleFormatter.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TupleFormatter.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

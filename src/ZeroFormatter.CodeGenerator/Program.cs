@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Mono.Options;
+using System.Collections.Generic;
 
 namespace ZeroFormatter.CodeGenerator
 {
@@ -14,18 +15,22 @@ namespace ZeroFormatter.CodeGenerator
         public string InputPath { get; private set; }
         public string OutputPath { get; private set; }
         public bool UnuseUnityAttr { get; private set; }
+        public List<string> AllowCustomTypes { get; private set; }
         public bool IsSeparate { get; private set; }
 
         public bool IsParsed { get; set; }
 
         public CommandlineArguments(string[] args)
         {
+            AllowCustomTypes = new List<string>();
+
             var option = new OptionSet()
             {
                 { "i|input=", "[required]Input path of analyze csproj", x => { InputPath = x; } },
                 { "o|output=", "[required]Output path(file) or directory base(in separated mode)", x => { OutputPath = x; } },
                 { "s|separate", "[optional, default=false]Output files are separated", _ => { IsSeparate = true; } },
                 { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer", _ => { UnuseUnityAttr = true; } },
+                { "t|customTypes=", "[optional, default=empty]comma separated allows custom types", x => { AllowCustomTypes.AddRange(x.Split(',')); } },
             };
             if (args.Length == 0)
             {
@@ -75,7 +80,7 @@ namespace ZeroFormatter.CodeGenerator
             var sw = Stopwatch.StartNew();
             Console.WriteLine("Project Compilation Start:" + csprojPath);
 
-            var tc = new TypeCollector(csprojPath);
+            var tc = new TypeCollector(csprojPath, cmdArgs.AllowCustomTypes);
 
             Console.WriteLine("Project Compilation Complete:" + sw.Elapsed.ToString());
             Console.WriteLine();

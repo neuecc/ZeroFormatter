@@ -57,24 +57,6 @@ namespace ZeroFormatter.Analyzer
             description: "IndexAttribute can not allow duplicate.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
-        internal static readonly DiagnosticDescriptor DictionaryNotSupport = new DiagnosticDescriptor(
-            id: DiagnosticIdBase + "_" + nameof(DictionaryNotSupport), title: Title, category: Category,
-            messageFormat: "Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV>, ILazyDictionary<TK, TV> instead of Dictionary. {0}.{1}.", // type.Name + "." + property.Name 
-            description: "Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV>, ILazyDictionary<TK, TV> instead of Dictionary.",
-            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
-
-        internal static readonly DiagnosticDescriptor ListNotSupport = new DiagnosticDescriptor(
-            id: DiagnosticIdBase + "_" + nameof(ListNotSupport), title: Title, category: Category,
-            messageFormat: "List does not support in ZeroFormatter because List have to deserialize all objects. You can use IList<T> instead of List. {0}.{1}.", // type.Name + "." + property.Name 
-            description: "List does not support in ZeroFormatter because List have to deserialize all objects. You can use IList<T> instead of List.",
-            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
-
-        internal static readonly DiagnosticDescriptor ArrayNotSupport = new DiagnosticDescriptor(
-            id: DiagnosticIdBase + "_" + nameof(ArrayNotSupport), title: Title, category: Category,
-            messageFormat: "Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[]. {0}.{1}.", // type.Name + "." + property.Name 
-            description: "Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[].",
-            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
-
         internal static readonly DiagnosticDescriptor IndexIsTooLarge = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(IndexIsTooLarge), title: Title, category: Category,
             messageFormat: "MaxIndex is {0}, it is large. Index is size of binary, recommended to small. {1}", // index, type.Name
@@ -106,9 +88,6 @@ namespace ZeroFormatter.Analyzer
             PublicPropertyMustBeVirtual,
             ClassNotSupportPublicField,
             IndexAttributeDuplicate,
-            DictionaryNotSupport,
-            ListNotSupport,
-            ArrayNotSupport,
             IndexIsTooLarge,
             TypeMustNeedsParameterlessConstructor,
             StructIndexMustBeStartedWithZeroAndSequential,
@@ -180,13 +159,25 @@ namespace ZeroFormatter.Analyzer
                 return;
             }
 
-            if (AllowTypes.Contains(type.ToDisplayString()))
+            var displayString = type.ToDisplayString();
+            if (AllowTypes.Contains(displayString))
             {
                 return; // it is primitive...
+            }
+            else if (context.AdditionalAllowTypes.Contains(displayString))
+            {
+                return;
             }
 
             if (type.TypeKind == TypeKind.Enum)
             {
+                return;
+            }
+            if (type.TypeKind == TypeKind.Array)
+            {
+                var array = type as IArrayTypeSymbol;
+                var t = array.ElementType;
+                VerifyType(context, callerLocation, t, alreadyAnalyzed, callFromProperty);
                 return;
             }
 
@@ -201,16 +192,6 @@ namespace ZeroFormatter.Analyzer
                     VerifyType(context, callerLocation, namedType.TypeArguments[0], alreadyAnalyzed, callFromProperty);
                     return;
                 }
-                else if (genericTypeString == "System.Collections.Generic.List<>")
-                {
-                    context.Add(Diagnostic.Create(ListNotSupport, callerLocation, callFromProperty.ContainingType?.Name, callFromProperty.Name));
-                    return;
-                }
-                else if (genericTypeString == "System.Collections.Generic.Dictionary<,>")
-                {
-                    context.Add(Diagnostic.Create(DictionaryNotSupport, callerLocation, callFromProperty.ContainingType?.Name, callFromProperty.Name));
-                    return;
-                }
                 else if (genericTypeString == "System.Collections.Generic.IList<>"
                       || genericTypeString == "System.Collections.Generic.IDictionary<,>"
                       || genericTypeString == "ZeroFormatter.ILazyDictionary<,>"
@@ -219,6 +200,8 @@ namespace ZeroFormatter.Analyzer
                       || genericTypeString == "ZeroFormatter.ILazyReadOnlyDictionary<,>"
                       || genericTypeString == "System.Linq.ILookup<,>"
                       || genericTypeString == "ZeroFormatter.ILazyLookup<,>"
+                      || genericTypeString.StartsWith("System.Collections.Generic.KeyValuePair")
+                      || genericTypeString.StartsWith("System.Tuple")
                       || genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
                 {
                     foreach (var t in namedType.TypeArguments)
@@ -226,6 +209,17 @@ namespace ZeroFormatter.Analyzer
                         VerifyType(context, callerLocation, t, alreadyAnalyzed, callFromProperty);
                     }
                     return;
+                }
+                else
+                {
+                    if (namedType.AllInterfaces.Any(x => (x.IsGenericType ? x.ConstructUnboundGenericType().ToDisplayString() : "") == "System.Collections.Generic.ICollection<>"))
+                    {
+                        foreach (var t in namedType.TypeArguments)
+                        {
+                            VerifyType(context, callerLocation, t, alreadyAnalyzed, callFromProperty);
+                        }
+                        return;
+                    }
                 }
             }
 
@@ -365,19 +359,6 @@ namespace ZeroFormatter.Analyzer
                 }
             }
 
-            if (property.Type.TypeKind == TypeKind.Array)
-            {
-                var array = property.Type as IArrayTypeSymbol;
-                var t = array.ElementType;
-                if (t.SpecialType == SpecialType.System_Byte) // allows byte[]
-                {
-                    return;
-                }
-
-                context.Add(Diagnostic.Create(ArrayNotSupport, property.Locations[0], property.ContainingType?.Name, property.Name));
-                return;
-            }
-
             var namedType = property.Type as INamedTypeSymbol;
             if (namedType != null) // if <T> is unnamed type, it can't analyze.
             {
@@ -426,20 +407,6 @@ namespace ZeroFormatter.Analyzer
             if ((int)index.Value >= 100)
             {
                 context.Add(Diagnostic.Create(IndexIsTooLarge, field.Locations[0], index.Value, field.Name));
-            }
-
-
-            if (field.Type.TypeKind == TypeKind.Array)
-            {
-                var array = field.Type as IArrayTypeSymbol;
-                var t = array.ElementType;
-                if (t.SpecialType == SpecialType.System_Byte) // allows byte[]
-                {
-                    return;
-                }
-
-                context.Add(Diagnostic.Create(ArrayNotSupport, field.Locations[0], field.ContainingType?.Name, field.Name));
-                return;
             }
 
             var namedType = field.Type as INamedTypeSymbol;

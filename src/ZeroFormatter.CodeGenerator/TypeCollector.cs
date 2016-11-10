@@ -28,9 +28,12 @@ namespace ZeroFormatter.CodeGenerator
         List<GenericType> genericTypeContainer;
         HashSet<string> alreadyCollected;
 
-        public TypeCollector(string csProjPath)
+        HashSet<string> allowCustomTypes;
+
+        public TypeCollector(string csProjPath, IEnumerable<string> allowCustomTypes)
         {
             this.csProjPath = csProjPath;
+            this.allowCustomTypes = new HashSet<string>(allowCustomTypes);
 
             var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, CodegeneratorOnlyPreprocessorSymbol).GetAwaiter().GetResult();
             targetTypes = compilation.GetNamedTypeSymbols()
@@ -131,6 +134,11 @@ namespace ZeroFormatter.CodeGenerator
                 CollectEnum(type);
                 return;
             }
+            if (allowCustomTypes.Contains(type.ToDisplayString()))
+            {
+                return;
+            }
+
             if (type.IsGenericType)
             {
                 var genericType = type.ConstructUnboundGenericType();
@@ -141,22 +149,16 @@ namespace ZeroFormatter.CodeGenerator
                     CollectObjectSegment(type.TypeArguments[0] as INamedTypeSymbol);
                     return;
                 }
-                else if (genericTypeString == "System.Collections.Generic.List<>")
-                {
-                    throw new Exception($"List does not support in ZeroFormatter because List have to deserialize all objects. You can use IList<T> instead of List. {type.Name}.");
-                }
-                else if (genericTypeString == "System.Collections.Generic.Dictionary<,>")
-                {
-                    throw new Exception($"Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary. {type.Name}.");
-                }
                 else if (genericTypeString == "System.Collections.Generic.IList<>"
                       || genericTypeString == "System.Collections.Generic.IDictionary<,>"
+                      || genericTypeString == "System.Collections.Generic.Dictionary<,>"
                       || genericTypeString == "ZeroFormatter.ILazyDictionary<,>"
                       || genericTypeString == "System.Collections.Generic.IReadOnlyList<>"
                       || genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>"
                       || genericTypeString == "ZeroFormatter.ILazyReadOnlyDictionary<,>"
                       || genericTypeString == "System.Linq.ILookup<,>"
                       || genericTypeString == "ZeroFormatter.ILazyLookup<,>"
+                      || genericTypeString.StartsWith("System.Collections.Generic.KeyValuePair")
                       || genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
                 {
                     var elementTypes = string.Join(", ", type.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
@@ -169,7 +171,7 @@ namespace ZeroFormatter.CodeGenerator
                     {
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.ReadOnlyList, ElementTypes = elementTypes });
                     }
-                    else if (genericTypeString == "System.Collections.Generic.IDictionary<,>")
+                    else if (genericTypeString == "System.Collections.Generic.IDictionary<,>" || genericTypeString == "System.Collections.Generic.Dictionary<,>")
                     {
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Dictionary, ElementTypes = elementTypes });
                     }
@@ -197,6 +199,17 @@ namespace ZeroFormatter.CodeGenerator
                     {
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.KeyTuple, ElementTypes = elementTypes });
                     }
+
+                    foreach (var t in type.TypeArguments)
+                    {
+                        CollectObjectSegment(t as INamedTypeSymbol);
+                    }
+                    return;
+                }
+                else if (type.AllInterfaces.Any(x => (x.IsGenericType ? x.ConstructUnboundGenericType().ToDisplayString() : "") == "System.Collections.Generic.ICollection<>"))
+                {
+                    var elementTypes = string.Join(", ", type.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))) + ", " + type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                    genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Collection, ElementTypes = elementTypes });
 
                     foreach (var t in type.TypeArguments)
                     {
@@ -329,10 +342,22 @@ namespace ZeroFormatter.CodeGenerator
                 if (memberType.TypeKind == TypeKind.Array)
                 {
                     var array = memberType as IArrayTypeSymbol;
-                    var t = array.ElementType;
-                    if (t.SpecialType != SpecialType.System_Byte) // allows byte[]
+                    while (array != null)
                     {
-                        throw new Exception($"Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[]. {type.Name}.{property.Name}.  Location:{type.Locations[0]}");
+                        var t = array.ElementType;
+                        if (!KnownFormatterSpec.AllowArrayType(t))
+                        {
+                            genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Array, ElementTypes = t.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) });
+                        }
+
+                        var namedType = memberType as INamedTypeSymbol;
+                        if (namedType != null) // if <T> is unnamed type, it can't analyze.
+                        {
+                            // Recursive
+                            CollectObjectSegment(namedType);
+                            break;
+                        }
+                        array = t as IArrayTypeSymbol;
                     }
                 }
                 else
@@ -355,7 +380,7 @@ namespace ZeroFormatter.CodeGenerator
                     IsSetProtected = (propSymbol != null) ? propSymbol.SetMethod.DeclaredAccessibility == Accessibility.Protected : false,
                     FixedSize = length ?? 0,
                     IsProperty = propSymbol != null,
-                    IsCacheSegment = KnownFormatterSpec.CanAcceptCacheSegment(memberType),
+                    IsCacheSegment = !KnownFormatterSpec.IsLazySegment(memberType),
                     IsFixedSize = (length != null)
                 };
 

@@ -26,6 +26,7 @@ namespace ZeroFormatter.Tests
             UnitTest.RegisterAllMethods<BlockSerializeTest>();
             UnitTest.RegisterAllMethods<StructTest>();
             UnitTest.RegisterAllMethods<VersioningTest>();
+            UnitTest.RegisterAllMethods<SequenceTest>();
 
             UnitTest.RegisterAllMethods<PerformanceTest>();
         }

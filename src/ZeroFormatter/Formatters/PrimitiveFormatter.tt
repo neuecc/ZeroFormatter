@@ -40,6 +40,14 @@ namespace ZeroFormatter.Formatters
 
     internal class <#= t.Name #>Formatter : Formatter<<#= t.Name #>>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return <#= tuple.Item2 #>;
@@ -59,6 +67,14 @@ namespace ZeroFormatter.Formatters
 
     internal class Nullable<#= t.Name #>Formatter : Formatter<<#= t.Name #>?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return <#= tuple.Item2 + 1 #>;

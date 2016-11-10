@@ -1,0 +1,99 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+#if !UNITY
+
+using System;
+using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
+
+namespace ZeroFormatter.Formatters
+{
+    // Layout: [hasValue:1][T1, T2...]
+
+<# for(var i = 1; i <= 8; i++) { 
+    Func<int, string> toT = x => "T" + ((x == 8) ? "Rest" : x.ToString());
+    Func<int, string> toItem = x => ((x == 8) ? "Rest" : "Item" + x);
+    var ts = string.Join(", ", Enumerable.Range(1, i).Select(x => toT(x))); 
+    var t = "Tuple<" + ts + ">"; 
+#>
+
+
+    [Preserve(AllMembers = true)]
+    internal class TupleFormatter<<#= ts #>> : Formatter<<#= t #>>
+    {
+<# for(var j = 1; j <= i; j++) { #>
+        readonly Formatter<<#= toT(j) #>> formatter<#= j #>;
+<# } #>        
+
+        [Preserve]
+        public TupleFormatter()
+        {
+<# for(var j = 1; j <= i; j++) { #>
+            this.formatter<#= j #> = Formatter<<#= toT(j) #>>.Default;
+<# } #>   
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter1.NoUseDirtyTracker
+<# for(var j = 2; j <= i; j++) { #>
+                    && formatter<#= j #>.NoUseDirtyTracker
+<# } #>        
+                ;
+            }
+        }
+
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, <#= t #> value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value != null);
+            if (value != null)
+            {
+                var startOffset = offset;
+                offset += 1;
+<# for(var j = 1; j <= i; j++) { #>
+                offset += this.formatter<#= j #>.Serialize(ref bytes, offset, value.<#= toItem(j) #>);
+<# } #>
+                return offset - startOffset;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
+        public override <#= t #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 1;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
+            
+            offset += 1;
+            int size;
+
+<# for(var j = 1; j <= i; j++) { #>
+            var item<#= j #> = this.formatter<#= j #>.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+<# } #>
+
+            return new Tuple<<#= ts #>>(<#= string.Join(", ", Enumerable.Range(1, i).Select(x => "item" + x)) #>);
+        }
+    }
+
+<# } #>
+
+}
+
+#endif

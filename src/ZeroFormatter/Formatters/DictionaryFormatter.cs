@@ -8,7 +8,7 @@ namespace ZeroFormatter.Formatters
     // ImmediateDictionary
     // [int count][(Key:Value)...], count == -1 is null
     [Preserve(AllMembers = true)]
-    public class DictionaryFormatter<TKey, TValue> : Formatter<IDictionary<TKey, TValue>>
+    internal class DictionaryFormatter<TKey, TValue> : Formatter<IDictionary<TKey, TValue>>
     {
         readonly Formatter<TKey> keyFormatter;
         readonly Formatter<TValue> valueFormatter;
@@ -61,7 +61,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class LazyDictionaryFormatter<TKey, TValue> : Formatter<ILazyDictionary<TKey, TValue>>
+    internal class LazyDictionaryFormatter<TKey, TValue> : Formatter<ILazyDictionary<TKey, TValue>>
     {
         [Preserve]
         public LazyDictionaryFormatter()
@@ -104,7 +104,7 @@ namespace ZeroFormatter.Formatters
 #if !UNITY
 
     [Preserve(AllMembers = true)]
-    public class ReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<IReadOnlyDictionary<TKey, TValue>>
+    internal class ReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<IReadOnlyDictionary<TKey, TValue>>
     {
         readonly Formatter<TKey> keyFormatter;
         readonly Formatter<TValue> valueFormatter;
@@ -157,7 +157,7 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    public class LazyReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<ILazyReadOnlyDictionary<TKey, TValue>>
+    internal class LazyReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<ILazyReadOnlyDictionary<TKey, TValue>>
     {
         [Preserve]
         public LazyReadOnlyDictionaryFormatter()
@@ -200,7 +200,7 @@ namespace ZeroFormatter.Formatters
 #endif
 
     [Preserve(AllMembers = true)]
-    public class DictionaryEntryFormatter<TKey, TValue> : Formatter<DictionaryEntry<TKey, TValue>>
+    internal class DictionaryEntryFormatter<TKey, TValue> : Formatter<DictionaryEntry<TKey, TValue>>
     {
         [Preserve]
         public DictionaryEntryFormatter()

@@ -9,6 +9,14 @@ namespace ZeroFormatter.Formatters
     {
         static readonly Encoding encoding = StringEncoding.UTF8;
 
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return null;

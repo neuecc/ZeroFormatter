@@ -42,6 +42,16 @@ namespace ZeroFormatter.CodeGenerator
             return AllowTypesAndSize.ContainsKey(str);
         }
 
+        public static bool AllowArrayType(ITypeSymbol elementType)
+        {
+            var str = elementType.ToDisplayString();
+            return AllowTypesAndSize.ContainsKey(str)
+                && str != "decimal"
+                && str != "System.TimeSpan"
+                && str != "System.DateTime"
+                && str != "System.DateTimeOffset";
+        }
+
         public static int? GetLength(ITypeSymbol symbol)
         {
             if (symbol == null) return null;
@@ -79,42 +89,44 @@ namespace ZeroFormatter.CodeGenerator
                     }
                     sum += size.Value;
                 }
+                if (sum == 0)
+                {
+                    return null;
+                }
                 return sum;
             }
 
             return null;
         }
 
-        public static bool CanAcceptCacheSegment(ITypeSymbol symbol)
+        public static bool IsLazySegment(ITypeSymbol symbol)
         {
-            var str = symbol.ToDisplayString();
+            // ObjectSegment
+            if (!symbol.IsValueType && symbol.GetAttributes().FindAttributeShortName("ZeroFormattableAttribute") != null)
+            {
+                return true;
+            }
 
-            if (str == "string")
+            var named = symbol as INamedTypeSymbol;
+
+            if (named != null && named.IsGenericType)
             {
-                return true;
-            }
-            else if (str == "byte[]")
-            {
-                return true;
-            }
-            else if (symbol.AllInterfaces.Any(x => x.ToDisplayString() == "IKeyTuple"))
-            {
-                return true;
-            }
-            else if ((symbol as INamedTypeSymbol)?.IsNullable() ?? false)
-            {
-                return CanAcceptCacheSegment((symbol as INamedTypeSymbol).TypeArguments[0]);
-            }
-            else if (symbol.IsValueType)
-            {
-                return true;
-            }
-            else if ((symbol as INamedTypeSymbol)?.IsGenericType ?? false)
-            {
-                var genericTypeString = (symbol as INamedTypeSymbol).ConstructUnboundGenericType().ToDisplayString();
-                if (genericTypeString == "System.Collections.Generic.IDictionary<,>"
-                    || genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>"
-                    || genericTypeString == "System.Linq.ILookup<,>")
+                var genType = named.ConstructUnboundGenericType().ToDisplayString();
+                // ListSegment
+
+                if (genType == "System.Collections.Generic.IList<>")
+                {
+                    return true;
+                }
+                else if (genType == "ZeroFormatter.ILazyLookup<,>")
+                {
+                    return true;
+                }
+                else if (genType == "ZeroFormatter.ILazyDictionary<,>")
+                {
+                    return true;
+                }
+                else if (genType == "ZeroFormatter.ILazyReadOnlyDictionary<,>")
                 {
                     return true;
                 }

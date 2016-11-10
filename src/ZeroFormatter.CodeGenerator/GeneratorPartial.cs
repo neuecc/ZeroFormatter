@@ -124,6 +124,8 @@ namespace ZeroFormatter.CodeGenerator
         LazyDictionary,
         LazyReadOnlyDictionary,
         Lookup,
-        LazyLookup
+        LazyLookup,
+        Array,
+        Collection
     }
 }

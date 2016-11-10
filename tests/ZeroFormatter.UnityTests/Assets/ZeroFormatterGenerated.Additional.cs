@@ -30,6 +30,10 @@
             Formatter.RegisterLookup<int, int>();
             Formatter.RegisterLazyLookup<bool, int>();
             Formatter.RegisterLazyLookup<int, int>();
+
+            var structFormatter = new ZeroFormatter.DynamicObjectSegments.UnityEngine.Vector3Formatter();
+            ZeroFormatter.Formatters.Formatter<global::UnityEngine.Vector3>.Register(structFormatter);
+            Formatter.RegisterArray<UnityEngine.Vector3>();
         }
     }
 }

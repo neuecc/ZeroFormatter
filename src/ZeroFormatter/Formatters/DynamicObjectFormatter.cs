@@ -413,7 +413,7 @@ namespace ZeroFormatter.Formatters
 
                 var members = DynamicObjectDescriptor.GetMembers(elementType, false);
                 var length = ValidateAndCalculateLength(elementType, members);
-                var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, elementType, length, members.Select(x => x.Item2).ToArray());
+                var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, elementType, length, members);
                 var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
 
                 return formatter;
@@ -455,13 +455,74 @@ namespace ZeroFormatter.Formatters
             return isNullable ? (int?)null : lengthSum;
         }
 
-        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, int? length, EmittableMemberInfo[] memberInfos)
+        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, int? length, Tuple<int, EmittableMemberInfo>[] memberInfos)
         {
             var typeBuilder = builder.DefineType(
                 DynamicAssemblyHolder.ModuleName + "." + elementType.FullName + "$Formatter",
                 TypeAttributes.Public,
                 typeof(Formatter<>).MakeGenericType(elementType));
 
+            // field
+            var formattersInField = new List<Tuple<int, EmittableMemberInfo, FieldBuilder>>();
+            foreach (var item in memberInfos)
+            {
+                var field = typeBuilder.DefineField("<>" + item.Item2.Name + "Formatter", typeof(Formatter<>).MakeGenericType(item.Item2.MemberType), FieldAttributes.Private | FieldAttributes.InitOnly);
+                formattersInField.Add(Tuple.Create(item.Item1, item.Item2, field));
+            }
+            // .ctor
+            {
+                var method = typeBuilder.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, Type.EmptyTypes);
+
+                var il = method.GetILGenerator();
+
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Call, typeof(Formatter<>).MakeGenericType(elementType).GetTypeInfo().GetConstructor(Type.EmptyTypes));
+
+                foreach (var item in formattersInField)
+                {
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Call, item.Item3.FieldType.GetTypeInfo().GetProperty("Default").GetGetMethod());
+                    il.Emit(OpCodes.Stfld, item.Item3);
+                }
+                il.Emit(OpCodes.Ret);
+            }
+            // public override bool NoUseDirtyTracker
+            {
+                var method = typeBuilder.DefineMethod("get_NoUseDirtyTracker", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    typeof(bool),
+                    Type.EmptyTypes);
+
+                var il = method.GetILGenerator();
+
+                if (formattersInField.Count == 0)
+                {
+                    il.Emit(OpCodes.Ldc_I4_1);
+                    il.Emit(OpCodes.Ret);
+                }
+                else
+                {
+                    var label = il.DefineLabel();
+                    for (int i = 0; i < formattersInField.Count; i++)
+                    {
+                        var field = formattersInField[i];
+                        if (i != 0) il.Emit(OpCodes.Brfalse, label);
+
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, field.Item3);
+                        il.Emit(OpCodes.Callvirt, field.Item3.FieldType.GetTypeInfo().GetProperty("NoUseDirtyTracker").GetGetMethod());
+                    }
+
+                    il.Emit(OpCodes.Ret);
+                    il.MarkLabel(label);
+                    il.Emit(OpCodes.Ldc_I4_0);
+                    il.Emit(OpCodes.Ret);
+                }
+
+                var props = typeBuilder.DefineProperty("NoUseDirtyTracker", PropertyAttributes.None,
+                    typeof(bool),
+                    Type.EmptyTypes);
+                props.SetGetMethod(method);
+            }
             // public override int? GetLength()
             {
                 var method = typeBuilder.DefineMethod("GetLength", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
@@ -506,16 +567,16 @@ namespace ZeroFormatter.Formatters
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Stloc_0);
 
-                foreach (var item in memberInfos)
+                foreach (var item in formattersInField)
                 {
-                    var formatter = typeof(Formatter<>).MakeGenericType(item.MemberType);
                     il.Emit(OpCodes.Ldarg_2);
-                    il.Emit(OpCodes.Call, formatter.GetTypeInfo().GetProperty("Default").GetGetMethod());
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldfld, item.Item3);
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldarg_2);
                     il.Emit(OpCodes.Ldarga_S, (byte)3);
-                    item.EmitLoadValue(il);
-                    il.Emit(OpCodes.Callvirt, formatter.GetTypeInfo().GetMethod("Serialize"));
+                    item.Item2.EmitLoadValue(il);
+                    il.Emit(OpCodes.Callvirt, item.Item3.FieldType.GetTypeInfo().GetMethod("Serialize"));
                     il.Emit(OpCodes.Add);
                     il.Emit(OpCodes.Starg_S, (byte)2);
                 }
@@ -535,27 +596,25 @@ namespace ZeroFormatter.Formatters
                 var il = method.GetILGenerator();
 
                 il.DeclareLocal(typeof(int)); // size
-                foreach (var item in memberInfos)
+                foreach (var item in formattersInField)
                 {
-                    il.DeclareLocal(item.MemberType); // item1, item2...
+                    il.DeclareLocal(item.Item2.MemberType); // item1, item2...
                 }
                 il.DeclareLocal(elementType); // result
 
                 il.Emit(OpCodes.Ldarg_S, (byte)4);
                 il.Emit(OpCodes.Ldc_I4_0);
                 il.Emit(OpCodes.Stind_I4);
-                for (int i = 0; i < memberInfos.Length; i++)
+                foreach (var item in formattersInField)
                 {
-                    var item = memberInfos[i];
-
-                    var formatter = typeof(Formatter<>).MakeGenericType(item.MemberType);
-                    il.Emit(OpCodes.Call, formatter.GetTypeInfo().GetProperty("Default").GetGetMethod());
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldfld, item.Item3);
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldarg_2);
                     il.Emit(OpCodes.Ldarg_3);
                     il.Emit(OpCodes.Ldloca_S, (byte)0);
-                    il.Emit(OpCodes.Callvirt, formatter.GetTypeInfo().GetMethod("Deserialize"));
-                    il.Emit(OpCodes.Stloc, i + 1);
+                    il.Emit(OpCodes.Callvirt, item.Item3.FieldType.GetTypeInfo().GetMethod("Deserialize"));
+                    il.Emit(OpCodes.Stloc, item.Item1 + 1);
                     il.Emit(OpCodes.Ldarg_2);
                     il.Emit(OpCodes.Ldloc_0);
                     il.Emit(OpCodes.Add);
@@ -573,7 +632,7 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldloc, i + 1);
                 }
 
-                var constructor = elementType.GetTypeInfo().GetConstructor(memberInfos.Select(x => x.MemberType).ToArray());
+                var constructor = elementType.GetTypeInfo().GetConstructor(memberInfos.Select(x => x.Item2.MemberType).ToArray());
                 il.Emit(OpCodes.Newobj, constructor);
                 il.Emit(OpCodes.Ret);
             }
@@ -584,6 +643,7 @@ namespace ZeroFormatter.Formatters
 
 #endif
 
+    // public! because used from generated code.
     public class NullableStructFormatter<T> : Formatter<T?>
         where T : struct
     {

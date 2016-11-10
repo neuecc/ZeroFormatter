@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AllNewFormat.cs" />
     <Compile Include="Bar\MyClass.cs" />
     <Compile Include="Foo\MyClass.cs" />
     <Compile Include="GlobalNamespace.cs" />

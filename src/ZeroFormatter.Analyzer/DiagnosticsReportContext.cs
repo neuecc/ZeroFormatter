@@ -17,9 +17,12 @@ namespace ZeroFormatter.Analyzer
 
         public IReadOnlyList<Diagnostic> Diagnostics => diagnostics;
 
+        public IReadOnlyList<string> AdditionalAllowTypes { get; }
+
         public DiagnosticsReportContext(SyntaxNodeAnalysisContext context)
         {
             this.context = context;
+            this.AdditionalAllowTypes = this.context.Options.GetAdditionalAllowTypes();
         }
 
         public void Add(Diagnostic diagnostic)

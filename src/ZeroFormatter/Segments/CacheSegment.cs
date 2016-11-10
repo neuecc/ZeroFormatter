@@ -8,58 +8,6 @@ using System.Collections.Generic;
 
 namespace ZeroFormatter.Segments
 {
-    // for KeyTuple, String, byte[], IDict, ILookup and struct.
-    internal static class CacheSegment
-    {
-        public static bool CanAccept(Type type)
-        {
-            var ti = type.GetTypeInfo();
-
-            if (type == typeof(string))
-            {
-                return true;
-            }
-            else if (type == typeof(byte[]))
-            {
-                return true;
-            }
-            else if (ti.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
-            {
-                return true;
-            }
-            else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                if (ti.GetGenericArguments()[0].GetTypeInfo().GetInterfaces().Any(x => x == typeof(IKeyTuple)))
-                {
-                    return true;
-                }
-            }
-            else if (ti.IsValueType)
-            {
-                return true;
-            }
-            else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
-            {
-                return true;
-            }
-
-#if !UNITY
-            else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
-            {
-                return true;
-            }
-
-#endif
-            else if (ti.IsGenericType && type.GetGenericTypeDefinition() == typeof(ILookup<,>))
-            {
-                return true;
-            }
-
-
-            return false;
-        }
-    }
-
     /// <summary>
     /// Mutable Segment State
     /// </summary>

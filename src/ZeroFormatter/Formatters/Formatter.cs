@@ -175,13 +175,58 @@ namespace ZeroFormatter.Formatters
                 {
                     formatter = new NullableCharFormatter();
                 }
-                else if (t == typeof(byte[]))
-                {
-                    formatter = new ByteArrayFormatter();
-                }
                 else if (t == typeof(IList<int>)) // known generic formatter...
                 {
                     formatter = new ListFormatter<int>();
+                }
+                else if (t.IsArray)
+                {
+                    var elementType = t.GetElementType();
+                    switch (Type.GetTypeCode(elementType))
+                    {
+                        case TypeCode.Boolean:
+                            formatter = new BooleanArrayFormatter();
+                            break;
+                        case TypeCode.Char:
+                            formatter = new CharArrayFormatter();
+                            break;
+                        case TypeCode.SByte:
+                            formatter = new SByteArrayFormatter();
+                            break;
+                        case TypeCode.Byte:
+                            formatter = new ByteArrayFormatter();
+                            break;
+                        case TypeCode.Int16:
+                            formatter = new Int16ArrayFormatter();
+                            break;
+                        case TypeCode.UInt16:
+                            formatter = new UInt16ArrayFormatter();
+                            break;
+                        case TypeCode.Int32:
+                            formatter = new Int32ArrayFormatter();
+                            break;
+                        case TypeCode.UInt32:
+                            formatter = new UInt32ArrayFormatter();
+                            break;
+                        case TypeCode.Int64:
+                            formatter = new Int64ArrayFormatter();
+                            break;
+                        case TypeCode.UInt64:
+                            formatter = new UInt64ArrayFormatter();
+                            break;
+                        case TypeCode.Single:
+                            formatter = new SingleArrayFormatter();
+                            break;
+                        case TypeCode.Double:
+                            formatter = new DoubleArrayFormatter();
+                            break;
+                        default:
+#if !UNITY
+                            var formatterType = typeof(ArrayFormatter<>).MakeGenericType(elementType);
+                            formatter = Activator.CreateInstance(formatterType);
+#endif
+                            break;
+                    }
                 }
 
 #if !UNITY
@@ -334,6 +379,55 @@ namespace ZeroFormatter.Formatters
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
 
+                    else if (ti.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+                    {
+                        var formatterType = typeof(KeyValuePairFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
+                    else if (t.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    {
+                        var formatterType = typeof(SequenceDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
+                    else if (ti.FullName.StartsWith("System.Tuple"))
+                    {
+                        Type tupleFormatterType = null;
+                        switch (ti.GetGenericArguments().Length)
+                        {
+                            case 1:
+                                tupleFormatterType = typeof(TupleFormatter<>);
+                                break;
+                            case 2:
+                                tupleFormatterType = typeof(TupleFormatter<,>);
+                                break;
+                            case 3:
+                                tupleFormatterType = typeof(TupleFormatter<,,>);
+                                break;
+                            case 4:
+                                tupleFormatterType = typeof(TupleFormatter<,,,>);
+                                break;
+                            case 5:
+                                tupleFormatterType = typeof(TupleFormatter<,,,,>);
+                                break;
+                            case 6:
+                                tupleFormatterType = typeof(TupleFormatter<,,,,,>);
+                                break;
+                            case 7:
+                                tupleFormatterType = typeof(TupleFormatter<,,,,,,>);
+                                break;
+                            case 8:
+                                tupleFormatterType = typeof(TupleFormatter<,,,,,,,>);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        var formatterType = tupleFormatterType.MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
                     else if (ti.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
                     {
                         Type tupleFormatterType = null;
@@ -371,9 +465,18 @@ namespace ZeroFormatter.Formatters
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
 
-                    else if (t.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    else if (ti.GetInterfaces().Any(x =>
                     {
-                        throw new InvalidOperationException("Dictionary does not support in ZeroFormatter because Dictionary have to deserialize all objects. You can use IDictionary<TK, TV> instead of Dictionary.");
+                        var iti = x.GetTypeInfo();
+                        if (iti.IsGenericType && iti.GetGenericTypeDefinition() == typeof(ICollection<>))
+                        {
+                            return true;
+                        }
+                        return false;
+                    }))
+                    {
+                        var formatterType = typeof(CollectionFormatter<,>).MakeGenericType(ti.GetGenericArguments()[0], t);
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
 
                     // custom nullable struct
@@ -381,11 +484,6 @@ namespace ZeroFormatter.Formatters
                     {
                         formatter = DynamicStructFormatter.Create<T>();
                     }
-                }
-
-                else if (t.IsArray)
-                {
-                    throw new InvalidOperationException("Array does not support in ZeroFormatter(except byte[]) because Array have to deserialize all objects. You can use IList<T> instead of T[].");
                 }
 
                 else if (ti.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() != null)
@@ -442,6 +540,17 @@ namespace ZeroFormatter.Formatters
         public static void Register(Formatter<T> formatter)
         {
             defaultFormatter = formatter;
+        }
+
+        /// <summary>
+        /// Optimize option, If formatter does not use dirty tracker can set to true.
+        /// </summary>
+        public virtual bool NoUseDirtyTracker
+        {
+            get
+            {
+                return false;
+            }
         }
 
         public abstract int? GetLength();
@@ -519,6 +628,14 @@ namespace ZeroFormatter.Formatters
             {
                 Formatter<IDictionary<TKey, TValue>>.Register(new DictionaryFormatter<TKey, TValue>());
             }
+            if (Formatter<KeyValuePair<TKey, TValue>>.Default is IErrorFormatter)
+            {
+                Formatter<KeyValuePair<TKey, TValue>>.Register(new KeyValuePairFormatter<TKey, TValue>());
+            }
+            if (Formatter<Dictionary<TKey, TValue>>.Default is IErrorFormatter)
+            {
+                Formatter<Dictionary<TKey, TValue>>.Register(new SequenceDictionaryFormatter<TKey, TValue>());
+            }
         }
 
 #if !UNITY
@@ -546,6 +663,23 @@ namespace ZeroFormatter.Formatters
             if (Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default is IErrorFormatter)
             {
                 Formatter<IList<DictionaryEntry<TKey, TValue>>>.Register(new ListFormatter<DictionaryEntry<TKey, TValue>>());
+            }
+        }
+
+        public static void RegisterArray<T>()
+        {
+            if (Formatter<T[]>.Default is IErrorFormatter)
+            {
+                Formatter<T[]>.Register(new ArrayFormatter<T>());
+            }
+        }
+
+        public static void RegisterCollection<TElement, TCollection>()
+            where TCollection : ICollection<TElement>, new()
+        {
+            if (Formatter<TCollection>.Default is IErrorFormatter)
+            {
+                Formatter<TCollection>.Register(new CollectionFormatter<TElement, TCollection>());
             }
         }
 

@@ -83,6 +83,7 @@ Analyzer
 ---
 ![zeroformatteranalyzer](https://cloud.githubusercontent.com/assets/46207/20078766/3ea54f14-a585-11e6-9873-b99cb5d9efe5.gif)
 
+![image](https://cloud.githubusercontent.com/assets/46207/20149311/0e6f73d6-a6f4-11e6-91cb-44c771c267cb.png)
 
 
 Supported Type
@@ -353,14 +354,12 @@ Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlyi
 
 **Variable Length Format**
 
-byte[], String, KeyTuple, KeyTuple? are eager evalution. FixedSizeList and VariableSizeList are lazy evaluation.
+byte[], String are eager evalution. FixedSizeList and VariableSizeList are lazy evaluation.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
 | byte[] | [length:int(4)][byte(length)] | if length = -1, indicates null, byte[] is mutable but can not track mutate(should not mutate). |
 | String | [length:int(4)][utf8Bytes:(length)] | if length = -1, indicates null, the value is UTF8 encoded |
-| KeyTuple | [Item1:T1, Item2:T2,...] | T is generic type, T1 ~ T8, mainly used for Dictionary Key |
-| KeyTuple? | [hasValue:bool(1)][Item1:T1, Item2:T2 ...] | T is T1 ~ T8 |
 | FixedSizeList | [length:int(4)][elements:T...] | represents `IList<T>` where T is fixed length format. if length = -1, indicates null
 | VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | represents `IList<T>` where T is variable length format. if length = -1, indicates null
 
@@ -371,8 +370,8 @@ Object is defined user own type. Class is lazy evaluation which has index header
 | Type | Layout | Note |
 | ---- | ------ | ---- |
 | Class | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | if length = -1, indicates null, indexOffset = 0, indicates blank |
-| Struct | [Index1Item:T1, Index2Item:T2,...] | Index is required begin from 0 and sequential |
-| Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] ||
+| Struct | [Index1Item:T1, Index2Item:T2,...] | Index is required begin from 0 and sequential. This layout includes KeyTuple, KeyValuePair. |
+| Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | This layout includes KeyTuple?, KeyValuePair? and Tuple(C# Tuple is class but serialized in this format)|
 
 **Dictionary Format**
 

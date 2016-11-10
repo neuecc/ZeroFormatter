@@ -1,0 +1,90 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+
+    var types = new[]
+    {
+        Tuple.Create(typeof(Int16), 2),
+        Tuple.Create(typeof(Int32), 4),
+        Tuple.Create(typeof(Int64), 8),
+        Tuple.Create(typeof(UInt16), 2),
+        Tuple.Create(typeof(UInt32), 4),
+        Tuple.Create(typeof(UInt64), 8),
+        Tuple.Create(typeof(Single), 4),
+        Tuple.Create(typeof(Double), 8),
+        Tuple.Create(typeof(bool), 1),
+        Tuple.Create(typeof(byte), 1),
+        Tuple.Create(typeof(sbyte), 1),
+        Tuple.Create(typeof(char), 2),
+    };
+
+#>
+using System;
+using ZeroFormatter.Internal;
+using ZeroFormatter.Segments;
+
+namespace ZeroFormatter.Formatters
+{
+
+<# foreach(var tuple in types) { var t = tuple.Item1; #>
+
+    internal class <#= t.Name #>ArrayFormatter : Formatter<<#= t.Name #>[]>
+    {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, <#= t.Name #>[] value)
+        {
+            if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+
+            var writeSize = value.Length * <#= tuple.Item2 #>;
+            BinaryUtil.EnsureCapacity(ref bytes, offset, writeSize + 4);
+            BinaryUtil.WriteInt32Unsafe(ref bytes, offset, value.Length);
+            Buffer.BlockCopy(value, 0, bytes, offset + 4, writeSize);
+
+            return writeSize + 4;
+        }
+
+        public override <#= t.Name #>[] Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            tracker.Dirty(); // can not track so mark as dirty.
+
+            var length = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (length == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            else
+            {
+                byteSize = length + 4;
+            }
+
+            var result = new <#= t.Name #>[length];
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * <#= tuple.Item2 #>);
+
+            return result;
+        }
+    }
+
+<# } #>
+
+}

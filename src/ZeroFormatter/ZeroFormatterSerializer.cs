@@ -81,8 +81,9 @@ namespace ZeroFormatter
             var formatter = Formatter<T>.Default;
             if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
 
+            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker(0);
             int _;
-            return formatter.Deserialize(ref bytes, 0, new DirtyTracker(0), out _);
+            return formatter.Deserialize(ref bytes, 0, tracker, out _);
         }
 
         public static T Deserialize<T>(byte[] bytes, int offset)
@@ -90,13 +91,16 @@ namespace ZeroFormatter
             var formatter = Formatter<T>.Default;
             if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
 
+            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker(offset);
             int _;
-            return formatter.Deserialize(ref bytes, offset, new DirtyTracker(offset), out _);
+            return formatter.Deserialize(ref bytes, offset, tracker, out _);
         }
 
         public static T Deserialize<T>(Stream stream)
         {
             var ms = stream as MemoryStream;
+            var formatter = Formatter<T>.Default;
+            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker((int)stream.Position);
             if (ms != null)
             {
 #if NET_CORE
@@ -104,25 +108,21 @@ namespace ZeroFormatter
                 if (ms.TryGetBuffer(out b))
                 {
                     var buffer = b.Array;
-                    var formatter = Formatter<T>.Default;
                     int _;
-                    return formatter.Deserialize(ref buffer, b.Offset, new DirtyTracker(0), out _);
+                    return formatter.Deserialize(ref buffer, b.Offset, tracker, out _);
                 }
 #else
                 var buffer = ms.GetBuffer();
-                var formatter = Formatter<T>.Default;
                 int _;
-                return formatter.Deserialize(ref buffer, (int)ms.Position, new DirtyTracker(0), out _);
+                return formatter.Deserialize(ref buffer, (int)ms.Position, tracker, out _);
 #endif
             }
 
             {
                 var buffer = FillFromStream(stream);
                 var array = buffer.Array;
-
-                var formatter = Formatter<T>.Default;
                 int _;
-                return formatter.Deserialize(ref array, buffer.Offset, new DirtyTracker(0), out _);
+                return formatter.Deserialize(ref array, buffer.Offset, tracker, out _);
             }
         }
 

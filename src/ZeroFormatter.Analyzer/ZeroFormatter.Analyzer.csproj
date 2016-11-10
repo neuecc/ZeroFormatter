@@ -41,6 +41,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ConfigurationLoader.cs" />
+    <Compile Include="TinyJson.cs" />
     <Compile Include="ZeroFormatterCodeFixProvider.cs" />
     <Compile Include="ZeroFormatterAnalyzer.cs" />
     <Compile Include="DiagnosticsReportContext.cs" />
@@ -55,6 +57,7 @@
     <None Include="tools\uninstall.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="ZeroFormatterAnalyzer.json" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />

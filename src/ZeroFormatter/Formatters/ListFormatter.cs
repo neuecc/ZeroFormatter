@@ -8,13 +8,14 @@ namespace ZeroFormatter.Formatters
     // Layout: FixedSize -> [count:int][t format...] -> if count = -1 is null
     // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...] -> if byteSize = -1 is null
     [Preserve(AllMembers = true)]
-    public class ListFormatter<T> : Formatter<IList<T>>
+    internal class ListFormatter<T> : Formatter<IList<T>>
     {
+        readonly Formatter<T> formatter;
 
         [Preserve]
         public ListFormatter()
         {
-
+            this.formatter = Formatter<T>.Default;
         }
 
         public override int? GetLength()
@@ -36,7 +37,6 @@ namespace ZeroFormatter.Formatters
                 return segment.Serialize(ref bytes, offset);
             }
 
-            var formatter = Formatter<T>.Default;
             var length = formatter.GetLength();
             if (length != null)
             {
@@ -132,7 +132,6 @@ namespace ZeroFormatter.Formatters
 
         public override IList<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            var formatter = Formatter<T>.Default;
             var length = formatter.GetLength();
             if (length != null)
             {
@@ -148,13 +147,14 @@ namespace ZeroFormatter.Formatters
 #if !UNITY
 
     [Preserve(AllMembers = true)]
-    public class ReadOnlyListFormatter<T> : Formatter<IReadOnlyList<T>>
+    internal class ReadOnlyListFormatter<T> : Formatter<IReadOnlyList<T>>
     {
+        readonly Formatter<T> formatter;
 
         [Preserve]
         public ReadOnlyListFormatter()
         {
-
+            this.formatter = Formatter<T>.Default;
         }
 
         public override int? GetLength()
@@ -176,7 +176,6 @@ namespace ZeroFormatter.Formatters
                 return segment.Serialize(ref bytes, offset);
             }
 
-            var formatter = Formatter<T>.Default;
             var length = formatter.GetLength();
             if (length != null)
             {
@@ -272,7 +271,6 @@ namespace ZeroFormatter.Formatters
 
         public override IReadOnlyList<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            var formatter = Formatter<T>.Default;
             var length = formatter.GetLength();
             if (length != null)
             {

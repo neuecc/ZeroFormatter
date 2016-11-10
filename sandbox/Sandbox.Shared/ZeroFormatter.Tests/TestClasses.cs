@@ -216,6 +216,27 @@ namespace ZeroFormatter.Tests
     }
 
     [ZeroFormattable]
+    public class MyVectorClass
+    {
+        [Index(0)]
+        public virtual float X { get;  set; }
+        [Index(1)]
+        public virtual float Y { get;  set; }
+
+        public MyVectorClass()
+        {
+
+        }
+
+        public MyVectorClass(float x, float y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+
+    }
+
+    [ZeroFormattable]
     public struct MyNonVector
     {
         [Index(0)]

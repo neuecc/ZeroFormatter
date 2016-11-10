@@ -48,6 +48,14 @@ namespace ZeroFormatter.Formatters
             this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<<#= t.Name #>, T>)) as Func<<#= t.Name #>, T>;
         }
 
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return <#= tuple.Item2 #>;
@@ -80,6 +88,14 @@ namespace ZeroFormatter.Formatters
             Func<<#= t.Name #>, <#= t.Name #>> identity = Identity;
             this.serializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<T, <#= t.Name #>>)) as Func<T, <#= t.Name #>>;
             this.deserializeCast = identity.GetMethodInfo().CreateDelegate(typeof(Func<<#= t.Name #>, T>)) as Func<<#= t.Name #>, T>;
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
         }
 
         public override int? GetLength()

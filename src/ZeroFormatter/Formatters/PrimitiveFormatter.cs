@@ -10,6 +10,14 @@ namespace ZeroFormatter.Formatters
 
     internal class Int16Formatter : Formatter<Int16>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 2;
@@ -29,6 +37,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableInt16Formatter : Formatter<Int16?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 3;
@@ -64,6 +80,14 @@ namespace ZeroFormatter.Formatters
 
     internal class Int32Formatter : Formatter<Int32>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 4;
@@ -83,6 +107,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableInt32Formatter : Formatter<Int32?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 5;
@@ -118,6 +150,14 @@ namespace ZeroFormatter.Formatters
 
     internal class Int64Formatter : Formatter<Int64>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 8;
@@ -137,6 +177,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableInt64Formatter : Formatter<Int64?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 9;
@@ -172,6 +220,14 @@ namespace ZeroFormatter.Formatters
 
     internal class UInt16Formatter : Formatter<UInt16>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 2;
@@ -191,6 +247,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableUInt16Formatter : Formatter<UInt16?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 3;
@@ -226,6 +290,14 @@ namespace ZeroFormatter.Formatters
 
     internal class UInt32Formatter : Formatter<UInt32>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 4;
@@ -245,6 +317,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableUInt32Formatter : Formatter<UInt32?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 5;
@@ -280,6 +360,14 @@ namespace ZeroFormatter.Formatters
 
     internal class UInt64Formatter : Formatter<UInt64>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 8;
@@ -299,6 +387,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableUInt64Formatter : Formatter<UInt64?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 9;
@@ -334,6 +430,14 @@ namespace ZeroFormatter.Formatters
 
     internal class SingleFormatter : Formatter<Single>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 4;
@@ -353,6 +457,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableSingleFormatter : Formatter<Single?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 5;
@@ -388,6 +500,14 @@ namespace ZeroFormatter.Formatters
 
     internal class DoubleFormatter : Formatter<Double>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 8;
@@ -407,6 +527,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableDoubleFormatter : Formatter<Double?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 9;
@@ -442,6 +570,14 @@ namespace ZeroFormatter.Formatters
 
     internal class BooleanFormatter : Formatter<Boolean>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 1;
@@ -461,6 +597,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableBooleanFormatter : Formatter<Boolean?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 2;
@@ -496,6 +640,14 @@ namespace ZeroFormatter.Formatters
 
     internal class ByteFormatter : Formatter<Byte>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 1;
@@ -515,6 +667,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableByteFormatter : Formatter<Byte?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 2;
@@ -550,6 +710,14 @@ namespace ZeroFormatter.Formatters
 
     internal class SByteFormatter : Formatter<SByte>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 1;
@@ -569,6 +737,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableSByteFormatter : Formatter<SByte?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 2;
@@ -604,6 +780,14 @@ namespace ZeroFormatter.Formatters
 
     internal class CharFormatter : Formatter<Char>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 2;
@@ -623,6 +807,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableCharFormatter : Formatter<Char?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 3;
@@ -658,6 +850,14 @@ namespace ZeroFormatter.Formatters
 
     internal class DecimalFormatter : Formatter<Decimal>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 16;
@@ -677,6 +877,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableDecimalFormatter : Formatter<Decimal?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 17;
@@ -712,6 +920,14 @@ namespace ZeroFormatter.Formatters
 
     internal class TimeSpanFormatter : Formatter<TimeSpan>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 12;
@@ -731,6 +947,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableTimeSpanFormatter : Formatter<TimeSpan?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 13;
@@ -766,6 +990,14 @@ namespace ZeroFormatter.Formatters
 
     internal class DateTimeFormatter : Formatter<DateTime>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 12;
@@ -785,6 +1017,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableDateTimeFormatter : Formatter<DateTime?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 13;
@@ -820,6 +1060,14 @@ namespace ZeroFormatter.Formatters
 
     internal class DateTimeOffsetFormatter : Formatter<DateTimeOffset>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 12;
@@ -839,6 +1087,14 @@ namespace ZeroFormatter.Formatters
 
     internal class NullableDateTimeOffsetFormatter : Formatter<DateTimeOffset?>
     {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override int? GetLength()
         {
             return 13;
