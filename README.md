@@ -1,6 +1,6 @@
-ZeroFormatter - Fastest C# Serializer and Infinitly Fast Deserializer for .NET, .NET Core and Unity.
+ZeroFormatter
 ===
-Created by Yoshifumi Kawai(neuecc)
+Fastest C# Serializer and Infinitly Fast Deserializer for .NET, .NET Core and Unity.
 
 [![Gitter](https://badges.gitter.im/neuecc/ZeroFormatter.svg)](https://gitter.im/neuecc/ZeroFormatter?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
