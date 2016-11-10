@@ -74,13 +74,10 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            var arrayarray = new[] { new[] { 1, 10, 100 }, new[] { 1000, 1000, 10000 } };
+            var l = new List<int> { 1, 100, 10000 };
 
 
-            var aaa = ZeroFormatterSerializer.Serialize(arrayarray);
-            //var huga = ZeroFormatterSerializer.Convert(arrayarray);
-
-            var hugahuga = ZeroFormatterSerializer.Deserialize<int[][]>(aaa);
+            ZeroFormatterSerializer.Convert(l);
         }
     }
 

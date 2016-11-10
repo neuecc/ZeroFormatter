@@ -7,13 +7,6 @@ namespace ZeroFormatter.DotNetCore.Tests
     public class ListFormatterTest
     {
         [Fact]
-        public void ArrayCannotSerialize()
-        {
-            var xs = new[] { 12, 431, 426, 76, 373, 7, 53, 563, 563 };
-            AssertEx.Catch<Exception>(() => ZeroFormatterSerializer.Serialize(xs)).Message.Contains("Array does not support");
-        }
-
-        [Fact]
         public void FixedList()
         {
             {

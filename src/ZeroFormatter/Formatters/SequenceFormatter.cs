@@ -47,7 +47,6 @@ namespace ZeroFormatter.Formatters
             var startOffset = offset;
             offset += BinaryUtil.WriteInt32(ref bytes, offset, value.Length);
 
-            // Optimize iteration
             for (int i = 0; i < value.Length; i++)
             {
                 offset += formatter.Serialize(ref bytes, offset, value[i]);
@@ -88,10 +87,14 @@ namespace ZeroFormatter.Formatters
         where TCollection : ICollection<TElement>, new()
     {
         readonly Formatter<TElement> formatter;
+        readonly int? formatterLength;
+        readonly bool isList;
 
         public CollectionFormatter()
         {
             this.formatter = Formatter<TElement>.Default;
+            this.formatterLength = formatter.GetLength();
+            this.isList = typeof(TCollection).GetGenericTypeDefinition() == typeof(List<>);
         }
 
         public override bool NoUseDirtyTracker
@@ -113,6 +116,12 @@ namespace ZeroFormatter.Formatters
             {
                 BinaryUtil.WriteInt32(ref bytes, offset, -1);
                 return 4;
+            }
+
+            if (formatterLength != null)
+            {
+                // make fixed size.
+                BinaryUtil.EnsureCapacity(ref bytes, offset, 4 + formatterLength.Value * value.Count);
             }
 
             var startOffset = offset;
@@ -163,7 +172,17 @@ namespace ZeroFormatter.Formatters
             var startOffset = offset;
             offset += 4;
             int size;
-            var result = new TCollection();
+
+            TCollection result;
+            if (isList)
+            {
+                // optmize fixed length.
+                result = (TCollection)(object)new List<TElement>(length);
+            }
+            else
+            {
+                result = new TCollection();
+            }
             for (int i = 0; i < length; i++)
             {
                 result.Add(formatter.Deserialize(ref bytes, offset, tracker, out size));
