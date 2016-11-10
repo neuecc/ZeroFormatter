@@ -186,9 +186,9 @@ Result run on iPhone 6s Plus and IL2CPP build.
 
 ![](https://cloud.githubusercontent.com/assets/46207/20076797/281f7b78-a57d-11e6-8fbd-e83cc6b72025.png)
 
-ZeroFormatter is faster than JsonUtility so yes, faster than native serializer!
+ZeroFormatter is faster than JsonUtility so yes, faster than native serializer! Why MsgPack-Cli is slow? MsgPack-Cli's Unity implemntation has a lot of hack of avoid AOT issues, it causes performance impact(especially struct, all codes pass boxing). ZeroFormatter codes is full tuned for Unity with/without IL2CPP.
 
-**Single Integer(1), Vector3 Struct(float, float, float), Vector3[100], Large String(represents HTML)**
+**Single Integer(1), Large String(represents HTML), Vector3 Struct(float, float, float), Vector3[100]**
 
 ![image](https://cloud.githubusercontent.com/assets/46207/20140302/c0f18dcc-a6cd-11e6-9bf2-17d11ce552e7.png)
 ![image](https://cloud.githubusercontent.com/assets/46207/20140306/c6b1b0fc-a6cd-11e6-9193-303179d23764.png)
