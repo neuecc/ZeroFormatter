@@ -42,8 +42,8 @@ namespace ZeroFormatter.Tests
         PersonLike p2;
         PersonLikeVector l2;
 
-        Vector3 v3;
-        Vector3[] v3Array;
+        //Vector3 v3;
+        //Vector3[] v3Array;
 
         byte[] zeroFormatterSingleBytes;
         byte[] zeroFormatterArrayBytes;
@@ -52,12 +52,12 @@ namespace ZeroFormatter.Tests
         byte[] jsonSingleBytes;
         byte[] jsonArrayBytes;
 
-        byte[] zeroFormatterv3Bytes;
-        byte[] zeroFormatterv3ArrayBytes;
-        byte[] msgpackv3Bytes;
-        byte[] msgpackv3ArrayBytes;
-        byte[] jsonv3Bytes;
-        byte[] jsonv3ArrayBytes;
+        //byte[] zeroFormatterv3Bytes;
+        //byte[] zeroFormatterv3ArrayBytes;
+        //byte[] msgpackv3Bytes;
+        //byte[] msgpackv3ArrayBytes;
+        //byte[] jsonv3Bytes;
+        //byte[] jsonv3ArrayBytes;
 
         SerializationContext msgPackContext;
 
@@ -103,20 +103,20 @@ namespace ZeroFormatter.Tests
 
             // vector?
 
-            MsgPack.Serialization.MessagePackSerializer.PrepareType<Vector3>();
-            MsgPack.Serialization.MessagePackSerializer.PrepareType<Vector3[]>();
+            //MsgPack.Serialization.MessagePackSerializer.PrepareType<Vector3>();
+            //MsgPack.Serialization.MessagePackSerializer.PrepareType<Vector3[]>();
 
-            v3 = new Vector3 { x = 12345.12345f, y = 3994.35226f, z = 325125.52426f };
-            v3Array = Enumerable.Range(1, 100).Select(_ => new Vector3 { x = 12345.12345f, y = 3994.35226f, z = 325125.52426f }).ToArray();
-            zeroFormatterv3Bytes = ZeroFormatterSerializer.Serialize(v3);
-            zeroFormatterv3ArrayBytes = ZeroFormatterSerializer.Serialize(v3Array);
-            var serializer3 = this.msgPackContext.GetSerializer<Vector3>();
-            msgpackv3Bytes = serializer3.PackSingleObject(v3);
-            var serializer4 = this.msgPackContext.GetSerializer<Vector3[]>();
-            msgpackv3ArrayBytes = serializer4.PackSingleObject(v3Array);
+            //v3 = new Vector3 { x = 12345.12345f, y = 3994.35226f, z = 325125.52426f };
+            //v3Array = Enumerable.Range(1, 100).Select(_ => new Vector3 { x = 12345.12345f, y = 3994.35226f, z = 325125.52426f }).ToArray();
+            //zeroFormatterv3Bytes = ZeroFormatterSerializer.Serialize(v3);
+            //zeroFormatterv3ArrayBytes = ZeroFormatterSerializer.Serialize(v3Array);
+            //var serializer3 = this.msgPackContext.GetSerializer<Vector3>();
+            //msgpackv3Bytes = serializer3.PackSingleObject(v3);
+            //var serializer4 = this.msgPackContext.GetSerializer<Vector3[]>();
+            //msgpackv3ArrayBytes = serializer4.PackSingleObject(v3Array);
 
-            jsonv3Bytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(v3));
-            jsonv3ArrayBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(v3Array));
+            //jsonv3Bytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(v3));
+            //jsonv3ArrayBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(v3Array));
         }
 
         private void SerializationContext_ResolveSerializer(object sender, ResolveSerializerEventArgs e)
@@ -232,108 +232,108 @@ namespace ZeroFormatter.Tests
 
         // more...
 
-        public void ZeroFormatterSerializeVector3()
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                ZeroFormatterSerializer.Serialize(v3);
-            }
-        }
+        //public void ZeroFormatterSerializeVector3()
+        //{
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        ZeroFormatterSerializer.Serialize(v3);
+        //    }
+        //}
 
-        public void ZeroFormatterSerializeVector3Array()
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                ZeroFormatterSerializer.Serialize(v3Array);
-            }
-        }
+        //public void ZeroFormatterSerializeVector3Array()
+        //{
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        ZeroFormatterSerializer.Serialize(v3Array);
+        //    }
+        //}
 
-        public void ZeroFormatterDeserializeVector3()
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                ZeroFormatterSerializer.Deserialize<Vector3>(zeroFormatterv3Bytes);
-            }
-        }
+        //public void ZeroFormatterDeserializeVector3()
+        //{
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        ZeroFormatterSerializer.Deserialize<Vector3>(zeroFormatterv3Bytes);
+        //    }
+        //}
 
-        public void ZeroFormatterDeserializeVector3Array()
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                ZeroFormatterSerializer.Deserialize<Vector3[]>(zeroFormatterv3ArrayBytes);
-            }
-        }
+        //public void ZeroFormatterDeserializeVector3Array()
+        //{
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        ZeroFormatterSerializer.Deserialize<Vector3[]>(zeroFormatterv3ArrayBytes);
+        //    }
+        //}
 
-        public void MsgPackSerializeVector3()
-        {
-            var serializer = this.msgPackContext.GetSerializer<Vector3>();
-            for (int i = 0; i < Iteration; i++)
-            {
-                serializer.PackSingleObject(v3);
-            }
-        }
+        //public void MsgPackSerializeVector3()
+        //{
+        //    var serializer = this.msgPackContext.GetSerializer<Vector3>();
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        serializer.PackSingleObject(v3);
+        //    }
+        //}
 
-        public void MsgPackSerializeVector3Array()
-        {
-            var serializer = this.msgPackContext.GetSerializer<Vector3[]>();
-            for (int i = 0; i < Iteration; i++)
-            {
-                serializer.PackSingleObject(v3Array);
-            }
-        }
+        //public void MsgPackSerializeVector3Array()
+        //{
+        //    var serializer = this.msgPackContext.GetSerializer<Vector3[]>();
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        serializer.PackSingleObject(v3Array);
+        //    }
+        //}
 
-        public void MsgPackDeserializeVector3()
-        {
-            var serializer = this.msgPackContext.GetSerializer<Vector3>();
-            for (int i = 0; i < Iteration; i++)
-            {
-                serializer.UnpackSingleObject(msgpackv3Bytes);
-            }
-        }
+        //public void MsgPackDeserializeVector3()
+        //{
+        //    var serializer = this.msgPackContext.GetSerializer<Vector3>();
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        serializer.UnpackSingleObject(msgpackv3Bytes);
+        //    }
+        //}
 
-        public void MsgPackDeserializeVector3Array()
-        {
-            var serializer = this.msgPackContext.GetSerializer<Vector3[]>();
-            for (int i = 0; i < Iteration; i++)
-            {
-                serializer.UnpackSingleObject(msgpackv3ArrayBytes);
-            }
-        }
+        //public void MsgPackDeserializeVector3Array()
+        //{
+        //    var serializer = this.msgPackContext.GetSerializer<Vector3[]>();
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        serializer.UnpackSingleObject(msgpackv3ArrayBytes);
+        //    }
+        //}
 
-        public void JsonUtilitySerializeVector3()
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                var str = JsonUtility.ToJson(v3);
-                Encoding.UTF8.GetBytes(str); // testing with binary...
-            }
-        }
+        //public void JsonUtilitySerializeVector3()
+        //{
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        var str = JsonUtility.ToJson(v3);
+        //        Encoding.UTF8.GetBytes(str); // testing with binary...
+        //    }
+        //}
 
-        public void JsonUtilitySerializeVector3Array()
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                var str = JsonUtility.ToJson(v3Array);
-                Encoding.UTF8.GetBytes(str); // testing with binary...
-            }
-        }
+        //public void JsonUtilitySerializeVector3Array()
+        //{
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        var str = JsonUtility.ToJson(v3Array);
+        //        Encoding.UTF8.GetBytes(str); // testing with binary...
+        //    }
+        //}
 
-        public void JsonUtilityDeserializeVector3()
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                var str = Encoding.UTF8.GetString(jsonv3Bytes);
-                JsonUtility.FromJson<Vector3>(str);
-            }
-        }
+        //public void JsonUtilityDeserializeVector3()
+        //{
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        var str = Encoding.UTF8.GetString(jsonv3Bytes);
+        //        JsonUtility.FromJson<Vector3>(str);
+        //    }
+        //}
 
-        public void JsonUtilityDeserializeVector3Array()
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                var str = Encoding.UTF8.GetString(jsonv3ArrayBytes);
-                JsonUtility.FromJson<Vector3[]>(str);
-            }
-        }
+        //public void JsonUtilityDeserializeVector3Array()
+        //{
+        //    for (int i = 0; i < Iteration; i++)
+        //    {
+        //        var str = Encoding.UTF8.GetString(jsonv3ArrayBytes);
+        //        JsonUtility.FromJson<Vector3[]>(str);
+        //    }
+        //}
     }
 }

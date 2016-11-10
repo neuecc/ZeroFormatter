@@ -49,7 +49,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 2 + 4;
             }
 
             var result = new Int16[length];
@@ -103,7 +103,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 4 + 4;
             }
 
             var result = new Int32[length];
@@ -157,7 +157,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 8 + 4;
             }
 
             var result = new Int64[length];
@@ -211,7 +211,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 2 + 4;
             }
 
             var result = new UInt16[length];
@@ -265,7 +265,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 4 + 4;
             }
 
             var result = new UInt32[length];
@@ -319,7 +319,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 8 + 4;
             }
 
             var result = new UInt64[length];
@@ -373,7 +373,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 4 + 4;
             }
 
             var result = new Single[length];
@@ -427,7 +427,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 8 + 4;
             }
 
             var result = new Double[length];
@@ -481,7 +481,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 1 + 4;
             }
 
             var result = new Boolean[length];
@@ -535,7 +535,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 1 + 4;
             }
 
             var result = new Byte[length];
@@ -589,7 +589,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 1 + 4;
             }
 
             var result = new SByte[length];
@@ -643,7 +643,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * 2 + 4;
             }
 
             var result = new Char[length];

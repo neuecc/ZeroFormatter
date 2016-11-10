@@ -74,36 +74,13 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
-            ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
+            var arrayarray = new[] { new[] { 1, 10, 100 }, new[] { 1000, 1000, 10000 } };
 
 
-            ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
-            {
-                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
-                {
-                    var formatterType = typeof(KeyValuePairFormatter<,>).MakeGenericType(t.GetGenericArguments());
-                    return Activator.CreateInstance(formatterType);
-                }
+            var aaa = ZeroFormatterSerializer.Serialize(arrayarray);
+            //var huga = ZeroFormatterSerializer.Convert(arrayarray);
 
-                return null;
-            });
-
-
-            var my = new MyGuid()
-            {
-                MyProperty = Guid.NewGuid(),
-                MyProperty2 = new Uri("http://hogehoge.com/hugahuga/takotako"),
-                MyProperty3 = new KeyValuePair<string, int>("hugahugahugahuga", 10000)
-            };
-            var huga = ZeroFormatterSerializer.Convert(my);
-
-            Console.WriteLine(my.MyProperty);
-            Console.WriteLine(huga.MyProperty);
-            Console.WriteLine(huga.MyProperty3);
-            Console.WriteLine(my.MyProperty2);
-            Console.WriteLine(huga.MyProperty2);
-            Console.WriteLine(huga.MyProperty3);
+            var hugahuga = ZeroFormatterSerializer.Deserialize<int[][]>(aaa);
         }
     }
 

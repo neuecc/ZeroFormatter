@@ -75,7 +75,7 @@ namespace ZeroFormatter.Formatters
             }
             else
             {
-                byteSize = length + 4;
+                byteSize = length * <#= tuple.Item2 #> + 4;
             }
 
             var result = new <#= t.Name #>[length];
