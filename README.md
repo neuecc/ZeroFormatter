@@ -111,6 +111,97 @@ Versioning
 TODO...
 
 
+Union
+---
+ZeroFormatter supports Union type. It can define abstract class and `UnionAttributes`, `UnionKeyAttribute`.
+
+```csharp
+public enum CharacterType
+{
+    Human, Monster
+}
+
+// UnionAttribute abstract type becomes Union, arguments is union subtypes.
+// It needs single UnionKey to discriminate
+[Union(typeof(Human), typeof(Monster))]
+public abstract class Character
+{
+    [UnionKey]
+    public abstract CharacterType Type { get; }
+}
+
+[ZeroFormattable]
+public class Human : Character
+{
+    // UnionKey property must mark [IgnoreFormat]
+    // UnionKey value must return constant value(Type is free, you can use int, string, enum, etc...)
+    [IgnoreFormat]
+    public override CharacterType Type
+    {
+        get
+        {
+            return CharacterType.Human;
+        }
+    }
+
+    [Index(0)]
+    public virtual string Name { get; set; }
+
+    [Index(1)]
+    public virtual int Age { get; set; }
+
+    [Index(2)]
+    public virtual int Faith { get; set; }
+}
+
+[ZeroFormattable]
+public class Monster : Character
+{
+    [IgnoreFormat]
+    public override CharacterType Type
+    {
+        get
+        {
+            return CharacterType.Monster;
+        }
+    }
+
+    [Index(0)]
+    public virtual string Race { get; set; }
+
+    [Index(1)]
+    public virtual int Power { get; set; }
+
+    [Index(2)]
+    public virtual int Magic { get; set; }
+}
+```
+
+You can use Union as following.
+
+```csharp
+var demon = new Monster { Race = "Demon", Power = 9999, Magic = 1000 };
+
+// use UnionType(Character) formatter(be carefule, does not use concrete type)
+var data = ZeroFormatterSerializer.Serialize<Character>(demon);
+
+var union = ZeroFormatterSerializer.Deserialize<Character>(data);
+
+// you can discriminate by UnionKey.
+switch (union.Type)
+{
+    case CharacterType.Monster:
+        var demon2 = (Monster)union;
+        demon2.Race.Is("Demon");
+        demon2.Power.Is(9999);
+        demon2.Magic.Is(1000);
+        break;
+    default:
+        Assert.Fail("invalid");
+        break;
+}
+```
+
 for Unity
 ---
 ZeroFormatter.Unity works on all platforms(PC, Android, iOS, etc...). But it can 'not' use dynamic serializer generation due to IL2CPP issue. But pre code generate helps it. Code Generator is located in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc.exe`. zfc is using [Roslyn](https://github.com/dotnet/roslyn) so analyze source code, pass the target `csproj`. 
@@ -385,6 +476,14 @@ Object is defined user own type. Class is lazy evaluation which has index header
 | Class | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | if length = -1, indicates null, indexOffset = 0, indicates blank |
 | Struct | [Index1Item:T1, Index2Item:T2,...] | Index is required begin from 0 and sequential. This layout includes KeyTuple, KeyValuePair. |
 | Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | This layout includes KeyTuple?, KeyValuePair? and Tuple(C# Tuple is class but serialized in this format)|
+
+**Union Format**
+
+Union is eager evaluation, discriminated by key type to each value type.
+
+| Type | Layout | Note |
+| ---- | ------ | ---- |
+| Union | [hasValue:bool(1)][unionKey:TKey][value:TValue] ||
 
 **Dictionary Format**
 
