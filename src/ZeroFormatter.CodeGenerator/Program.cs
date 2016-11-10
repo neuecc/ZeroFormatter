@@ -93,7 +93,8 @@ namespace ZeroFormatter.CodeGenerator
             EnumGenerator[] enumGen;
             GenericType[] genericTypes;
             StructGenerator[] structGen;
-            tc.Visit(out enumGen, out objectGen, out structGen, out genericTypes);
+            UnionGenerator[] unionGen;
+            tc.Visit(out enumGen, out objectGen, out structGen, out unionGen, out genericTypes);
 
             Console.WriteLine("Type Collect Complete:" + sw.Elapsed.ToString());
             Console.WriteLine();
@@ -103,13 +104,17 @@ namespace ZeroFormatter.CodeGenerator
                 Console.WriteLine("String Generation Start");
                 sw.Restart();
                 var sb = new StringBuilder();
-                sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse }.TransformText());
+                sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen }.TransformText());
 
                 foreach (var item in objectGen)
                 {
                     sb.AppendLine(item.TransformText());
                 }
                 foreach (var item in structGen)
+                {
+                    sb.AppendLine(item.TransformText());
+                }
+                foreach (var item in unionGen)
                 {
                     sb.AppendLine(item.TransformText());
                 }
@@ -128,7 +133,7 @@ namespace ZeroFormatter.CodeGenerator
                 sw.Restart();
 
                 var initializerPath = Path.Combine(outputpath, "ZeroFormatterInitializer.cs");
-                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse }.TransformText());
+                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen }.TransformText());
 
                 foreach (var item in objectGen.SelectMany(x => x.Types))
                 {
@@ -141,6 +146,13 @@ namespace ZeroFormatter.CodeGenerator
                 {
                     var path = Path.Combine(outputpath, item.FullName.Replace(".", "\\") + ".cs");
                     var gen = new StructGenerator { Namespace = item.Namespace, Types = new[] { item } };
+                    Output(path, gen.TransformText());
+                }
+
+                foreach (var item in unionGen.SelectMany(x => x.Types))
+                {
+                    var path = Path.Combine(outputpath, item.FullName.Replace(".", "\\") + ".cs");
+                    var gen = new UnionGenerator { Namespace = item.Namespace, Types = new[] { item } };
                     Output(path, gen.TransformText());
                 }
 

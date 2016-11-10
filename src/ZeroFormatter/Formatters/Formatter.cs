@@ -486,6 +486,11 @@ namespace ZeroFormatter.Formatters
                     }
                 }
 
+                else if (ti.GetCustomAttributes(typeof(UnionAttribute), false).FirstOrDefault() != null)
+                {
+                    formatter = DynamicUnionFormatter.Create<T>();
+                }
+
                 else if (ti.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() != null)
                 {
                     if (ti.IsValueType)
@@ -533,6 +538,7 @@ namespace ZeroFormatter.Formatters
             Default = (Formatter<T>)formatter;
         }
 
+        [Preserve]
         public Formatter()
         {
         }

@@ -68,6 +68,10 @@
       <Project>{82049AFE-0913-4FA4-B924-AD5354952154}</Project>
       <Name>ZeroFormatter</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sandbox.Shared\Sandbox.Shared.csproj">
+      <Project>{944F22D3-20B1-4F6D-83FA-9331CD4ADF75}</Project>
+      <Name>Sandbox.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

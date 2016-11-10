@@ -27,6 +27,9 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Sex>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.SexFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Sex?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableSexFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Sex>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.SexEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.CharacterType>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CharacterTypeFormatter());
+            ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.CharacterType?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableCharacterTypeFormatter());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.CharacterType>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CharacterTypeEqualityComparer());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Bar.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMogeFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Bar.MogeMoge?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.NullableMogeMogeFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMogeEqualityComparer());
@@ -73,6 +76,8 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.InheritBase>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InheritBaseFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Inherit>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InheritFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.FooBarBaz>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.FooBarBazFormatter());
+            ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Human>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.HumanFormatter());
+            ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Monster>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.MonsterFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Standard>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.StandardFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Large>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.LargeFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Bar.MyClass>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MyClassFormatter());
@@ -127,6 +132,11 @@ namespace ZeroFormatter.Internal
                 var structFormatter = new ZeroFormatter.DynamicObjectSegments.UnityEngine.Vector3Formatter();
                 ZeroFormatter.Formatters.Formatter<global::UnityEngine.Vector3>.Register(structFormatter);
                 ZeroFormatter.Formatters.Formatter<global::UnityEngine.Vector3?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<global::UnityEngine.Vector3>(structFormatter));
+            }
+            // Unions
+            {
+                var unionFormatter = new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CharacterFormatter();
+                ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Character>.Register(unionFormatter);
             }
             // Generics
             ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<int, string>();
@@ -1166,6 +1176,282 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 offset += ObjectSegmentHelper.SerializeSegment<global::System.Collections.Generic.IList<byte[]>>(ref targetBytes, startOffset, offset, 0, _HugaHuga);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class HumanFormatter : Formatter<global::Sandbox.Shared.Human>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.Human value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (2 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 0, value.Name);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 1, value.Age);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 2, value.Faith);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 2);
+            }
+        }
+
+        public override global::Sandbox.Shared.Human Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new HumanObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class HumanObjectSegment : global::Sandbox.Shared.Human, IZeroFormatterSegment
+    {
+        static readonly int[] __elementSizes = new int[]{ 0, 4, 4 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+        readonly CacheSegment<string> _Name;
+
+        // 0
+        public override string Name
+        {
+            get
+            {
+                return _Name.Value;
+            }
+            set
+            {
+                _Name.Value = value;
+            }
+        }
+
+        // 1
+        public override int Age
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 1, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 1, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+            }
+        }
+
+        // 2
+        public override int Faith
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 2, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 2, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+            }
+        }
+
+
+        public HumanObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 2, __elementSizes);
+
+            _Name = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 0, __binaryLastIndex, __tracker));
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (2 + 1));
+
+                offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 0, _Name);
+                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 1, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 2, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 2);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class MonsterFormatter : Formatter<global::Sandbox.Shared.Monster>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.Monster value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (2 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 0, value.Race);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 1, value.Power);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 2, value.Magic);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 2);
+            }
+        }
+
+        public override global::Sandbox.Shared.Monster Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new MonsterObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class MonsterObjectSegment : global::Sandbox.Shared.Monster, IZeroFormatterSegment
+    {
+        static readonly int[] __elementSizes = new int[]{ 0, 4, 4 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+        readonly CacheSegment<string> _Race;
+
+        // 0
+        public override string Race
+        {
+            get
+            {
+                return _Race.Value;
+            }
+            set
+            {
+                _Race.Value = value;
+            }
+        }
+
+        // 1
+        public override int Power
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 1, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 1, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+            }
+        }
+
+        // 2
+        public override int Magic
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 2, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 2, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+            }
+        }
+
+
+        public MonsterObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 2, __elementSizes);
+
+            _Race = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 0, __binaryLastIndex, __tracker));
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (2 + 1));
+
+                offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 0, _Race);
+                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 1, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 2, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 2);
             }
             else
             {
@@ -5136,6 +5422,105 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 168
+namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
+{
+    using global::System;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
+
+    public class CharacterFormatter : Formatter<global::Sandbox.Shared.Character>
+    {
+        readonly global::System.Collections.Generic.EqualityComparer<global::Sandbox.Shared.CharacterType> comparer;
+        readonly global::Sandbox.Shared.CharacterType[] unionKeys;
+        
+        public CharacterFormatter()
+        {
+            comparer = global::System.Collections.Generic.EqualityComparer<global::Sandbox.Shared.CharacterType>.Default;
+            unionKeys = new global::Sandbox.Shared.CharacterType[2];
+            unionKeys[0] = new global::Sandbox.Shared.Human().Type;
+            unionKeys[1] = new global::Sandbox.Shared.Monster().Type;
+            
+        }
+
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.Character value)
+        {
+            if (value == null)
+            {
+                return BinaryUtil.WriteBoolean(ref bytes, offset, false);
+            }
+
+            var startOffset = offset;
+
+            offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
+            offset += Formatter<global::Sandbox.Shared.CharacterType>.Default.Serialize(ref bytes, offset, value.Type);
+
+            if (value is global::Sandbox.Shared.Human)
+            {
+                offset += Formatter<global::Sandbox.Shared.Human>.Default.Serialize(ref bytes, offset, (global::Sandbox.Shared.Human)value);
+            }
+            else if (value is global::Sandbox.Shared.Monster)
+            {
+                offset += Formatter<global::Sandbox.Shared.Monster>.Default.Serialize(ref bytes, offset, (global::Sandbox.Shared.Monster)value);
+            }
+            
+            else
+            {
+                throw new Exception("Unknown subtype of Union:" + value.GetType().FullName);
+            }
+        
+            return offset - startOffset;
+        }
+
+        public override global::Sandbox.Shared.Character Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 1;
+            if (!BinaryUtil.ReadBoolean(ref bytes, offset))
+            {
+                return null;
+            }
+        
+            offset += 1;
+            int size;
+            var unionKey = Formatter<global::Sandbox.Shared.CharacterType>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            byteSize += size;
+            offset += size;
+
+            global::Sandbox.Shared.Character result;
+            if (comparer.Equals(unionKey, unionKeys[0]))
+            {
+                result = Formatter<global::Sandbox.Shared.Human>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            }
+            else if (comparer.Equals(unionKey, unionKeys[1]))
+            {
+                result = Formatter<global::Sandbox.Shared.Monster>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            }
+            else
+            {
+                throw new Exception("Unknown unionKey type of Union: " + unionKey.ToString());
+            }
+
+            byteSize += size;
+            return result;
+        }
+    }
+
+
+}
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
 namespace ZeroFormatter.DynamicObjectSegments
 {
     using global::System;
@@ -5354,6 +5739,71 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         public int GetHashCode(global::Sandbox.Shared.Sex x)
         {
              return (int)(SByte)x ^ (int)(SByte)x << 8; 
+        }
+    }
+
+
+    public class CharacterTypeFormatter : Formatter<global::Sandbox.Shared.CharacterType>
+    {
+        public override int? GetLength()
+        {
+            return 4;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.CharacterType value)
+        {
+            return BinaryUtil.WriteInt32(ref bytes, offset, (Int32)value);
+        }
+
+        public override global::Sandbox.Shared.CharacterType Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 4;
+            return (global::Sandbox.Shared.CharacterType)BinaryUtil.ReadInt32(ref bytes, offset);
+        }
+    }
+
+    public class NullableCharacterTypeFormatter : Formatter<global::Sandbox.Shared.CharacterType?>
+    {
+        public override int? GetLength()
+        {
+            return 5;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.CharacterType? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset + 1, (Int32)value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
+            }
+
+            return 5;
+        }
+
+        public override global::Sandbox.Shared.CharacterType? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 5;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
+
+            return (global::Sandbox.Shared.CharacterType)BinaryUtil.ReadInt32(ref bytes, offset + 1);
+        }
+    }
+
+    public class CharacterTypeEqualityComparer : IEqualityComparer<global::Sandbox.Shared.CharacterType>
+    {
+        public bool Equals(global::Sandbox.Shared.CharacterType x, global::Sandbox.Shared.CharacterType y)
+        {
+            return (Int32)x == (Int32)y;
+        }
+
+        public int GetHashCode(global::Sandbox.Shared.CharacterType x)
+        {
+            return (int)x;
         }
     }
 

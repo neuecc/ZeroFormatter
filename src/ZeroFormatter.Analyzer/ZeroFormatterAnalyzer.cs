@@ -20,6 +20,8 @@ namespace ZeroFormatter.Analyzer
         internal const string ZeroFormattableAttributeShortName = "ZeroFormattableAttribute";
         internal const string IndexAttributeShortName = "IndexAttribute";
         internal const string IgnoreShortName = "IgnoreFormatAttribute";
+        internal const string UnionAttributeShortName = "UnionAttribute";
+        internal const string UnionKeyAttributeShortName = "UnionKeyAttribute";
 
         internal static readonly DiagnosticDescriptor TypeMustBeZeroFormattable = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(TypeMustBeZeroFormattable), title: Title, category: Category,
@@ -81,6 +83,24 @@ namespace ZeroFormatter.Analyzer
             description: "Struct needs full parameter constructor of index property types.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
+        internal static readonly DiagnosticDescriptor UnionTypeRequiresUnionKey = new DiagnosticDescriptor(
+            id: DiagnosticIdBase + "_" + nameof(UnionTypeRequiresUnionKey), title: Title, category: Category,
+            messageFormat: "Union class requires abstract [UnionKey]property. Type: {0}", //  type.Name
+            description: "Union class requires abstract [UnionKey]property.",
+            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+
+        internal static readonly DiagnosticDescriptor UnionKeyDoesNotAllowMultipleKey = new DiagnosticDescriptor(
+            id: DiagnosticIdBase + "_" + nameof(UnionKeyDoesNotAllowMultipleKey), title: Title, category: Category,
+            messageFormat: "[UnionKey]property does not allow multiple key. Type: {0}", //  type.Name
+            description: "[UnionKey]property does not allow multiple key.",
+            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+
+        internal static readonly DiagnosticDescriptor AllUnionSubTypesMustBeInheritedType = new DiagnosticDescriptor(
+            id: DiagnosticIdBase + "_" + nameof(UnionKeyDoesNotAllowMultipleKey), title: Title, category: Category,
+            messageFormat: "All Union subTypes must be inherited type. Type: {0}, SubType: {1}", //  type.Name subType.Name
+            description: "All Union subTypes must be inherited type.",
+            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+
         static readonly ImmutableArray<DiagnosticDescriptor> supportedDiagnostics = ImmutableArray.Create(
             TypeMustBeZeroFormattable,
             PublicPropertyNeedsIndex,
@@ -91,7 +111,10 @@ namespace ZeroFormatter.Analyzer
             IndexIsTooLarge,
             TypeMustNeedsParameterlessConstructor,
             StructIndexMustBeStartedWithZeroAndSequential,
-            StructMustNeedsSameConstructorWithIndexes
+            StructMustNeedsSameConstructorWithIndexes,
+            UnionTypeRequiresUnionKey,
+            UnionKeyDoesNotAllowMultipleKey,
+            AllUnionSubTypesMustBeInheritedType
             );
 
         static readonly HashSet<string> AllowTypes = new HashSet<string>
@@ -138,16 +161,23 @@ namespace ZeroFormatter.Analyzer
             var declaredSymbol = model.GetDeclaredSymbol(typeDeclaration);
             if (declaredSymbol == null) return;
 
-            // Analysing Target is only [ZeroFormattable] class, allows ShortName
-            if (declaredSymbol.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) == null)
+            var isUnion = declaredSymbol.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null;
+            var isZeroFormatter = declaredSymbol.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null;
+
+            if (!isUnion && !isZeroFormatter)
             {
                 return;
             }
 
             var reportContext = new DiagnosticsReportContext(context);
-
-            // Start RootType
-            VerifyType(reportContext, typeDeclaration.GetLocation(), declaredSymbol, new HashSet<ITypeSymbol>(), null);
+            if (isUnion)
+            {
+                VerifyUnion(reportContext, typeDeclaration.GetLocation(), declaredSymbol);
+            }
+            else
+            {
+                VerifyType(reportContext, typeDeclaration.GetLocation(), declaredSymbol, new HashSet<ITypeSymbol>(), null);
+            }
 
             reportContext.ReportAll();
         }
@@ -320,8 +350,15 @@ namespace ZeroFormatter.Analyzer
 
             if (!property.IsVirtual && !property.ContainingType.IsValueType)
             {
-                context.Add(Diagnostic.Create(PublicPropertyMustBeVirtual, property.Locations[0], property.ContainingType?.Name, property.Name));
-                return;
+                if (property.IsOverride && !property.IsSealed)
+                {
+                    // ok, base type's override property.
+                }
+                else
+                {
+                    context.Add(Diagnostic.Create(PublicPropertyMustBeVirtual, property.Locations[0], property.ContainingType?.Name, property.Name));
+                    return;
+                }
             }
 
             var indexAttr = attributes.FindAttributeShortName(IndexAttributeShortName);
@@ -413,6 +450,44 @@ namespace ZeroFormatter.Analyzer
             if (namedType != null) // if <T> is unnamed type, it can't analyze.
             {
                 VerifyType(context, field.Locations[0], field.Type, alreadyAnalyzed, field);
+            }
+        }
+
+        static void VerifyUnion(DiagnosticsReportContext context, Location callerLocation, ITypeSymbol type)
+        {
+            var unionKeys = type.GetMembers().OfType<IPropertySymbol>().Where(x => x.GetAttributes().FindAttributeShortName(UnionKeyAttributeShortName) != null).ToArray();
+            if (unionKeys.Length == 0)
+            {
+                context.Add(Diagnostic.Create(UnionTypeRequiresUnionKey, callerLocation, type.Locations, type.Name));
+                return;
+            }
+            else if (unionKeys.Length != 1)
+            {
+                context.Add(Diagnostic.Create(UnionKeyDoesNotAllowMultipleKey, callerLocation, type.Locations, type.Name));
+                return;
+            }
+
+            var unionKeyProperty = unionKeys[0];
+            if (!unionKeyProperty.GetMethod.IsAbstract)
+            {
+                context.Add(Diagnostic.Create(UnionTypeRequiresUnionKey, callerLocation, type.Locations, type.Name));
+                return;
+            }
+
+            var constructorArguments = type.GetAttributes().FindAttributeShortName(UnionAttributeShortName)?.ConstructorArguments.FirstOrDefault();
+
+            if (constructorArguments == null) return;
+
+
+            foreach (var item in constructorArguments.Value.Values.Select(x => x.Value).OfType<ITypeSymbol>())
+            {
+                var found = item.FindBaseTargetType(type.ToDisplayString());
+
+                if (found == null)
+                {
+                    context.Add(Diagnostic.Create(AllUnionSubTypesMustBeInheritedType, callerLocation, type.Locations, type.Name, item.Name));
+                    return;
+                }
             }
         }
     }

@@ -1,0 +1,35 @@
+﻿namespace Data;
+
+file_identifier "MYFI";
+
+union Data
+{
+    MonsterDataV1,
+    MonsterDataV2
+}
+
+table Root
+{
+    data:Data;
+}
+
+table MonsterDataV1
+{
+    name:string;
+    hp:uint;
+    hitRate:float;
+    speed:uint;
+    luck:uint;
+}
+
+table MonsterDataV2
+{
+    name:string;
+    hp:uint;
+    hitRate:float;
+    speed:uint;
+    luck:uint;
+    defence:uint;
+}
+
+root_type Root;

@@ -188,6 +188,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KnownFormatterSpec.cs" />
     <Compile Include="RoslynExtensions.cs" />
+    <Compile Include="UnionGenerator.cs">
+      <DependentUpon>UnionGenerator.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="StructGenerator.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -211,6 +216,10 @@
     <Content Include="ObjectGenerator.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ObjectGenerator.cs</LastGenOutput>
+    </Content>
+    <Content Include="UnionGenerator.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>UnionGenerator.cs</LastGenOutput>
     </Content>
     <Content Include="StructGenerator.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>

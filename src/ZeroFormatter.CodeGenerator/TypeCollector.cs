@@ -15,6 +15,8 @@ namespace ZeroFormatter.CodeGenerator
         public const string ZeroFormattableAttributeShortName = "ZeroFormattableAttribute";
         public const string IndexAttributeShortName = "IndexAttribute";
         public const string IgnoreAttributeShortName = "IgnoreFormatAttribute";
+        internal const string UnionAttributeShortName = "UnionAttribute";
+        internal const string UnionKeyAttributeShortName = "UnionKeyAttribute";
 
         static readonly SymbolDisplayFormat binaryWriteFormat = new SymbolDisplayFormat(
                 genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
@@ -26,6 +28,7 @@ namespace ZeroFormatter.CodeGenerator
         List<ObjectSegmentType> structContainer;
         List<ObjectSegmentType> objectContainer;
         List<GenericType> genericTypeContainer;
+        List<UnionType> unionTypeContainer;
         HashSet<string> alreadyCollected;
 
         HashSet<string> allowCustomTypes;
@@ -38,6 +41,7 @@ namespace ZeroFormatter.CodeGenerator
             var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, CodegeneratorOnlyPreprocessorSymbol).GetAwaiter().GetResult();
             targetTypes = compilation.GetNamedTypeSymbols()
                 .Where(x => (x.TypeKind == TypeKind.Enum)
+                    || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
                     || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null)
                     || ((x.TypeKind == TypeKind.Struct) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null)
                     )
@@ -50,10 +54,11 @@ namespace ZeroFormatter.CodeGenerator
             objectContainer = new List<CodeGenerator.ObjectSegmentType>();
             structContainer = new List<CodeGenerator.ObjectSegmentType>();
             genericTypeContainer = new List<CodeGenerator.GenericType>();
+            unionTypeContainer = new List<CodeGenerator.UnionType>();
             alreadyCollected = new HashSet<string>();
         }
 
-        public void Visit(out EnumGenerator[] enumGenerators, out ObjectGenerator[] objectGenerators, out StructGenerator[] structGenerators, out GenericType[] genericTypes)
+        public void Visit(out EnumGenerator[] enumGenerators, out ObjectGenerator[] objectGenerators, out StructGenerator[] structGenerators, out UnionGenerator[] unionGenerators, out GenericType[] genericTypes)
         {
             Init(); // cleanup field.
 
@@ -63,7 +68,14 @@ namespace ZeroFormatter.CodeGenerator
             }
             foreach (var item in targetTypes[TypeKind.Class])
             {
-                CollectObjectSegment(item);
+                if (item.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
+                {
+                    CollectUnion(item);
+                }
+                else
+                {
+                    CollectObjectSegment(item);
+                }
             }
             foreach (var item in targetTypes[TypeKind.Struct])
             {
@@ -89,6 +101,15 @@ namespace ZeroFormatter.CodeGenerator
                })
                .ToArray();
 
+            unionGenerators = unionTypeContainer
+               .GroupBy(x => x.Namespace)
+               .Select(x => new UnionGenerator
+               {
+                   Namespace = "ZeroFormatter.DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
+                   Types = x.ToArray(),
+               })
+               .ToArray();
+
             structGenerators = structContainer
                .GroupBy(x => x.Namespace)
                .Select(x => new StructGenerator
@@ -97,6 +118,8 @@ namespace ZeroFormatter.CodeGenerator
                    Types = x.ToArray(),
                })
                .ToArray();
+
+
 
             genericTypes = genericTypeContainer.Distinct().OrderBy(x => x).ToArray();
         }
@@ -276,8 +299,11 @@ namespace ZeroFormatter.CodeGenerator
 
             var definedIndexes = new HashSet<int>();
 
+            var distinctName = new HashSet<string>();
             foreach (var property in type.GetAllMembers())
             {
+                if (!distinctName.Add(property.Name)) continue;
+
                 var propSymbol = property as IPropertySymbol;
                 var fieldSymbol = property as IFieldSymbol;
 
@@ -301,7 +327,14 @@ namespace ZeroFormatter.CodeGenerator
                 {
                     if (!property.IsVirtual)
                     {
-                        throw new Exception($"Public property's accessor must be virtual. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
+                        if (property.IsOverride && !property.IsSealed)
+                        {
+                            // okay, it is override property.
+                        }
+                        else
+                        {
+                            throw new Exception($"Public property's accessor must be virtual. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
+                        }
                     }
                 }
 
@@ -404,6 +437,51 @@ namespace ZeroFormatter.CodeGenerator
             {
                 objectContainer.Add(segment);
             }
+        }
+
+        void CollectUnion(INamedTypeSymbol type)
+        {
+            var unionKeys = type.GetMembers().OfType<IPropertySymbol>().Where(x => x.GetAttributes().FindAttributeShortName(UnionKeyAttributeShortName) != null).ToArray();
+            if (unionKeys.Length == 0)
+            {
+                throw new Exception($"Union class requires abstract [UnionKey]property. Type: {type.Name}. Location:{type.Locations[0]}");
+            }
+            else if (unionKeys.Length != 1)
+            {
+                throw new Exception($"[UnionKey]property does not allow multiple key. Type: {type.Name}. Location:{type.Locations[0]}");
+            }
+
+            var unionKeyProperty = unionKeys[0];
+            if (!unionKeyProperty.GetMethod.IsAbstract)
+            {
+                throw new Exception($"Union class requires abstract [UnionKey]property. Type: {type.Name}. Location:{type.Locations[0]}");
+            }
+
+            var constructorArguments = type.GetAttributes().FindAttributeShortName(UnionAttributeShortName)?.ConstructorArguments.FirstOrDefault();
+
+            if (constructorArguments == null) return;
+
+            var subTypList = new List<string>();
+            foreach (var item in constructorArguments.Value.Values.Select(x => x.Value).OfType<ITypeSymbol>())
+            {
+                var found = item.FindBaseTargetType(type.ToDisplayString());
+
+                if (found == null)
+                {
+                    throw new Exception($"All Union subTypes must be inherited type. Type: {type.Name}, SubType: {item.Name}. Location:{type.Locations[0]}");
+                }
+                subTypList.Add(item.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+            }
+
+            unionTypeContainer.Add(new UnionType
+            {
+                Name = type.Name,
+                FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                Namespace = type.ContainingNamespace.IsGlobalNamespace ? null : type.ContainingNamespace.ToDisplayString(),
+                UnionKeyTypeName = unionKeyProperty.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                UnionKeyPropertyName = unionKeyProperty.Name,
+                SubTypeNames = subTypList.ToArray(),
+            });
         }
 
         static int GetEnumSize(INamedTypeSymbol enumUnderlyingType)

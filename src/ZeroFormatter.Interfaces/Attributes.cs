@@ -2,8 +2,6 @@
 
 namespace ZeroFormatter
 {
-    // We need to use Analyazer so can't use DataContractAttribute.
-
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
     public class ZeroFormattableAttribute : Attribute
     {
@@ -23,6 +21,23 @@ namespace ZeroFormatter
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public class IgnoreFormatAttribute : Attribute
     {
+    }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class UnionAttribute : Attribute
+    {
+        public Type[] SubTypes { get; private set; }
+
+        public UnionAttribute(params Type[] subTypes)
+        {
+            this.SubTypes = subTypes;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    public class UnionKeyAttribute : Attribute
+    {
+
     }
 
     public sealed class PreserveAttribute : Attribute

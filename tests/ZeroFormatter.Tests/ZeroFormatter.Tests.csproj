@@ -88,6 +88,7 @@
     <Compile Include="LookupSegmentTest.cs" />
     <Compile Include="NullCheckTest.cs" />
     <Compile Include="StructTest.cs" />
+    <Compile Include="UnionTest.cs" />
     <Compile Include="VersiongTest.cs" />
   </ItemGroup>
   <ItemGroup>

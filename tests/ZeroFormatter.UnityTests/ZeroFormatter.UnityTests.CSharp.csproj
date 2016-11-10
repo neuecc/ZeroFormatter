@@ -92,6 +92,7 @@
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\UnitTestRunner.cs" />
     <Compile Include="Assets\Scripts\Tests\PerformanceTest.cs" />
     <Compile Include="Assets\Scripts\Tests\SequenceTest.cs" />
+    <Compile Include="Assets\Scripts\Tests\UnionTest.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Shim.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Tuple.cs" />
     <Compile Include="Assets\Scripts\Tests\BinatyUtilTest.cs" />

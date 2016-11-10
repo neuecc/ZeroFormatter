@@ -55,6 +55,7 @@
     <Compile Include="PseudoVector.cs" />
     <Compile Include="Inherit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnionType.cs" />
     <Compile Include="Versioning.cs" />
     <Compile Include="ZeroFormatter.Tests\TestClasses.cs" />
   </ItemGroup>

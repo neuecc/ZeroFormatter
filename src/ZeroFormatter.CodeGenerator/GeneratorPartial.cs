@@ -31,6 +31,22 @@ namespace ZeroFormatter.CodeGenerator
         }
     }
 
+    public partial class UnionGenerator
+    {
+        public string Namespace { get; set; }
+        public UnionType[] Types { get; set; }
+    }
+
+    public class UnionType
+    {
+        public string Name { get; set; }
+        public string FullName { get; set; }
+        public string Namespace { get; set; }
+        public string UnionKeyTypeName { get; set; }
+        public string UnionKeyPropertyName { get; set; }
+        public string[] SubTypeNames { get; set; }
+    }
+
     public partial class ObjectGenerator
     {
         public string Namespace { get; set; }
@@ -89,6 +105,7 @@ namespace ZeroFormatter.CodeGenerator
         public ObjectGenerator[] Objects { get; set; }
         public StructGenerator[] Structs { get; set; }
         public EnumGenerator[] Enums { get; set; }
+        public UnionGenerator[] Unions { get; set; }
         public GenericType[] GenericTypes { get; set; }
         public bool UnuseUnityAttribute { get; set; }
     }

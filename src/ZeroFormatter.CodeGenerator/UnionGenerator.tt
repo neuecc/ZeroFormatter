@@ -1,0 +1,101 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+namespace <#= Namespace #>
+{
+    using global::System;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
+
+<# foreach(var t in Types) {  #>
+    public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
+    {
+        readonly global::System.Collections.Generic.EqualityComparer<<#= t.UnionKeyTypeName #>> comparer;
+        readonly <#= t.UnionKeyTypeName #>[] unionKeys;
+        
+        public <#= t.Name #>Formatter()
+        {
+            comparer = global::System.Collections.Generic.EqualityComparer<<#= t.UnionKeyTypeName #>>.Default;
+            unionKeys = new <#= t.UnionKeyTypeName #>[<#= t.SubTypeNames.Length #>];
+<# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
+            unionKeys[<#= i #>] = new <#= subType #>().<#= t.UnionKeyPropertyName #>;
+<# } #>            
+        }
+
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, <#= t.FullName #> value)
+        {
+            if (value == null)
+            {
+                return BinaryUtil.WriteBoolean(ref bytes, offset, false);
+            }
+
+            var startOffset = offset;
+
+            offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
+            offset += Formatter<<#= t.UnionKeyTypeName #>>.Default.Serialize(ref bytes, offset, value.Type);
+
+<# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
+            <#= i != 0 ? "else if" : "if" #> (value is <#= subType  #>)
+            {
+                offset += Formatter<<#= subType  #>>.Default.Serialize(ref bytes, offset, (<#= subType #>)value);
+            }
+<# } #>            
+            else
+            {
+                throw new Exception("Unknown subtype of Union:" + value.GetType().FullName);
+            }
+        
+            return offset - startOffset;
+        }
+
+        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 1;
+            if (!BinaryUtil.ReadBoolean(ref bytes, offset))
+            {
+                return null;
+            }
+        
+            offset += 1;
+            int size;
+            var unionKey = Formatter<<#= t.UnionKeyTypeName #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            byteSize += size;
+            offset += size;
+
+            <#= t.FullName #> result;
+<# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
+            <#= i != 0 ? "else if" : "if" #> (comparer.Equals(unionKey, unionKeys[<#= i #>]))
+            {
+                result = Formatter<<#= subType  #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            }
+<# } #>
+            else
+            {
+                throw new Exception("Unknown unionKey type of Union: " + unionKey.ToString());
+            }
+
+            byteSize += size;
+            return result;
+        }
+    }
+
+<# } #>
+
+}
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612

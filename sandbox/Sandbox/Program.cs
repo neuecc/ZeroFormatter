@@ -10,6 +10,7 @@ using System.IO;
 using ZeroFormatter.Segments;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
+using Sandbox.Shared;
 
 [ZeroFormattable]
 public class MyClass
@@ -74,10 +75,13 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            var l = new List<int> { 1, 100, 10000 };
 
+            var demon = new Monster { Race = "Demon", Power = 9999, Magic = 1000 };
+            var human = new Human { Name = "Tokugawa", Age = 32, Faith = 9999 };
 
-            ZeroFormatterSerializer.Convert(l);
+            //var data = ZeroFormatterSerializer.Serialize<Character>(demon);
+            ZeroFormatterSerializer.Serialize<Character>(demon);
+
         }
     }
 
@@ -173,5 +177,7 @@ namespace Sandbox
         [Index(0)]
         public int MyProperty1;
     }
-}
 
+
+
+}

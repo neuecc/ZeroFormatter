@@ -91,7 +91,9 @@
     <Compile Include="FlatBuffers\ByteBuffer.cs" />
     <Compile Include="FlatBuffers\FlatBufferBuilder.cs" />
     <Compile Include="FlatBuffers\FlatBufferConstants.cs" />
+    <Compile Include="FlatBuffers\FlatBuffersObject\MonsterData.cs" />
     <Compile Include="Protobuf3\Person.cs" />
+    <None Include="FlatBuffers\MonsterData.fbs" />
     <None Include="FlatBuffers\Person.fbs" />
     <Compile Include="FlatBuffers\FlatBuffersObject\Person.cs" />
     <Compile Include="FlatBuffers\FlatBuffersObject\PersonVector.cs" />

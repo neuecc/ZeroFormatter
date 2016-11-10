@@ -42,6 +42,13 @@ namespace ZeroFormatter.Internal
                 ZeroFormatter.Formatters.Formatter<<#= t.FullName #>?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<<#= t.FullName #>>(structFormatter));
             }
 <# } } #>
+            // Unions
+<# foreach(var g in Unions) { foreach(var t in g.Types) {   #>
+            {
+                var unionFormatter = new <#= g.Namespace + "." + t.Name #>Formatter();
+                ZeroFormatter.Formatters.Formatter<<#= t.FullName #>>.Register(unionFormatter);
+            }
+<# } } #>
             // Generics
 <# foreach(var g in GenericTypes) { #>
 <# if (g.TypeKind == GenericTypeKind.KeyTuple) { #>
