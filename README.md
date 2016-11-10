@@ -31,10 +31,8 @@ Visual Studio Analyzer
 
 Quick Start
 ---
-Define class and mark as `[ZeroFormattable]`.
+Define class and mark as `[ZeroFormattable]` and public properties mark `[Index]` and declare `virtual`.
 
-Sample
----
 ```csharp
 [ZeroFormattable]
 public class MyClass
@@ -99,11 +97,11 @@ Object Define Rules
 TODO...
 
 
-Serialize Dictionary/Lookup
+Eager/Lazy Evaluation
 ---
 TODO:...
-
-
+(Sequence)
+(Serialize Dictionary/Lookup)
 
 Versioning
 ---
@@ -199,6 +197,9 @@ Architecture
 TODO...
 
 ![](https://cloud.githubusercontent.com/assets/46207/20078613/9f9ddfda-a584-11e6-9d7c-b98f8a6ac70e.png)
+
+ZeroFormatterSerializer
+---
 
 Extensibility
 ---
@@ -367,7 +368,7 @@ Sequence is eager evaluation. If declared concrete types of collection, used thi
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| `Sequence<T>` | [length:int(4)][elements:T...] | represents `T[]`, `List<T>` or all of `ICollection<T>` types. if length = -1, indicates null, byte[] is mutable but can not track mutate(should not mutate). |
+| `Sequence<T>` | [length:int(4)][elements:T...] | represents `T[]`, `List<T>` or all of `ICollection<T>` types. if length = -1, indicates null |
 
 **Object Format**
 
