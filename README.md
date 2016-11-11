@@ -428,7 +428,7 @@ ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
         return Activator.CreateInstance(formatter);
     }
 
-    return null;
+    return null; // fallback to the next resolver
 });
 ```
 
