@@ -17,12 +17,12 @@ namespace <#= Namespace #>
 <# foreach(var t in Types) {  #>
     public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
     {
-        readonly global::System.Collections.Generic.EqualityComparer<<#= t.UnionKeyTypeName #>> comparer;
+        readonly global::System.Collections.Generic.IEqualityComparer<<#= t.UnionKeyTypeName #>> comparer;
         readonly <#= t.UnionKeyTypeName #>[] unionKeys;
         
         public <#= t.Name #>Formatter()
         {
-            comparer = global::System.Collections.Generic.EqualityComparer<<#= t.UnionKeyTypeName #>>.Default;
+            comparer = global::ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<<#= t.UnionKeyTypeName #>>.Default;
             unionKeys = new <#= t.UnionKeyTypeName #>[<#= t.SubTypeNames.Length #>];
 <# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
             unionKeys[<#= i #>] = new <#= subType #>().<#= t.UnionKeyPropertyName #>;

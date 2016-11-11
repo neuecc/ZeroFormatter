@@ -59,7 +59,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(">\r\n    {\r\n        readonly global::System.Collections.Generic.EqualityComparer<");
+            this.Write(">\r\n    {\r\n        readonly global::System.Collections.Generic.IEqualityComparer<");
             
             #line 20 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyTypeName));
@@ -80,8 +80,8 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write("Formatter()\r\n        {\r\n            comparer = global::System.Collections.Generic" +
-                    ".EqualityComparer<");
+            this.Write("Formatter()\r\n        {\r\n            comparer = global::ZeroFormatter.Comparers.Ze" +
+                    "roFormatterEqualityComparer<");
             
             #line 25 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyTypeName));

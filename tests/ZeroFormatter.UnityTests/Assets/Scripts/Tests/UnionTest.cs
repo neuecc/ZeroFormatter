@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Segments;
+using UnityEngine;
 
 namespace ZeroFormatter.Tests
 {
@@ -32,7 +33,7 @@ namespace ZeroFormatter.Tests
                         break;
                 }
             }
-
+            
             {
                 var human = new Human { Name = "Tokugawa", Age = 32, Faith = 9999 };
 

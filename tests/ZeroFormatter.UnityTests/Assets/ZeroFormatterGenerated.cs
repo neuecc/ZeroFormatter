@@ -5431,12 +5431,12 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 
     public class CharacterFormatter : Formatter<global::Sandbox.Shared.Character>
     {
-        readonly global::System.Collections.Generic.EqualityComparer<global::Sandbox.Shared.CharacterType> comparer;
+        readonly global::System.Collections.Generic.IEqualityComparer<global::Sandbox.Shared.CharacterType> comparer;
         readonly global::Sandbox.Shared.CharacterType[] unionKeys;
         
         public CharacterFormatter()
         {
-            comparer = global::System.Collections.Generic.EqualityComparer<global::Sandbox.Shared.CharacterType>.Default;
+            comparer = global::ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.CharacterType>.Default;
             unionKeys = new global::Sandbox.Shared.CharacterType[2];
             unionKeys[0] = new global::Sandbox.Shared.Human().Type;
             unionKeys[1] = new global::Sandbox.Shared.Monster().Type;
