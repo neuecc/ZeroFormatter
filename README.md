@@ -113,7 +113,7 @@ TODO...
 
 Union
 ---
-ZeroFormatter supports Union type. It can define abstract class and `UnionAttributes`, `UnionKeyAttribute`.
+ZeroFormatter supports Union(Polymorphic) type. It can define abstract class and `UnionAttributes`, `UnionKeyAttribute`.
 
 ```csharp
 public enum CharacterType
@@ -146,6 +146,9 @@ public class Human : Character
 
     [Index(0)]
     public virtual string Name { get; set; }
+
+    [Index(1)]
+    public virtual DateTime Birth { get; set; }
 
     [Index(1)]
     public virtual int Age { get; set; }
@@ -192,9 +195,16 @@ switch (union.Type)
 {
     case CharacterType.Monster:
         var demon2 = (Monster)union;
-        demon2.Race.Is("Demon");
-        demon2.Power.Is(9999);
-        demon2.Magic.Is(1000);
+        demon2.Race...
+        demon2.Power..
+        demon2.Magic...
+        break;
+    case CharacterType.Human:
+        var human2 = (Human)union;
+        human2.Name...
+        human2.Birth...
+        human2.Age..
+        human2.Faith...
         break;
     default:
         Assert.Fail("invalid");
@@ -354,38 +364,55 @@ ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
 ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
 ```
 
-One more case, how to create generic formatter. For example, If implemnts `KeyValuePair<TKey, TValue>`?
+One more case, how to create generic formatter. For example, If implemnts `ImmutableList<T>`?
 
 ```csharp
-public class KeyValuePairFormatter<TKey, TValue> : Formatter<KeyValuePair<TKey, TValue>>
+public class ImmutableListFormatter<T> : Formatter<ImmutableList<T>>
 {
     public override int? GetLength()
     {
         return null;
     }
 
-    public override int Serialize(ref byte[] bytes, int offset, KeyValuePair<TKey, TValue> value)
+    public override int Serialize(ref byte[] bytes, int offset, ImmutableList<T> value)
     {
+        // use sequence format.
+        if (value == null)
+        {
+            BinaryUtil.WriteInt32(ref bytes, offset, -1);
+            return 4;
+        }
+
         var startOffset = offset;
-        offset += Formatter<TKey>.Default.Serialize(ref bytes, offset, value.Key);
-        offset += Formatter<TValue>.Default.Serialize(ref bytes, offset, value.Value);
+        offset += BinaryUtil.WriteInt32(ref bytes, offset, value.Count);
+
+        var formatter = Formatter<T>.Default;
+        foreach (var item in value)
+        {
+            offset += formatter.Serialize(ref bytes, offset, item);
+        }
+
         return offset - startOffset;
     }
 
-    public override KeyValuePair<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+    public override ImmutableList<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
     {
+        byteSize = 4;
+        var length = BinaryUtil.ReadInt32(ref bytes, offset);
+        if (length == -1) return null;
+
+        var formatter = Formatter<T>.Default;
+        var builder = ImmutableList<T>.Empty.ToBuilder();
         int size;
-        byteSize = 0;
-
-        var key = Formatter<TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
-        offset += size;
-        byteSize += size;
-
-        var value = Formatter<TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
-        offset += size;
-        byteSize += size;
-
-        return new KeyValuePair<TKey, TValue>(key, value);
+        offset += 4;
+        for (int i = 0; i < length; i++)
+        {
+            var val = formatter.Deserialize(ref bytes, offset, tracker, out size);
+            builder.Add(val);
+            offset += size;
+        }
+            
+        return builder.ToImmutable();
     }
 }
 ```
@@ -395,13 +422,12 @@ And register generic resolver on startup.
 ```csharp
 ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
 {
-    if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+    if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ImmutableList<>))
     {
-        var formatterType = typeof(KeyValuePairFormatter<,>).MakeGenericType(t.GetGenericArguments());
-        return Activator.CreateInstance(formatterType);
+        var formatter = typeof(ImmutableListFormatter<>).MakeGenericType(t.GetGenericArguments());
+        return Activator.CreateInstance(formatter);
     }
 
-    // return null means type is not supported.
     return null;
 });
 ```
