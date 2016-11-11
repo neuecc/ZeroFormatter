@@ -493,13 +493,13 @@ Sequence is eager evaluation. If declared concrete types of collection, used thi
 
 **Object Format**
 
-Object is defined user own type. LazyObject is lazy evaluation which has index header(variant of VariableSizeList in wireformat). PackedObject is eager evaluation, if all property/field types are fixed length which struct is marked fixed-length, else variable-length.
+Object is defined user own type. IndexdObject is lazy evaluation which has index header(variant of VariableSizeList in wireformat). Struct is eager evaluation, if all property/field types are fixed length which struct is marked fixed-length, else variable-length.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| LazyObject | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | used by class in default. if length = -1, indicates null, indexOffset = 0, indicates blank |
-| PackedObject | [Index1Item:T1, Index2Item:T2,...] | used by struct in default. This layout includes KeyTuple, KeyValuePair, IGrouping(Item1 = key, Item2  Value[]) |
-| PackedObject? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | This layout includes KeyTuple?, KeyValuePair? and Tuple |
+| IndexdObject | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | used by class in default. if length = -1, indicates null, indexOffset = 0, indicates blank |
+| Struct | [Index1Item:T1, Index2Item:T2,...] | used by struct in default. This layout includes KeyTuple, KeyValuePair, IGrouping(Item1 = key, Item2  Value[]). This format can be fixed-length(C# impl all strcut fields are fixed-length, the packedobject is fixed-length). |
+| Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | This layout includes KeyTuple?, KeyValuePair? and Tuple. This format can be fixed-length(C# impl all strcut fields are fixed-length, the packedobject is fixed-length). |
 
 **Union Format**
 
