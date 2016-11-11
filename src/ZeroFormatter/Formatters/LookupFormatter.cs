@@ -6,8 +6,9 @@ using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
-    // ImmediateLookup
-    // [int count][(Key, Value[])...], count == -1 is null
+    // ImmediateLookup, uses sequence format.
+    // [length:int(4)][elements:T...]
+    // IGrouping<TKey, TElement> was encoded by struct format(key, T[]).
     [Preserve(AllMembers = true)]
     internal class LookupFormatter<TKey, TValue> : Formatter<ILookup<TKey, TValue>>
     {

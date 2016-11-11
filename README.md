@@ -454,7 +454,6 @@ Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlyi
 | Byte | [byte(1)] |
 | SByte | [sbyte(1)] |
 | Char | [ushort(2)] |
-| Decimal | [lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] |
 | TimeSpan | [seconds:long(8)][nanos:int(4)] |
 | DateTime | [seconds:long(8)][nanos:int(4)] |
 | DateTimeOffset | [seconds:long(8)][nanos:int(4)] |
@@ -470,7 +469,6 @@ Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlyi
 | Byte? | [hasValue:bool(1)][byte(1)] |
 | SByte? | [hasValue:bool(1)][sbyte(1)] |
 | Char? | [hasValue:bool(1)][ushort(2)] |
-| Decimal? | [hasValue:bool(1)][lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] |
 | TimeSpan? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
 | DateTime? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
 | DateTimeOffset? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
@@ -491,17 +489,17 @@ Sequence is eager evaluation. If declared concrete types of collection, used thi
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| `Sequence<T>` | [length:int(4)][elements:T...] | represents `T[]`, `List<T>` or all of `ICollection<T>` types. if length = -1, indicates null |
+| `Sequence<T>` | [length:int(4)][elements:T...] | represents `T[]`, `List<T>`, `Dictionary<KeyValuePair>`, `ILookup<TKey, TValues>`, or all of `ICollection<T>` types. if length = -1, indicates null |
 
 **Object Format**
 
-Object is defined user own type. Class is lazy evaluation which has index header(variant of VariableSizeList in wireformat). Struct is eager evaluation, if all property/field types are fixed length which struct is marked fixed-length, else variable-length.
+Object is defined user own type. LazyObject is lazy evaluation which has index header(variant of VariableSizeList in wireformat). PackedObject is eager evaluation, if all property/field types are fixed length which struct is marked fixed-length, else variable-length.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| Class | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | if length = -1, indicates null, indexOffset = 0, indicates blank |
-| Struct | [Index1Item:T1, Index2Item:T2,...] | Index is required begin from 0 and sequential. This layout includes KeyTuple, KeyValuePair. |
-| Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | This layout includes KeyTuple?, KeyValuePair? and Tuple(C# Tuple is class but serialized in this format)|
+| LazyObject | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | used by class in default. if length = -1, indicates null, indexOffset = 0, indicates blank |
+| PackedObject | [Index1Item:T1, Index2Item:T2,...] | used by struct in default. This layout includes KeyTuple, KeyValuePair, IGrouping(Item1 = key, Item2  Value[]) |
+| PackedObject? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | This layout includes KeyTuple?, KeyValuePair? and Tuple |
 
 **Union Format**
 
@@ -511,14 +509,14 @@ Union is eager evaluation, discriminated by key type to each value type.
 | ---- | ------ | ---- |
 | Union | [hasValue:bool(1)][unionKey:TKey][value:TValue] ||
 
-**Dictionary Format**
+**Extension Format**
 
-Dictionary/MultiDictionary is eager evaluation. LazyDictionary/LazyMultiDictionary is lazy evaluation. All format are variable-length.
+Not a standard format but builtin on C# implementation.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| Dictionary | [length:int(4)][`(key:TKey, value:TValue)`...] | represents `Dictionary<TKey, TValue>` and `IDictionary<TKey, TValue>`, if length == -1, indicates null |
-| MultiDictionary | [length:int(4)][`(key:TKey, elements:List<TElement>)`...] | represents `ILookup<TKey, TElement>`, if length == -1, indicates null |
+| Decimal | [lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | Fixed Length |
+| Decimal? | [hasValue:bool(1)][lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | Fixed Length |
 | LazyDictionary | [byteSize:int(4)][length:int(4)][buckets:`FixedSizeList<int>`][entries:`VariableSizeList<DictionaryEntry>`] | represents `ILazyDictionary<TKey, TValue>`, if byteSize == -1, indicates null |
 | DictionaryEntry | [hashCode:int(4)][next:int(4)][key:TKey][value:TValue] | substructure of LazyDictionary | 
 | LazyMultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] | represents `ILazyLookup<TKey, TElement>`, if byteSize == -1, indicates null | 
@@ -531,16 +529,19 @@ ZeroFormatter's EqualityComparer calculates stable hashCode for serialize LazyDi
 * [WireFormatEqualityComparers](https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/WireFormatEqualityComparers.cs)
 * [KeyTupleEqualityComparer](https://github.com/neuecc/ZeroFormatter/blob/master/src/ZeroFormatter/Comparers/KeyTupleEqualityComparer.cs)
 
+C# Schema
+---
+TODO...
+
 Cross Plaftorm
 ---
 Currently No and I have no plans. Welcome to contribute port to other languages, I want to help your work!
 
-ZeroFormatter spec  has four stages.
+ZeroFormatter spec has three stages.
 
-* Stage1: All format are eager-evaluation, does not support Decimal, LazyDictionary/LazyMultiDictionary.
-* Stage2: FixedSizeList, VariableSizeList, Class support lazy-evaluation, does not support Decimal, LazyDictionary/LazyMultiDictionary.
-* Stage3: Supports Decimal, does not support LazyDictionary/LazyMultiDictionary.
-* Stage4: Supporting all format includes LazyDictionary/LazyMultiDictionary
+* Stage1: All format are eager-evaluation, does not Extension Format.
+* Stage2: FixedSizeList, VariableSizeList, Class support lazy-evaluation, does not support Extension Format.
+* StageEx: Supports C# Extension Format(LazyDictionary/LazyMultiDictionary).
 
 Author Info
 ---
