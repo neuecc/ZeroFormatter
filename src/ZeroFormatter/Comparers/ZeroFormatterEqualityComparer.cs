@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 namespace ZeroFormatter.Comparers
 {
+    /// <summary>
+    /// Get deterministic EqualityComparer for calcluate safe hashCode.
+    /// </summary>
     public static class ZeroFormatterEqualityComparer<T>
     {
         static IEqualityComparer<T> defaultComparer;
@@ -85,7 +88,7 @@ namespace ZeroFormatter.Comparers
             else if (t.GetTypeInfo().GetInterfaces().Any(x => x == typeof(IKeyTuple)))
             {
                 var ti = t.GetTypeInfo();
-                
+
                 Type keyTupleComparerType = null;
                 switch (ti.GetGenericArguments().Length)
                 {
@@ -141,6 +144,18 @@ namespace ZeroFormatter.Comparers
         public static void Register(IEqualityComparer<T> comparer)
         {
             defaultComparer = comparer;
+        }
+
+        public static IEqualityComparer<T> GetUndeterministicSafeFallbackedEqualityComparer()
+        {
+            var comparer = Default;
+            if (comparer is StringEqualityComparer || comparer is IErrorEqualityComparer)
+            {
+                // native EqualityComparer<string> is faster than deterministic embeded comparer.
+                return EqualityComparer<T>.Default;
+            }
+
+            return comparer;
         }
     }
 

@@ -1,11 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
-    // Sequence:Array(Optimized formatter)
+    // Sequence:
     // Layout: [count:int][t format...] -> if count = -1 is null
+
+    // Array(Optimized formatter)
     internal class ArrayFormatter<T> : Formatter<T[]>
     {
         readonly Formatter<T> formatter;
@@ -81,8 +86,7 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    // Sequence:Collection
-    // Layout: [count:int][t format...] -> if count = -1 is null
+    // Collection(All concrete collections like List<T>, HashSet<T>, etc...
     internal class CollectionFormatter<TElement, TCollection> : Formatter<TCollection>
         where TCollection : ICollection<TElement>, new()
     {
@@ -194,6 +198,25 @@ namespace ZeroFormatter.Formatters
         }
     }
 
+    // Same as CollectionFormatter but specialized to ReadOnlyCollection.
+    internal class ReadOnlyCollectionFormatter<T> : Formatter<ReadOnlyCollection<T>>
+    {
+        public override int? GetLength()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, ReadOnlyCollection<T> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ReadOnlyCollection<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     // Same as CollectionFormatter but specialized to Dictionary.
     internal class SequenceDictionaryFormatter<TKey, TValue> : Formatter<Dictionary<TKey, TValue>>
     {
@@ -228,7 +251,7 @@ namespace ZeroFormatter.Formatters
             var startOffset = offset;
             offset += BinaryUtil.WriteInt32(ref bytes, offset, value.Count);
 
-            foreach (var item in value)
+            foreach (var item in value) // Dictionary.Enumerator is faster than from interfaces...
             {
                 offset += formatter.Serialize(ref bytes, offset, item);
             }
@@ -262,4 +285,167 @@ namespace ZeroFormatter.Formatters
             return result;
         }
     }
+
+    // well known interfaces, fallback to concrete collection.
+    internal class InterfaceDictionaryFormatter<TKey, TValue> : Formatter<IDictionary<TKey, TValue>>
+    {
+        readonly Formatter<KeyValuePair<TKey, TValue>> formatter;
+
+        public InterfaceDictionaryFormatter()
+        {
+            this.formatter = Formatter<KeyValuePair<TKey, TValue>>.Default;
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return formatter.NoUseDirtyTracker;
+            }
+        }
+
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, IDictionary<TKey, TValue> value)
+        {
+            if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+
+            var startOffset = offset;
+            offset += BinaryUtil.WriteInt32(ref bytes, offset, value.Count);
+
+            foreach (var item in value)
+            {
+                offset += formatter.Serialize(ref bytes, offset, item);
+            }
+
+            return offset - startOffset;
+        }
+
+        public override IDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            tracker.Dirty(); // can not track so mark as dirty.
+
+            var length = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (length == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+
+            var startOffset = offset;
+            offset += 4;
+            int size;
+            var result = new Dictionary<TKey, TValue>(length);
+            for (int i = 0; i < length; i++)
+            {
+                var kvp = formatter.Deserialize(ref bytes, offset, tracker, out size);
+                result.Add(kvp.Key, kvp.Value);
+                offset += size;
+            }
+
+            byteSize = offset - startOffset;
+            return result;
+        }
+    }
+
+    internal class InterfaceCollectionFormatter<TElement> : Formatter<ICollection<TElement>>
+    {
+        public override int? GetLength()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, ICollection<TElement> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ICollection<TElement> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal class InterfaceEnumerableFormatter<TElement> : Formatter<IEnumerable<TElement>>
+    {
+        public override int? GetLength()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, IEnumerable<TElement> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<TElement> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal class InterfaceSetFormatter<T> : Formatter<ISet<T>>
+    {
+        public override int? GetLength()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, ISet<T> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ISet<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+#if !UNITY
+
+    internal class InterfaceIReadOnlyCollectionFormatter<T> : Formatter<IReadOnlyCollection<T>>
+    {
+        public override int? GetLength()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, IReadOnlyCollection<T> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IReadOnlyCollection<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal class SequenceReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<ReadOnlyDictionary<TKey, TValue>>
+    {
+        public override int? GetLength()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, ReadOnlyDictionary<TKey, TValue> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ReadOnlyDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+#endif
 }

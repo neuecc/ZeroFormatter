@@ -150,10 +150,10 @@ public class Human : Character
     [Index(1)]
     public virtual DateTime Birth { get; set; }
 
-    [Index(1)]
+    [Index(2)]
     public virtual int Age { get; set; }
 
-    [Index(2)]
+    [Index(3)]
     public virtual int Faith { get; set; }
 }
 
