@@ -437,7 +437,7 @@ ZeroFormatter is faster than JsonUtility so yes, faster than native serializer! 
 
 **Single Integer(1), Large String(represents HTML), Vector3 Struct(float, float, float), Vector3[100]**
 
-![image](https://cloud.githubusercontent.com/assets/46207/20140302/c0f18dcc-a6cd-11e6-9bf2-17d11ce552e7.png)
+![image](https://cloud.githubusercontent.com/assets/46207/20247341/2393be4a-aa0d-11e6-8475-ec50bfefa687.png)
 ![image](https://cloud.githubusercontent.com/assets/46207/20140306/c6b1b0fc-a6cd-11e6-9193-303179d23764.png)
 
 ZeroFormatter is optimized for all types(small struct to large object!). I know why protobuf-net is slow on integer test, currently [protobuf-net's internal serialize method](https://github.com/mgravell/protobuf-net/blob/0d0bb407865600c7dad1b833a9a1f71ef48c7106/protobuf-net/Meta/TypeModel.cs#L210) has only `object value` so it causes boxing and critical for performance. Anyway ZeroFormatter's simple struct and struct array(struct array is serialized FixedSizeList format internally, it is faster than class array)'s serialization/deserialization speed is very fast that effective storing value to KeyValueStore(like Redis) or network gaming(transport many transform position), etc.
