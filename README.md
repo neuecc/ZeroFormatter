@@ -179,6 +179,21 @@ If there is no change in data, reserialization is very fast because it writes th
 
 > If property includes array/collection, ZeroFormatter can not track data was mutated so always marks dirty initially even if you have not mutated it. To avoid it, declare all collections with `IList<>` or `IReadOnlyList<>`.
 
+If you want to define Immutable, you can use "protected set" and "IReadOnlyList<>".
+
+```csharp
+[ZeroFormattable]
+public class ImmutableClass
+{
+    [Index(0)]
+    public virtual int ImmutableValue { get; protected set; }
+
+    // IReadOnlyDictionary, ILazyReadOnlyDictionary, etc, too.
+    [Index(1)]
+    public virtual IReadOnlyList<int> ImmutableList { get; protected set; }
+}
+```
+
 Versioning
 ---
 If schema is growing, you can add Index.

@@ -244,7 +244,7 @@ namespace ZeroFormatter.Formatters
 
         public override ReadOnlyCollection<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            tracker.Dirty(); // can not track so mark as dirty.
+            // tracker.Dirty(); ReadOnly is immutable
 
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)
@@ -451,8 +451,6 @@ namespace ZeroFormatter.Formatters
 
         public override ICollection<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-
-
             tracker.Dirty(); // can not track so mark as dirty.
 
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
@@ -515,7 +513,7 @@ namespace ZeroFormatter.Formatters
 
         public override IEnumerable<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            tracker.Dirty(); // can not track so mark as dirty.
+            // tracker.Dirty(); // IEnumerable is immutable
 
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)
@@ -580,7 +578,7 @@ namespace ZeroFormatter.Formatters
 
         public override ILookup<TKey, TElement> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            tracker.Dirty(); // can not track so mark as dirty.
+            // tracker.Dirty(); // ilookup is immutable
 
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)
@@ -738,7 +736,7 @@ namespace ZeroFormatter.Formatters
 
         public override IReadOnlyCollection<T> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            tracker.Dirty(); // can not track so mark as dirty.
+            // tracker.Dirty(); // immutable
 
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)
@@ -805,7 +803,7 @@ namespace ZeroFormatter.Formatters
 
         public override ReadOnlyDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            tracker.Dirty(); // can not track so mark as dirty.
+            // tracker.Dirty(); // immutable
 
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)
@@ -874,7 +872,7 @@ namespace ZeroFormatter.Formatters
 
         public override IReadOnlyDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            tracker.Dirty(); // can not track so mark as dirty.
+            // tracker.Dirty(); // immutable
 
             var length = BinaryUtil.ReadInt32(ref bytes, offset);
             if (length == -1)
