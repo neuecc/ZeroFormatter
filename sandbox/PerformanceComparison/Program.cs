@@ -267,6 +267,8 @@ class Program
         return copy;
     }
 
+    static Wire.Serializer wireSerializer = new Wire.Serializer();
+
     static T SerializeWire<T>(T original)
     {
         Console.WriteLine("Wire");
@@ -274,13 +276,11 @@ class Program
         T copy = default(T);
         MemoryStream stream = null;
 
-        var serializer = new Wire.Serializer();
-
         using (new Measure("Wire"))
         {
             for (int i = 0; i < Iteration; i++)
             {
-                serializer.Serialize(original, stream = new MemoryStream());
+                wireSerializer.Serialize(original, stream = new MemoryStream());
             }
         }
 
@@ -289,7 +289,7 @@ class Program
             for (int i = 0; i < Iteration; i++)
             {
                 stream.Position = 0;
-                copy = serializer.Deserialize<T>(stream);
+                copy = wireSerializer.Deserialize<T>(stream);
             }
         }
 
@@ -297,7 +297,7 @@ class Program
         {
             for (int i = 0; i < Iteration; i++)
             {
-                serializer.Serialize(original, stream = new MemoryStream());
+                wireSerializer.Serialize(original, stream = new MemoryStream());
             }
         }
 
