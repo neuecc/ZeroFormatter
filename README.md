@@ -6,13 +6,15 @@ Fastest C# Serializer and Infinitly Fast Deserializer for .NET, .NET Core and Un
 
 ![image](https://cloud.githubusercontent.com/assets/46207/20072942/ba760e70-a56d-11e6-918f-edf84f0187da.png)
 
+Note: this is **unfair** comparison, please see the [performance](https://github.com/neuecc/ZeroFormatter#performance) section for the details.
+
 Why use ZeroFormatter?
 ---
 * **Fastest** C# serializer, the code is extremely tuned by both implementation and binary layout(see: [performance](https://github.com/neuecc/ZeroFormatter#performance))
 * Deserialize/re-serialize is infinitly fast because formatter can access to serialized data without parsing/packing(see: [architecture](https://github.com/neuecc/ZeroFormatter#architecture))
 * Strongly Typed and C# Code as schema, no needs to other IDL like `.proto`, `.fbs`...
 * Smart API, only to use `Serialize<T>` and `Deserialize<T>`
-* Multifunctional, supports Union(Polymorphism) and native support of Dictionary, MultiDictionary(ILookup)
+* Full set of general purpose, multifunctional serializer, supports Union(Polymorphism) and native support of Dictionary, MultiDictionary(ILookup)
 * First-class support to Unity(IL2CPP), it's faster than native JsonUtility
 
 ZeroFormatter is similar as [FlatBuffers](http://google.github.io/flatbuffers/) but ZeroFormatter has clean API(FlatBuffers API is too ugly, [see: sample](https://github.com/google/flatbuffers/blob/master/samples/SampleBinary.cs); we can not use reguraly) and C# specialized. If you need to performance such as Game, Distributed Computing, Microservices etc..., ZeroFormatter will help you.
