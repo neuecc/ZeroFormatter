@@ -137,12 +137,15 @@ namespace ZeroFormatter.CodeGenerator
         List,
         ReadOnlyList,
         Dictionary,
-        ReadOnlyDictionary,
         LazyDictionary,
         LazyReadOnlyDictionary,
         Lookup,
         LazyLookup,
         Array,
-        Collection
+        Collection,
+        InterfaceCollection,
+        Enumerable,
+        ReadOnlyCollection,
+        KeyValuePair
     }
 }

@@ -435,7 +435,7 @@ namespace FlatBuffers
         public double GetDouble(int index)
         {
             ulong i = ReadLittleEndian(index, sizeof(double));
-            // There's Int64BitsToDouble but it uses unsafe code internally.
+            // There's Int64Bits To Double but it uses unsafe code internally.
             ulonghelper[0] = i;
             Buffer.BlockCopy(ulonghelper, 0, doublehelper, 0, sizeof(double));
             return doublehelper[0];

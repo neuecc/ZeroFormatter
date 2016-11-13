@@ -34,7 +34,7 @@ namespace ZeroFormatter
         }
     }
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class UnionKeyAttribute : Attribute
     {
 

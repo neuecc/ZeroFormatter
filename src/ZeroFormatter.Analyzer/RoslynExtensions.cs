@@ -38,6 +38,18 @@ namespace ZeroFormatter.Analyzer
                 .FirstOrDefault();
         }
 
+        public static AttributeData FindAttributeIncludeBasePropertyShortName(this IPropertySymbol property, string typeName)
+        {
+            do
+            {
+                var data = FindAttributeShortName(property.GetAttributes(), typeName);
+                if (data != null) return data;
+                property = property.OverriddenProperty;
+            } while (property != null);
+
+            return null;
+        }
+
         public static AttributeSyntax FindAttribute(this BaseTypeDeclarationSyntax typeDeclaration, SemanticModel model, string typeName)
         {
             return typeDeclaration.AttributeLists

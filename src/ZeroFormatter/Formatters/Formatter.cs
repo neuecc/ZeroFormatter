@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ZeroFormatter.Segments;
 using ZeroFormatter.Comparers;
+using System.Collections.ObjectModel;
 
 namespace ZeroFormatter.Formatters
 {
@@ -165,7 +166,7 @@ namespace ZeroFormatter.Formatters
                 // Others
                 else if (t == typeof(String))
                 {
-                    formatter = new StringFormatter();
+                    formatter = new NullableStringFormatter();
                 }
                 else if (t == typeof(Char))
                 {
@@ -339,7 +340,7 @@ namespace ZeroFormatter.Formatters
                 {
                     if (t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                     {
-                        var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        var formatterType = typeof(InterfaceDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
                     else if (t.GetGenericTypeDefinition() == typeof(ILazyDictionary<,>))
@@ -349,7 +350,7 @@ namespace ZeroFormatter.Formatters
                     }
                     else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
                     {
-                        var formatterType = typeof(ReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        var formatterType = typeof(InterfaceReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
                     else if (t.GetGenericTypeDefinition() == typeof(ILazyReadOnlyDictionary<,>))
@@ -387,7 +388,49 @@ namespace ZeroFormatter.Formatters
 
                     else if (t.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                     {
-                        var formatterType = typeof(SequenceDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
+                    else if (t.GetGenericTypeDefinition() == typeof(ReadOnlyDictionary<,>))
+                    {
+                        var formatterType = typeof(ReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
+                    else if (t.GetGenericTypeDefinition() == typeof(ReadOnlyCollection<>))
+                    {
+                        var formatterType = typeof(ReadOnlyCollectionFormatter<>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
+                    else if (t.GetGenericTypeDefinition() == typeof(ICollection<>))
+                    {
+                        var formatterType = typeof(InterfaceCollectionFormatter<>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
+                    else if (t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                    {
+                        var formatterType = typeof(InterfaceEnumerableFormatter<>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
+                    else if (t.GetGenericTypeDefinition() == typeof(ISet<>))
+                    {
+                        var formatterType = typeof(InterfaceSetFormatter<>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
+                    else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>))
+                    {
+                        var formatterType = typeof(InterfaceReadOnlyCollectionFormatter<>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    }
+
+                    else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
+                    {
+                        var formatterType = typeof(InterfaceReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
                         formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
                     }
 
@@ -499,7 +542,7 @@ namespace ZeroFormatter.Formatters
                     }
                     else
                     {
-                        formatter = DynamicObjectFormatter.Create<T>();
+                        formatter = DynamicFormatter.Create<T>();
                     }
                 }
 
@@ -585,11 +628,20 @@ namespace ZeroFormatter.Formatters
                     return resolved;
                 }
             }
+
             return null;
         }
 
+
+
+#if UNITY
+
         public static void RegisterLookup<TKey, TElement>()
         {
+            if (Formatter<IEnumerable<TElement>>.Default is IErrorFormatter)
+            {
+                Formatter<IEnumerable<TElement>>.Register(new InterfaceEnumerableFormatter<TElement>());
+            }
             if (Formatter<ILookup<TKey, TElement>>.Default is IErrorFormatter)
             {
                 Formatter<ILookup<TKey, TElement>>.Register(new LookupFormatter<TKey, TElement>());
@@ -630,31 +682,19 @@ namespace ZeroFormatter.Formatters
 
         public static void RegisterDictionary<TKey, TValue>()
         {
-            if (Formatter<IDictionary<TKey, TValue>>.Default is IErrorFormatter)
-            {
-                Formatter<IDictionary<TKey, TValue>>.Register(new DictionaryFormatter<TKey, TValue>());
-            }
             if (Formatter<KeyValuePair<TKey, TValue>>.Default is IErrorFormatter)
             {
                 Formatter<KeyValuePair<TKey, TValue>>.Register(new KeyValuePairFormatter<TKey, TValue>());
             }
+            if (Formatter<IDictionary<TKey, TValue>>.Default is IErrorFormatter)
+            {
+                Formatter<IDictionary<TKey, TValue>>.Register(new InterfaceDictionaryFormatter<TKey, TValue>());
+            }
             if (Formatter<Dictionary<TKey, TValue>>.Default is IErrorFormatter)
             {
-                Formatter<Dictionary<TKey, TValue>>.Register(new SequenceDictionaryFormatter<TKey, TValue>());
+                Formatter<Dictionary<TKey, TValue>>.Register(new DictionaryFormatter<TKey, TValue>());
             }
         }
-
-#if !UNITY
-
-        public static void RegisterReadOnlyDictionary<TKey, TValue>()
-        {
-            if (Formatter<IReadOnlyDictionary<TKey, TValue>>.Default is IErrorFormatter)
-            {
-                Formatter<IReadOnlyDictionary<TKey, TValue>>.Register(new ReadOnlyDictionaryFormatter<TKey, TValue>());
-            }
-        }
-
-#endif
 
         public static void RegisterLazyDictionary<TKey, TValue>()
         {
@@ -689,6 +729,29 @@ namespace ZeroFormatter.Formatters
             }
         }
 
+        public static void RegisterInterfaceCollection<T>()
+        {
+            if (Formatter<ICollection<T>>.Default is IErrorFormatter)
+            {
+                Formatter<ICollection<T>>.Register(new InterfaceCollectionFormatter<T>());
+            }
+        }
+        public static void RegisterEnumerable<T>()
+        {
+            if (Formatter<IEnumerable<T>>.Default is IErrorFormatter)
+            {
+                Formatter<IEnumerable<T>>.Register(new InterfaceEnumerableFormatter<T>());
+            }
+        }
+
+        public static void RegisterReadOnlyCollection<T>()
+        {
+            if (Formatter<ReadOnlyCollection<T>>.Default is IErrorFormatter)
+            {
+                Formatter<ReadOnlyCollection<T>>.Register(new ReadOnlyCollectionFormatter<T>());
+            }
+        }
+
         public static void RegisterList<T>()
         {
             if (Formatter<IList<T>>.Default is IErrorFormatter)
@@ -697,17 +760,13 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-#if !UNITY
-
-        public static void RegisterReadOnlyList<T>()
+        public static void RegisterKeyValuePair<TKey, TValue>()
         {
-            if (Formatter<IReadOnlyList<T>>.Default is IErrorFormatter)
+            if (Formatter<KeyValuePair<TKey, TValue>>.Default is IErrorFormatter)
             {
-                Formatter<IReadOnlyList<T>>.Register(new ReadOnlyListFormatter<T>());
+                Formatter<KeyValuePair<TKey, TValue>>.Register(new KeyValuePairFormatter<TKey, TValue>());
             }
         }
-
-#endif
 
         public static void RegisterKeyTuple<T1>()
         {
@@ -836,6 +895,8 @@ namespace ZeroFormatter.Formatters
                 ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7, T8>());
             }
         }
+
+#endif
     }
 
     internal interface IErrorFormatter

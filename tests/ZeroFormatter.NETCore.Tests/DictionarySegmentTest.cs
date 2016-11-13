@@ -23,7 +23,7 @@ namespace ZeroFormatter.DotNetCore.Tests
             var bytes = ZeroFormatterSerializer.Serialize(sampleDict);
 
             int _;
-            return DictionarySegment<int, string>.Create(new DirtyTracker(0), bytes, 0, DictionarySegmentMode.LazyAll, out _);
+            return DictionarySegment<int, string>.Create(new DirtyTracker(0), bytes, 0, out _);
         }
 
         [Fact]

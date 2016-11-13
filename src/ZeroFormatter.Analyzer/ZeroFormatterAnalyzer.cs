@@ -25,20 +25,20 @@ namespace ZeroFormatter.Analyzer
 
         internal static readonly DiagnosticDescriptor TypeMustBeZeroFormattable = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(TypeMustBeZeroFormattable), title: Title, category: Category,
-            messageFormat: "Type must mark ZeroFormattableAttribute. {0}.", // type.Name
-            description: "Type must mark ZeroFormattableAttribute.",
+            messageFormat: "Type must be marked with ZeroFormattableAttribute. {0}.", // type.Name
+            description: "Type must be marked with ZeroFormattableAttribute.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor PublicPropertyNeedsIndex = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(PublicPropertyNeedsIndex), title: Title, category: Category,
-            messageFormat: "Public property must mark IndexAttribute or IgnoreFormatAttribute. {0}.{1}.", // type.Name + "." + item.Name
-            description: "Public property must mark IndexAttribute or IgnoreFormatAttribute.",
+            messageFormat: "Public property must be marked with IndexAttribute or IgnoreFormatAttribute. {0}.{1}.", // type.Name + "." + item.Name
+            description: "Public property must be marked with IndexAttribute or IgnoreFormatAttribute.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor PublicPropertyNeedsGetAndSetAccessor = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(PublicPropertyNeedsGetAndSetAccessor), title: Title, category: Category,
-            messageFormat: "Public property's accessor must needs both public/protected get and set. {0}.{1}.", // type.Name + "." + item.Name
-            description: "Public property's accessor must needs both public/protected get and set.",
+            messageFormat: "Public property must needs both public/protected get and set accessor. {0}.{1}.", // type.Name + "." + item.Name
+            description: "Public property must needs both public/protected get and set accessor.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor PublicPropertyMustBeVirtual = new DiagnosticDescriptor(
@@ -55,8 +55,8 @@ namespace ZeroFormatter.Analyzer
 
         internal static readonly DiagnosticDescriptor IndexAttributeDuplicate = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(IndexAttributeDuplicate), title: Title, category: Category,
-            messageFormat: "IndexAttribute can not allow duplicate. {0}.{1}, Index:{2}", // type.Name, item.Name index.Index
-            description: "IndexAttribute can not allow duplicate.",
+            messageFormat: "IndexAttribute is not allow duplicate number. {0}.{1}, Index:{2}", // type.Name, item.Name index.Index
+            description: "IndexAttribute is not allow duplicate number.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor IndexIsTooLarge = new DiagnosticDescriptor(
@@ -162,9 +162,9 @@ namespace ZeroFormatter.Analyzer
             if (declaredSymbol == null) return;
 
             var isUnion = declaredSymbol.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null;
-            var isZeroFormatter = declaredSymbol.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null;
+            var isZeroFormattable = declaredSymbol.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null;
 
-            if (!isUnion && !isZeroFormatter)
+            if (!isUnion && !isZeroFormattable)
             {
                 return;
             }
@@ -174,7 +174,7 @@ namespace ZeroFormatter.Analyzer
             {
                 VerifyUnion(reportContext, typeDeclaration.GetLocation(), declaredSymbol);
             }
-            else
+            if (isZeroFormattable)
             {
                 VerifyType(reportContext, typeDeclaration.GetLocation(), declaredSymbol, new HashSet<ITypeSymbol>(), null);
             }
@@ -224,15 +224,24 @@ namespace ZeroFormatter.Analyzer
                 }
                 else if (genericTypeString == "System.Collections.Generic.IList<>"
                       || genericTypeString == "System.Collections.Generic.IDictionary<,>"
+                      || genericTypeString == "System.Collections.Generic.Dictionary<,>"
                       || genericTypeString == "ZeroFormatter.ILazyDictionary<,>"
                       || genericTypeString == "System.Collections.Generic.IReadOnlyList<>"
+                      || genericTypeString == "System.Collections.Generic.IReadOnlyCollection<>"
                       || genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>"
+                      || genericTypeString == "System.Collections.Generic.ICollection<>"
+                      || genericTypeString == "System.Collections.Generic.IEnumerable<>"
+                      || genericTypeString == "System.Collections.Generic.ISet<>"
+                      || genericTypeString == "System.Collections.ObjectModel.ReadOnlyCollection<>"
+                      || genericTypeString == "System.Collections.ObjectModel.ReadOnlyDictionary<,>"
                       || genericTypeString == "ZeroFormatter.ILazyReadOnlyDictionary<,>"
                       || genericTypeString == "System.Linq.ILookup<,>"
                       || genericTypeString == "ZeroFormatter.ILazyLookup<,>"
                       || genericTypeString.StartsWith("System.Collections.Generic.KeyValuePair")
                       || genericTypeString.StartsWith("System.Tuple")
-                      || genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
+                      || genericTypeString.StartsWith("ZeroFormatter.KeyTuple")
+                      || context.AdditionalAllowTypes.Contains(genericTypeString)
+                      )
                 {
                     foreach (var t in namedType.TypeArguments)
                     {
@@ -344,6 +353,11 @@ namespace ZeroFormatter.Analyzer
 
             var attributes = property.GetAttributes();
             if (attributes.FindAttributeShortName(IgnoreShortName) != null)
+            {
+                return;
+            }
+
+            if (property.FindAttributeIncludeBasePropertyShortName(UnionKeyAttributeShortName) != null)
             {
                 return;
             }

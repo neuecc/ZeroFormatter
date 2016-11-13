@@ -1,6 +1,8 @@
 ﻿
 using System;
 using ZeroFormatter;
+#pragma warning disable ZeroFormatterAnalyzer_PublicPropertyNeedsIndex // Lint of ZeroFormattable Type.
+#pragma warning disable ZeroFormatterAnalyzer_PublicPropertyMustBeVirtual // Lint of ZeroFormattable Type.
 
 namespace Sandbox.Shared
 {
@@ -16,10 +18,10 @@ namespace Sandbox.Shared
         public abstract CharacterType Type { get; }
     }
 
+
     [ZeroFormattable]
     public class Human : Character
     {
-        [IgnoreFormat]
         public override CharacterType Type
         {
             get
@@ -41,7 +43,6 @@ namespace Sandbox.Shared
     [ZeroFormattable]
     public class Monster : Character
     {
-        [IgnoreFormat]
         public override CharacterType Type
         {
             get
@@ -60,3 +61,7 @@ namespace Sandbox.Shared
         public virtual int Magic { get; set; }
     }
 }
+
+
+#pragma warning restore ZeroFormatterAnalyzer_PublicPropertyNeedsIndex // Lint of ZeroFormattable Type.
+#pragma warning restore ZeroFormatterAnalyzer_PublicPropertyMustBeVirtual // Lint of ZeroFormattable Type.

@@ -19,13 +19,13 @@ namespace ZeroFormatter.Tests
 
         DictionarySegment<int, string> CreateFresh()
         {
-            IDictionary<int, string> sampleDict = new Dictionary<int, string>()
+            ILazyDictionary<int, string> sampleDict = new Dictionary<int, string>()
             {
                 {1234, "aaaa" },
                 {-1, "mainasu" },
                 {-42432, "more mainasu" },
                 {99999, "plus plus" }
-            };
+            }.AsLazyDictionary();
             return ZeroFormatter.ZeroFormatterSerializer.Convert(sampleDict) as DictionarySegment<int, string>;
         }
 
@@ -86,37 +86,6 @@ namespace ZeroFormatter.Tests
                 Tuple.Create(9991, "hogehoge one"));
         }
 
-        public void ModeImmediate()
-        {
-            IDictionary<int, string> dict = new Dictionary<int, string>
-            {
-                {1, "a" },
-                {2, "b" },
-                {3, "c" }
-            };
-
-            var immediateLazySegment = ZeroFormatterSerializer.Convert(dict);
-            var segment = immediateLazySegment as IZeroFormatterSegment;
-
-            immediateLazySegment[1].Is("a");
-            immediateLazySegment[2].Is("b");
-            immediateLazySegment[3].Is("c");
-
-            segment.CanDirectCopy().IsTrue();
-            var moreSerialize = ZeroFormatterSerializer.Convert(immediateLazySegment, true);
-            (moreSerialize as IZeroFormatterSegment).CanDirectCopy().IsTrue();
-
-            moreSerialize.Add(10, "hugahuga");
-            (moreSerialize as IZeroFormatterSegment).CanDirectCopy().IsFalse();
-            moreSerialize[10].Is("hugahuga");
-
-            var lastSerialize = ZeroFormatterSerializer.Convert(moreSerialize, true);
-
-            lastSerialize[1].Is("a");
-            lastSerialize[2].Is("b");
-            lastSerialize[3].Is("c");
-            moreSerialize[10].Is("hugahuga");
-        }
 
         public void ModeLazyAll()
         {

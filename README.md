@@ -8,11 +8,11 @@ Fastest C# Serializer and Infinitly Fast Deserializer for .NET, .NET Core and Un
 
 Why use ZeroFormatter?
 ---
-* Fastest C# Serializer, code is extremely tuned by both sides of implementation and binary layout(see: [performance](https://github.com/neuecc/ZeroFormatter#performance))
-* Deserialize/Reserialize is infinitly fast because formatter can access to serialized data without parsing/packing(see: [architecture](https://github.com/neuecc/ZeroFormatter#architecture))
+* **Fastest** C# serializer, the code is extremely tuned by both implementation and binary layout(see: [performance](https://github.com/neuecc/ZeroFormatter#performance))
+* Deserialize/re-serialize is infinitly fast because formatter can access to serialized data without parsing/packing(see: [architecture](https://github.com/neuecc/ZeroFormatter#architecture))
 * Strongly Typed and C# Code as schema, no needs to other IDL like `.proto`, `.fbs`...
 * Smart API, only to use `Serialize<T>` and `Deserialize<T>`
-* Native support of Dictionary, MultiDictionary(ILookup)
+* Multifunctional, supports Union(Polymorphism) and native support of Dictionary, MultiDictionary(ILookup)
 * First-class support to Unity(IL2CPP), it's faster than native JsonUtility
 
 ZeroFormatter is similar as [FlatBuffers](http://google.github.io/flatbuffers/) but ZeroFormatter has clean API(FlatBuffers API is too ugly, [see: sample](https://github.com/google/flatbuffers/blob/master/samples/SampleBinary.cs); we can not use reguraly) and C# specialized. If you need to performance such as Game, Distributed Computing, Microservices etc..., ZeroFormatter will help you.
@@ -23,7 +23,7 @@ for .NET, .NET Core
 
 * PM> Install-Package [ZeroFormatter](https://www.nuget.org/packages/ZeroFormatter)
 
-for Unity(Interfaces can reference both .NET 3.5 and Unity for share types), Unity binary is exists on [ZeroFormatter/Releases](https://github.com/neuecc/ZeroFormatter/releases) as well.
+for Unity(Interfaces can reference both .NET 3.5 and Unity for share types), Unity binary is exists on [ZeroFormatter/Releases](https://github.com/neuecc/ZeroFormatter/releases) as well. More details, please see the [Unity-Supports](https://github.com/neuecc/ZeroFormatter#unity-supports) section.
 
 * PM> Install-Package [ZeroFormatter.Interfaces](https://www.nuget.org/packages/ZeroFormatter.Interfaces/)
 * PM> Install-Package [ZeroFormatter.Unity](https://www.nuget.org/packages/ZeroFormatter.Unity)
@@ -34,12 +34,14 @@ Visual Studio Analyzer
 
 Quick Start
 ---
-Define class and mark as `[ZeroFormattable]` and public properties mark `[Index]` and declare `virtual`.
+Define class and mark as `[ZeroFormattable]` and public properties mark `[Index]` and declare `virtual`, call `ZeroFormatterSerializer.Serialize<T>/Deserialize<T>`. 
 
 ```csharp
+// mark ZeroFormattableAttribute
 [ZeroFormattable]
 public class MyClass
 {
+    // Index is key of serialization
     [Index(0)]
     public virtual int Age { get; set; }
 
@@ -49,6 +51,7 @@ public class MyClass
     [Index(2)]
     public virtual string LastName { get; set; }
 
+    // When mark IgnoreFormatAttribute, out of the serialization target
     [IgnoreFormat]
     public string FullName { get { return FirstName + LastName; } }
 
@@ -79,37 +82,131 @@ class Program
 
 Serializable target must mark `ZeroFormattableAttribute`, there public property must be `virtual` and requires `IndexAttribute`.
 
-
 Analyzer
 ---
+ZeroFormatter.Analyzer helps object definition. Attributes, accessibility etc are detected and it becomes a compiler error.
+
 ![zeroformatteranalyzer](https://cloud.githubusercontent.com/assets/46207/20078766/3ea54f14-a585-11e6-9873-b99cb5d9efe5.gif)
+
+If you want to allow a specific type (for example, when registering a custom type), put `ZeroFormatterAnalyzer.json` at the project root and make the Build Action to `AdditionalFiles`.
 
 ![image](https://cloud.githubusercontent.com/assets/46207/20149311/0e6f73d6-a6f4-11e6-91cb-44c771c267cb.png)
 
+This is a sample of the contents of ZeroFormatterAnalyzer.json. 
 
-Supported Type
+```
+[ "System.Guid" ]
+```
+
+Built-in support types
 ---
-Primitive, Enum, TimeSpan, DateTime, DateTimeOffset, `IList<>`, `IDictionary<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<>`, `ILookup<>`, `ZeroFormatter.KeyTuple` and there nullable.
+All primitives, All enums, `TimeSpan`,  `DateTime`, `DateTimeOffset`, `Tuple<,...>`, `KeyValuePair<,>`, `KeyTuple<,...>`, `Array`, `List<>`, `HashSet<>`, `Dictionary<,>`, `ReadOnlyCollection<>`, `ReadOnlyDictionary<,>`, `IEnumerable<>`, `ICollection<>`, `IList<>`, `ISet<,>`, `IReadOnlyCollection<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<,>`, `ILookup<,>` and inherited `ICollection<>` with paramterless constructor. Support type can extend easily, see: [Extensibility](https://github.com/neuecc/ZeroFormatter#performance) section.
 
-User defined `[ZeroFormattbale]` objects(class/struct), `T[]`, `List<T>`, `Dictionary<TKey, TValue>`, `Tuple`, `KeyValuePair` and `ICollection<T>` types.
-
-LazyDictionary's key is native serialized in binary, but has limitation of keys. Key can use Primitive, Enum and ZeroFormatter.KeyTuple for mulitple keys.
-
-Object Define Rules
+Define object rules
 ---
-TODO...
+There rules can detect ZeroFormatter.Analyzer.
 
+* Type must be marked with ZeroformattableAttribute.  
+* Public property must be marked with IndexAttribute or IgnoreFormatAttribute.
+* Public property's must needs both public/protected get and set accessor.
+* Public property's accessor must be virtual.
+* Class is only supports public property not field(If struct can define field).
+* IndexAttribute is not allow duplicate number.
+* Class must needs parameterless constructor.
+* Struct index must be started with 0 and be sequential.
+* Struct needs full parameter constructor of index property types.
+* Union type requires UnionKey property.
+* UnionKey does not suppor multiple key.
+* All Union sub types must be inherited type.
 
-Eager/Lazy Evaluation
+eager/lazy-evaluation
 ---
-TODO:...
-(Sequence)
-(Serialize Dictionary/Lookup)
+ZeroFormatter has two types of evaluation, "eager-evaluation" and "lazy-evaluation". If the type is lazy-evaluation, deserialization will be infinitely fast because it does not parse. If the user-defined class or type is `IList<>`, `IReadOnlyList<>`, `ILazyLookup<>`, `ILazyDicitonary<>`, `ILazyReadOnlyDictionary<>`, deserialization of that type will be lazily evaluated.
+
+```csharp
+// MyClass is lazy-evaluation, all properties are lazily
+[ZeroFormattable]
+public class MyClass
+{
+    // int[] is eager-evaluation, when accessing Prop2, all values are deserialized
+    [Index(0)]
+    public virtual int[] Prop1 { get; set; }
+
+    // IList<int> is lazy-evaluation, when accessing Prop2 with indexer, only that index value is deserialized 
+    [Index(1)]
+    public virtual IList<int> Prop2 { get; set; }
+}
+```
+
+If you want to maximize the power of lazy-evaluation, define all collections with `IList<>`/`IReadOnlyList<>`.
+
+`ILazyLookup<>`, `ILazyDicitonary<>`, `ILazyReadOnlyDictionary<>` is special collection interface, it defined by ZeroFormatter. The values defined in these cases are deserialized very quickly because the internal structure is also serialized in its entirety and does not need to be rebuilt data structure. But there are some limitations instead. Key type must be primitive, enum or there KeyTuple only because the key must be deterministic.
+
+```csharp
+[ZeroFormattable]
+public class MyClass
+{
+    [Index(0)]
+    public virtual ILazyDictionary<int, int> LazyDictionary { get; set; }
+
+    [Index(1)]
+    public virtual ILazyLookup<int, int> LazyLookup { get; set; }
+}
+
+// there properties can set from `AsLazy***` extension methods. 
+
+var mc = new MyClass();
+
+mc.LazyDictionary = Enumerable.Range(1, 10).ToDictionary(x => x).AsLazyDictionary();
+mc.LazyLookup = Enumerable.Range(1, 10).ToLookup(x => x).AsLazyLookup();
+```
+
+As a precaution, the binary size will be larger because all internal structures are serialized. This is a tradeoff, please select the best case depending on the situation.
+
+Architecture
+---
+When deserializing an object, it returns a byte[] wrapper object. When accessing the property, it reads the data from the offset information of the header(and cache when needed).
+
+![image](https://cloud.githubusercontent.com/assets/46207/20246782/e11518da-aa01-11e6-99c4-aa8e55f6b726.png)
+
+Why must we define object in virtual? The reason is to converts access to properties into access to byte buffers.
+
+If there is no change in data, reserialization is very fast because it writes the internal buffer data as it is. All serialized data can mutate and if the property type is fixed-length(primitive and some struct),  it is written directly to internal binary data so keep the reserialization speed. If property is variable-length(string, list, object, etc...) the type and property are marked dirty. And it serializes only the difference, it is faster than normal serialization.
+
+![](https://cloud.githubusercontent.com/assets/46207/20078613/9f9ddfda-a584-11e6-9d7c-b98f8a6ac70e.png)
+
+> If property includes array/collection, ZeroFormatter can not track data was mutated so always marks dirty initially even if you have not mutated it. To avoid it, declare all collections with `IList<>` or `IReadOnlyList<>`.
 
 Versioning
 ---
-TODO...
+If schema is growing, you can add Index.
 
+```csharp
+[ZeroFormattable]
+public class Version1
+{
+    [Index(0)]
+    public virtual int Prop1 { get; set; }
+    [Index(1)]
+    public virtual int Prop2 { get; set; }
+    
+    // If deserialize from new data, ignored.
+}
+
+[ZeroFormattable]
+public class Version2
+{
+    [Index(0)]
+    public virtual int Prop1 { get; set; }
+    [Index(1)]
+    public virtual int Prop2 { get; set; }
+    // You can add new property. If deserialize from old data, value is assigned default(T).
+    [Index(2)]
+    public virtual int NewType { get; set; }
+}
+```
+
+But you can not delete index. If that index is unnecessary, please make it blank(such as [0, 1, 3]).
 
 Union
 ---
@@ -133,9 +230,7 @@ public abstract class Character
 [ZeroFormattable]
 public class Human : Character
 {
-    // UnionKey property must mark [IgnoreFormat]
     // UnionKey value must return constant value(Type is free, you can use int, string, enum, etc...)
-    [IgnoreFormat]
     public override CharacterType Type
     {
         get
@@ -160,7 +255,6 @@ public class Human : Character
 [ZeroFormattable]
 public class Monster : Character
 {
-    [IgnoreFormat]
     public override CharacterType Type
     {
         get
@@ -212,17 +306,29 @@ switch (union.Type)
 }
 ```
 
-for Unity
+Unity Supports
 ---
 ZeroFormatter.Unity works on all platforms(PC, Android, iOS, etc...). But it can 'not' use dynamic serializer generation due to IL2CPP issue. But pre code generate helps it. Code Generator is located in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc.exe`. zfc is using [Roslyn](https://github.com/dotnet/roslyn) so analyze source code, pass the target `csproj`. 
 
 ```
 zfc arguments help:
-  -i, --input=VALUE          [required]Input path of analyze csproj
-  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
-  -s, --separate             [optional, default=false]Output files are separated
-  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
-  -t, --customTypes          [optional, default=empty]comma separated allows custom types
+  -i, --input=VALUE             [required]Input path of analyze csproj
+  -o, --output=VALUE            [required]Output path(file) or directory base(in separated mode)
+  -s, --separate                [optional, default=false]Output files are separated
+  -u, --unuseunityattr          [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
+  -t, --customtypes=VALUE       [optional, default=empty]comma separated allows custom types
+  -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
+```
+
+```
+// Simple Case:
+zfc.exe -i "..\src\Sandbox.Shared.csproj" -o "ZeroFormatterGenerated.cs"
+
+// with t, c
+zfc.exe -i "..\src\Sandbox.Shared.csproj" -o "..\unity\ZfcCompiled\ZeroFormatterGenerated.cs" -t "System.Guid" -c "UNITY"
+
+// -s
+zfc.exe -i "..\src\Sandbox.Shared.csproj" -s -o "..\unity\ZfcCompiled\" 
 ```
 
 > Note: zfc.exe is currently only run on Windows. It is .NET Core's [Roslyn](https://github.com/dotnet/roslyn) workspace API limitation but I want to implements to all platforms...
@@ -259,8 +365,28 @@ namespace UnityEngine
 
 `INCLUDE_ONLY_CODE_GENERATION` is special symbol of zfc, include generator target but does not includes compile.
 
+If you encount `InvalidOperationException` such as 
 
-TODO:...RegisterArray....
+```
+InvalidOperationException: Type is not supported, please register Vector3[]
+```
+
+It means not generated/registed type. Especially collections are not automatically registered if they are not included in the property. You can register manually such as `Formatter.RegisterArray<UnityEngine.Vector3>()` or create hint type for zfc.
+
+```csharp
+using ZeroFormatter;
+
+namespace ZfcHint
+{
+    [ZeroFormattable]
+    public class TypeHint
+    {
+        // zfc analyzes UnityEngine.Vector3[] type and register it. 
+        [Index(0)]
+        public UnityEngine.Vector3[] Hint1;
+    }
+}
+```
 
 Performance
 ---
@@ -299,14 +425,15 @@ ZeroFormatter is faster than JsonUtility so yes, faster than native serializer! 
 
 ZeroFormatter is optimized for all types(small struct to large object!). I know why protobuf-net is slow on integer test, currently [protobuf-net's internal serialize method](https://github.com/mgravell/protobuf-net/blob/0d0bb407865600c7dad1b833a9a1f71ef48c7106/protobuf-net/Meta/TypeModel.cs#L210) has only `object value` so it causes boxing and critical for performance. Anyway ZeroFormatter's simple struct and struct array(struct array is serialized FixedSizeList format internally, it is faster than class array)'s serialization/deserialization speed is very fast that effective storing value to KeyValueStore(like Redis) or network gaming(transport many transform position), etc.
 
-Architecture
+ZeroFormatterSerializer API
 ---
-TODO...
+We usually use `Serialize<T>` and `Deserialize<T>, but there are other APIs as well. `Convert<T>` is converted T to T but the return value is wrapped data. It is fast when reserialization so if you store the immutable data and serialize frequently, very effective. `IsFormattedObject<T>` can checked the data is wrapped data or not.
 
-![](https://cloud.githubusercontent.com/assets/46207/20078613/9f9ddfda-a584-11e6-9d7c-b98f8a6ac70e.png)
+`Serialize<T>` has some overload, one of them is the NonAllocate API. `int Serialize<T>(ref byte[] buffer, int offset, T obj)` is expand the buffer but do not shrink. Return value int is size so you can pass the buffer from array pooling, ZeroFormatter does not allocate any extra memory.
 
-ZeroFormatterSerializer
----
+If you want to use non-generic API, there are exists under `ZeroFormatterSerializer.NonGeneric`. It can pass Type on first-argument instead of `<T>`.
+
+> NonGeneric API is not supported in Unity. NonGeneric API is a bit slower than the generic API. Because the lookup of the serializer by type and the cost of boxing if the value is a value type are costly. We recommend using generic API if possible.
 
 Extensibility
 ---
@@ -434,11 +561,11 @@ ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
 
 WireFormat Specification
 ---
-All formats are always represented in little-endian. eager-evaluation is deserialized before access field. lazy-evaluation is delayed deserialize timing until property field.
+All formats are represented in little endian. There are two lengths of binary, fixed-length and variable-length, which affect the `List Format`.
 
-**Fixed Length Format**
+**Primitive Format**
 
-Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlying type. DateTime, DateTimeOffset is serialized UniversalTime and serialized format is same as Protocol Buffers's [timestamp.proto](https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto).
+Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is serialized there underlying type. DateTime, DateTimeOffset is serialized UniversalTime and serialized format is same as Protocol Buffers's [timestamp.proto](https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto).
 
 | Type | Layout |
 | ---- | ------ | 
@@ -457,6 +584,7 @@ Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlyi
 | TimeSpan | [seconds:long(8)][nanos:int(4)] |
 | DateTime | [seconds:long(8)][nanos:int(4)] |
 | DateTimeOffset | [seconds:long(8)][nanos:int(4)] |
+| String | [utf8Bytes:(length)] | currently no used but reserved for future |
 | Int16? | [hasValue:bool(1)][short(2)] |
 | Int32? | [hasValue:bool(1)][int(4)] |
 | Int64? | [hasValue:bool(1)][long(8)] |
@@ -472,38 +600,42 @@ Fixed Length formats is eager evaluation. C# `Enum` is serialized there underlyi
 | TimeSpan? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
 | DateTime? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
 | DateTimeOffset? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
-
-**Variable Length Format**
-
-String is eager evalution. FixedSizeList and VariableSizeList are lazy evaluation.
-
-| Type | Layout | Note |
-| ---- | ------ | ---- |
-| String | [length:int(4)][utf8Bytes:(length)] | if length = -1, indicates null, the value is UTF8 encoded |
-| FixedSizeList | [length:int(4)][elements:T...] | represents `IList<T>` where T is fixed length format. if length = -1, indicates null
-| VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | represents `IList<T>` where T is variable length format. if length = -1, indicates null
+| String? | [length:int(4)][utf8Bytes:(length)] | representes `String`, if length = -1, indicates null. This is only variable-length primitive. |
 
 **Sequence Format**
 
-Sequence is eager evaluation. If declared concrete types of collection, used this format.
+Sequence is variable-length, eager-evaluation. Sequence represents a multiple object. If field is declared collection type(except `IList<T>, IReadOnlyList<T>`), used this format.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| `Sequence<T>` | [length:int(4)][elements:T...] | represents `T[]`, `List<T>`, `Dictionary<KeyValuePair>`, `ILookup<TKey, TValues>`, or all of `ICollection<T>` types. if length = -1, indicates null |
+| `Sequence<T>` | [length:int(4)][elements:T...] | if length = -1, indicates null |
+
+**List Format**
+
+List is variable-length, lazy-evaluation. If field is declared `IList<T>` or `IReadOnlyList<T>`, used this format.
+
+| Type | Layout | Note |
+| ---- | ------ | ---- |
+| FixedSizeList | [length:int(4)][elements:T...] | T is fixed-length format. if length = -1, indicates null |
+| VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | T is variable-length format. if length = -1, indicates null. indexOffset is absolute position of underlying buffer |
 
 **Object Format**
 
-Object is defined user own type. IndexdObject is lazy evaluation which has index header(variant of VariableSizeList in wireformat). Struct is eager evaluation, if all property/field types are fixed length which struct is marked fixed-length, else variable-length.
+Object Format is a user-defined type.
+
+Object is variable-length, lazy-evaluation which has index header.
+
+Struct is eager-evaluation, if all field types are fixed-length which struct is marked fixed-length, else variable-length. This format is included `KeyTuple`, `Tuple`, `KeyValuePair(used by Dictionary)`, `IGrouping(used by ILookup)`.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| IndexdObject | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | used by class in default. if length = -1, indicates null, indexOffset = 0, indicates blank |
-| Struct | [Index1Item:T1, Index2Item:T2,...] | used by struct in default. This layout includes KeyTuple, KeyValuePair, IGrouping(Item1 = key, Item2  Value[]). This format can be fixed-length(C# impl all strcut fields are fixed-length, the packedobject is fixed-length). |
-| Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | This layout includes KeyTuple?, KeyValuePair? and Tuple. This format can be fixed-length(C# impl all strcut fields are fixed-length, the packedobject is fixed-length). |
+| Object | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | used by class in default. if length = -1, indicates null, indexOffset = 0, indicates blank. indexOffset is absolute position of underlying buffer |
+| Struct | [Index1Item:T1, Index2Item:T2,...] | used by struct in default. This format can be fixed-length. |
+| Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | used by struct in default. This format can be fixed-length. |
 
 **Union Format**
 
-Union is eager evaluation, discriminated by key type to each value type.
+Union is variable-length, eager-evaluation, discriminated by key type to each value type.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
@@ -515,11 +647,11 @@ Not a standard format but builtin on C# implementation.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| Decimal | [lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | Fixed Length |
-| Decimal? | [hasValue:bool(1)][lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | Fixed Length |
-| LazyDictionary | [byteSize:int(4)][length:int(4)][buckets:`FixedSizeList<int>`][entries:`VariableSizeList<DictionaryEntry>`] | represents `ILazyDictionary<TKey, TValue>`, if byteSize == -1, indicates null |
+| Decimal | [lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | Fixed Length | fixed-length, eager-evaluation |
+| Decimal? | [hasValue:bool(1)][lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | Fixed Length | fixed-length, eager-evaluation |
+| LazyDictionary | [byteSize:int(4)][length:int(4)][buckets:`FixedSizeList<int>`][entries:`VariableSizeList<DictionaryEntry>`] | represents `ILazyDictionary<TKey, TValue>`, if byteSize == -1, indicates null, variable-length, lazy-evaluation  |
 | DictionaryEntry | [hashCode:int(4)][next:int(4)][key:TKey][value:TValue] | substructure of LazyDictionary | 
-| LazyMultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] | represents `ILazyLookup<TKey, TElement>`, if byteSize == -1, indicates null | 
+| LazyMultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] | represents `ILazyLookup<TKey, TElement>`, if byteSize == -1, indicates null, variable-length, lazy-evaluation | 
 | GroupingSegment | [key:TKey] [hashCode:int(4)][elements:`VariableSizeList<TElement>`] | substructure of LazyMultiDictionary 
 
 **EqualityComparer**
@@ -531,7 +663,28 @@ ZeroFormatter's EqualityComparer calculates stable hashCode for serialize LazyDi
 
 C# Schema
 ---
-TODO...
+ZeroFormatter has no schema but has schema so C# can be schema. You can define schema by C# and analyze by Roslyn.
+
+```csharp
+namespace /* Namespace */
+{
+    // Fomrat Schemna
+    [ZeroFormattable]
+    public class /* FormatName */
+    {
+        [Index(/* Index Number */)]
+        public virtual /* FormatType */ Name { get; set; }
+    }
+
+    // UnionSchema
+    [Union(typeof(/* Union Subtypes */))]
+    public abstract class UnionSchema
+    {
+        [UnionKey]
+        public abstract /* UnionKey Type */ Key { get; }
+    }
+}
+```
 
 Cross Plaftorm
 ---
@@ -539,8 +692,8 @@ Currently No and I have no plans. Welcome to contribute port to other languages,
 
 ZeroFormatter spec has three stages.
 
-* Stage1: All format are eager-evaluation, does not Extension Format.
-* Stage2: FixedSizeList, VariableSizeList, Class support lazy-evaluation, does not support Extension Format.
+* Stage1: All formats are eager-evaluation, does not support Extension Format.
+* Stage2: FixedSizeList, VariableSizeList and Object supports lazy-evaluation, does not support Extension Format.
 * StageEx: Supports C# Extension Format(LazyDictionary/LazyMultiDictionary).
 
 Author Info

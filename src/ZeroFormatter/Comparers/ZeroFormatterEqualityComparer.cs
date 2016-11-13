@@ -24,6 +24,21 @@ namespace ZeroFormatter.Comparers
             }
         }
 
+        public static IEqualityComparer<T> NondeterministicSafeFallbacked
+        {
+            get
+            {
+                var comparer = defaultComparer;
+                if (comparer is StringEqualityComparer || comparer is IErrorEqualityComparer)
+                {
+                    // native EqualityComparer<string> is faster than deterministic embeded comparer.
+                    return EqualityComparer<T>.Default;
+                }
+
+                return comparer;
+            }
+        }
+
         static ZeroFormatterEqualityComparer()
         {
             object comparer = null;
@@ -144,18 +159,6 @@ namespace ZeroFormatter.Comparers
         public static void Register(IEqualityComparer<T> comparer)
         {
             defaultComparer = comparer;
-        }
-
-        public static IEqualityComparer<T> GetUndeterministicSafeFallbackedEqualityComparer()
-        {
-            var comparer = Default;
-            if (comparer is StringEqualityComparer || comparer is IErrorEqualityComparer)
-            {
-                // native EqualityComparer<string> is faster than deterministic embeded comparer.
-                return EqualityComparer<T>.Default;
-            }
-
-            return comparer;
         }
     }
 

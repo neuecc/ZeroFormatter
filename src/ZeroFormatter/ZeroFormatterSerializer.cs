@@ -25,7 +25,7 @@ namespace ZeroFormatter
             {
                 BinaryUtil.FastResize(ref bytes, size);
             }
-
+            
             return bytes;
         }
 

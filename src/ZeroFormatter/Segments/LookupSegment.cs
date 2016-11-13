@@ -16,14 +16,6 @@ namespace ZeroFormatter.Segments
     // [int count]
     // [IList<IList<GroupingSemengt>>]
 
-    // [int count]
-    // [key:list[]]
-
-    public enum LookupSegmentMode
-    {
-        Immediate = 0,
-        LazyAll = 1
-    }
 
     public class LookupSegment<TKey, TElement> : ILookup<TKey, TElement>, ILazyLookup<TKey, TElement>, IZeroFormatterSegment
     {
@@ -37,9 +29,6 @@ namespace ZeroFormatter.Segments
         // others
         internal DirtyTracker tracker;
         ArraySegment<byte> originalBytes;
-
-        // be careful!
-        internal LookupSegmentMode mode;
 
         // from Formatter only for serialize.
         internal LookupSegment(ILookup<TKey, TElement> source)
@@ -61,10 +50,9 @@ namespace ZeroFormatter.Segments
             }
 
             this.count = source.Count;
-            this.mode = LookupSegmentMode.LazyAll;
         }
 
-        public static LookupSegment<TKey, TElement> Create(DirtyTracker tracker, byte[] bytes, int offset, LookupSegmentMode mode, out int byteSize)
+        public static LookupSegment<TKey, TElement> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
             tracker = tracker.CreateChild();
 
@@ -76,60 +64,18 @@ namespace ZeroFormatter.Segments
             }
 
             var segment = new LookupSegment<TKey, TElement>();
-            if (mode == LookupSegmentMode.LazyAll)
-            {
-                byteSize = byteSizeOrCount;
-                segment.count = BinaryUtil.ReadInt32(ref bytes, offset + 4);
 
-                var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
-                int _;
-                segment.groupings = formatter.Deserialize(ref bytes, offset + 8, tracker, out _);
+            byteSize = byteSizeOrCount;
+            segment.count = BinaryUtil.ReadInt32(ref bytes, offset + 4);
 
-                segment.tracker = tracker;
-                segment.originalBytes = new ArraySegment<byte>(bytes, offset, byteSize);
-                segment.mode = LookupSegmentMode.LazyAll;
+            var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
+            int _;
+            segment.groupings = formatter.Deserialize(ref bytes, offset + 8, tracker, out _);
 
-                return segment;
-            }
-            else
-            {
-                var originalOffset = offset;
+            segment.tracker = tracker;
+            segment.originalBytes = new ArraySegment<byte>(bytes, offset, byteSize);
 
-                var keyFormatter = Formatter<TKey>.Default;
-                var valuesFormatter = Formatter<IList<TElement>>.Default;
-
-                segment.tracker = tracker;
-                segment.groupings = new List<IList<GroupingSegment<TKey, TElement>>>(byteSizeOrCount);
-                for (int i = 0; i < byteSizeOrCount; i++)
-                {
-                    segment.groupings.Add(null); // null clear
-                }
-
-                int size = 0;
-                byteSize = 4;
-                offset += 4;
-                for (int i = 0; i < byteSizeOrCount; i++)
-                {
-                    var key = keyFormatter.Deserialize(ref bytes, offset, tracker, out size);
-                    byteSize += size;
-                    offset += size;
-
-                    var values = valuesFormatter.Deserialize(ref bytes, offset, tracker, out size);
-                    byteSize += size;
-                    offset += size;
-
-                    var group = segment.GetGrouping(key, true);
-                    foreach (var item in values)
-                    {
-                        group.Add(item);
-                    }
-                }
-
-                segment.originalBytes = new ArraySegment<byte>(bytes, originalOffset, byteSize);
-                segment.mode = LookupSegmentMode.Immediate;
-
-                return segment;
-            }
+            return segment;
         }
 
         LookupSegment()
@@ -237,40 +183,13 @@ namespace ZeroFormatter.Segments
             }
             else
             {
-                if (mode == LookupSegmentMode.LazyAll)
-                {
-                    var totalSize = 4;
-                    totalSize += BinaryUtil.WriteInt32(ref bytes, offset + 4, count);
-                    var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
-                    totalSize += formatter.Serialize(ref bytes, offset + 8, groupings);
-                    BinaryUtil.WriteInt32(ref bytes, offset, totalSize);
+                var totalSize = 4;
+                totalSize += BinaryUtil.WriteInt32(ref bytes, offset + 4, count);
+                var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
+                totalSize += formatter.Serialize(ref bytes, offset + 8, groupings);
+                BinaryUtil.WriteInt32(ref bytes, offset, totalSize);
 
-                    return totalSize;
-                }
-                else
-                {
-                    var startOffset = offset;
-
-                    var keyFormatter = Formatter<TKey>.Default;
-                    var valuesFormatter = Formatter<IList<TElement>>.Default;
-
-                    offset += ZeroFormatter.Internal.BinaryUtil.WriteInt32(ref bytes, offset, count);
-                    for (int i = 0; i < groupings.Count; i++)
-                    {
-                        var g = groupings[i];
-                        if (g != null)
-                        {
-                            for (int j = 0; j < g.Count; j++)
-                            {
-                                var segment = g[j];
-                                offset += keyFormatter.Serialize(ref bytes, offset, segment.Key);
-                                offset += valuesFormatter.Serialize(ref bytes, offset, segment.elements);
-                            }
-                        }
-                    }
-
-                    return offset - startOffset;
-                }
+                return totalSize;
             }
         }
     }

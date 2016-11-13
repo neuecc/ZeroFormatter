@@ -70,6 +70,27 @@ namespace Sandbox
         public virtual KeyValuePair<string, int> MyProperty3 { get; set; }
     }
 
+    [ZeroFormattable]
+    public class Version1
+    {
+        [Index(0)]
+        public virtual int Prop1 { get; set; }
+        [Index(1)]
+        public virtual int Prop2 { get; set; }
+    }
+
+    [ZeroFormattable]
+    public class Version2
+    {
+        [Index(0)]
+        public virtual int Prop1 { get; set; }
+        [Index(1)]
+        public virtual int Prop2 { get; set; }
+        // You can add new property. If deserialize from old data, value is assigned default(T).
+        [Index(2)]
+        public virtual int NewType { get; set; }
+    }
+
 
     class Program
     {
@@ -81,6 +102,7 @@ namespace Sandbox
 
             //var data = ZeroFormatterSerializer.Serialize<Character>(demon);
             ZeroFormatterSerializer.Serialize<Character>(demon);
+
 
         }
     }

@@ -54,5 +54,90 @@ namespace ZeroFormatter.Tests
             convert.MyProperty15["3"].Is(3);
             convert.MyProperty20.Is(999999);
         }
+
+        [ZeroFormattable]
+        public class Version1
+        {
+            [Index(0)]
+            public virtual int Prop1 { get; set; }
+            [Index(1)]
+            public virtual int Prop2 { get; set; }
+
+            // If deserialize from new data, ignored.
+        }
+
+        [ZeroFormattable]
+        public class Version2
+        {
+            [Index(0)]
+            public virtual int Prop1 { get; set; }
+            [Index(1)]
+            public virtual int Prop2 { get; set; }
+            // You can add new property. If deserialize from old data, value is assigned default(T).
+            [Index(2)]
+            public virtual int NewType { get; set; }
+        }
+
+        [ZeroFormattable]
+        public class VersionEx1
+        {
+            [Index(0)]
+            public virtual string Prop1 { get; set; }
+            [Index(1)]
+            public virtual string Prop2 { get; set; }
+
+            // If deserialize from new data, ignored.
+        }
+
+        [ZeroFormattable]
+        public class VersionEx2
+        {
+            [Index(0)]
+            public virtual string Prop1 { get; set; }
+            [Index(1)]
+            public virtual string Prop2 { get; set; }
+            // You can add new property. If deserialize from old data, value is assigned default(T).
+            [Index(2)]
+            public virtual string NewType { get; set; }
+        }
+
+        [TestMethod]
+        public void VersiongCheckReadme()
+        {
+            var v1 = new Version1 { Prop1 = 999, Prop2 = 1000 };
+            var v2 = new Version2 { Prop1 = 10, Prop2 = 100, NewType = 9 };
+
+            var v1Data = ZeroFormatterSerializer.Serialize(v1);
+            var v2Data = ZeroFormatterSerializer.Serialize(v2);
+
+            // deserialize new data to old schema
+            var newV1 = ZeroFormatterSerializer.Deserialize<Version1>(v2Data);
+            newV1.Prop1.Is(10); newV1.Prop2.Is(100);
+
+            var newV2 = ZeroFormatterSerializer.Deserialize<Version2>(v1Data);
+            newV2.Prop1.Is(999); newV2.Prop2.Is(1000); newV2.NewType.Is(default(int));
+            newV2.NewType = 99999;
+            ZeroFormatterSerializer.Convert(newV2).NewType.Is(99999);
+        }
+
+
+        [TestMethod]
+        public void VersiongCheckReadme2()
+        {
+            var v1 = new VersionEx1 { Prop1 = "aiueo", Prop2 = "あいうえお" };
+            var v2 = new VersionEx2 { Prop1 = "kakikukeko", Prop2 = "ほげ", NewType = "ふがふが" };
+
+            var v1Data = ZeroFormatterSerializer.Serialize(v1);
+            var v2Data = ZeroFormatterSerializer.Serialize(v2);
+
+            // deserialize new data to old schema
+            var newV1 = ZeroFormatterSerializer.Deserialize<VersionEx1>(v2Data);
+            newV1.Prop1.Is("kakikukeko"); newV1.Prop2.Is("ほげ");
+
+            var newV2 = ZeroFormatterSerializer.Deserialize<VersionEx2>(v1Data);
+            newV2.Prop1.Is("aiueo"); newV2.Prop2.Is("あいうえお"); newV2.NewType.Is(default(string));
+            newV2.NewType = "とりあえず";
+            ZeroFormatterSerializer.Convert(newV2).NewType.Is("とりあえず");
+        }
     }
 }

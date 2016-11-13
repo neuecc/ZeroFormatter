@@ -68,16 +68,16 @@
     </Compile>
     <Compile Include="Comparers\EnumEqualityComparer.cs" />
     <Compile Include="Formatters\KeyValuePairFormatter.cs" />
-    <Compile Include="Formatters\LookupFormatter.cs" />
+    <Compile Include="Formatters\LazyLookupFormatter.cs" />
     <Compile Include="Formatters\EnumFormatter.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EnumFormatter.tt</DependentUpon>
     </Compile>
     <Compile Include="Formatters\Formatter.cs" />
-    <Compile Include="Formatters\DictionaryFormatter.cs" />
+    <Compile Include="Formatters\LazyDictionaryFormatter.cs" />
     <Compile Include="Formatters\ListFormatter.cs" />
-    <Compile Include="Formatters\DynamicObjectFormatter.cs" />
+    <Compile Include="Formatters\DynamicFormatter.cs" />
     <Compile Include="Formatters\PrimitiveFormatter.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

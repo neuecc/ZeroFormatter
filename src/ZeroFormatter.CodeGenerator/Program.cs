@@ -16,6 +16,7 @@ namespace ZeroFormatter.CodeGenerator
         public string OutputPath { get; private set; }
         public bool UnuseUnityAttr { get; private set; }
         public List<string> AllowCustomTypes { get; private set; }
+        public List<string> ConditionalSymbols { get; private set; }
         public bool IsSeparate { get; private set; }
 
         public bool IsParsed { get; set; }
@@ -23,6 +24,7 @@ namespace ZeroFormatter.CodeGenerator
         public CommandlineArguments(string[] args)
         {
             AllowCustomTypes = new List<string>();
+            ConditionalSymbols = new List<string>();
 
             var option = new OptionSet()
             {
@@ -30,7 +32,8 @@ namespace ZeroFormatter.CodeGenerator
                 { "o|output=", "[required]Output path(file) or directory base(in separated mode)", x => { OutputPath = x; } },
                 { "s|separate", "[optional, default=false]Output files are separated", _ => { IsSeparate = true; } },
                 { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer", _ => { UnuseUnityAttr = true; } },
-                { "t|customTypes=", "[optional, default=empty]comma separated allows custom types", x => { AllowCustomTypes.AddRange(x.Split(',')); } },
+                { "t|customtypes=", "[optional, default=empty]comma separated allows custom types", x => { AllowCustomTypes.AddRange(x.Split(',')); } },
+                { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
             };
             if (args.Length == 0)
             {
@@ -81,7 +84,7 @@ namespace ZeroFormatter.CodeGenerator
             var sw = Stopwatch.StartNew();
             Console.WriteLine("Project Compilation Start:" + csprojPath);
 
-            var tc = new TypeCollector(csprojPath, cmdArgs.AllowCustomTypes);
+            var tc = new TypeCollector(csprojPath, cmdArgs.ConditionalSymbols, cmdArgs.AllowCustomTypes);
 
             Console.WriteLine("Project Compilation Complete:" + sw.Elapsed.ToString());
             Console.WriteLine();

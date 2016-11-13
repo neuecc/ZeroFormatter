@@ -9,12 +9,12 @@ namespace ZeroFormatter.DotNetCore.Tests
         [Fact]
         public void LookupSegment()
         {
-            var lookup = Enumerable.Range(1, 10)
-                .ToLookup(x => x % 2 == 0);
+            ILazyLookup<bool, int> lookup = Enumerable.Range(1, 10)
+                .ToLookup(x => x % 2 == 0).AsLazyLookup();
             var bytes = ZeroFormatterSerializer.Serialize(lookup);
 
             int _;
-            var segment = LookupSegment<bool, int>.Create(new DirtyTracker(0), bytes, 0, LookupSegmentMode.Immediate, out _);
+            var segment = LookupSegment<bool, int>.Create(new DirtyTracker(0), bytes, 0, out _);
 
             segment[true].Is(2, 4, 6, 8, 10);
             segment[false].Is(1, 3, 5, 7, 9);

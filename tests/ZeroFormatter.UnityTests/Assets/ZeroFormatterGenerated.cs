@@ -72,6 +72,7 @@ namespace ZeroFormatter.Internal
             // Objects
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.AllNewFormat>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.AllNewFormatFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.CustomFormat>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CustomFormatFormatter());
+            ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.SequenceFormat>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.SequenceFormatFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Person>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.PersonFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.InheritBase>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InheritBaseFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Inherit>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InheritFormatter());
@@ -146,15 +147,21 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter.RegisterList<int>();
             ZeroFormatter.Formatters.Formatter.RegisterList<string>();
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>();
+            ZeroFormatter.Formatters.Formatter.RegisterDictionary<int, int>();
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<int, string>();
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<string, int>();
             ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<string, int>();
             ZeroFormatter.Formatters.Formatter.RegisterLookup<bool, int>();
             ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<bool, int>();
+            ZeroFormatter.Formatters.Formatter.RegisterArray<global::ZeroFormatter.Tests.MyStructFixed>();
             ZeroFormatter.Formatters.Formatter.RegisterArray<global::ZeroFormatter.Tests.MyVector>();
             ZeroFormatter.Formatters.Formatter.RegisterArray<global::ZeroFormatter.Tests.MyVectorClass>();
             ZeroFormatter.Formatters.Formatter.RegisterCollection<int, global::System.Collections.Generic.List<int>>();
             ZeroFormatter.Formatters.Formatter.RegisterCollection<string, global::System.Collections.Generic.HashSet<string>>();
+            ZeroFormatter.Formatters.Formatter.RegisterInterfaceCollection<int>();
+            ZeroFormatter.Formatters.Formatter.RegisterEnumerable<int>();
+            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyCollection<int>();
+            ZeroFormatter.Formatters.Formatter.RegisterKeyValuePair<int, string>();
         }
     }
 }
@@ -670,6 +677,233 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Guid>(ref targetBytes, startOffset, offset, 0, _AllowGuid);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class SequenceFormatFormatter : Formatter<global::Sandbox.Shared.SequenceFormat>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.SequenceFormat value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (11 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::ZeroFormatter.Tests.MyStructFixed[]>(ref bytes, startOffset, offset, 0, value.ArrayFormat);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.List<int>>(ref bytes, startOffset, offset, 1, value.CollectionFormat);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.ObjectModel.ReadOnlyCollection<int>>(ref bytes, startOffset, offset, 2, value.ReadOnlyCollectionFormat);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.Dictionary<int, int>>(ref bytes, startOffset, offset, 3, value.DictionaryFormat);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IDictionary<int, int>>(ref bytes, startOffset, offset, 4, value.InterafceDictionaryFormat);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.ICollection<int>>(ref bytes, startOffset, offset, 5, value.InterfaceCollectionFormat);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Collections.Generic.IEnumerable<int>>(ref bytes, startOffset, offset, 6, value.InterfaceEnumerableFormat);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::System.Linq.ILookup<bool, int>>(ref bytes, startOffset, offset, 11, value.LookupFormat);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 11);
+            }
+        }
+
+        public override global::Sandbox.Shared.SequenceFormat Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new SequenceFormatObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class SequenceFormatObjectSegment : global::Sandbox.Shared.SequenceFormat, IZeroFormatterSegment
+    {
+        static readonly int[] __elementSizes = new int[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+        readonly CacheSegment<global::ZeroFormatter.Tests.MyStructFixed[]> _ArrayFormat;
+        readonly CacheSegment<global::System.Collections.Generic.List<int>> _CollectionFormat;
+        readonly CacheSegment<global::System.Collections.ObjectModel.ReadOnlyCollection<int>> _ReadOnlyCollectionFormat;
+        readonly CacheSegment<global::System.Collections.Generic.Dictionary<int, int>> _DictionaryFormat;
+        readonly CacheSegment<global::System.Collections.Generic.IDictionary<int, int>> _InterafceDictionaryFormat;
+        readonly CacheSegment<global::System.Collections.Generic.ICollection<int>> _InterfaceCollectionFormat;
+        readonly CacheSegment<global::System.Collections.Generic.IEnumerable<int>> _InterfaceEnumerableFormat;
+        readonly CacheSegment<global::System.Linq.ILookup<bool, int>> _LookupFormat;
+
+        // 0
+        public override global::ZeroFormatter.Tests.MyStructFixed[] ArrayFormat
+        {
+            get
+            {
+                return _ArrayFormat.Value;
+            }
+            set
+            {
+                _ArrayFormat.Value = value;
+            }
+        }
+
+        // 1
+        public override global::System.Collections.Generic.List<int> CollectionFormat
+        {
+            get
+            {
+                return _CollectionFormat.Value;
+            }
+            set
+            {
+                _CollectionFormat.Value = value;
+            }
+        }
+
+        // 2
+        public override global::System.Collections.ObjectModel.ReadOnlyCollection<int> ReadOnlyCollectionFormat
+        {
+            get
+            {
+                return _ReadOnlyCollectionFormat.Value;
+            }
+            set
+            {
+                _ReadOnlyCollectionFormat.Value = value;
+            }
+        }
+
+        // 3
+        public override global::System.Collections.Generic.Dictionary<int, int> DictionaryFormat
+        {
+            get
+            {
+                return _DictionaryFormat.Value;
+            }
+            set
+            {
+                _DictionaryFormat.Value = value;
+            }
+        }
+
+        // 4
+        public override global::System.Collections.Generic.IDictionary<int, int> InterafceDictionaryFormat
+        {
+            get
+            {
+                return _InterafceDictionaryFormat.Value;
+            }
+            set
+            {
+                _InterafceDictionaryFormat.Value = value;
+            }
+        }
+
+        // 5
+        public override global::System.Collections.Generic.ICollection<int> InterfaceCollectionFormat
+        {
+            get
+            {
+                return _InterfaceCollectionFormat.Value;
+            }
+            set
+            {
+                _InterfaceCollectionFormat.Value = value;
+            }
+        }
+
+        // 6
+        public override global::System.Collections.Generic.IEnumerable<int> InterfaceEnumerableFormat
+        {
+            get
+            {
+                return _InterfaceEnumerableFormat.Value;
+            }
+            set
+            {
+                _InterfaceEnumerableFormat.Value = value;
+            }
+        }
+
+        // 11
+        public override global::System.Linq.ILookup<bool, int> LookupFormat
+        {
+            get
+            {
+                return _LookupFormat.Value;
+            }
+            set
+            {
+                _LookupFormat.Value = value;
+            }
+        }
+
+
+        public SequenceFormatObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 11, __elementSizes);
+
+            _ArrayFormat = new CacheSegment<global::ZeroFormatter.Tests.MyStructFixed[]>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 0, __binaryLastIndex, __tracker));
+            _CollectionFormat = new CacheSegment<global::System.Collections.Generic.List<int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
+            _ReadOnlyCollectionFormat = new CacheSegment<global::System.Collections.ObjectModel.ReadOnlyCollection<int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex, __tracker));
+            _DictionaryFormat = new CacheSegment<global::System.Collections.Generic.Dictionary<int, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 3, __binaryLastIndex, __tracker));
+            _InterafceDictionaryFormat = new CacheSegment<global::System.Collections.Generic.IDictionary<int, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 4, __binaryLastIndex, __tracker));
+            _InterfaceCollectionFormat = new CacheSegment<global::System.Collections.Generic.ICollection<int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 5, __binaryLastIndex, __tracker));
+            _InterfaceEnumerableFormat = new CacheSegment<global::System.Collections.Generic.IEnumerable<int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 6, __binaryLastIndex, __tracker));
+            _LookupFormat = new CacheSegment<global::System.Linq.ILookup<bool, int>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 11, __binaryLastIndex, __tracker));
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (11 + 1));
+
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::ZeroFormatter.Tests.MyStructFixed[]>(ref targetBytes, startOffset, offset, 0, _ArrayFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.List<int>>(ref targetBytes, startOffset, offset, 1, _CollectionFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.ObjectModel.ReadOnlyCollection<int>>(ref targetBytes, startOffset, offset, 2, _ReadOnlyCollectionFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.Dictionary<int, int>>(ref targetBytes, startOffset, offset, 3, _DictionaryFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.IDictionary<int, int>>(ref targetBytes, startOffset, offset, 4, _InterafceDictionaryFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.ICollection<int>>(ref targetBytes, startOffset, offset, 5, _InterfaceCollectionFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Collections.Generic.IEnumerable<int>>(ref targetBytes, startOffset, offset, 6, _InterfaceEnumerableFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 11, _LookupFormat);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 11);
             }
             else
             {

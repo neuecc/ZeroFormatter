@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sandbox.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,6 +96,45 @@ namespace ZeroFormatter.Tests
                 var r = ZeroFormatterSerializer.Convert(new HashSet<string> { "a", "b", "cdefg" });
                 r.OrderBy(x => x).Is("a", "b", "cdefg");
             }
+        }
+
+
+        [TestMethod]
+        public void WellknownInterfaces()
+        {
+            var baseObject = new SequenceFormat()
+            {
+                ArrayFormat = new[] { new MyStructFixed(1, 10, 3.4f), new MyStructFixed(2, 6, 5.2f) },
+                CollectionFormat = new List<int> { 1, 10, 100 },
+                DictionaryFormat = new Dictionary<int, int> { { 1, 100 }, { -4, 9999 } },
+                InterafceDictionaryFormat = new Dictionary<int, int> { { 1, 100 }, { -4, 9999 } },
+                InterfaceCollectionFormat = new[] { 1, 10, 1000 },
+                InterfaceEnumerableFormat = new[] { 1, 2, 3 },
+                InterfaceReadOnlyCollectionFormat = new[] { 5, 6, 7 },
+                InterfaceSetFormat = new HashSet<int>(new[] { 1, 9099, 3452 }),
+                ReadOnlyCollectionFormat = new System.Collections.ObjectModel.ReadOnlyCollection<int>(new[] { 1, 10, 100 }),
+                ReadOnlyDictionaryFormat = new System.Collections.ObjectModel.ReadOnlyDictionary<int, int>(new Dictionary<int, int> { { 9, 9999 } }),
+                InterfaceReadOnlyDictionaryFormat = new System.Collections.ObjectModel.ReadOnlyDictionary<int, int>(new Dictionary<int, int> { { 9, 9999 } }),
+                LookupFormat = Enumerable.Range(1, 5).ToLookup(x => x % 2 == 0)
+            };
+
+            var converted = ZeroFormatterSerializer.Convert(baseObject, true);
+
+            converted.ArrayFormat[0].MyProperty1.Is(1); converted.ArrayFormat[0].MyProperty2.Is(10); converted.ArrayFormat[0].MyProperty3.Is(3.4f);
+            converted.ArrayFormat[1].MyProperty1.Is(2); converted.ArrayFormat[1].MyProperty2.Is(6); converted.ArrayFormat[1].MyProperty3.Is(5.2f);
+
+            converted.CollectionFormat.Is(1, 10, 100);
+            converted.DictionaryFormat[1].Is(100); converted.DictionaryFormat[-4].Is(9999);
+            converted.InterafceDictionaryFormat[1].Is(100); converted.InterafceDictionaryFormat[-4].Is(9999);
+            converted.InterfaceCollectionFormat.Is(1, 10, 1000);
+            converted.InterfaceEnumerableFormat.Is(1, 2, 3);
+            converted.ReadOnlyCollectionFormat.Is(1, 10, 100);
+            converted.InterfaceSetFormat.OrderBy(x => x).Is(1, 3452, 9099);
+            converted.ReadOnlyCollectionFormat.Is(1, 10, 100);
+            converted.ReadOnlyDictionaryFormat[9].Is(9999);
+            converted.InterfaceReadOnlyDictionaryFormat[9].Is(9999);
+            converted.LookupFormat[true].Is(2, 4);
+            converted.LookupFormat[false].Is(1, 3, 5);
         }
     }
 }

@@ -33,12 +33,12 @@ namespace ZeroFormatter.CodeGenerator
 
         HashSet<string> allowCustomTypes;
 
-        public TypeCollector(string csProjPath, IEnumerable<string> allowCustomTypes)
+        public TypeCollector(string csProjPath, IEnumerable<string> conditinalSymbols, IEnumerable<string> allowCustomTypes)
         {
             this.csProjPath = csProjPath;
             this.allowCustomTypes = new HashSet<string>(allowCustomTypes);
 
-            var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, CodegeneratorOnlyPreprocessorSymbol).GetAwaiter().GetResult();
+            var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, conditinalSymbols.Concat(new[] { CodegeneratorOnlyPreprocessorSymbol }).ToArray()).GetAwaiter().GetResult();
             targetTypes = compilation.GetNamedTypeSymbols()
                 .Where(x => (x.TypeKind == TypeKind.Enum)
                     || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
@@ -172,13 +172,24 @@ namespace ZeroFormatter.CodeGenerator
                     CollectObjectSegment(type.TypeArguments[0] as INamedTypeSymbol);
                     return;
                 }
+                else if (allowCustomTypes.Contains(genericTypeString))
+                {
+                    foreach (var t in type.TypeArguments)
+                    {
+                        CollectObjectSegment(t as INamedTypeSymbol);
+                    }
+                    return;
+                }
                 else if (genericTypeString == "System.Collections.Generic.IList<>"
                       || genericTypeString == "System.Collections.Generic.IDictionary<,>"
                       || genericTypeString == "System.Collections.Generic.Dictionary<,>"
                       || genericTypeString == "ZeroFormatter.ILazyDictionary<,>"
                       || genericTypeString == "System.Collections.Generic.IReadOnlyList<>"
-                      || genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>"
+                      || genericTypeString == "System.Collections.Generic.ICollection<>"
+                      || genericTypeString == "System.Collections.Generic.IEnumerable<>"
+                      || genericTypeString == "System.Collections.Generic.ISet<>"
                       || genericTypeString == "ZeroFormatter.ILazyReadOnlyDictionary<,>"
+                      || genericTypeString == "System.Collections.ObjectModel.ReadOnlyCollection<>"
                       || genericTypeString == "System.Linq.ILookup<,>"
                       || genericTypeString == "ZeroFormatter.ILazyLookup<,>"
                       || genericTypeString.StartsWith("System.Collections.Generic.KeyValuePair")
@@ -197,10 +208,6 @@ namespace ZeroFormatter.CodeGenerator
                     else if (genericTypeString == "System.Collections.Generic.IDictionary<,>" || genericTypeString == "System.Collections.Generic.Dictionary<,>")
                     {
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Dictionary, ElementTypes = elementTypes });
-                    }
-                    else if (genericTypeString == "System.Collections.Generic.IReadOnlyDictionary<,>")
-                    {
-                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.ReadOnlyDictionary, ElementTypes = elementTypes });
                     }
                     else if (genericTypeString == "ZeroFormatter.ILazyDictionary<,>")
                     {
@@ -221,6 +228,23 @@ namespace ZeroFormatter.CodeGenerator
                     else if (genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
                     {
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.KeyTuple, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString.StartsWith("System.Collections.Generic.KeyValuePair"))
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.KeyValuePair, ElementTypes = elementTypes });
+                    }
+
+                    else if (genericTypeString.StartsWith("System.Collections.Generic.ICollection<>"))
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.InterfaceCollection, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString.StartsWith("System.Collections.Generic.IEnumerable<>"))
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Enumerable, ElementTypes = elementTypes });
+                    }
+                    else if (genericTypeString.StartsWith("System.Collections.ObjectModel.ReadOnlyCollection<>"))
+                    {
+                        genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.ReadOnlyCollection, ElementTypes = elementTypes });
                     }
 
                     foreach (var t in type.TypeArguments)
@@ -244,7 +268,7 @@ namespace ZeroFormatter.CodeGenerator
 
             if (type.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) == null)
             {
-                throw new Exception($"Type must mark ZeroFormattableAttribute. {type.Name}.  Location:{type.Locations[0]}");
+                throw new Exception($"Type must be marked with ZeroFormattableAttribute. {type.Name}.  Location:{type.Locations[0]}");
             }
 
             if (!type.IsValueType)
@@ -338,10 +362,15 @@ namespace ZeroFormatter.CodeGenerator
                     }
                 }
 
+                if (propSymbol != null && propSymbol.FindAttributeIncludeBasePropertyShortName(UnionKeyAttributeShortName) != null)
+                {
+                    continue;
+                }
+
                 var indexAttr = attributes.FindAttributeShortName(IndexAttributeShortName);
                 if (indexAttr == null || indexAttr.ConstructorArguments.Length == 0)
                 {
-                    throw new Exception($"Public property must mark IndexAttribute or IgnoreFormatAttribute. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
+                    throw new Exception($"Public property must be marked with IndexAttribute or IgnoreFormatAttribute. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
                 }
 
                 var index = indexAttr.ConstructorArguments[0];
@@ -352,7 +381,7 @@ namespace ZeroFormatter.CodeGenerator
 
                 if (!definedIndexes.Add((int)index.Value))
                 {
-                    throw new Exception($"IndexAttribute can not allow duplicate. {type.Name}.{property.Name}, Index:{index.Value} Location:{type.Locations[0]}");
+                    throw new Exception($"IndexAttribute is not allow duplicate number. {type.Name}.{property.Name}, Index:{index.Value} Location:{type.Locations[0]}");
                 }
 
                 if (!type.IsValueType)
@@ -366,7 +395,7 @@ namespace ZeroFormatter.CodeGenerator
                      || propSymbol.GetMethod.DeclaredAccessibility == Accessibility.Private
                      || propSymbol.SetMethod.DeclaredAccessibility == Accessibility.Private)
                     {
-                        throw new Exception($"Public property's accessor must needs both public/protected get and set. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
+                        throw new Exception($"Public property must needs both public/protected get and set accessor. {type.Name}.{property.Name}. Location:{type.Locations[0]}");
                     }
                 }
 
@@ -506,3 +535,6 @@ namespace ZeroFormatter.CodeGenerator
         }
     }
 }
+
+
+
