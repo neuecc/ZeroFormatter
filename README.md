@@ -569,8 +569,8 @@ All formats are represented in little endian. There are two lengths of binary, f
 
 Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is serialized there underlying type. DateTime, DateTimeOffset is serialized UniversalTime and serialized format is same as Protocol Buffers's [timestamp.proto](https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto).
 
-| Type | Layout |
-| ---- | ------ | 
+| Type | Layout | Note |
+| ---- | ------ | ---- |
 | Int16 | [short(2)] |
 | Int32 | [int(4)] |
 | Int64 | [long(8)] |
