@@ -429,7 +429,7 @@ ZeroFormatter is optimized for all types(small struct to large object!). I know 
 
 ZeroFormatterSerializer API
 ---
-We usually use `Serialize<T>` and `Deserialize<T>, but there are other APIs as well. `Convert<T>` is converted T to T but the return value is wrapped data. It is fast when reserialization so if you store the immutable data and serialize frequently, very effective. `IsFormattedObject<T>` can checked the data is wrapped data or not.
+We usually use `Serialize<T>` and `Deserialize<T>`, but there are other APIs as well. `Convert<T>` is converted T to T but the return value is wrapped data. It is fast when reserialization so if you store the immutable data and serialize frequently, very effective. `IsFormattedObject<T>` can checked the data is wrapped data or not.
 
 `Serialize<T>` has some overload, one of them is the NonAllocate API. `int Serialize<T>(ref byte[] buffer, int offset, T obj)` is expand the buffer but do not shrink. Return value int is size so you can pass the buffer from array pooling, ZeroFormatter does not allocate any extra memory.
 
