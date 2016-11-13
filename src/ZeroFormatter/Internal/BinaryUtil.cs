@@ -17,34 +17,48 @@ namespace ZeroFormatter.Internal
     {
         public static void EnsureCapacity(ref byte[] bytes, int offset, int appendLength)
         {
+            var newLength = offset + appendLength;
+
             // If null(most case fisrt time) fill byte.
             if (bytes == null)
             {
-                bytes = new byte[offset + appendLength];
+                ValidateNewSize(newLength);
+                bytes = new byte[newLength];
                 return;
             }
 
             // like MemoryStream.EnsureCapacity
             var current = bytes.Length;
-            var newLength = offset + appendLength;
-
             if (newLength > current)
             {
+                ValidateNewSize(newLength);
+
                 int num = newLength;
                 if (num < 256)
                 {
                     num = 256;
+                    FastResize(ref bytes, num);
+                    return;
                 }
                 if (num < current * 2)
                 {
                     num = current * 2;
                 }
-                if (current * 2 > 2147483591)
+
+                if (ZeroFormatterSerializer.MaximumSizeOfBytes < num)
                 {
-                    num = ((current > 2147483591) ? current : 2147483591);
+                    num = ZeroFormatterSerializer.MaximumSizeOfBytes;
                 }
 
                 FastResize(ref bytes, num);
+            }
+        }
+
+        public static void ValidateNewSize(int size)
+        {
+            if (ZeroFormatterSerializer.MaximumSizeOfBytes < size)
+            {
+                throw new InvalidOperationException("Reached maximum size of bytes or similar:" + ZeroFormatterSerializer.MaximumSizeOfBytes + " so ensure MaximumSizeOfBytes or handle alternate strategy.");
             }
         }
 

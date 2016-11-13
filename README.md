@@ -447,7 +447,7 @@ Deserialize speed is Infinitely fast(but of course, it is **unfair**, ZeroFormat
 * Don't create intermediate utility instance(XxxWriter/Reader, XxxContext, etc...)
 * Heavyly tuned dynamic il code generation: [DynamicObjectFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/853a0d0c6b7de66b8447b426ab47b90336deca2c/src/ZeroFormatter/Formatters/DynamicFormatter.cs#L212-L980)
 * Getting cached generated formatter on static generic field(don't use dictinary-cache because dictionary lookup is overhead): [Formatter.cs](https://github.com/neuecc/ZeroFormatter/blob/853a0d0c6b7de66b8447b426ab47b90336deca2c/src/ZeroFormatter/Formatters/Formatter.cs)
-* Enum serialize underlying value only and uses fastest cast technique: [EnumFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/853a0d0c6b7de66b8447b426ab47b90336deca2c/src/ZeroFormatter/Formatters/EnumFormatter.cs)
+* Enum is serialized only underlying-value and uses fastest cast technique: [EnumFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/853a0d0c6b7de66b8447b426ab47b90336deca2c/src/ZeroFormatter/Formatters/EnumFormatter.cs)
 
 The result is achieved from both sides of implementation and binary layout. ZeroFormatter's binary layout is tuned for serialize/deserialize speed(this is advantage than other serializer).
 
@@ -475,6 +475,8 @@ We usually use `Serialize<T>` and `Deserialize<T>`, but there are other APIs as 
 If you want to use non-generic API, there are exists under `ZeroFormatterSerializer.NonGeneric`. It can pass Type on first-argument instead of `<T>`.
 
 > NonGeneric API is not supported in Unity. NonGeneric API is a bit slower than the generic API. Because of the lookup of the serializer by type and the cost of boxing if the value is a value type are costly. We recommend using generic API if possible.
+
+`ZeroFormatterSerializer.MaximumSizeOfBytes` is max size per message of serialize/deserialize. The default is 67MB. This limitation is for security issue(block, attack of OutOfMemory). If you want to know more information of this topics, see: [ProtocolBuffers Techniques - Large Data Sets](https://developers.google.com/protocol-buffers/docs/techniques#large-data). 
 
 Extensibility
 ---

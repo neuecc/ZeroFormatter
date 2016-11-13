@@ -52,6 +52,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 2 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 2);
             var result = new Int16[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 2);
 
@@ -106,6 +107,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 4 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 4);
             var result = new Int32[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 4);
 
@@ -160,6 +162,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 8 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 8);
             var result = new Int64[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 8);
 
@@ -214,6 +217,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 2 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 2);
             var result = new UInt16[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 2);
 
@@ -268,6 +272,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 4 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 4);
             var result = new UInt32[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 4);
 
@@ -322,6 +327,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 8 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 8);
             var result = new UInt64[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 8);
 
@@ -376,6 +382,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 4 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 4);
             var result = new Single[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 4);
 
@@ -430,6 +437,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 8 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 8);
             var result = new Double[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 8);
 
@@ -484,6 +492,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 1 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 1);
             var result = new Boolean[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 1);
 
@@ -538,6 +547,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 1 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 1);
             var result = new Byte[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 1);
 
@@ -592,6 +602,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 1 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 1);
             var result = new SByte[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 1);
 
@@ -646,6 +657,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 2 + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * 2);
             var result = new Char[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 2);
 

@@ -76,6 +76,7 @@ namespace ZeroFormatter.Formatters
             var startOffset = offset;
             offset += 4;
             int size;
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
             var result = new T[length];
             for (int i = 0; i < length; i++)
             {
@@ -179,6 +180,7 @@ namespace ZeroFormatter.Formatters
             offset += 4;
             int size;
 
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
             TCollection result;
             if (isList)
             {
@@ -256,6 +258,7 @@ namespace ZeroFormatter.Formatters
             var startOffset = offset;
             offset += 4;
             int size;
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
             var result = new T[length];
             for (int i = 0; i < length; i++)
             {
@@ -320,6 +323,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
 
             var startOffset = offset;
             offset += 4;
@@ -390,6 +394,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
 
             var startOffset = offset;
             offset += 4;
@@ -459,6 +464,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
 
             var startOffset = offset;
             offset += 4;
@@ -521,6 +527,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
 
             var startOffset = offset;
             offset += 4;
@@ -586,6 +593,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
 
             var startOffset = offset;
             offset += 4;
@@ -676,6 +684,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
 
             var startOffset = offset;
             offset += 4;
@@ -744,6 +753,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
 
             var startOffset = offset;
             offset += 4;
@@ -811,6 +821,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
 
             var startOffset = offset;
             offset += 4;
@@ -880,6 +891,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
+            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
 
             var startOffset = offset;
             offset += 4;

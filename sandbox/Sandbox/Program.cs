@@ -96,14 +96,8 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-
-            var demon = new Monster { Race = "Demon", Power = 9999, Magic = 1000 };
-            var human = new Human { Name = "Tokugawa", Age = 32, Faith = 9999 };
-
-            //var data = ZeroFormatterSerializer.Serialize<Character>(demon);
-            ZeroFormatterSerializer.Serialize<Character>(demon);
-
-
+            var b = ZeroFormatterSerializer.Serialize("hogehoge");
+            BinaryUtil.ReadString(ref b, 0, int.MaxValue);
         }
     }
 

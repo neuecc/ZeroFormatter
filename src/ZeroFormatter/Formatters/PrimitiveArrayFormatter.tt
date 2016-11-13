@@ -78,6 +78,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * <#= tuple.Item2 #> + 4;
             }
 
+            BinaryUtil.ValidateNewSize(length * <#= tuple.Item2 #>);
             var result = new <#= t.Name #>[length];
             Buffer.BlockCopy(bytes, offset + 4, result, 0, length * <#= tuple.Item2 #>);
 

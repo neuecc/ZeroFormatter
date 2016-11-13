@@ -13,6 +13,23 @@ namespace ZeroFormatter
 {
     public static class ZeroFormatterSerializer
     {
+        // Same as protocol-buffers
+        // https://developers.google.com/protocol-buffers/docs/techniques#large-data
+        const int DefaultMaxSize = 67108864;
+
+        static int maxSize = DefaultMaxSize;
+        public static int MaximumSizeOfBytes
+        {
+            get
+            {
+                return maxSize;
+            }
+            set
+            {
+                maxSize = value;
+            }
+        }
+
         /// <summary>
         /// Serialize to binary.
         /// </summary>
@@ -25,7 +42,7 @@ namespace ZeroFormatter
             {
                 BinaryUtil.FastResize(ref bytes, size);
             }
-            
+
             return bytes;
         }
 
@@ -312,7 +329,7 @@ namespace ZeroFormatter
                                 ? Expression.Unbox(param1, type)
                                 : Expression.Convert(param1, type), param2);
                         var body = Expression.Convert(callConvert, typeof(object));
-                        var lambda = Expression.Lambda<Func<object,bool, object>>(body, param1, param2).Compile();
+                        var lambda = Expression.Lambda<Func<object, bool, object>>(body, param1, param2).Compile();
 
                         this.convert = lambda;
                     }
