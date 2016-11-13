@@ -121,6 +121,28 @@ There rules can detect ZeroFormatter.Analyzer.
 * UnionKey does not suppor multiple key.
 * All Union sub types must be inherited type.
 
+The definition of struct is somewhat different from class. 
+
+```csharp
+[ZeroFormattable]
+public struct Vector2
+{
+    [Index(0)]
+    public float x;
+    [Index(1)]
+    public float y;
+
+    // arg0 = Index0, arg1 = Index1
+    public Vector2(float x, float y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+}
+```
+
+Struct index must be started with 0 and be sequential and needs full parameter constructor of index property types.
+
 eager/lazy-evaluation
 ---
 ZeroFormatter has two types of evaluation, "eager-evaluation" and "lazy-evaluation". If the type is lazy-evaluation, deserialization will be infinitely fast because it does not parse. If the user-defined class or type is `IList<>`, `IReadOnlyList<>`, `ILazyLookup<>`, `ILazyDicitonary<>`, `ILazyReadOnlyDictionary<>`, deserialization of that type will be lazily evaluated.
@@ -224,6 +246,8 @@ public class Version2
 ```
 
 But you can not delete index. If that index is unnecessary, please make it blank(such as [0, 1, 3]).
+
+Only `class` definition is supported for versioning. Please note that `struct` is not supported.
 
 Union
 ---
