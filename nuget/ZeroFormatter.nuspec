@@ -8,7 +8,7 @@
         <owners>y.neuecc</owners>
         <projectUrl>https://github.com/neuecc/ZeroFormatter/</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Infinitly fast serializer for .NET, .NET Core and Unity.</description>
+        <description>Infinitely fast serializer for .NET, .NET Core and Unity.</description>
         <releaseNotes>Support wellknown interface collections.</releaseNotes>
         <tags>ZeroFormatter, Serialization, Formatter, Serializer</tags>
         <frameworkAssemblies>

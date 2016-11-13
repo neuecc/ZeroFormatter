@@ -1,6 +1,6 @@
 ZeroFormatter
 ===
-Fastest C# Serializer and Infinitly Fast Deserializer for .NET, .NET Core and Unity.
+Fastest C# Serializer and Infinitely Fast Deserializer for .NET, .NET Core and Unity.
 
 [![Gitter](https://badges.gitter.im/neuecc/ZeroFormatter.svg)](https://gitter.im/neuecc/ZeroFormatter?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
@@ -11,13 +11,13 @@ Note: this is **unfair** comparison, please see the [performance](https://github
 Why use ZeroFormatter?
 ---
 * **Fastest** C# serializer, the code is extremely tuned by both implementation and binary layout(see: [performance](https://github.com/neuecc/ZeroFormatter#performance))
-* Deserialize/re-serialize is infinitly fast because formatter can access to serialized data without parsing/packing(see: [architecture](https://github.com/neuecc/ZeroFormatter#architecture))
+* Deserialize/re-serialize is Infinitely fast because formatter can access to serialized data without parsing/packing(see: [architecture](https://github.com/neuecc/ZeroFormatter#architecture))
 * Strongly Typed and C# Code as schema, no needs to other IDL like `.proto`, `.fbs`...
 * Smart API, only to use `Serialize<T>` and `Deserialize<T>`
 * Full set of general purpose, multifunctional serializer, supports Union(Polymorphism) and native support of Dictionary, MultiDictionary(ILookup)
 * First-class support to Unity(IL2CPP), it's faster than native JsonUtility
 
-ZeroFormatter is similar as [FlatBuffers](http://google.github.io/flatbuffers/) but ZeroFormatter has clean API(FlatBuffers API is too ugly, [see: sample](https://github.com/google/flatbuffers/blob/master/samples/SampleBinary.cs); we can not use reguraly) and C# specialized. If you need to performance such as Game, Distributed Computing, Microservices etc..., ZeroFormatter will help you.
+ZeroFormatter is similar as [FlatBuffers](http://google.github.io/flatbuffers/) but ZeroFormatter has clean API(FlatBuffers API is too ugly, [see: sample](https://github.com/google/flatbuffers/blob/master/samples/SampleBinary.cs); we can not use regularly) and C# specialized. If you need to performance such as Game, Distributed Computing, Microservices, etc..., ZeroFormatter will help you.
 
 Install
 ---
@@ -25,7 +25,7 @@ for .NET, .NET Core
 
 * PM> Install-Package [ZeroFormatter](https://www.nuget.org/packages/ZeroFormatter)
 
-for Unity(Interfaces can reference both .NET 3.5 and Unity for share types), Unity binary is exists on [ZeroFormatter/Releases](https://github.com/neuecc/ZeroFormatter/releases) as well. More details, please see the [Unity-Supports](https://github.com/neuecc/ZeroFormatter#unity-supports) section.
+for Unity(Interfaces can reference both .NET 3.5 and Unity for share types), Unity binary exists on [ZeroFormatter/Releases](https://github.com/neuecc/ZeroFormatter/releases) as well. More details, please see the [Unity-Supports](https://github.com/neuecc/ZeroFormatter#unity-supports) section.
 
 * PM> Install-Package [ZeroFormatter.Interfaces](https://www.nuget.org/packages/ZeroFormatter.Interfaces/)
 * PM> Install-Package [ZeroFormatter.Unity](https://www.nuget.org/packages/ZeroFormatter.Unity)
@@ -102,7 +102,7 @@ This is a sample of the contents of ZeroFormatterAnalyzer.json.
 
 Built-in support types
 ---
-All primitives, All enums, `TimeSpan`,  `DateTime`, `DateTimeOffset`, `Tuple<,...>`, `KeyValuePair<,>`, `KeyTuple<,...>`, `Array`, `List<>`, `HashSet<>`, `Dictionary<,>`, `ReadOnlyCollection<>`, `ReadOnlyDictionary<,>`, `IEnumerable<>`, `ICollection<>`, `IList<>`, `ISet<,>`, `IReadOnlyCollection<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<,>`, `ILookup<,>` and inherited `ICollection<>` with paramterless constructor. Support type can extend easily, see: [Extensibility](https://github.com/neuecc/ZeroFormatter#performance) section.
+All primitives, All enums, `TimeSpan`,  `DateTime`, `DateTimeOffset`, `Tuple<,...>`, `KeyValuePair<,>`, `KeyTuple<,...>`, `Array`, `List<>`, `HashSet<>`, `Dictionary<,>`, `ReadOnlyCollection<>`, `ReadOnlyDictionary<,>`, `IEnumerable<>`, `ICollection<>`, `IList<>`, `ISet<,>`, `IReadOnlyCollection<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<,>`, `ILookup<,>` and inherited `ICollection<>` with paramterless constructor. Support type can extend easily, see: [Extensibility](https://github.com/neuecc/ZeroFormatter#extensibility) section.
 
 Define object rules
 ---
@@ -112,13 +112,13 @@ There rules can detect ZeroFormatter.Analyzer.
 * Public property must be marked with IndexAttribute or IgnoreFormatAttribute.
 * Public property's must needs both public/protected get and set accessor.
 * Public property's accessor must be virtual.
-* Class is only supports public property not field(If struct can define field).
-* IndexAttribute is not allow duplicate number.
-* Class must needs parameterless constructor.
+* Class is only supported public property not field(If struct can define field).
+* IndexAttribute is not allowed duplicate number.
+* Class must needs a parameterless constructor.
 * Struct index must be started with 0 and be sequential.
 * Struct needs full parameter constructor of index property types.
 * Union type requires UnionKey property.
-* UnionKey does not suppor multiple key.
+* UnionKey does not support multiple keys.
 * All Union sub types must be inherited type.
 
 The definition of struct is somewhat different from class. 
@@ -374,7 +374,7 @@ zfc.exe -i "..\src\Sandbox.Shared.csproj" -s -o "..\unity\ZfcCompiled\"
 
 > Note: zfc.exe is currently only run on Windows. It is .NET Core's [Roslyn](https://github.com/dotnet/roslyn) workspace API limitation but I want to implements to all platforms...
 
-Generated formatters must needs register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
+Generated formatters must need to register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
 
 ZeroFormatter can not serialize Unity native types by default but you can make custom formatter by define pseudo type. For example create `Vector2` to ZeroFormatter target. 
 
@@ -404,15 +404,15 @@ namespace UnityEngine
 #endif
 ```
 
-`INCLUDE_ONLY_CODE_GENERATION` is special symbol of zfc, include generator target but does not includes compile.
+`INCLUDE_ONLY_CODE_GENERATION` is special symbol of zfc, include generator target but does not include compile.
 
-If you encount `InvalidOperationException` such as 
+If you encounter `InvalidOperationException` such as 
 
 ```
 InvalidOperationException: Type is not supported, please register Vector3[]
 ```
 
-It means not generated/registed type. Especially collections are not automatically registered if they are not included in the property. You can register manually such as `Formatter.RegisterArray<UnityEngine.Vector3>()` or create hint type for zfc.
+It means not generated/registered type. Especially collections are not automatically registered if they are not included in the property. You can register manually such as `Formatter.RegisterArray<UnityEngine.Vector3>()` or create hint type for zfc.
 
 ```csharp
 using ZeroFormatter;
@@ -437,7 +437,7 @@ Benchmarks comparing to other serializers run on `Windows 10 Pro x64 Intel Core 
 
 ![](https://cloud.githubusercontent.com/assets/46207/20077970/f3ce8044-a581-11e6-909d-e30b2a33e991.png)
 
-Deserialize speed is infinitly fast(but of course it is **unfair**, ZeroFormatter's deserialize is delayed when access target field). Serialize speed is fair-comparison. ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) for sure. ZeroFormatter has many reasons why fast.
+Deserialize speed is Infinitely fast(but of course, it is **unfair**, ZeroFormatter's deserialize is delayed when access target field). Serialize speed is fair-comparison. ZeroFormatter is fastest(compare to protobuf-net, 2~3x fast) for sure. ZeroFormatter has many reasons why fast.
 
 * Serializer uses only `ref byte[]` and `int offset`, don't use MemoryStream(call MemoryStream api is overhead)
 * Don't use variable-length number when encode number so there has encode cost(for example; protobuf uses ZigZag Encoding)
@@ -449,7 +449,7 @@ Deserialize speed is infinitly fast(but of course it is **unfair**, ZeroFormatte
 * Getting cached generated formatter on static generic field(don't use dictinary-cache because dictionary lookup is overhead): [Formatter.cs](https://github.com/neuecc/ZeroFormatter/blob/853a0d0c6b7de66b8447b426ab47b90336deca2c/src/ZeroFormatter/Formatters/Formatter.cs)
 * Enum serialize underlying value only and uses fastest cast technique: [EnumFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/853a0d0c6b7de66b8447b426ab47b90336deca2c/src/ZeroFormatter/Formatters/EnumFormatter.cs)
 
-The result is achived from both sides of implementation and binary layout. ZeroFormatter's binary layout is tuned for serialize/deserialize speed(this is advantage than other serializer).
+The result is achieved from both sides of implementation and binary layout. ZeroFormatter's binary layout is tuned for serialize/deserialize speed(this is advantage than other serializer).
 
 **In Unity**
 
@@ -464,17 +464,17 @@ ZeroFormatter is faster than JsonUtility so yes, faster than native serializer! 
 ![image](https://cloud.githubusercontent.com/assets/46207/20247341/2393be4a-aa0d-11e6-8475-ec50bfefa687.png)
 ![image](https://cloud.githubusercontent.com/assets/46207/20140306/c6b1b0fc-a6cd-11e6-9193-303179d23764.png)
 
-ZeroFormatter is optimized for all types(small struct to large object!). I know why protobuf-net is slow on integer test, currently [protobuf-net's internal serialize method](https://github.com/mgravell/protobuf-net/blob/0d0bb407865600c7dad1b833a9a1f71ef48c7106/protobuf-net/Meta/TypeModel.cs#L210) has only `object value` so it causes boxing and critical for performance. Anyway ZeroFormatter's simple struct and struct array(struct array is serialized FixedSizeList format internally, it is faster than class array)'s serialization/deserialization speed is very fast that effective storing value to KeyValueStore(like Redis) or network gaming(transport many transform position), etc.
+ZeroFormatter is optimized for all types(small struct to large object!). I know why protobuf-net is slow on integer test, currently [protobuf-net's internal serialize method](https://github.com/mgravell/protobuf-net/blob/0d0bb407865600c7dad1b833a9a1f71ef48c7106/protobuf-net/Meta/TypeModel.cs#L210) has only `object value` so it causes boxing and critical for performance. Anyway, ZeroFormatter's simple struct and struct array(struct array is serialized FixedSizeList format internally, it is faster than class array)'s serialization/deserialization speed is very fast that effective storing value to KeyValueStore(like Redis) or network gaming(transport many transform position), etc.
 
 ZeroFormatterSerializer API
 ---
-We usually use `Serialize<T>` and `Deserialize<T>`, but there are other APIs as well. `Convert<T>` is converted T to T but the return value is wrapped data. It is fast when reserialization so if you store the immutable data and serialize frequently, very effective. `IsFormattedObject<T>` can checked the data is wrapped data or not.
+We usually use `Serialize<T>` and `Deserialize<T>`, but there are other APIs as well. `Convert<T>` is converted T to T but the return value is wrapped data. It is fast when reserialization so if you store the immutable data and serialize frequently, very effective. `IsFormattedObject<T>` can check the data is wrapped data or not.
 
-`Serialize<T>` has some overload, one of them is the NonAllocate API. `int Serialize<T>(ref byte[] buffer, int offset, T obj)` is expand the buffer but do not shrink. Return value int is size so you can pass the buffer from array pooling, ZeroFormatter does not allocate any extra memory.
+`Serialize<T>` has some overload, one of them is the NonAllocate API. `int Serialize<T>(ref byte[] buffer, int offset, T obj)` expands the buffer but do not shrink. Return value int is size so you can pass the buffer from array pooling, ZeroFormatter does not allocate any extra memory.
 
 If you want to use non-generic API, there are exists under `ZeroFormatterSerializer.NonGeneric`. It can pass Type on first-argument instead of `<T>`.
 
-> NonGeneric API is not supported in Unity. NonGeneric API is a bit slower than the generic API. Because the lookup of the serializer by type and the cost of boxing if the value is a value type are costly. We recommend using generic API if possible.
+> NonGeneric API is not supported in Unity. NonGeneric API is a bit slower than the generic API. Because of the lookup of the serializer by type and the cost of boxing if the value is a value type are costly. We recommend using generic API if possible.
 
 Extensibility
 ---
@@ -532,7 +532,7 @@ ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
 ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
 ```
 
-One more case, how to create generic formatter. For example, If implemnts `ImmutableList<T>`?
+One more case, how to create generic formatter. For example, If implements `ImmutableList<T>`?
 
 ```csharp
 public class ImmutableListFormatter<T> : Formatter<ImmutableList<T>>
@@ -727,9 +727,9 @@ namespace /* Namespace */
 }
 ```
 
-Cross Plaftorm
+Cross Platform
 ---
-Currently No and I have no plans. Welcome to contribute port to other languages, I want to help your work!
+Currently, No and I have no plans. Welcome to contribute port to other languages, I want to help your work!
 
 ZeroFormatter spec has three stages.
 
