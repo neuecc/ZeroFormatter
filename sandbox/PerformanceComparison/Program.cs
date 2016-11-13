@@ -114,17 +114,21 @@ class Program
         Console.WriteLine("Warming-up"); Console.WriteLine();
         SerializeZeroFormatter(p); SerializeZeroFormatter(l); 
         SerializeZeroFormatter(integer); SerializeZeroFormatter(v3); SerializeZeroFormatter(largeString); SerializeZeroFormatter(v3List);
-        SerializeProtobuf(p); SerializeProtobuf(l); 
-        SerializeProtobuf(integer); SerializeProtobuf(v3); SerializeProtobuf(largeString); SerializeProtobuf(v3List);
-        SerializeMsgPack(p); SerializeMsgPack(l);
-        SerializeMsgPack(integer); SerializeMsgPack(v3); SerializeMsgPack(largeString); SerializeMsgPack(v3List);
-        SerializeJsonNet(p); SerializeJsonNet(l);
-        SerializeJil(p); SerializeJil(l);
-        SerializeFsPickler(p); SerializeFsPickler(l);
-        SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
-        SerializeDataContract(p); SerializeDataContract(l);
-        SerializeSingleFlatBuffers(); SerializeArrayFlatBuffers();
-        SerializeSingleProto3(p); SerializeArrayProto3(l);
+        //SerializeProtobuf(p); SerializeProtobuf(l); 
+        //SerializeProtobuf(integer); SerializeProtobuf(v3); SerializeProtobuf(largeString); SerializeProtobuf(v3List);
+        //SerializeMsgPack(p); SerializeMsgPack(l);
+        //SerializeMsgPack(integer); SerializeMsgPack(v3); SerializeMsgPack(largeString); SerializeMsgPack(v3List);
+
+        SerializeWire(p); SerializeWire(l);
+        SerializeWire(integer); SerializeWire(v3); SerializeWire(largeString); SerializeWire(v3List);
+
+        //SerializeJsonNet(p); SerializeJsonNet(l);
+        //SerializeJil(p); SerializeJil(l);
+        //SerializeFsPickler(p); SerializeFsPickler(l);
+        //SerializeBinaryFormatter(p); SerializeBinaryFormatter(l);
+        //SerializeDataContract(p); SerializeDataContract(l);
+        //SerializeSingleFlatBuffers(); SerializeArrayFlatBuffers();
+        //SerializeSingleProto3(p); SerializeArrayProto3(l);
 
         dryRun = false;
 
@@ -132,39 +136,42 @@ class Program
         Console.WriteLine($"Small Object(int,string,string,enum) {Iteration} Iteration"); Console.WriteLine();
 
         var a = SerializeZeroFormatter(p); Console.WriteLine();
-        var b = SerializeProtobuf(p); Console.WriteLine();
-        var c = SerializeMsgPack(p); Console.WriteLine();
-        var d = SerializeJsonNet(p); Console.WriteLine();
-        var e = SerializeJil(p); Console.WriteLine();
-        var f = SerializeFsPickler(p); Console.WriteLine();
-        var g = SerializeBinaryFormatter(p); Console.WriteLine();
-        var h = SerializeDataContract(p); Console.WriteLine();
-        var i = SerializeSingleFlatBuffers(); Console.WriteLine();
-        var j = SerializeSingleProto3(p); Console.WriteLine();
+        SerializeWire(p); Console.WriteLine();
+
+        //var b = SerializeProtobuf(p); Console.WriteLine();
+        //var c = SerializeMsgPack(p); Console.WriteLine();
+        //var d = SerializeJsonNet(p); Console.WriteLine();
+        //var e = SerializeJil(p); Console.WriteLine();
+        //var f = SerializeFsPickler(p); Console.WriteLine();
+        //var g = SerializeBinaryFormatter(p); Console.WriteLine();
+        //var h = SerializeDataContract(p); Console.WriteLine();
+        //var i = SerializeSingleFlatBuffers(); Console.WriteLine();
+        //var j = SerializeSingleProto3(p); Console.WriteLine();
 
         Console.WriteLine($"Large Array(SmallObject[1000]) {Iteration} Iteration"); Console.WriteLine();
 
         var A = SerializeZeroFormatter(l); Console.WriteLine();
-        var B = SerializeProtobuf(l); Console.WriteLine();
-        var C = SerializeMsgPack(l); Console.WriteLine();
-        var D = SerializeJsonNet(l); Console.WriteLine();
-        var E = SerializeJil(l); Console.WriteLine();
-        var F = SerializeFsPickler(l); Console.WriteLine();
-        var G = SerializeBinaryFormatter(l); Console.WriteLine();
-        var H = SerializeDataContract(l); Console.WriteLine();
-        var I = SerializeArrayFlatBuffers(); Console.WriteLine();
-        var J = SerializeArrayProto3(l); Console.WriteLine();
+        SerializeWire(l); Console.WriteLine();
+        //var B = SerializeProtobuf(l); Console.WriteLine();
+        //var C = SerializeMsgPack(l); Console.WriteLine();
+        //var D = SerializeJsonNet(l); Console.WriteLine();
+        //var E = SerializeJil(l); Console.WriteLine();
+        //var F = SerializeFsPickler(l); Console.WriteLine();
+        //var G = SerializeBinaryFormatter(l); Console.WriteLine();
+        //var H = SerializeDataContract(l); Console.WriteLine();
+        //var I = SerializeArrayFlatBuffers(); Console.WriteLine();
+        //var J = SerializeArrayProto3(l); Console.WriteLine();
 
-        Validate("ZeroFormatter", p, l, a, A);
-        Validate("protobuf-net", p, l, b, B);
-        Validate("MsgPack-CLI", p, l, c, C);
-        Validate("JSON.NET", p, l, d, D);
-        Validate("Jil", p, l, e, E);
-        Validate("FsPickler", p, l, f, F);
-        Validate("BinaryFormatter", p, l, g, G);
-        Validate("DataContract", p, l, h, H);
-        ValidateFlatBuffers(p, l, i, I);
-        ValidateProto3(p, l, j, J);
+        //Validate("ZeroFormatter", p, l, a, A);
+        //Validate("protobuf-net", p, l, b, B);
+        //Validate("MsgPack-CLI", p, l, c, C);
+        //Validate("JSON.NET", p, l, d, D);
+        //Validate("Jil", p, l, e, E);
+        //Validate("FsPickler", p, l, f, F);
+        //Validate("BinaryFormatter", p, l, g, G);
+        //Validate("DataContract", p, l, h, H);
+        //ValidateFlatBuffers(p, l, i, I);
+        //ValidateProto3(p, l, j, J);
 
         Console.WriteLine();
         Console.WriteLine("Additional Benchmarks"); Console.WriteLine();
@@ -172,31 +179,37 @@ class Program
         Console.WriteLine($"Int32(1) {Iteration} Iteration"); Console.WriteLine();
 
         var W1 = SerializeZeroFormatter(integer); Console.WriteLine();
-        var W2 = SerializeMsgPack(integer); Console.WriteLine();
-        var W3 = SerializeProtobuf(integer); Console.WriteLine();
+        SerializeWire(integer); Console.WriteLine();
+        //var W2 = SerializeMsgPack(integer); Console.WriteLine();
+        //var W3 = SerializeProtobuf(integer); Console.WriteLine();
 
         Console.WriteLine($"Vector3(float, float, float) {Iteration} Iteration"); Console.WriteLine();
 
         var X1 = SerializeZeroFormatter(v3); Console.WriteLine();
-        var X2 = SerializeMsgPack(v3); Console.WriteLine();
-        var X3 = SerializeProtobuf(v3); Console.WriteLine();
+
+        SerializeWire(v3); Console.WriteLine();
+        //var X2 = SerializeMsgPack(v3); Console.WriteLine();
+        //var X3 = SerializeProtobuf(v3); Console.WriteLine();
 
         Console.WriteLine($"HtmlString({Encoding.UTF8.GetByteCount(largeString)}bytes) {Iteration} Iteration"); Console.WriteLine();
+        
 
         var Y1 = SerializeZeroFormatter(largeString); Console.WriteLine();
-        var Y2 = SerializeMsgPack(largeString); Console.WriteLine();
-        var Y3 = SerializeProtobuf(largeString); Console.WriteLine();
+        SerializeWire(largeString); Console.WriteLine();
+        //var Y2 = SerializeMsgPack(largeString); Console.WriteLine();
+        //var Y3 = SerializeProtobuf(largeString); Console.WriteLine();
 
         Console.WriteLine($"Vector3[100] {Iteration} Iteration"); Console.WriteLine();
 
         var Z1 = SerializeZeroFormatter(v3List); Console.WriteLine();
-        var Z2 = SerializeMsgPack(v3List); Console.WriteLine();
-        var Z3 = SerializeProtobuf(v3List); Console.WriteLine();
+        SerializeWire(v3List); Console.WriteLine();
+        //var Z2 = SerializeMsgPack(v3List); Console.WriteLine();
+        //var Z3 = SerializeProtobuf(v3List); Console.WriteLine();
 
-        Validate2("ZeroFormatter", W1, integer); Validate2("MsgPack-Cli", W2, integer); Validate2("MsgPack", W3, integer);
-        Validate2("ZeroFormatter", X1, v3); Validate2("MsgPack-Cli", X2, v3); Validate2("MsgPack", X3, v3);
-        Validate2("ZeroFormatter", Y1, largeString); Validate2("MsgPack-Cli", Y2, largeString); Validate2("MsgPack", Y3, largeString);
-        Validate2("ZeroFormatter", Z1, v3List); Validate2("MsgPack-Cli", Z2, v3List); Validate2("MsgPack", Z3, v3List);
+        //Validate2("ZeroFormatter", W1, integer); Validate2("MsgPack-Cli", W2, integer); Validate2("MsgPack", W3, integer);
+        //Validate2("ZeroFormatter", X1, v3); Validate2("MsgPack-Cli", X2, v3); Validate2("MsgPack", X3, v3);
+        //Validate2("ZeroFormatter", Y1, largeString); Validate2("MsgPack-Cli", Y2, largeString); Validate2("MsgPack", Y3, largeString);
+        //Validate2("ZeroFormatter", Z1, v3List); Validate2("MsgPack-Cli", Z2, v3List); Validate2("MsgPack", Z3, v3List);
     }
 
     static void Validate(string label, Person original, IList<Person> originalList, Person copy, IList<Person> copyList)
@@ -249,6 +262,48 @@ class Program
         if (!dryRun)
         {
             Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(bytes.Length)));
+        }
+
+        return copy;
+    }
+
+    static T SerializeWire<T>(T original)
+    {
+        Console.WriteLine("Wire");
+
+        T copy = default(T);
+        MemoryStream stream = null;
+
+        var serializer = new Wire.Serializer();
+
+        using (new Measure("Wire"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                serializer.Serialize(original, stream = new MemoryStream());
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                stream.Position = 0;
+                copy = serializer.Deserialize<T>(stream);
+            }
+        }
+
+        using (new Measure("ReSerialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                serializer.Serialize(original, stream = new MemoryStream());
+            }
+        }
+
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
         }
 
         return copy;
