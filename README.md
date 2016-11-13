@@ -406,9 +406,9 @@ Deserialize speed is infinitly fast(but of course it is **unfair**, ZeroFormatte
 * Avoid boxing all codes, all platforms(include Unity/IL2CPP)
 * Reduce native string encoder methods
 * Don't create intermediate utility instance(XxxWriter/Reader, XxxContext, etc...)
-* Heavyly tuned dynamic il code generation: [DynamicObjectFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/7e68883dc3365d2caf32279cf64f07427b94f109/src/ZeroFormatter/Formatters/DynamicObjectFormatter.cs#L186-L583)
-* Getting cached generated formatter on static generic field(don't use dictinary-cache because dictionary lookup is overhead): [Formatter.cs](https://github.com/neuecc/ZeroFormatter/blob/7e68883dc3365d2caf32279cf64f07427b94f109/src/ZeroFormatter/Formatters/Formatter.cs)
-* Enum serialize underlying value only and uses fastest cast technique: [EnumFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/57bd76e8121cd6421abda4d69ad677950df9d26f/src/ZeroFormatter/Formatters/EnumFormatter.cs)
+* Heavyly tuned dynamic il code generation: [DynamicObjectFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/853a0d0c6b7de66b8447b426ab47b90336deca2c/src/ZeroFormatter/Formatters/DynamicFormatter.cs#L212-L980)
+* Getting cached generated formatter on static generic field(don't use dictinary-cache because dictionary lookup is overhead): [Formatter.cs](https://github.com/neuecc/ZeroFormatter/blob/853a0d0c6b7de66b8447b426ab47b90336deca2c/src/ZeroFormatter/Formatters/Formatter.cs)
+* Enum serialize underlying value only and uses fastest cast technique: [EnumFormatter.cs](https://github.com/neuecc/ZeroFormatter/blob/853a0d0c6b7de66b8447b426ab47b90336deca2c/src/ZeroFormatter/Formatters/EnumFormatter.cs)
 
 The result is achived from both sides of implementation and binary layout. ZeroFormatter's binary layout is tuned for serialize/deserialize speed(this is advantage than other serializer).
 
