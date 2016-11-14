@@ -327,7 +327,7 @@ class Program
         T copy = default(T);
         MemoryStream stream = null;
 
-        using (new Measure("Wire"))
+        using (new Measure("Serialize"))
         {
             for (int i = 0; i < Iteration; i++)
             {
