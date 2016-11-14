@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>ZeroFormatter.Interfaces</id>
-        <version>1.3.1</version>
+        <version>1.3.2</version>
         <title>ZeroFormatter.Interfaces</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
@@ -33,5 +33,6 @@
         <file src="..\src\ZeroFormatter.Interfaces\bin\Release\ZeroFormatter.Interfaces.dll" target="lib\net45" />
         <file src="..\src\ZeroFormatter.Interfaces.NETCore\bin\Release\netstandard1.1\ZeroFormatter.Interfaces.dll" target="lib\netstandard1.1" />
         <file src="zfc.exe" target="tools\" />
+        <file src="zfc.exe.config" target="tools\" />
     </files>
 </package>
