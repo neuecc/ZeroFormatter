@@ -437,7 +437,7 @@ namespace ZfcHint
 
 Performance
 ---
-Benchmarks comparing to other serializers run on `Windows 10 Pro x64 Intel Core i7-6700 3.40GHz, 32GB RAM`. Benchmark code is [here](https://github.com/neuecc/ZeroFormatter/tree/master/sandbox/PerformanceComparison) and full-result is [here](https://gist.github.com/neuecc/f786e7161e0af9578d717942372bc1f4).
+Benchmarks comparing to other serializers run on `Windows 10 Pro x64 Intel Core i7-6700 3.40GHz, 32GB RAM`. Benchmark code is [here](https://github.com/neuecc/ZeroFormatter/tree/master/sandbox/PerformanceComparison) and full-result is [here](https://gist.github.com/neuecc/f786e7161e0af9578d717942372bc1f4), latest compare with more serializers(Wire, NetSerializer, etc...) result is [here](https://github.com/neuecc/ZeroFormatter/issues/30).
 
 ![](https://cloud.githubusercontent.com/assets/46207/20078590/81b890aa-a584-11e6-838b-5f2a4f1a11f8.png)
 
