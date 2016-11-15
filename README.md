@@ -256,7 +256,7 @@ DateTime
 `DateTime` is serialized to UniversalTime so lose the TimeKind. If you want to change local time, use ToLocalTime after converted. 
 
 ```csharp
-// in Tokyo, UTC +9:00
+// in Tokyo, Japan Local Time(UTC+9)
 var date = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
 Console.WriteLine(date);
 
@@ -270,7 +270,7 @@ var toLocal = deserialized.ToLocalTime();
 If you want to save offset info, use DateTimeOffset instead of DateTime. 
 
 ```csharp
-// in Tokyo, UTC +9:00
+// in Tokyo, Japan Local Time(UTC+9)
 var date = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
 
 // 2000/1/1, +9:00
