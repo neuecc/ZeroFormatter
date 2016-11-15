@@ -251,6 +251,35 @@ But you can not delete index. If that index is unnecessary, please make it blank
 
 Only `class` definition is supported for versioning. Please note that `struct` is not supported.
 
+DateTime
+---
+`DateTime` is serialized to UniversalTime so lose the TimeKind. If you want to change local time, use ToLocalTime after converted. 
+
+```csharp
+// in Tokyo, UTC +9:00
+var date = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
+Console.WriteLine(date);
+
+// 1999/12/31 15:00:00(UTC)
+var deserialized = ZeroFormatterSerializer.Deserialize<DateTime>(ZeroFormatterSerializer.Serialize(date));
+
+// 2000/1/1 00:00:00(in Tokyo, +9:00)
+var toLocal = deserialized.ToLocalTime();
+```
+
+If you want to save offset info, use DateTimeOffset instead of DateTime. 
+
+```csharp
+// in Tokyo, UTC +9:00
+var date = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
+
+// 2000/1/1, +9:00
+var target = new DateTimeOffset(date);
+
+// 2000/1/1, +9:00
+var deserialized = ZeroFormatterSerializer.Deserialize<DateTimeOffset>(ZeroFormatterSerializer.Serialize(target));
+```
+
 Union
 ---
 ZeroFormatter supports Union(Polymorphic) type. It can define abstract class and `UnionAttributes`, `UnionKeyAttribute`.
@@ -591,7 +620,7 @@ All formats are represented in little endian. There are two lengths of binary, f
 
 **Primitive Format**
 
-Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is serialized there underlying type. DateTime, DateTimeOffset is serialized UniversalTime and serialized format is same as Protocol Buffers's [timestamp.proto](https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto).
+Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is serialized there underlying type. TimeSpan, DateTime is serialized UniversalTime and serialized format is same as Protocol Buffers's [timestamp.proto](https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto).
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
@@ -609,7 +638,7 @@ Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is 
 | Char | [ushort(2)] |
 | TimeSpan | [seconds:long(8)][nanos:int(4)] |
 | DateTime | [seconds:long(8)][nanos:int(4)] |
-| DateTimeOffset | [seconds:long(8)][nanos:int(4)] |
+| DateTimeOffset | [dateTime:DateTime(12)][offset:TimeSpan(12)] | DateTime with a time difference |
 | String | [utf8Bytes:(length)] | currently no used but reserved for future |
 | Int16? | [hasValue:bool(1)][short(2)] |
 | Int32? | [hasValue:bool(1)][int(4)] |
@@ -625,7 +654,7 @@ Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is 
 | Char? | [hasValue:bool(1)][ushort(2)] |
 | TimeSpan? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
 | DateTime? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
-| DateTimeOffset? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
+| DateTimeOffset? | [hasValue:bool(1)][dateTime:DateTime(12)][offset:TimeSpan(12)] | DateTime with a time difference |
 | String? | [length:int(4)][utf8Bytes:(length)] | representes `String`, if length = -1, indicates null. This is only variable-length primitive. |
 
 **Sequence Format**

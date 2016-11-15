@@ -31,11 +31,6 @@ namespace ZeroFormatter.Tests
             BinaryUtil.ReadDateTime(ref bytes, offset).Is(now);
 
             bytes = new byte[100];
-            var now2 = DateTimeOffset.Now.ToUniversalTime();
-            BinaryUtil.WriteDateTimeOffset(ref bytes, offset, now2).Is(12);
-            BinaryUtil.ReadDateTimeOffset(ref bytes, offset).Is(now2);
-
-            bytes = new byte[100];
             BinaryUtil.WriteDecimal(ref bytes, offset, decimal.MaxValue).Is(16);
             BinaryUtil.ReadDecimal(ref bytes, offset).Is(decimal.MaxValue);
 

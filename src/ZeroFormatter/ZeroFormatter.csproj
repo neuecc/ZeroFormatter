@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Comparers\KeyTupleEqualityComparer.cs" />
     <Compile Include="Comparers\WireFormatEqualityComparers.cs" />
+    <Compile Include="Formatters\DateTimeOffsetFormatter.cs" />
     <Compile Include="Formatters\PrimitiveArrayFormatter.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

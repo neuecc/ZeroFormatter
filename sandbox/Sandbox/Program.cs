@@ -92,12 +92,70 @@ namespace Sandbox
     }
 
 
+    [Serializable]
+    [ZeroFormattable]
+    public struct LargeStruct
+    {
+        private static void A(bool b)
+        {
+            if (!b)
+                throw new Exception();
+        }
+
+        [Index(0)]
+        private ulong m_val1;
+        [Index(1)]
+        private ulong m_val2;
+        [Index(2)]
+        private ulong m_val3;
+        [Index(3)]
+        private ulong m_val4;
+
+        private static ulong counter;
+
+        public LargeStruct(ulong m_val1, ulong m_val2, ulong m_val3, ulong m_val4)
+        {
+            this.m_val1 = m_val1;
+            this.m_val2 = m_val2;
+            this.m_val3 = m_val3;
+            this.m_val4 = m_val4;
+        }
+
+        public static LargeStruct Create()
+        {
+            return new LargeStruct
+            {
+                m_val1 = counter++,
+                m_val2 = ulong.MaxValue - counter++,
+                m_val3 = counter++,
+                m_val4 = ulong.MaxValue - counter++
+            };
+        }
+
+        public static void Compare(LargeStruct a, LargeStruct b)
+        {
+            A(a.m_val1 == b.m_val1);
+            A(a.m_val2 == b.m_val2);
+            A(a.m_val3 == b.m_val3);
+            A(a.m_val4 == b.m_val4);
+        }
+    }
     class Program
     {
         static void Main(string[] args)
         {
-            var b = ZeroFormatterSerializer.Serialize("hogehoge");
-            BinaryUtil.ReadString(ref b, 0, int.MaxValue);
+
+// in Tokyo, UTC +9:00
+var date = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
+
+// 2000/1/1, +9:00
+var target = new DateTimeOffset(date);
+
+// 2000/1/1, +9:00
+var deserialized = ZeroFormatterSerializer.Deserialize<DateTimeOffset>(ZeroFormatterSerializer.Serialize(target));
+
+
+            Console.WriteLine(deserialized);
         }
     }
 

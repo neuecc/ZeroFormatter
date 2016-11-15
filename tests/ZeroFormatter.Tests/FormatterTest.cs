@@ -313,7 +313,7 @@ namespace ZeroFormatter.Tests
         [TestMethod]
         public void DatetimeOffset()
         {
-            var now = DateTimeOffset.Now.ToUniversalTime();
+            var now = new DateTimeOffset(2000, 1, 1, 0, 0, 0, System.TimeSpan.FromHours(9));
             {
                 var r = ZeroFormatterSerializer.Serialize<DateTimeOffset>(now);
                 ZeroFormatterSerializer.Deserialize<DateTimeOffset>(r).ToString("yyyy-MM-dd HH:mm:ss fff").Is(now.ToString("yyyy-MM-dd HH:mm:ss fff"));

@@ -9,7 +9,7 @@
         <projectUrl>https://github.com/neuecc/ZeroFormatter/</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Analyzer of ZeroFormatter, verify rule for [ZeroFormattable] classes.</description>
-        <releaseNotes>Support 1.3.3 WireFormat.</releaseNotes>
+        <releaseNotes>Support 1.4.0 WireFormat.</releaseNotes>
         <tags>ZeroFormatter, analyzers</tags>
         <frameworkAssemblies>
             <frameworkAssembly assemblyName="System" targetFramework="" />

@@ -24,7 +24,6 @@
         Tuple.Create(typeof(Guid), 16),
         Tuple.Create(typeof(TimeSpan), 12),
         Tuple.Create(typeof(DateTime), 12),
-        Tuple.Create(typeof(DateTimeOffset), 12),
     };
 
 #>

@@ -452,16 +452,6 @@ namespace ZeroFormatter.Internal
             }
         }
 
-        public static int WriteDateTimeOffset(ref byte[] bytes, int offset, DateTimeOffset dateTime)
-        {
-            return WriteDateTime(ref bytes, offset, dateTime.UtcDateTime);
-        }
-
-        public static DateTimeOffset ReadDateTimeOffset(ref byte[] bytes, int offset)
-        {
-            return new DateTimeOffset(ReadDateTime(ref bytes, offset), TimeSpan.Zero);
-        }
-
         internal static class Timestamp
         {
             internal static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
