@@ -44,7 +44,7 @@ namespace <#= Namespace #>
             var startOffset = offset;
 
             offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
-            offset += Formatter<<#= t.UnionKeyTypeName #>>.Default.Serialize(ref bytes, offset, value.Type);
+            offset += Formatter<<#= t.UnionKeyTypeName #>>.Default.Serialize(ref bytes, offset, value.<#= t.UnionKeyPropertyName #>);
 
 <# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
             <#= i != 0 ? "else if" : "if" #> (value is <#= subType  #>)

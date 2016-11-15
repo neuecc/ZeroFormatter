@@ -22,7 +22,6 @@ namespace ZeroFormatter.Internal
             // If null(most case fisrt time) fill byte.
             if (bytes == null)
             {
-                ValidateNewSize(newLength);
                 bytes = new byte[newLength];
                 return;
             }
@@ -31,8 +30,6 @@ namespace ZeroFormatter.Internal
             var current = bytes.Length;
             if (newLength > current)
             {
-                ValidateNewSize(newLength);
-
                 int num = newLength;
                 if (num < 256)
                 {
@@ -45,20 +42,7 @@ namespace ZeroFormatter.Internal
                     num = current * 2;
                 }
 
-                if (ZeroFormatterSerializer.MaximumSizeOfBytes < num)
-                {
-                    num = ZeroFormatterSerializer.MaximumSizeOfBytes;
-                }
-
                 FastResize(ref bytes, num);
-            }
-        }
-
-        public static void ValidateNewSize(int size)
-        {
-            if (ZeroFormatterSerializer.MaximumSizeOfBytes < size)
-            {
-                throw new InvalidOperationException("Reached maximum size of bytes or similar:" + ZeroFormatterSerializer.MaximumSizeOfBytes + " so ensure MaximumSizeOfBytes or handle alternate strategy.");
             }
         }
 
@@ -353,49 +337,51 @@ namespace ZeroFormatter.Internal
             return StringEncoding.UTF8.GetString(bytes, offset, count);
         }
 
-        public static int WriteDecimal(ref byte[] bytes, int offset, decimal value)
+        // decimal underlying "flags, hi, lo, mid" fields are sequential and same layuout with .NET Framework and Mono(Unity)
+        public static unsafe int WriteDecimal(ref byte[] bytes, int offset, decimal value)
         {
             EnsureCapacity(ref bytes, offset, 16);
 
-            var bits = decimal.GetBits(value);
-            var lo = bits[0];
-            var mid = bits[1];
-            var hi = bits[2];
-            var flags = bits[3];
-
-            bytes[offset + 0] = (byte)lo;
-            bytes[offset + 1] = (byte)(lo >> 8);
-            bytes[offset + 2] = (byte)(lo >> 16);
-            bytes[offset + 3] = (byte)(lo >> 24);
-            bytes[offset + 4] = (byte)mid;
-            bytes[offset + 5] = (byte)(mid >> 8);
-            bytes[offset + 6] = (byte)(mid >> 16);
-            bytes[offset + 7] = (byte)(mid >> 24);
-            bytes[offset + 8] = (byte)hi;
-            bytes[offset + 9] = (byte)(hi >> 8);
-            bytes[offset + 10] = (byte)(hi >> 16);
-            bytes[offset + 11] = (byte)(hi >> 24);
-            bytes[offset + 12] = (byte)flags;
-            bytes[offset + 13] = (byte)(flags >> 8);
-            bytes[offset + 14] = (byte)(flags >> 16);
-            bytes[offset + 15] = (byte)(flags >> 24);
+            fixed (byte* ptr = bytes)
+            {
+                *(Decimal*)(ptr + offset) = value;
+            }
 
             return 16;
         }
 
-        public static decimal ReadDecimal(ref byte[] bytes, int offset)
+        public static unsafe decimal ReadDecimal(ref byte[] bytes, int offset)
         {
-            var lo = (int)bytes[offset + 0] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24;
-            var mid = (int)bytes[offset + 4] | (int)bytes[offset + 5] << 8 | (int)bytes[offset + 6] << 16 | (int)bytes[offset + 7] << 24;
-            var hi = (int)bytes[offset + 8] | (int)bytes[offset + 9] << 8 | (int)bytes[offset + 10] << 16 | (int)bytes[offset + 11] << 24;
-            var flags = (int)bytes[offset + 12] | (int)bytes[offset + 13] << 8 | (int)bytes[offset + 14] << 16 | (int)bytes[offset + 15] << 24;
+            fixed (byte* ptr = bytes)
+            {
+                return *(Decimal*)(ptr + offset);
+            }
+        }
 
-            return new decimal(new[] { lo, mid, hi, flags });
+        // Guid's underlying _a,...,_k field is sequential and same layuout as .NET Framework and Mono(Unity)
+        public static unsafe int WriteGuid(ref byte[] bytes, int offset, Guid value)
+        {
+            EnsureCapacity(ref bytes, offset, 16);
+
+            fixed (byte* ptr = bytes)
+            {
+                *(Guid*)(ptr + offset) = value;
+            }
+
+            return 16;
+        }
+
+        public static unsafe Guid ReadGuid(ref byte[] bytes, int offset)
+        {
+            fixed (byte* ptr = bytes)
+            {
+                return *(Guid*)(ptr + offset);
+            }
         }
 
         #region Timestamp/Duration
 
-        public static int WriteTimeSpan(ref byte[] bytes, int offset, TimeSpan timeSpan)
+        public static unsafe int WriteTimeSpan(ref byte[] bytes, int offset, TimeSpan timeSpan)
         {
             checked
             {
@@ -403,30 +389,37 @@ namespace ZeroFormatter.Internal
                 long seconds = ticks / TimeSpan.TicksPerSecond;
                 int nanos = (int)(ticks % TimeSpan.TicksPerSecond) * Duration.NanosecondsPerTick;
 
-                WriteInt64(ref bytes, offset, seconds);
-                WriteInt32(ref bytes, offset + 8, nanos);
+                EnsureCapacity(ref bytes, offset, 12);
+                fixed (byte* ptr = bytes)
+                {
+                    *(long*)(ptr + offset) = seconds;
+                    *(int*)(ptr + offset + 8) = nanos;
+                }
 
                 return 12;
             }
         }
 
-        public static TimeSpan ReadTimeSpan(ref byte[] bytes, int offset)
+        public static unsafe TimeSpan ReadTimeSpan(ref byte[] bytes, int offset)
         {
             checked
             {
-                Int64 seconds = ReadInt64(ref bytes, offset);
-                Int32 nanos = ReadInt32(ref bytes, offset + 8);
-
-                if (!Duration.IsNormalized(seconds, nanos))
+                fixed (byte* ptr = bytes)
                 {
-                    throw new InvalidOperationException("Duration was not a valid normalized duration");
+                    var seconds = *(long*)(ptr + offset);
+                    var nanos = *(int*)(ptr + offset + 8);
+
+                    if (!Duration.IsNormalized(seconds, nanos))
+                    {
+                        throw new InvalidOperationException("Duration was not a valid normalized duration");
+                    }
+                    long ticks = seconds * TimeSpan.TicksPerSecond + nanos / Duration.NanosecondsPerTick;
+                    return TimeSpan.FromTicks(ticks);
                 }
-                long ticks = seconds * TimeSpan.TicksPerSecond + nanos / Duration.NanosecondsPerTick;
-                return TimeSpan.FromTicks(ticks);
             }
         }
 
-        public static int WriteDateTime(ref byte[] bytes, int offset, DateTime dateTime)
+        public static unsafe int WriteDateTime(ref byte[] bytes, int offset, DateTime dateTime)
         {
             dateTime = dateTime.ToUniversalTime();
 
@@ -434,22 +427,29 @@ namespace ZeroFormatter.Internal
             long secondsSinceBclEpoch = dateTime.Ticks / TimeSpan.TicksPerSecond;
             int nanoseconds = (int)(dateTime.Ticks % TimeSpan.TicksPerSecond) * Duration.NanosecondsPerTick;
 
-            WriteInt64(ref bytes, offset, secondsSinceBclEpoch - Timestamp.BclSecondsAtUnixEpoch);
-            WriteInt32(ref bytes, offset + 8, nanoseconds);
+            EnsureCapacity(ref bytes, offset, 12);
+            fixed (byte* ptr = bytes)
+            {
+                *(long*)(ptr + offset) = (secondsSinceBclEpoch - Timestamp.BclSecondsAtUnixEpoch);
+                *(int*)(ptr + offset + 8) = nanoseconds;
+            }
 
             return 12;
         }
 
-        public static DateTime ReadDateTime(ref byte[] bytes, int offset)
+        public static unsafe DateTime ReadDateTime(ref byte[] bytes, int offset)
         {
-            Int64 seconds = ReadInt64(ref bytes, offset);
-            Int32 nanos = ReadInt32(ref bytes, offset + 8);
-
-            if (!Timestamp.IsNormalized(seconds, nanos))
+            fixed (byte* ptr = bytes)
             {
-                throw new InvalidOperationException(string.Format(@"Timestamp contains invalid values: Seconds={0}; Nanos={1}", seconds, nanos));
+                var seconds = *(long*)(ptr + offset);
+                var nanos = *(int*)(ptr + offset + 8);
+
+                if (!Timestamp.IsNormalized(seconds, nanos))
+                {
+                    throw new InvalidOperationException(string.Format(@"Timestamp contains invalid values: Seconds={0}; Nanos={1}", seconds, nanos));
+                }
+                return Timestamp.UnixEpoch.AddSeconds(seconds).AddTicks(nanos / Duration.NanosecondsPerTick);
             }
-            return Timestamp.UnixEpoch.AddSeconds(seconds).AddTicks(nanos / Duration.NanosecondsPerTick);
         }
 
         public static int WriteDateTimeOffset(ref byte[] bytes, int offset, DateTimeOffset dateTime)

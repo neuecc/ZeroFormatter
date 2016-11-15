@@ -101,6 +101,10 @@ namespace ZeroFormatter.Formatters
                 {
                     formatter = new DateTimeOffsetFormatter();
                 }
+                else if (t == typeof(Guid))
+                {
+                    formatter = new GuidFormatter();
+                }
                 // Nulllable
                 else if (t == typeof(Nullable<Int16>))
                 {
@@ -161,6 +165,10 @@ namespace ZeroFormatter.Formatters
                 else if (t == typeof(Nullable<DateTimeOffset>))
                 {
                     formatter = new NullableDateTimeOffsetFormatter();
+                }
+                else if (t == typeof(Guid?))
+                {
+                    formatter = new NullableGuidFormatter();
                 }
 
                 // Others

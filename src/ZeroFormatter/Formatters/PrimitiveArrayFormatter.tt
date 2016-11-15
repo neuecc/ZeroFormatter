@@ -78,9 +78,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * <#= tuple.Item2 #> + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * <#= tuple.Item2 #>);
+            var arraySize = length * <#= tuple.Item2 #>;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new <#= t.Name #>[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * <#= tuple.Item2 #>);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }

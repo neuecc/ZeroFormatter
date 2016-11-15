@@ -101,26 +101,6 @@ namespace Sandbox
         }
     }
 
-    public class GuidFormatter : Formatter<Guid>
-    {
-        public override int? GetLength()
-        {
-            return 16;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, Guid value)
-        {
-            return BinaryUtil.WriteBytes(ref bytes, offset, value.ToByteArray());
-        }
-
-        public override Guid Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
-        {
-            byteSize = 16;
-            var guidBytes = BinaryUtil.ReadBytes(ref bytes, offset, 16);
-            return new Guid(guidBytes);
-        }
-    }
-
     public class UriFormatter : Formatter<Uri>
     {
         public override int? GetLength()
@@ -137,38 +117,6 @@ namespace Sandbox
         {
             var uriString = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out byteSize);
             return (uriString == null) ? null : new Uri(uriString);
-        }
-    }
-
-    public class KeyValuePairFormatter<TKey, TValue> : Formatter<KeyValuePair<TKey, TValue>>
-    {
-        public override int? GetLength()
-        {
-            return null;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, KeyValuePair<TKey, TValue> value)
-        {
-            var startOffset = offset;
-            offset += Formatter<TKey>.Default.Serialize(ref bytes, offset, value.Key);
-            offset += Formatter<TValue>.Default.Serialize(ref bytes, offset, value.Value);
-            return offset - startOffset;
-        }
-
-        public override KeyValuePair<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
-        {
-            int size;
-            byteSize = 0;
-
-            var key = Formatter<TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
-            var value = Formatter<TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
-            return new KeyValuePair<TKey, TValue>(key, value);
         }
     }
 

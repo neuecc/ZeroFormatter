@@ -52,9 +52,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 2 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 2);
+            var arraySize = length * 2;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new Int16[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 2);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -107,9 +108,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 4 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 4);
+            var arraySize = length * 4;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new Int32[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 4);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -162,9 +164,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 8 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 8);
+            var arraySize = length * 8;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new Int64[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 8);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -217,9 +220,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 2 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 2);
+            var arraySize = length * 2;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new UInt16[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 2);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -272,9 +276,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 4 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 4);
+            var arraySize = length * 4;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new UInt32[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 4);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -327,9 +332,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 8 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 8);
+            var arraySize = length * 8;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new UInt64[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 8);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -382,9 +388,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 4 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 4);
+            var arraySize = length * 4;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new Single[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 4);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -437,9 +444,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 8 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 8);
+            var arraySize = length * 8;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new Double[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 8);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -492,9 +500,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 1 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 1);
+            var arraySize = length * 1;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new Boolean[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 1);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -547,9 +556,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 1 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 1);
+            var arraySize = length * 1;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new Byte[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 1);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -602,9 +612,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 1 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 1);
+            var arraySize = length * 1;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new SByte[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 1);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }
@@ -657,9 +668,10 @@ namespace ZeroFormatter.Formatters
                 byteSize = length * 2 + 4;
             }
 
-            BinaryUtil.ValidateNewSize(length * 2);
+            var arraySize = length * 2;
+            ZeroFormatterSerializer.ValidateNewLength(arraySize);
             var result = new Char[length];
-            Buffer.BlockCopy(bytes, offset + 4, result, 0, length * 2);
+            Buffer.BlockCopy(bytes, offset + 4, result, 0, arraySize);
 
             return result;
         }

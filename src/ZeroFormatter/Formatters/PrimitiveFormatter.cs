@@ -918,6 +918,76 @@ namespace ZeroFormatter.Formatters
     }
 
 
+    internal class GuidFormatter : Formatter<Guid>
+    {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override int? GetLength()
+        {
+            return 16;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, Guid value)
+        {
+            return BinaryUtil.WriteGuid(ref bytes, offset, value);
+        }
+
+        public override Guid Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 16;
+            return BinaryUtil.ReadGuid(ref bytes, offset);
+        }
+    }
+
+    internal class NullableGuidFormatter : Formatter<Guid?>
+    {
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override int? GetLength()
+        {
+            return 17;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, Guid? value)
+        {
+            BinaryUtil.EnsureCapacity(ref bytes, offset, 17);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteBooleanTrueUnsafe(ref bytes, offset);
+                BinaryUtil.WriteGuid(ref bytes, offset + 1, value.Value);
+            }
+            else
+            {
+                BinaryUtil.WriteBooleanFalseUnsafe(ref bytes, offset);
+            }
+
+            return 17;
+        }
+
+        public override Guid? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 17;
+
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return default(Guid?);
+
+            return BinaryUtil.ReadGuid(ref bytes, offset + 1);
+        }
+    }
+
+
     internal class TimeSpanFormatter : Formatter<TimeSpan>
     {
         public override bool NoUseDirtyTracker

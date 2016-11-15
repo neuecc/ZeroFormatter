@@ -13,12 +13,10 @@ namespace ZeroFormatter
 {
     public static class ZeroFormatterSerializer
     {
-        // Same as protocol-buffers
-        // https://developers.google.com/protocol-buffers/docs/techniques#large-data
         const int DefaultMaxSize = 67108864;
 
         static int maxSize = DefaultMaxSize;
-        public static int MaximumSizeOfBytes
+        public static int MaximumLengthOfDeserialize
         {
             get
             {
@@ -27,6 +25,18 @@ namespace ZeroFormatter
             set
             {
                 maxSize = value;
+            }
+        }
+
+        /// <summary>
+        /// If reached maximum length, throw exception.
+        /// </summary>
+        /// <param name="length"></param>
+        public static void ValidateNewLength(int length)
+        {
+            if (MaximumLengthOfDeserialize < length)
+            {
+                throw new InvalidOperationException("Reached maximum length:" + MaximumLengthOfDeserialize + " so ensure MaximumLengthOfDeserialize or handle alternate strategy.");
             }
         }
 

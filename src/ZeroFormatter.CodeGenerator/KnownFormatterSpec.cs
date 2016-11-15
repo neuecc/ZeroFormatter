@@ -21,6 +21,7 @@ namespace ZeroFormatter.CodeGenerator
             { "sbyte",                  1 },
             { "decimal",               16 },
             { "char",                   2 },
+            { "System.Guid",           16 },
             { "System.TimeSpan",       12 },
             { "System.DateTime",       12 },
             { "System.DateTimeOffset", 12 },
@@ -47,6 +48,7 @@ namespace ZeroFormatter.CodeGenerator
             var str = elementType.ToDisplayString();
             return AllowTypesAndSize.ContainsKey(str)
                 && str != "decimal"
+                && str != "System.Guid"
                 && str != "System.TimeSpan"
                 && str != "System.DateTime"
                 && str != "System.DateTimeOffset";

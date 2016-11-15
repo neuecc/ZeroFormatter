@@ -24,12 +24,22 @@ namespace ZeroFormatter.Comparers
             }
         }
 
+        // In Unity, EqualityComparer<Enum> is slow
+        // zfc.exe generates fast EqualityComparer and this method can use it.
         public static IEqualityComparer<T> NondeterministicSafeFallbacked
         {
             get
             {
                 var comparer = defaultComparer;
-                if (comparer is StringEqualityComparer || comparer is IErrorEqualityComparer)
+                if (comparer is StringEqualityComparer
+                 || comparer is SingleEqualityComparer
+                 || comparer is DoubleEqualityComparer
+                 || comparer is DecimalEqualityComparer
+                 || comparer is GuidEqualityComparer
+                 || comparer is TimeSpanEqualityComparer
+                 || comparer is DeteTimeEqualityComparer
+                 || comparer is DeteTimeOffsetEqualityComparer
+                 || comparer is IErrorEqualityComparer)
                 {
                     // native EqualityComparer<string> is faster than deterministic embeded comparer.
                     return EqualityComparer<T>.Default;
@@ -96,6 +106,26 @@ namespace ZeroFormatter.Comparers
             else if (t == typeof(Char))
             {
                 comparer = new CharEqualityComparer();
+            }
+            else if (t == typeof(TimeSpan))
+            {
+                comparer = new TimeSpanEqualityComparer();
+            }
+            else if (t == typeof(DateTime))
+            {
+                comparer = new DeteTimeEqualityComparer();
+            }
+            else if (t == typeof(DateTimeOffset))
+            {
+                comparer = new DeteTimeOffsetEqualityComparer();
+            }
+            else if (t == typeof(decimal))
+            {
+                comparer = new DecimalEqualityComparer();
+            }
+            else if (t == typeof(Guid))
+            {
+                comparer = new GuidEqualityComparer();
             }
 
 #if !UNITY

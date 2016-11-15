@@ -139,6 +139,10 @@ namespace ZeroFormatter.Internal
                 var unionFormatter = new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CharacterFormatter();
                 ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Character>.Register(unionFormatter);
             }
+            {
+                var unionFormatter = new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Union2Formatter();
+                ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Union2>.Register(unionFormatter);
+            }
             // Generics
             ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<int, string>();
             ZeroFormatter.Formatters.Formatter.RegisterList<byte[]>();
@@ -621,25 +625,24 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 
     public class CustomFormatObjectSegment : global::Sandbox.Shared.CustomFormat, IZeroFormatterSegment
     {
-        static readonly int[] __elementSizes = new int[]{ 0 };
+        static readonly int[] __elementSizes = new int[]{ 16 };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<global::System.Guid> _AllowGuid;
 
         // 0
         public override global::System.Guid AllowGuid
         {
             get
             {
-                return _AllowGuid.Value;
+                return ObjectSegmentHelper.GetFixedProperty<global::System.Guid>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
             }
             set
             {
-                _AllowGuid.Value = value;
+                ObjectSegmentHelper.SetFixedProperty<global::System.Guid>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value, __tracker);
             }
         }
 
@@ -654,7 +657,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
 
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 0, __elementSizes);
 
-            _AllowGuid = new CacheSegment<global::System.Guid>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 0, __binaryLastIndex, __tracker));
         }
 
         public bool CanDirectCopy()
@@ -674,7 +676,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 var startOffset = offset;
                 offset += (8 + 4 * (0 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<global::System.Guid>(ref targetBytes, startOffset, offset, 0, _AllowGuid);
+                offset += ObjectSegmentHelper.SerializeFixedLength<global::System.Guid>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
             }
@@ -5733,6 +5735,87 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             else if (comparer.Equals(unionKey, unionKeys[1]))
             {
                 result = Formatter<global::Sandbox.Shared.Monster>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            }
+            else
+            {
+                throw new Exception("Unknown unionKey type of Union: " + unionKey.ToString());
+            }
+
+            byteSize += size;
+            return result;
+        }
+    }
+
+    public class Union2Formatter : Formatter<global::Sandbox.Shared.Union2>
+    {
+        readonly global::System.Collections.Generic.IEqualityComparer<string> comparer;
+        readonly string[] unionKeys;
+        
+        public Union2Formatter()
+        {
+            comparer = global::ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<string>.Default;
+            unionKeys = new string[2];
+            unionKeys[0] = new global::Sandbox.Shared.SubTest1().UnionKeyDayo;
+            unionKeys[1] = new global::Sandbox.Shared.SubTest2().UnionKeyDayo;
+            
+        }
+
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.Union2 value)
+        {
+            if (value == null)
+            {
+                return BinaryUtil.WriteBoolean(ref bytes, offset, false);
+            }
+
+            var startOffset = offset;
+
+            offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
+            offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.UnionKeyDayo);
+
+            if (value is global::Sandbox.Shared.SubTest1)
+            {
+                offset += Formatter<global::Sandbox.Shared.SubTest1>.Default.Serialize(ref bytes, offset, (global::Sandbox.Shared.SubTest1)value);
+            }
+            else if (value is global::Sandbox.Shared.SubTest2)
+            {
+                offset += Formatter<global::Sandbox.Shared.SubTest2>.Default.Serialize(ref bytes, offset, (global::Sandbox.Shared.SubTest2)value);
+            }
+            
+            else
+            {
+                throw new Exception("Unknown subtype of Union:" + value.GetType().FullName);
+            }
+        
+            return offset - startOffset;
+        }
+
+        public override global::Sandbox.Shared.Union2 Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 1;
+            if (!BinaryUtil.ReadBoolean(ref bytes, offset))
+            {
+                return null;
+            }
+        
+            offset += 1;
+            int size;
+            var unionKey = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            byteSize += size;
+            offset += size;
+
+            global::Sandbox.Shared.Union2 result;
+            if (comparer.Equals(unionKey, unionKeys[0]))
+            {
+                result = Formatter<global::Sandbox.Shared.SubTest1>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            }
+            else if (comparer.Equals(unionKey, unionKeys[1]))
+            {
+                result = Formatter<global::Sandbox.Shared.SubTest2>.Default.Deserialize(ref bytes, offset, tracker, out size);
             }
             else
             {

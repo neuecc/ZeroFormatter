@@ -60,6 +60,36 @@ namespace Sandbox.Shared
         [Index(2)]
         public virtual int Magic { get; set; }
     }
+
+
+    [Union(typeof(SubTest1), typeof(SubTest2))]
+    public abstract class Union2
+    {
+        [UnionKey]
+        public abstract string UnionKeyDayo { get; }
+    }
+
+    public class SubTest1 : Union2
+    {
+        public override string UnionKeyDayo
+        {
+            get
+            {
+                return "AAA";
+            }
+        }
+    }
+
+    public class SubTest2 : Union2
+    {
+        public override string UnionKeyDayo
+        {
+            get
+            {
+                return "BBB";
+            }
+        }
+    }
 }
 
 

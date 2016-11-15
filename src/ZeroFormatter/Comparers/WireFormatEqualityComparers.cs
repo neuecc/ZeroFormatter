@@ -181,6 +181,33 @@ namespace ZeroFormatter.Comparers
         }
     }
 
+    internal class GuidEqualityComparer : IEqualityComparer<Guid>
+    {
+        public bool Equals(Guid x, Guid y)
+        {
+            return x == y;
+        }
+
+        public int GetHashCode(Guid obj)
+        {
+            var b = obj.ToByteArray();
+
+            var _a = ((int)b[3] << 24) | ((int)b[2] << 16) | ((int)b[1] << 8) | b[0];
+            var _b = (short)(((int)b[5] << 8) | b[4]);
+            var _c = (short)(((int)b[7] << 8) | b[6]);
+            //var _d = b[8];
+            //var _e = b[9];
+            var _f = b[10];
+            //var _g = b[11];
+            //var _h = b[12];
+            //var _i = b[13];
+            //var _j = b[14];
+            var _k = b[15];
+
+            return _a ^ (((int)_b << 16) | (int)(ushort)_c) ^ (((int)_f << 24) | _k);
+        }
+    }
+
     internal class TimeSpanEqualityComparer : IEqualityComparer<TimeSpan>
     {
         public bool Equals(TimeSpan x, TimeSpan y)

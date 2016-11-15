@@ -163,7 +163,14 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(">.Default.Serialize(ref bytes, offset, value.Type);\r\n\r\n");
+            this.Write(">.Default.Serialize(ref bytes, offset, value.");
+            
+            #line 47 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyPropertyName));
+            
+            #line default
+            #line hidden
+            this.Write(");\r\n\r\n");
             
             #line 49 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
  for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; 

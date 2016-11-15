@@ -76,7 +76,7 @@ namespace ZeroFormatter.Formatters
             var startOffset = offset;
             offset += 4;
             int size;
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
             var result = new T[length];
             for (int i = 0; i < length; i++)
             {
@@ -180,7 +180,7 @@ namespace ZeroFormatter.Formatters
             offset += 4;
             int size;
 
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
             TCollection result;
             if (isList)
             {
@@ -258,7 +258,7 @@ namespace ZeroFormatter.Formatters
             var startOffset = offset;
             offset += 4;
             int size;
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
             var result = new T[length];
             for (int i = 0; i < length; i++)
             {
@@ -323,7 +323,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
 
             var startOffset = offset;
             offset += 4;
@@ -394,7 +394,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
 
             var startOffset = offset;
             offset += 4;
@@ -464,7 +464,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
 
             var startOffset = offset;
             offset += 4;
@@ -527,7 +527,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
 
             var startOffset = offset;
             offset += 4;
@@ -593,7 +593,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
 
             var startOffset = offset;
             offset += 4;
@@ -684,7 +684,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
 
             var startOffset = offset;
             offset += 4;
@@ -753,7 +753,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
 
             var startOffset = offset;
             offset += 4;
@@ -821,7 +821,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
 
             var startOffset = offset;
             offset += 4;
@@ -891,7 +891,7 @@ namespace ZeroFormatter.Formatters
                 byteSize = 4;
                 return null;
             }
-            BinaryUtil.ValidateNewSize(length); // size is not strict(Marshal.SizeOf<T>()) but okay to use.
+            ZeroFormatterSerializer.ValidateNewLength(length);
 
             var startOffset = offset;
             offset += 4;

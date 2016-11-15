@@ -133,6 +133,7 @@ namespace ZeroFormatter.Analyzer
             "decimal",
             "char",
             "string",
+            "System.Guid",
             "System.TimeSpan",
             "System.DateTime",
             "System.DateTimeOffset"

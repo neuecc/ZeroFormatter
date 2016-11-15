@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>ZeroFormatter.Interfaces</id>
-        <version>1.3.2</version>
+        <version>1.3.3</version>
         <title>ZeroFormatter.Interfaces</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
         <projectUrl>https://github.com/neuecc/ZeroFormatter/</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Plain interfaces and KeyTuple of ZeroFormatter, it is used for define serializable targets.</description>
-        <releaseNotes>Support wellknown interface collections.</releaseNotes>
+        <releaseNotes>Support Guid.</releaseNotes>
         <tags>ZeroFormatter, Serialization, Formatter, Serializer</tags>
         <frameworkAssemblies>
             <frameworkAssembly assemblyName="System" targetFramework=".NETFramework3.5" />

@@ -97,12 +97,12 @@ If you want to allow a specific type (for example, when registering a custom typ
 This is a sample of the contents of ZeroFormatterAnalyzer.json. 
 
 ```
-[ "System.Guid" ]
+[ "System.Uri" ]
 ```
 
 Built-in support types
 ---
-All primitives, All enums, `TimeSpan`,  `DateTime`, `DateTimeOffset`, `Tuple<,...>`, `KeyValuePair<,>`, `KeyTuple<,...>`, `Array`, `List<>`, `HashSet<>`, `Dictionary<,>`, `ReadOnlyCollection<>`, `ReadOnlyDictionary<,>`, `IEnumerable<>`, `ICollection<>`, `IList<>`, `ISet<,>`, `IReadOnlyCollection<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<,>`, `ILookup<,>` and inherited `ICollection<>` with paramterless constructor. Support type can extend easily, see: [Extensibility](https://github.com/neuecc/ZeroFormatter#extensibility) section.
+All primitives, All enums, `TimeSpan`,  `DateTime`, `DateTimeOffset`, `Guid`, `Tuple<,...>`, `KeyValuePair<,>`, `KeyTuple<,...>`, `Array`, `List<>`, `HashSet<>`, `Dictionary<,>`, `ReadOnlyCollection<>`, `ReadOnlyDictionary<,>`, `IEnumerable<>`, `ICollection<>`, `IList<>`, `ISet<,>`, `IReadOnlyCollection<>`, `IReadOnlyList<>`, `IReadOnlyDictionary<,>`, `ILookup<,>` and inherited `ICollection<>` with paramterless constructor. Support type can extend easily, see: [Extensibility](https://github.com/neuecc/ZeroFormatter#extensibility) section.
 
 Define object rules
 ---
@@ -215,6 +215,8 @@ public class ImmutableClass
     public virtual IReadOnlyList<int> ImmutableList { get; protected set; }
 }
 ```
+
+Binary size is slightly larger than Protobuf, MsgPack because of needs the header index area and all primitives are fixed-length(same size as FlatBuffers, smaller than JSON). It is a good idea to compress it to shrink the data size, gzip or LZ4(recommended, LZ4 is fast compression/decompression algorithm).
 
 Versioning
 ---
@@ -349,6 +351,10 @@ switch (union.Type)
 
 Unity Supports
 ---
+Put the `ZeroFormatter.dll` and `ZeroFormatter.Interfaces.dll`, modify Edit -> Project Settings -> Player -> Optimization -> Api Compatibillity Level to `.NET 2.0` or higher.
+
+![image](https://cloud.githubusercontent.com/assets/46207/20293228/d3a4add2-ab37-11e6-878b-24daad4dc2c1.png)
+
 ZeroFormatter.Unity works on all platforms(PC, Android, iOS, etc...). But it can 'not' use dynamic serializer generation due to IL2CPP issue. But pre code generate helps it. Code Generator is located in `packages\ZeroFormatter.Interfaces.*.*.*\tools\zfc.exe`. zfc is using [Roslyn](https://github.com/dotnet/roslyn) so analyze source code, pass the target `csproj`. 
 
 ```
@@ -366,7 +372,7 @@ zfc arguments help:
 zfc.exe -i "..\src\Sandbox.Shared.csproj" -o "ZeroFormatterGenerated.cs"
 
 // with t, c
-zfc.exe -i "..\src\Sandbox.Shared.csproj" -o "..\unity\ZfcCompiled\ZeroFormatterGenerated.cs" -t "System.Guid" -c "UNITY"
+zfc.exe -i "..\src\Sandbox.Shared.csproj" -o "..\unity\ZfcCompiled\ZeroFormatterGenerated.cs" -t "System.Uri" -c "UNITY"
 
 // -s
 zfc.exe -i "..\src\Sandbox.Shared.csproj" -s -o "..\unity\ZfcCompiled\" 
@@ -470,41 +476,19 @@ ZeroFormatterSerializer API
 ---
 We usually use `Serialize<T>` and `Deserialize<T>`, but there are other APIs as well. `Convert<T>` is converted T to T but the return value is wrapped data. It is fast when reserialization so if you store the immutable data and serialize frequently, very effective. `IsFormattedObject<T>` can check the data is wrapped data or not.
 
-`Serialize<T>` has some overload, one of them is the NonAllocate API. `int Serialize<T>(ref byte[] buffer, int offset, T obj)` expands the buffer but do not shrink. Return value int is size so you can pass the buffer from array pooling, ZeroFormatter does not allocate any extra memory.
+`Serialize<T>` has some overload, the architecture of ZeroFormatter is to write to byte [], read from byte [] so byte[] method is fast, first-class method. Stream method is helper API. ZeroFormatter has non-allocate API, as well. `int Serialize<T>(ref byte[] buffer, int offset, T obj)` expands the buffer but do not shrink. Return value int is size so you can pass the buffer from array pooling, ZeroFormatter does not allocate any extra memory.
 
 If you want to use non-generic API, there are exists under `ZeroFormatterSerializer.NonGeneric`. It can pass Type on first-argument instead of `<T>`.
 
 > NonGeneric API is not supported in Unity. NonGeneric API is a bit slower than the generic API. Because of the lookup of the serializer by type and the cost of boxing if the value is a value type are costly. We recommend using generic API if possible.
 
-`ZeroFormatterSerializer.MaximumSizeOfBytes` is max size per message of serialize/deserialize. The default is 67MB. This limitation is for security issue(block, attack of OutOfMemory). If you want to know more information of this topics, see: [ProtocolBuffers Techniques - Large Data Sets](https://developers.google.com/protocol-buffers/docs/techniques#large-data). 
+`ZeroFormatterSerializer.MaximumLengthOfDeserialize` is max length of array(collection) length when deserializing. The default is 67108864, it includes `byte[]`(67MB). This limitation is for security issue(block of OutOfMemory). If you want to expand this limitation, set the new size.
 
 Extensibility
 ---
-ZeroFormatter can become custom binary layout framework. You can create own typed formatter. For example, add supports `Guid` and `Uri`.
+ZeroFormatter can become custom binary layout framework. You can create own typed formatter. For example, add supports `Uri`.
 
 ```csharp
-public class GuidFormatter : Formatter<Guid>
-{
-    public override int? GetLength()
-    {
-        // If size is fixed, return fixed size.
-        return 16;
-    }
-
-    public override int Serialize(ref byte[] bytes, int offset, Guid value)
-    {
-        // BinaryUtil is helpers of byte[] operation 
-        return BinaryUtil.WriteBytes(ref bytes, offset, value.ToByteArray());
-    }
-
-    public override Guid Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
-    {
-        byteSize = 16;
-        var guidBytes = BinaryUtil.ReadBytes(ref bytes, offset, 16);
-        return new Guid(guidBytes);
-    }
-}
-
 public class UriFormatter : Formatter<Uri>
 {
     public override int? GetLength()
@@ -530,7 +514,6 @@ public class UriFormatter : Formatter<Uri>
 You need to register formatter on application startup. 
 
 ```csharp
-ZeroFormatter.Formatters.Formatter<Guid>.Register(new GuidFormatter());
 ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
 ```
 
@@ -690,8 +673,10 @@ Not a standard format but builtin on C# implementation.
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| Decimal | [lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | Fixed Length | fixed-length, eager-evaluation |
-| Decimal? | [hasValue:bool(1)][lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | Fixed Length | fixed-length, eager-evaluation |
+| Decimal | [lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | fixed-length, eager-evaluation. If you need to language-wide cross platform, use string instead.  |
+| Decimal? | [hasValue:bool(1)][lo:int(4)][mid:int(4)][hi:int(4)][flags:int(4)] | fixed-length, eager-evaluation. If you need to language-wide cross platform, use string instead. |
+| Guid | [bytes:byteArray(16)] | fixed-length, eager-evaluation. If you need to language-wide cross platform, use string instead.  |
+| Guid? | [hasValue:bool(1)][bytes:byteArray(16)] | fixed-length, eager-evaluation. If you need to language-wide cross platform, use string instead. |
 | LazyDictionary | [byteSize:int(4)][length:int(4)][buckets:`FixedSizeList<int>`][entries:`VariableSizeList<DictionaryEntry>`] | represents `ILazyDictionary<TKey, TValue>`, if byteSize == -1, indicates null, variable-length, lazy-evaluation  |
 | DictionaryEntry | [hashCode:int(4)][next:int(4)][key:TKey][value:TValue] | substructure of LazyDictionary | 
 | LazyMultiDictionary | [byteSize:int(4)][length:int(4)][groupings:`VariableSizeList<VariableSizeList<GroupingSemengt>>`] | represents `ILazyLookup<TKey, TElement>`, if byteSize == -1, indicates null, variable-length, lazy-evaluation | 
@@ -733,11 +718,11 @@ Cross Platform
 ---
 Currently, No and I have no plans. Welcome to contribute port to other languages, I want to help your work!
 
-ZeroFormatter spec has three stages.
+ZeroFormatter spec has two stages + ex.
 
 * Stage1: All formats are eager-evaluation, does not support Extension Format.
 * Stage2: FixedSizeList, VariableSizeList and Object supports lazy-evaluation, does not support Extension Format.
-* StageEx: Supports C# Extension Format(LazyDictionary/LazyMultiDictionary).
+* StageEx: Supports C# Extension Format
 
 Author Info
 ---
