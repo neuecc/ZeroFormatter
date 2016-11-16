@@ -638,7 +638,7 @@ Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is 
 | Char | [ushort(2)] |
 | TimeSpan | [seconds:long(8)][nanos:int(4)] |
 | DateTime | [seconds:long(8)][nanos:int(4)] |
-| DateTimeOffset | [dateTime:DateTime(12)][offset:TimeSpan(12)] | DateTime with a time difference |
+| DateTimeOffset | [seconds:long(8)][nanos:int(4)][offsetMinutes:short(2)] | DateTime with a time difference |
 | String | [utf8Bytes:(length)] | currently no used but reserved for future |
 | Int16? | [hasValue:bool(1)][short(2)] |
 | Int32? | [hasValue:bool(1)][int(4)] |
@@ -654,7 +654,7 @@ Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is 
 | Char? | [hasValue:bool(1)][ushort(2)] |
 | TimeSpan? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
 | DateTime? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
-| DateTimeOffset? | [hasValue:bool(1)][dateTime:DateTime(12)][offset:TimeSpan(12)] | DateTime with a time difference |
+| DateTimeOffset? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)][offsetMinutes:short(2)] | DateTime with a time difference |
 | String? | [length:int(4)][utf8Bytes:(length)] | representes `String`, if length = -1, indicates null. This is only variable-length primitive. |
 
 **Sequence Format**
