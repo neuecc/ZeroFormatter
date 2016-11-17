@@ -4,9 +4,11 @@ using System.IO;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
+using System.Collections.Generic;
 #if !UNITY
 using System.Reflection;
 using System.Linq.Expressions;
+using System.Collections.Concurrent;
 #endif
 
 namespace ZeroFormatter
@@ -193,6 +195,57 @@ namespace ZeroFormatter
         }
 
 #if !UNITY
+
+        // RuntimeDynamicUnion(TODO:all apis)
+        public static byte[] SerializeDynamicUnion(string name, object obj)
+        {
+            dynamic formatter;
+            if (!dynamicUnionRegister.TryGetValue(name, out formatter))
+            {
+                throw new InvalidOperationException("Dynamic union is not registered. Name:" + name);
+            }
+
+            byte[] bytes = null;
+            formatter.Serialize(ref bytes, 0, obj);
+            return bytes;
+        }
+
+        public static object DeserializeDynamicUnion(string name, byte[] bytes)
+        {
+            dynamic formatter;
+            if (!dynamicUnionRegister.TryGetValue(name, out formatter))
+            {
+                throw new InvalidOperationException("Dynamic union is not registered. Name:" + name);
+            }
+
+            int size;
+            return formatter.Deserialize(ref bytes, 0, DirtyTracker.NullTracker, out size);
+        }
+
+        static ConcurrentDictionary<string, object> dynamicUnionRegister = new ConcurrentDictionary<string, object>();
+
+        public static void RegisterDynamicUnion<TDiscriminatedKey>(Func<DynamicUnionRegistry<TDiscriminatedKey>, string> registerUnion)
+        {
+            var registry = new DynamicUnionRegistry<TDiscriminatedKey>();
+            var name = registerUnion(registry);
+
+            var formatter = new RuntimeUnionFormatter<TDiscriminatedKey>(name, registry.list.ToArray());
+            if (!dynamicUnionRegister.TryAdd(name, formatter))
+            {
+                throw new InvalidOperationException("Already registered dynamic union. Name:" + name);
+            }
+        }
+
+        public class DynamicUnionRegistry<T>
+        {
+            internal List<KeyTuple<T, Type>> list = new List<KeyTuple<T, Type>>();
+
+            public void Register(T key, Type subType)
+            {
+                list.Add(KeyTuple.Create(key, subType));
+            }
+        }
+
 
         public static class NonGeneric
         {

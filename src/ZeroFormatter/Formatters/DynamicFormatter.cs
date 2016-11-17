@@ -418,10 +418,10 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal static class DynamicStructFormatter
+    public static class DynamicStructFormatter
     {
         // create dynamic struct Formatter<T>
-        public static object Create<T>()
+        internal static object Create<T>()
         {
             var t = typeof(T);
             var ti = t.GetTypeInfo();
@@ -444,6 +444,18 @@ namespace ZeroFormatter.Formatters
 
                 return formatter;
             }
+        }
+
+        public static object CreateStructFormatClass(Type t, IEnumerable<Tuple<int, PropertyInfo>> source)
+        {
+            var emmitableSource = source.Select(x => Tuple.Create(x.Item1, new EmittableMemberInfo(x.Item2))).ToArray();
+
+            ValidateAndCalculateLength(t, emmitableSource);
+
+            var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, t, null, emmitableSource);
+            var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
+
+            return formatter;
         }
 
         static int? ValidateAndCalculateLength(Type t, IEnumerable<Tuple<int, EmittableMemberInfo>> source)
@@ -472,7 +484,7 @@ namespace ZeroFormatter.Formatters
                 constructorTypes.Add(item.Item2.MemberType);
             }
 
-            var info = t.GetTypeInfo().GetConstructor(constructorTypes.ToArray());
+            var info = t.GetTypeInfo().GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, constructorTypes.ToArray(), null);
             if (info == null)
             {
                 throw new InvalidOperationException("Struct needs full parameter constructor of index property types. Type:" + t.FullName);
@@ -658,7 +670,8 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldloc, i + 1);
                 }
 
-                var constructor = elementType.GetTypeInfo().GetConstructor(memberInfos.Select(x => x.Item2.MemberType).ToArray());
+                var constructor = elementType.GetTypeInfo()
+                    .GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, memberInfos.Select(x => x.Item2.MemberType).ToArray(), null);
                 il.Emit(OpCodes.Newobj, constructor);
                 il.Emit(OpCodes.Ret);
             }

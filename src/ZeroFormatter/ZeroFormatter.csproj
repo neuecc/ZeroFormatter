@@ -49,6 +49,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -61,6 +62,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PrimitiveArrayFormatter.tt</DependentUpon>
     </Compile>
+    <Compile Include="Formatters\RuntimeUnionFormatter.cs" />
     <Compile Include="Formatters\SequenceFormatter.cs" />
     <Compile Include="Formatters\KeyTupleFormatter.cs">
       <DependentUpon>KeyTupleFormatter.tt</DependentUpon>

@@ -7,6 +7,10 @@ using ZeroFormatter.Segments;
 using ZeroFormatter.Comparers;
 using System.Collections.ObjectModel;
 
+#if !UNITY
+using System.Linq.Expressions;
+#endif
+
 namespace ZeroFormatter.Formatters
 {
     // raw layer of serialization.
@@ -640,8 +644,6 @@ namespace ZeroFormatter.Formatters
             return null;
         }
 
-
-
 #if UNITY
 
         public static void RegisterLookup<TKey, TElement>()
@@ -901,6 +903,74 @@ namespace ZeroFormatter.Formatters
             if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Default is IErrorEqualityComparer)
             {
                 ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleEqualityComparer<T1, T2, T3, T4, T5, T6, T7, T8>());
+            }
+        }
+
+#endif
+
+#if !UNITY
+
+        public static class NonGeneric
+        {
+            delegate int SerializeMethod(ref byte[] bytes, int offset, object value);
+            delegate object DeserializeMethod(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize);
+
+            static readonly System.Collections.Concurrent.ConcurrentDictionary<Type, CompiledMethods> serializes = new System.Collections.Concurrent.ConcurrentDictionary<Type, CompiledMethods>();
+
+            public static int Serialize(Type type, ref byte[] bytes, int offset, object value)
+            {
+                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).serialize.Invoke(ref bytes, offset, value);
+            }
+
+            public static object Deserialize(Type type, ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+            {
+                return serializes.GetOrAdd(type, t => new CompiledMethods(t)).deserialize.Invoke(ref bytes, offset, tracker, out byteSize);
+            }
+
+            class CompiledMethods
+            {
+                public readonly SerializeMethod serialize;
+                public readonly DeserializeMethod deserialize;
+
+                public CompiledMethods(Type type)
+                {
+                    var ti = type.GetTypeInfo();
+                    var formatter = typeof(ZeroFormatter.Formatters.Formatter<>).MakeGenericType(type);
+                    var methods = formatter.GetTypeInfo().GetMethods();
+
+                    {
+                        // delegate int SerializeMethod(ref byte[] bytes, int offset, object value);
+                        var serialize = methods.First(x => x.Name == "Serialize");
+
+                        var formatterDefault = Expression.Call(formatter.GetProperty("Default").GetGetMethod());
+                        var param1 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
+                        var param2 = Expression.Parameter(typeof(int), "offset");
+                        var param3 = Expression.Parameter(typeof(object), "value");
+
+                        var body = Expression.Call(formatterDefault, serialize, param1, param2, ti.IsValueType
+                            ? Expression.Unbox(param3, type)
+                            : Expression.Convert(param3, type));
+                        var lambda = Expression.Lambda<SerializeMethod>(body, param1, param2, param3).Compile();
+
+                        this.serialize = lambda;
+                    }
+                    {
+                        // public abstract T Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize);
+                        var deserialize = methods.First(x => x.Name == "Deserialize");
+
+                        var formatterDefault = Expression.Call(formatter.GetProperty("Default").GetGetMethod());
+                        var param1 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
+                        var param2 = Expression.Parameter(typeof(int), "offset");
+                        var param3 = Expression.Parameter(typeof(DirtyTracker), "tracker");
+                        var param4 = Expression.Parameter(typeof(int).MakeByRefType(), "byteSize");
+
+                        var body = Expression.Convert(Expression.Call(formatterDefault, deserialize, param1, param2, param3, param4), typeof(object));
+
+                        var lambda = Expression.Lambda<DeserializeMethod>(body, param1, param2, param3, param4).Compile();
+
+                        this.deserialize = lambda;
+                    }
+                }
             }
         }
 

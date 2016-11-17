@@ -144,18 +144,26 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
+            ZeroFormatterSerializer.RegisterDynamicUnion<byte>(x =>
+            {
+                x.Register(0, typeof(int));
+                x.Register(1, typeof(string));
 
-// in Tokyo, UTC +9:00
-var date = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
-
-// 2000/1/1, +9:00
-var target = new DateTimeOffset(date);
-
-// 2000/1/1, +9:00
-var deserialized = ZeroFormatterSerializer.Deserialize<DateTimeOffset>(ZeroFormatterSerializer.Serialize(target));
+                return "Test";
+            });
 
 
-            Console.WriteLine(deserialized);
+            var bin = ZeroFormatterSerializer.SerializeDynamicUnion("Test", 10000);
+            var huga = ZeroFormatterSerializer.DeserializeDynamicUnion("Test", bin);
+
+            Console.WriteLine(huga);
+
+
+            var bin2 = ZeroFormatterSerializer.SerializeDynamicUnion("Test", "kuwa kuwakuwa");
+            var huga2 = ZeroFormatterSerializer.DeserializeDynamicUnion("Test", bin2);
+
+            Console.WriteLine(huga2);
+
         }
     }
 
