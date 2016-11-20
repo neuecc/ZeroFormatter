@@ -161,5 +161,21 @@ namespace ZeroFormatter.Tests
             var d = BinaryUtil.ReadDouble(ref bytes, 0);
             d.Is(3.14);
         }
+
+        public void WriteDoubleOffset()
+        {
+            var offset = 33;
+            var bytes = new byte[100];
+            BinaryUtil.WriteDouble(ref bytes, offset, 3.14).Is(8);
+
+            bytes[33].Is((byte)31);
+            bytes[34].Is((byte)133);
+            bytes[35].Is((byte)235);
+            bytes[36].Is((byte)81);
+            bytes[37].Is((byte)184);
+            bytes[38].Is((byte)30);
+            bytes[39].Is((byte)9);
+            bytes[40].Is((byte)64);
+        }
     }
 }
