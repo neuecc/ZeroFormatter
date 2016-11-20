@@ -245,7 +245,7 @@ namespace ZeroFormatter.Comparers
                 comparer = EnumEqualityComparer<T>.Default;
             }
 
-            else if (t.GetTypeInfo().IsNullable() && t.GetTypeInfo().GenericTypeArguments[0].IsEnum)
+            else if (t.GetTypeInfo().IsNullable() && t.GetTypeInfo().GenericTypeArguments[0].GetTypeInfo().IsEnum)
             {
                 var formatterType =  typeof(NullableEqualityComparer<>).MakeGenericType(t.GetTypeInfo().GenericTypeArguments[0]);
                 comparer = Activator.CreateInstance(formatterType);

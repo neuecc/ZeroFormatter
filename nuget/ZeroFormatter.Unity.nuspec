@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>ZeroFormatter.Unity</id>
-        <version>1.4.1</version>
+        <version>1.4.2</version>
         <title>ZeroFormatter.Unity</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
         <projectUrl>https://github.com/neuecc/ZeroFormatter/</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Infinitely fast serializer for .NET, .NET Core and Unity.</description>
-        <releaseNotes>Support 1.4.1 Wireformat.</releaseNotes>
+        <releaseNotes>Support Nullable value in LazyDictionary/Lookup, Fix NullException on Android.</releaseNotes>
         <tags>ZeroFormatter, Serialization, Formatter, Serializer</tags>
         <frameworkAssemblies>
             <frameworkAssembly assemblyName="System" targetFramework="Unity Full v3.5" />
@@ -17,7 +17,7 @@
         </frameworkAssemblies>
         <dependencies>
             <group targetFramework="Unity Full v3.5">
-                <dependency id="ZeroFormatter.Interfaces" version="1.4.1" />
+                <dependency id="ZeroFormatter.Interfaces" version="1.4.2" />
             </group>
         </dependencies>
     </metadata>
