@@ -598,38 +598,63 @@ namespace ZeroFormatter.Formatters
             var startOffset = offset;
             offset += 4;
             var lastOffset = offset;
-            var lookup = DeserializeSequence(bytes, offset, tracker, length).ToLookup(x => x.Item1, x =>
-            {
-                lastOffset = x.Item3; // capture in lambda is overhead but lookup can only create from ToLookup
-                return x.Item2;
-            });
+            var comparer = ZeroFormatterEqualityComparer<TKey>.NondeterministicSafeFallbacked;
+            var sequence = new DeserializeSequence(bytes, offset, tracker, length, keyFormatter, valueFormatter);
+            var lookup = sequence.ToLookup(x => x.Item1, x => x.Item2, comparer);
 
-            byteSize = lastOffset - startOffset;
+            byteSize = sequence.offset - startOffset;
             return lookup;
         }
 
-        IEnumerable<KeyTuple<TKey, TElement, int>> DeserializeSequence(byte[] bytes, int offset, DirtyTracker tracker, int length)
+        class DeserializeSequence : IEnumerable<KeyTuple<TKey, TElement>>
         {
-            int size;
-            for (int i = 0; i < length; i++)
+            public int offset; // can read last offset. be careful.
+
+            readonly byte[] refBytes;
+            readonly DirtyTracker tracker;
+            readonly int length;
+            readonly Formatter<TKey> keyFormatter;
+            readonly Formatter<TElement> valueFormatter;
+
+            public DeserializeSequence(byte[] bytes, int offset, DirtyTracker tracker, int length, Formatter<TKey> keyFormatter, Formatter<TElement> valueFormatter)
             {
-                var key = keyFormatter.Deserialize(ref bytes, offset, tracker, out size);
-                offset += size;
+                this.refBytes = bytes;
+                this.offset = offset;
+                this.tracker = tracker;
+                this.length = length;
+                this.keyFormatter = keyFormatter;
+                this.valueFormatter = valueFormatter;
+            }
 
-                // no use valuesFormatter(avoid intermediate array allocate)
-                var valuesLength = BinaryUtil.ReadInt32(ref bytes, offset);
-                offset += 4;
+            public IEnumerator<KeyTuple<TKey, TElement>> GetEnumerator()
+            {
+                var bytes = refBytes;
 
-                for (int j = 0; j < valuesLength; j++)
+                int size;
+                for (int i = 0; i < length; i++)
                 {
-                    var value = valueFormatter.Deserialize(ref bytes, offset, tracker, out size);
+                    var key = keyFormatter.Deserialize(ref bytes, offset, tracker, out size);
                     offset += size;
-                    yield return new KeyTuple<TKey, TElement, int>(key, value, offset);
+
+                    // no use valuesFormatter(avoid intermediate array allocate)
+                    var valuesLength = BinaryUtil.ReadInt32(ref bytes, offset);
+                    offset += 4;
+
+                    for (int j = 0; j < valuesLength; j++)
+                    {
+                        var value = valueFormatter.Deserialize(ref bytes, offset, tracker, out size);
+                        offset += size;
+                        yield return new KeyTuple<TKey, TElement>(key, value);
+                    }
                 }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
             }
         }
     }
-
 
 #if !UNITY
 

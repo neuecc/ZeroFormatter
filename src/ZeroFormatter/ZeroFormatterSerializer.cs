@@ -173,7 +173,6 @@ namespace ZeroFormatter
         }
 
         // copy to does not supports before .NET 4
-        // Note:better to use System.Buffers.ArrayPool
         static ArraySegment<byte> FillFromStream(Stream input)
         {
             var buffer = new byte[input.CanSeek ? input.Length : 16];

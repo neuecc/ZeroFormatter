@@ -144,15 +144,11 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            byte[] bytes = null;
-            var len = BinaryUtil.WriteDouble(ref bytes, 0, 3.14d);
+            var lookup = Enumerable.Empty<int>().ToLookup(x => x % 2 == 0);
+            var a = ZeroFormatterSerializer.Convert(lookup);
 
-            //Console.WriteLine(BinaryUtil.ReadDouble(ref bytes, 0));
-
-            foreach (var item in bytes)
-            {
-                Console.WriteLine(item);
-            }
+            var lookup2 = Enumerable.Range(1, 10).ToLookup(x => x % 2 == 0);
+            var b = ZeroFormatterSerializer.Convert(lookup2);
 
         }
     }

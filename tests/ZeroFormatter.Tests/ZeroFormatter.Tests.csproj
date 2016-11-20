@@ -65,6 +65,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="MoreAdditionalCollectionTest.cs" />
     <Compile Include="SequenceFormatterTest.cs" />
     <Compile Include="BinaryUtilTest.cs" />
     <Compile Include="BlockSerializeTest.cs" />

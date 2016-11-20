@@ -74,6 +74,9 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static int WriteBoolean(ref byte[] bytes, int offset, bool value)
         {
             EnsureCapacity(ref bytes, offset, 1);
@@ -85,6 +88,9 @@ namespace ZeroFormatter.Internal
         /// <summary>
         /// Unsafe! don't ensure capacity and don't return size.
         /// </summary>
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static void WriteBooleanUnsafe(ref byte[] bytes, int offset, bool value)
         {
             bytes[offset] = (byte)(value ? 1 : 0);
@@ -93,6 +99,9 @@ namespace ZeroFormatter.Internal
         /// <summary>
         /// Unsafe! don't ensure capacity and don't return size.
         /// </summary>
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static void WriteBooleanTrueUnsafe(ref byte[] bytes, int offset)
         {
             bytes[offset] = (byte)(1);
@@ -101,16 +110,25 @@ namespace ZeroFormatter.Internal
         /// <summary>
         /// Unsafe! don't ensure capacity and don't return size.
         /// </summary>
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static void WriteBooleanFalseUnsafe(ref byte[] bytes, int offset)
         {
             bytes[offset] = (byte)(0);
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static bool ReadBoolean(ref byte[] bytes, int offset)
         {
             return (bytes[offset] == 0) ? false : true;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static int WriteByte(ref byte[] bytes, int offset, byte value)
         {
             EnsureCapacity(ref bytes, offset, 1);
@@ -119,11 +137,17 @@ namespace ZeroFormatter.Internal
             return 1;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static byte ReadByte(ref byte[] bytes, int offset)
         {
             return bytes[offset];
         }
-
+        
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static int WriteBytes(ref byte[] bytes, int offset, byte[] value)
         {
             EnsureCapacity(ref bytes, offset, value.Length);
@@ -131,13 +155,19 @@ namespace ZeroFormatter.Internal
             return value.Length;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static byte[] ReadBytes(ref byte[] bytes, int offset, int count)
         {
             var dest = new byte[count];
             Buffer.BlockCopy(bytes, offset, dest, 0, count);
             return dest;
         }
-
+        
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static int WriteSByte(ref byte[] bytes, int offset, sbyte value)
         {
             EnsureCapacity(ref bytes, offset, 1);
@@ -146,11 +176,17 @@ namespace ZeroFormatter.Internal
             return 1;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static sbyte ReadSByte(ref byte[] bytes, int offset)
         {
             return (sbyte)bytes[offset];
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteSingle(ref byte[] bytes, int offset, float value)
         {
             EnsureCapacity(ref bytes, offset, 4);
@@ -174,6 +210,9 @@ namespace ZeroFormatter.Internal
             return 4;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe float ReadSingle(ref byte[] bytes, int offset)
         {
             if (offset % 4 == 0)
@@ -190,6 +229,9 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteDouble(ref byte[] bytes, int offset, double value)
         {
             EnsureCapacity(ref bytes, offset, 8);
@@ -217,6 +259,9 @@ namespace ZeroFormatter.Internal
             return 8;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe double ReadDouble(ref byte[] bytes, int offset)
         {
             if (offset % 8 == 0)
@@ -234,6 +279,9 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteInt16(ref byte[] bytes, int offset, short value)
         {
             EnsureCapacity(ref bytes, offset, 2);
@@ -246,6 +294,9 @@ namespace ZeroFormatter.Internal
             return 2;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe short ReadInt16(ref byte[] bytes, int offset)
         {
             fixed (byte* ptr = bytes)
@@ -254,6 +305,9 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteInt32(ref byte[] bytes, int offset, int value)
         {
             EnsureCapacity(ref bytes, offset, 4);
@@ -269,6 +323,9 @@ namespace ZeroFormatter.Internal
         /// <summary>
         /// Unsafe! don't ensure capacity and don't return size.
         /// </summary>
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe void WriteInt32Unsafe(ref byte[] bytes, int offset, int value)
         {
             fixed (byte* ptr = bytes)
@@ -277,6 +334,9 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int ReadInt32(ref byte[] bytes, int offset)
         {
             fixed (byte* ptr = bytes)
@@ -285,6 +345,9 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteInt64(ref byte[] bytes, int offset, long value)
         {
             EnsureCapacity(ref bytes, offset, 8);
@@ -297,6 +360,9 @@ namespace ZeroFormatter.Internal
             return 8;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe long ReadInt64(ref byte[] bytes, int offset)
         {
             fixed (byte* ptr = bytes)
@@ -305,6 +371,9 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteUInt16(ref byte[] bytes, int offset, ushort value)
         {
             EnsureCapacity(ref bytes, offset, 2);
@@ -317,6 +386,9 @@ namespace ZeroFormatter.Internal
             return 2;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe ushort ReadUInt16(ref byte[] bytes, int offset)
         {
             fixed (byte* ptr = bytes)
@@ -325,6 +397,9 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteUInt32(ref byte[] bytes, int offset, uint value)
         {
             EnsureCapacity(ref bytes, offset, 4);
@@ -337,6 +412,9 @@ namespace ZeroFormatter.Internal
             return 4;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe uint ReadUInt32(ref byte[] bytes, int offset)
         {
             fixed (byte* ptr = bytes)
@@ -345,6 +423,9 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteUInt64(ref byte[] bytes, int offset, ulong value)
         {
             EnsureCapacity(ref bytes, offset, 8);
@@ -357,6 +438,9 @@ namespace ZeroFormatter.Internal
             return 8;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe ulong ReadUInt64(ref byte[] bytes, int offset)
         {
             fixed (byte* ptr = bytes)
@@ -365,16 +449,25 @@ namespace ZeroFormatter.Internal
             }
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static int WriteChar(ref byte[] bytes, int offset, char value)
         {
             return WriteUInt16(ref bytes, offset, (ushort)value);
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static char ReadChar(ref byte[] bytes, int offset)
         {
             return (char)ReadUInt16(ref bytes, offset);
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static int WriteString(ref byte[] bytes, int offset, string value)
         {
             var ensureSize = StringEncoding.UTF8.GetMaxByteCount(value.Length);
@@ -383,12 +476,18 @@ namespace ZeroFormatter.Internal
             return StringEncoding.UTF8.GetBytes(value, 0, value.Length, bytes, offset);
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static string ReadString(ref byte[] bytes, int offset, int count)
         {
             return StringEncoding.UTF8.GetString(bytes, offset, count);
         }
 
         // decimal underlying "flags, hi, lo, mid" fields are sequential and same layuout with .NET Framework and Mono(Unity)
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteDecimal(ref byte[] bytes, int offset, decimal value)
         {
             EnsureCapacity(ref bytes, offset, 16);
@@ -401,6 +500,9 @@ namespace ZeroFormatter.Internal
             return 16;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe decimal ReadDecimal(ref byte[] bytes, int offset)
         {
             fixed (byte* ptr = bytes)
@@ -410,6 +512,9 @@ namespace ZeroFormatter.Internal
         }
 
         // Guid's underlying _a,...,_k field is sequential and same layuout as .NET Framework and Mono(Unity)
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe int WriteGuid(ref byte[] bytes, int offset, Guid value)
         {
             EnsureCapacity(ref bytes, offset, 16);
@@ -422,6 +527,9 @@ namespace ZeroFormatter.Internal
             return 16;
         }
 
+#if !UNITY
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe Guid ReadGuid(ref byte[] bytes, int offset)
         {
             fixed (byte* ptr = bytes)
