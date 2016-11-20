@@ -144,18 +144,16 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
+            byte[] bytes = null;
+            var len = BinaryUtil.WriteDouble(ref bytes, 0, 3.14d);
 
-// in Tokyo, UTC +9:00
-var date = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
+            //Console.WriteLine(BinaryUtil.ReadDouble(ref bytes, 0));
 
-// 2000/1/1, +9:00
-var target = new DateTimeOffset(date);
+            foreach (var item in bytes)
+            {
+                Console.WriteLine(item);
+            }
 
-// 2000/1/1, +9:00
-var deserialized = ZeroFormatterSerializer.Deserialize<DateTimeOffset>(ZeroFormatterSerializer.Serialize(target));
-
-
-            Console.WriteLine(deserialized);
         }
     }
 

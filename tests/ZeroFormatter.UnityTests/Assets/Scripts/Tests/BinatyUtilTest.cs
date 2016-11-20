@@ -83,5 +83,83 @@ namespace ZeroFormatter.Tests
             BinaryUtil.WriteUInt64(ref bytes, offset, UInt64.MaxValue).Is(8);
             BinaryUtil.ReadUInt64(ref bytes, offset).Is(UInt64.MaxValue);
         }
+
+        public void IsLittleEndian()
+        {
+            System.BitConverter.IsLittleEndian.IsTrue();
+        }
+
+        public void WriteFloatFromNull()
+        {
+            byte[] bytes = null;
+            var len = BinaryUtil.WriteSingle(ref bytes, 0, 3.14f);
+            len.Is(4);
+
+            bytes[0].Is((byte)195);
+            bytes[1].Is((byte)245);
+            bytes[2].Is((byte)72);
+            bytes[3].Is((byte)64);
+        }
+
+        public void WriteFloatFromExists()
+        {
+            byte[] bytes = new byte[4];
+            var len = BinaryUtil.WriteSingle(ref bytes, 0, 3.14f);
+            len.Is(4);
+
+            bytes[0].Is((byte)195);
+            bytes[1].Is((byte)245);
+            bytes[2].Is((byte)72);
+            bytes[3].Is((byte)64);
+        }
+
+        public void ReadFloat()
+        {
+            byte[] bytes = new byte[4] { (byte)195, (byte)245, (byte)72, (byte)64 };
+
+            var f = BinaryUtil.ReadSingle(ref bytes, 0);
+            f.Is(3.14f);
+
+        }
+
+        public void WriteDoubleFromNull()
+        {
+            byte[] bytes = null;
+            var len = BinaryUtil.WriteDouble(ref bytes, 0, 3.14);
+            len.Is(8);
+
+            bytes[0].Is((byte)31);
+            bytes[1].Is((byte)133);
+            bytes[2].Is((byte)235);
+            bytes[3].Is((byte)81);
+            bytes[4].Is((byte)184);
+            bytes[5].Is((byte)30);
+            bytes[6].Is((byte)9);
+            bytes[7].Is((byte)64);
+        }
+
+        public void WriteDoubleFromExists()
+        {
+            byte[] bytes = new byte[8];
+            var len = BinaryUtil.WriteDouble(ref bytes, 0, 3.14);
+            len.Is(8);
+
+            bytes[0].Is((byte)31);
+            bytes[1].Is((byte)133);
+            bytes[2].Is((byte)235);
+            bytes[3].Is((byte)81);
+            bytes[4].Is((byte)184);
+            bytes[5].Is((byte)30);
+            bytes[6].Is((byte)9);
+            bytes[7].Is((byte)64);
+        }
+
+        public void ReadDouble()
+        {
+            byte[] bytes = new byte[8] { (byte)31, (byte)133, (byte)235, (byte)81, (byte)184, (byte)30, (byte)9, (byte)64 };
+
+            var d = BinaryUtil.ReadDouble(ref bytes, 0);
+            d.Is(3.14);
+        }
     }
 }
