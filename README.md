@@ -636,8 +636,8 @@ Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is 
 | Byte | [byte(1)] |
 | SByte | [sbyte(1)] |
 | Char | [ushort(2)] |
-| TimeSpan | [seconds:long(8)][nanos:int(4)] |
-| DateTime | [seconds:long(8)][nanos:int(4)] |
+| TimeSpan | [seconds:long(8)][nanos:int(4)] | seconds represents time from 00:00:00 |
+| DateTime | [seconds:long(8)][nanos:int(4)] | seconds represents UTC time since Unix epoch(0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z) |
 | DateTimeOffset | [seconds:long(8)][nanos:int(4)][offsetMinutes:short(2)] | DateTime with a time difference |
 | String | [utf8Bytes:(length)] | currently no used but reserved for future |
 | Int16? | [hasValue:bool(1)][short(2)] |
@@ -652,8 +652,8 @@ Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is 
 | Byte? | [hasValue:bool(1)][byte(1)] |
 | SByte? | [hasValue:bool(1)][sbyte(1)] |
 | Char? | [hasValue:bool(1)][ushort(2)] |
-| TimeSpan? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
-| DateTime? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] |
+| TimeSpan? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] | seconds represents time from 00:00:00 |
+| DateTime? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] | seconds represents UTC time since Unix epoch(0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z) |
 | DateTimeOffset? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)][offsetMinutes:short(2)] | DateTime with a time difference |
 | String? | [length:int(4)][utf8Bytes:(length)] | representes `String`, if length = -1, indicates null. This is only variable-length primitive. |
 
@@ -720,7 +720,7 @@ ZeroFormatter's EqualityComparer calculates stable hashCode for serialize LazyDi
 
 C# Schema
 ---
-ZeroFormatter has no schema but has schema so C# can be schema. You can define schema by C# and analyze by Roslyn.
+The schema of ZeroFormatter is C# itself. You can define the schema in C# and analyze it with Roslyn to generate in another language or C#(such as zfc.exe).
 
 ```csharp
 namespace /* Namespace */
