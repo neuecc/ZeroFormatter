@@ -15,6 +15,14 @@ namespace ZeroFormatter.Internal
     // "internal" but "public" because generated code uses BinaryUtil.
     public static class BinaryUtil
     {
+        static BinaryUtil()
+        {
+            if (!BitConverter.IsLittleEndian)
+            {
+                throw new Exception("Currently ZeroFormatter only supports Little-Endian environments. If you need supports, please report your envitonments to https://github.com/neuecc/ZeroFormatter/issues .");
+            }
+        }
+
         public static void EnsureCapacity(ref byte[] bytes, int offset, int appendLength)
         {
             var newLength = offset + appendLength;
@@ -147,9 +155,20 @@ namespace ZeroFormatter.Internal
         {
             EnsureCapacity(ref bytes, offset, 4);
 
-            fixed (byte* ptr = bytes)
+            if (offset % 4 == 0)
             {
-                *(float*)(ptr + offset) = value;
+                fixed (byte* ptr = bytes)
+                {
+                    *(float*)(ptr + offset) = value;
+                }
+            }
+            else
+            {
+                uint num = *(uint*)(&value);
+                bytes[offset] = (byte)num;
+                bytes[offset + 1] = (byte)(num >> 8);
+                bytes[offset + 2] = (byte)(num >> 16);
+                bytes[offset + 3] = (byte)(num >> 24);
             }
 
             return 4;
@@ -157,9 +176,17 @@ namespace ZeroFormatter.Internal
 
         public static unsafe float ReadSingle(ref byte[] bytes, int offset)
         {
-            fixed (byte* ptr = bytes)
+            if (offset % 4 == 0)
             {
-                return *(float*)(ptr + offset);
+                fixed (byte* ptr = bytes)
+                {
+                    return *(float*)(ptr + offset);
+                }
+            }
+            else
+            {
+                uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
+                return *(float*)(&num);
             }
         }
 
@@ -167,9 +194,24 @@ namespace ZeroFormatter.Internal
         {
             EnsureCapacity(ref bytes, offset, 8);
 
-            fixed (byte* ptr = bytes)
+            if (offset % 8 == 0)
             {
-                *(double*)(ptr + offset) = value;
+                fixed (byte* ptr = bytes)
+                {
+                    *(double*)(ptr + offset) = value;
+                }
+            }
+            else
+            {
+                ulong num = (ulong)(*(long*)(&value));
+                bytes[offset] = (byte)num;
+                bytes[offset + 1] = (byte)(num >> 8);
+                bytes[offset + 2] = (byte)(num >> 16);
+                bytes[offset + 3] = (byte)(num >> 24);
+                bytes[offset + 4] = (byte)(num >> 32);
+                bytes[offset + 5] = (byte)(num >> 40);
+                bytes[offset + 6] = (byte)(num >> 48);
+                bytes[offset + 7] = (byte)(num >> 56);
             }
 
             return 8;
@@ -177,9 +219,18 @@ namespace ZeroFormatter.Internal
 
         public static unsafe double ReadDouble(ref byte[] bytes, int offset)
         {
-            fixed (byte* ptr = bytes)
+            if (offset % 8 == 0)
             {
-                return *(double*)(ptr + offset);
+                fixed (byte* ptr = bytes)
+                {
+                    return *(double*)(ptr + offset);
+                }
+            }
+            else
+            {
+                uint num = (uint)((int)bytes[offset] | (int)bytes[offset + 1] << 8 | (int)bytes[offset + 2] << 16 | (int)bytes[offset + 3] << 24);
+                ulong num2 = (ulong)((int)bytes[offset + 4] | (int)bytes[offset + 5] << 8 | (int)bytes[offset + 6] << 16 | (int)bytes[offset + 7] << 24) << 32 | (ulong)num;
+                return *(double*)(&num2);
             }
         }
 

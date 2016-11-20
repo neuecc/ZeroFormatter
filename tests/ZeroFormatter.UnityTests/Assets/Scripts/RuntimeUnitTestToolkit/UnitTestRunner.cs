@@ -122,6 +122,11 @@ namespace RuntimeUnitTestToolkit
 
         void Start()
         {
+            UnityEngine.Application.logMessageReceived += (a,b,c) =>
+            {
+                logText.text += "[" + c + "]" + a + "\n";
+            };
+
             var executeAll = new List<Func<Coroutine>>();
             foreach (var ___item in tests)
             {
