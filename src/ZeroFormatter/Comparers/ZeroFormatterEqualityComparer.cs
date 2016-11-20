@@ -128,6 +128,75 @@ namespace ZeroFormatter.Comparers
                 comparer = new GuidEqualityComparer();
             }
 
+            else if (t == typeof(Int16?))
+            {
+                comparer = new NullableEqualityComparer<Int16>();
+            }
+            else if (t == typeof(Int32?))
+            {
+                comparer = new NullableEqualityComparer<Int32>();
+            }
+            else if (t == typeof(Int64?))
+            {
+                comparer = new NullableEqualityComparer<Int64>();
+            }
+            else if (t == typeof(UInt16?))
+            {
+                comparer = new NullableEqualityComparer<UInt16>();
+            }
+            else if (t == typeof(UInt32?))
+            {
+                comparer = new NullableEqualityComparer<UInt32>();
+            }
+            else if (t == typeof(UInt64?))
+            {
+                comparer = new NullableEqualityComparer<UInt64>();
+            }
+            else if (t == typeof(Single?))
+            {
+                comparer = new NullableEqualityComparer<Single>();
+            }
+            else if (t == typeof(Double?))
+            {
+                comparer = new NullableEqualityComparer<Double>();
+            }
+            else if (t == typeof(bool?))
+            {
+                comparer = new NullableEqualityComparer<bool>();
+            }
+            else if (t == typeof(byte?))
+            {
+                comparer = new NullableEqualityComparer<byte>();
+            }
+            else if (t == typeof(sbyte?))
+            {
+                comparer = new NullableEqualityComparer<sbyte>();
+            }
+            else if (t == typeof(Char?))
+            {
+                comparer = new NullableEqualityComparer<Char>();
+            }
+            else if (t == typeof(TimeSpan?))
+            {
+                comparer = new NullableEqualityComparer<TimeSpan>();
+            }
+            else if (t == typeof(DateTime?))
+            {
+                comparer = new NullableEqualityComparer<DateTime>();
+            }
+            else if (t == typeof(DateTimeOffset?))
+            {
+                comparer = new NullableEqualityComparer<DateTimeOffset>();
+            }
+            else if (t == typeof(decimal?))
+            {
+                comparer = new NullableEqualityComparer<decimal>();
+            }
+            else if (t == typeof(Guid?))
+            {
+                comparer = new NullableEqualityComparer<Guid>();
+            }
+
 #if !UNITY
 
             else if (t.GetTypeInfo().GetInterfaces().Any(x => x == typeof(IKeyTuple)))
@@ -174,6 +243,12 @@ namespace ZeroFormatter.Comparers
             else if (t.GetTypeInfo().IsEnum)
             {
                 comparer = EnumEqualityComparer<T>.Default;
+            }
+
+            else if (t.GetTypeInfo().IsNullable() && t.GetTypeInfo().GenericTypeArguments[0].IsEnum)
+            {
+                var formatterType =  typeof(NullableEqualityComparer<>).MakeGenericType(t.GetTypeInfo().GenericTypeArguments[0]);
+                comparer = Activator.CreateInstance(formatterType);
             }
 
 #endif

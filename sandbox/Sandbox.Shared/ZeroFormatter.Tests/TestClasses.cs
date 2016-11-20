@@ -219,9 +219,9 @@ namespace ZeroFormatter.Tests
     public class MyVectorClass
     {
         [Index(0)]
-        public virtual float X { get;  set; }
+        public virtual float X { get; set; }
         [Index(1)]
-        public virtual float Y { get;  set; }
+        public virtual float Y { get; set; }
 
         public MyVectorClass()
         {
@@ -316,5 +316,14 @@ namespace ZeroFormatter.Tests
         public virtual global::Sandbox.Shared.Foo.MyClass FooMyClass { get; set; }
         [Index(1)]
         public virtual global::Sandbox.Shared.Bar.MyClass BarMyClass { get; set; }
+    }
+
+    [ZeroFormattable]
+    public class NullableLazy
+    {
+        [Index(0)]
+        public virtual ILazyDictionary<int?, string> A { get; set; }
+        [Index(1)]
+        public virtual ILazyLookup<int?, string> B { get; set; }
     }
 }

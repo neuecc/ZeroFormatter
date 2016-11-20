@@ -18,7 +18,7 @@ namespace ZeroFormatter.CodeGenerator
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+    #line 1 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "14.0.0.0")]
     public partial class InitializerGenerator : InitializerGeneratorBase
     {
@@ -46,7 +46,7 @@ namespace ZeroFormatter.Internal
     {
 ");
             
-            #line 22 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  if( !UnuseUnityAttribute) { 
             
             #line default
@@ -54,42 +54,42 @@ namespace ZeroFormatter.Internal
             this.Write("        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeL" +
                     "oadType.BeforeSceneLoad)]\r\n");
             
-            #line 24 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 24 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } 
             
             #line default
             #line hidden
             this.Write("        public static void Register()\r\n        {\r\n            // Enums\r\n");
             
-            #line 28 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  foreach(var g in Enums) { foreach(var t in g.Types) {   
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter<");
             
-            #line 29 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 29 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(">.Register(new ");
             
-            #line 29 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 29 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + "." + t.Name));
             
             #line default
             #line hidden
             this.Write("Formatter());\r\n            ZeroFormatter.Formatters.Formatter<");
             
-            #line 30 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 30 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write("?>.Register(new ");
             
-            #line 30 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 30 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + ".Nullable" + t.Name));
             
             #line default
@@ -97,70 +97,85 @@ namespace ZeroFormatter.Internal
             this.Write("Formatter());\r\n            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<" +
                     "");
             
-            #line 31 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 31 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(">.Register(new ");
             
-            #line 31 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 31 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + "." + t.Name));
             
             #line default
             #line hidden
-            this.Write("EqualityComparer());\r\n");
+            this.Write("EqualityComparer());\r\n            ZeroFormatter.Comparers.ZeroFormatterEqualityCo" +
+                    "mparer<");
             
-            #line 32 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 32 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
+            
+            #line default
+            #line hidden
+            this.Write("?>.Register(new NullableEqualityComparer<");
+            
+            #line 32 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
+            
+            #line default
+            #line hidden
+            this.Write(">());\r\n");
+            
+            #line 33 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } } 
             
             #line default
             #line hidden
             this.Write("            // Objects\r\n");
             
-            #line 34 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 35 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  foreach(var g in Objects) { foreach(var t in g.Types) {   
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter<");
             
-            #line 35 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 36 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(">.Register(new ");
             
-            #line 35 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 36 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + "." + t.Name));
             
             #line default
             #line hidden
             this.Write("Formatter());\r\n");
             
-            #line 36 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 37 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } } 
             
             #line default
             #line hidden
             this.Write("            // Structs\r\n");
             
-            #line 38 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 39 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  foreach(var g in Structs) { foreach(var t in g.Types) {   
             
             #line default
             #line hidden
             this.Write("            {\r\n                var structFormatter = new ");
             
-            #line 40 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 41 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + "." + t.Name));
             
             #line default
             #line hidden
             this.Write("Formatter();\r\n                ZeroFormatter.Formatters.Formatter<");
             
-            #line 41 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 42 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
@@ -168,258 +183,258 @@ namespace ZeroFormatter.Internal
             this.Write(">.Register(structFormatter);\r\n                ZeroFormatter.Formatters.Formatter<" +
                     "");
             
-            #line 42 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 43 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write("?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<");
             
-            #line 42 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 43 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(">(structFormatter));\r\n            }\r\n");
             
-            #line 44 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 45 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } } 
             
             #line default
             #line hidden
             this.Write("            // Unions\r\n");
             
-            #line 46 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 47 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  foreach(var g in Unions) { foreach(var t in g.Types) {   
             
             #line default
             #line hidden
             this.Write("            {\r\n                var unionFormatter = new ");
             
-            #line 48 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 49 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.Namespace + "." + t.Name));
             
             #line default
             #line hidden
             this.Write("Formatter();\r\n                ZeroFormatter.Formatters.Formatter<");
             
-            #line 49 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 50 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(">.Register(unionFormatter);\r\n            }\r\n");
             
-            #line 51 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 52 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } } 
             
             #line default
             #line hidden
             this.Write("            // Generics\r\n");
             
-            #line 53 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 54 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  foreach(var g in GenericTypes) { 
             
             #line default
             #line hidden
             
-            #line 54 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 55 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  if (g.TypeKind == GenericTypeKind.KeyTuple) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<");
             
-            #line 55 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 56 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 56 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 57 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.List) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterList<");
             
-            #line 57 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 58 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 58 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 59 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.Array) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterArray<");
             
-            #line 59 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 60 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 60 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 61 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.Collection) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterCollection<");
             
-            #line 61 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 62 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 62 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 63 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.ReadOnlyList) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyList<");
             
-            #line 63 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 64 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 64 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 65 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.Dictionary) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterDictionary<");
             
-            #line 65 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 66 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 66 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 67 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.LazyDictionary) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<");
             
-            #line 67 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 68 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 68 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 69 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.LazyReadOnlyDictionary) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLazyReadOnlyDictionary<");
             
-            #line 69 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 70 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 70 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 71 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.Lookup) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLookup<");
             
-            #line 71 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 72 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 72 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 73 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.InterfaceCollection) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterInterfaceCollection<");
             
-            #line 73 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 74 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 74 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 75 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.Enumerable) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterEnumerable<");
             
-            #line 75 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 76 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 76 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 77 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.ReadOnlyCollection) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyCollection<");
             
-            #line 77 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 78 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 78 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 79 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.KeyValuePair) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterKeyValuePair<");
             
-            #line 79 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 80 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 80 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 81 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } else if(g.TypeKind == GenericTypeKind.LazyLookup) { 
             
             #line default
             #line hidden
             this.Write("            ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<");
             
-            #line 81 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 82 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(g.ElementTypes));
             
             #line default
             #line hidden
             this.Write(">();\r\n");
             
-            #line 82 "C:\Users\neuecc\Documents\Git\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
+            #line 83 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\InitializerGenerator.tt"
  } } 
             
             #line default

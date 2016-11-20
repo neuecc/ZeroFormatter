@@ -13,7 +13,7 @@ namespace ZeroFormatter.Tests
     public class VersioningTest
     {
         [TestMethod]
-        public void MyTestMethod()
+        public void Versioning1()
         {
             var standard = ZeroFormatterSerializer.Serialize(new Standard { MyProperty0 = 100, MyProperty3 = 300 });
 

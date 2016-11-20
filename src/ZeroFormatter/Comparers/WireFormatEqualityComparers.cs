@@ -4,6 +4,31 @@ using System.Collections.Generic;
 
 namespace ZeroFormatter.Comparers
 {
+    public class NullableEqualityComparer<T> : EqualityComparer<Nullable<T>>
+        where T : struct
+    {
+        readonly IEqualityComparer<T> innerComparer;
+
+        public NullableEqualityComparer()
+        {
+            this.innerComparer = ZeroFormatterEqualityComparer<T>.Default;
+        }
+
+        public override bool Equals(T? x, T? y)
+        {
+            if (x == null && y == null) return true;
+            if (x == null || y == null) return false;
+
+            return innerComparer.Equals(x.Value, y.Value);
+        }
+
+        public override int GetHashCode(T? obj)
+        {
+            if (obj == null) return 0;
+            return innerComparer.GetHashCode(obj.Value);
+        }
+    }
+
     internal class BoolEqualityComparer : IEqualityComparer<bool>
     {
         public bool Equals(bool x, bool y)

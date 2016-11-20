@@ -21,54 +21,71 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::DataRoot.DataTypeVersion>.Register(new ZeroFormatter.DynamicObjectSegments.DataTypeVersionFormatter());
             ZeroFormatter.Formatters.Formatter<global::DataRoot.DataTypeVersion?>.Register(new ZeroFormatter.DynamicObjectSegments.NullableDataTypeVersionFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::DataRoot.DataTypeVersion>.Register(new ZeroFormatter.DynamicObjectSegments.DataTypeVersionEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::DataRoot.DataTypeVersion?>.Register(new NullableEqualityComparer<global::DataRoot.DataTypeVersion>());
             ZeroFormatter.Formatters.Formatter<global::MyGlobal>.Register(new ZeroFormatter.DynamicObjectSegments.MyGlobalFormatter());
             ZeroFormatter.Formatters.Formatter<global::MyGlobal?>.Register(new ZeroFormatter.DynamicObjectSegments.NullableMyGlobalFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::MyGlobal>.Register(new ZeroFormatter.DynamicObjectSegments.MyGlobalEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::MyGlobal?>.Register(new NullableEqualityComparer<global::MyGlobal>());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Sex>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.SexFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Sex?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableSexFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Sex>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.SexEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Sex?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Sex>());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.CharacterType>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CharacterTypeFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.CharacterType?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableCharacterTypeFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.CharacterType>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CharacterTypeEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.CharacterType?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.CharacterType>());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Bar.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMogeFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Bar.MogeMoge?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.NullableMogeMogeFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMogeEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge>());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Bar.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMoge2Formatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Bar.MogeMoge2?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.NullableMogeMoge2Formatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMoge2EqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge2?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge2>());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Foo.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMogeFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Foo.MogeMoge?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.NullableMogeMogeFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMogeEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge>());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Foo.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMoge2Formatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.Foo.MogeMoge2?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.NullableMogeMoge2Formatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMoge2EqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge2?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge2>());
             ZeroFormatter.Formatters.Formatter<global::System.TypeCode>.Register(new ZeroFormatter.DynamicObjectSegments.System.TypeCodeFormatter());
             ZeroFormatter.Formatters.Formatter<global::System.TypeCode?>.Register(new ZeroFormatter.DynamicObjectSegments.System.NullableTypeCodeFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::System.TypeCode>.Register(new ZeroFormatter.DynamicObjectSegments.System.TypeCodeEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::System.TypeCode?>.Register(new NullableEqualityComparer<global::System.TypeCode>());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.IntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.IntEnumFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.IntEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableIntEnumFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.IntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.IntEnumEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.IntEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.IntEnum>());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.UIntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.UIntEnumFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.UIntEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableUIntEnumFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.UIntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.UIntEnumEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.UIntEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.UIntEnum>());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.ShortEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ShortEnumFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.ShortEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableShortEnumFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ShortEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ShortEnumEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ShortEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.ShortEnum>());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.UShortEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.UShortEnumFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.UShortEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableUShortEnumFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.UShortEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.UShortEnumEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.UShortEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.UShortEnum>());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.ByteEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ByteEnumFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.ByteEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableByteEnumFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ByteEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ByteEnumEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ByteEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.ByteEnum>());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.SByteEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.SByteEnumFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.SByteEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableSByteEnumFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.SByteEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.SByteEnumEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.SByteEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.SByteEnum>());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.LongEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.LongEnumFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.LongEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableLongEnumFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.LongEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.LongEnumEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.LongEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.LongEnum>());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.ULongEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ULongEnumFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.ULongEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableULongEnumFormatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ULongEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ULongEnumEqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ULongEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.ULongEnum>());
             // Objects
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.AllNewFormat>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.AllNewFormatFormatter());
             ZeroFormatter.Formatters.Formatter<global::Sandbox.Shared.CustomFormat>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CustomFormatFormatter());
@@ -103,6 +120,7 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.IncludeStruct>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.IncludeStructFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.LazyFormats>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.LazyFormatsFormatter());
             ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.FooBar>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.FooBarFormatter());
+            ZeroFormatter.Formatters.Formatter<global::ZeroFormatter.Tests.NullableLazy>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableLazyFormatter());
             // Structs
             {
                 var structFormatter = new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.MyStructFixedFormatter();
@@ -154,9 +172,11 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<int, int>();
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<int, string>();
             ZeroFormatter.Formatters.Formatter.RegisterDictionary<string, int>();
+            ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<int?, string>();
             ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<string, int>();
             ZeroFormatter.Formatters.Formatter.RegisterLookup<bool, int>();
             ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<bool, int>();
+            ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<int?, string>();
             ZeroFormatter.Formatters.Formatter.RegisterArray<global::ZeroFormatter.Tests.MyStructFixed>();
             ZeroFormatter.Formatters.Formatter.RegisterArray<global::ZeroFormatter.Tests.MyVector>();
             ZeroFormatter.Formatters.Formatter.RegisterArray<global::ZeroFormatter.Tests.MyVectorClass>();
@@ -5280,6 +5300,133 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
                 offset += ObjectSegmentHelper.SerializeSegment<global::Sandbox.Shared.Foo.MyClass>(ref targetBytes, startOffset, offset, 0, _FooMyClass);
                 offset += ObjectSegmentHelper.SerializeSegment<global::Sandbox.Shared.Bar.MyClass>(ref targetBytes, startOffset, offset, 1, _BarMyClass);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class NullableLazyFormatter : Formatter<global::ZeroFormatter.Tests.NullableLazy>
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.NullableLazy value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (1 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::ZeroFormatter.ILazyDictionary<int?, string>>(ref bytes, startOffset, offset, 0, value.A);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<global::ZeroFormatter.ILazyLookup<int?, string>>(ref bytes, startOffset, offset, 1, value.B);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 1);
+            }
+        }
+
+        public override global::ZeroFormatter.Tests.NullableLazy Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new NullableLazyObjectSegment(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class NullableLazyObjectSegment : global::ZeroFormatter.Tests.NullableLazy, IZeroFormatterSegment
+    {
+        static readonly int[] __elementSizes = new int[]{ 0, 0 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+        global::ZeroFormatter.ILazyDictionary<int?, string> _A;
+        global::ZeroFormatter.ILazyLookup<int?, string> _B;
+
+        // 0
+        public override global::ZeroFormatter.ILazyDictionary<int?, string> A
+        {
+            get
+            {
+                return _A;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _A = value;
+            }
+        }
+
+        // 1
+        public override global::ZeroFormatter.ILazyLookup<int?, string> B
+        {
+            get
+            {
+                return _B;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _B = value;
+            }
+        }
+
+
+        public NullableLazyObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 1, __elementSizes);
+
+            _A = ObjectSegmentHelper.DeserializeSegment<global::ZeroFormatter.ILazyDictionary<int?, string>>(originalBytes, 0, __binaryLastIndex, __tracker);
+            _B = ObjectSegmentHelper.DeserializeSegment<global::ZeroFormatter.ILazyLookup<int?, string>>(originalBytes, 1, __binaryLastIndex, __tracker);
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (1 + 1));
+
+                offset += ObjectSegmentHelper.SerializeSegment<global::ZeroFormatter.ILazyDictionary<int?, string>>(ref targetBytes, startOffset, offset, 0, _A);
+                offset += ObjectSegmentHelper.SerializeSegment<global::ZeroFormatter.ILazyLookup<int?, string>>(ref targetBytes, startOffset, offset, 1, _B);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
             }

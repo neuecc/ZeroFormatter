@@ -29,6 +29,7 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter<<#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>Formatter());
             ZeroFormatter.Formatters.Formatter<<#= t.FullName #>?>.Register(new <#= g.Namespace + ".Nullable" + t.Name #>Formatter());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<<#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>EqualityComparer());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<<#= t.FullName #>?>.Register(new NullableEqualityComparer<<#= t.FullName #>>());
 <# } } #>
             // Objects
 <# foreach(var g in Objects) { foreach(var t in g.Types) {   #>
