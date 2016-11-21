@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sandbox.Shared;
+using System.Collections.Generic;
 
 namespace ZeroFormatter.Tests
 {
@@ -56,10 +57,12 @@ namespace ZeroFormatter.Tests
         {
             Formatters.Formatter.AppendDynamicUnionResolver((unionType, resolver) =>
             {
-                if (unionType == typeof(MyClass))
+                if (unionType == typeof(MessageBase))
                 {
-
-
+                    resolver.RegisterUnionKeyType(typeof(string));
+                    resolver.RegisterSubType("A", typeof(MessageA));
+                    resolver.RegisterSubType("b", typeof(MessageB));
+                    resolver.RegisterFallbackType(typeof(UnknownMessage));
                 }
                 else if (unionType == typeof(IEvent))
                 {
@@ -71,28 +74,110 @@ namespace ZeroFormatter.Tests
             });
 
 
-            var emptySerialize = ZeroFormatterSerializer.Serialize(new EventA());
+            {
+                var union = ZeroFormatterSerializer.Serialize<IEvent>(new EventA());
+                var aaa = ZeroFormatterSerializer.Deserialize<IEvent>(union);
+                aaa.IsInstanceOf<EventA>();
+                var bbbUnion = ZeroFormatterSerializer.Serialize<IEvent>(new EventB());
+                var bbb = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
+                bbb.IsInstanceOf<EventB>();
+
+                bbbUnion[1] = 24; // unknown
+                var ccc = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
+                ccc.IsInstanceOf<UnknownEvent>();
+            }
+
+            {
+                var union = ZeroFormatterSerializer.Serialize<MessageBase>(new MessageA());
+                var aaa = ZeroFormatterSerializer.Deserialize<MessageBase>(union);
+                aaa.IsInstanceOf<MessageA>();
+                var bbbUnion = ZeroFormatterSerializer.Serialize<MessageBase>(new MessageB()
+                {
+                    Events = new List<IEvent> { (IEvent)new EventA(), (IEvent)new EventB(), (IEvent)new EventA() }
+                });
+                var bbb = ZeroFormatterSerializer.Deserialize<MessageBase>(bbbUnion);
+                bbb.IsInstanceOf<MessageB>();
+
+                bbbUnion[1] = 13;
+                var ccc = ZeroFormatterSerializer.Deserialize<MessageBase>(bbbUnion);
+                ccc.IsInstanceOf<UnknownMessage>();
+            }
+        }
 
 
-            var union = ZeroFormatterSerializer.Serialize<IEvent>(new EventA());
-            var aaa = ZeroFormatterSerializer.Deserialize<IEvent>(union);
-            aaa.IsInstanceOf<EventA>();
-            var bbbUnion = ZeroFormatterSerializer.Serialize<IEvent>(new EventB());
-            var bbb = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
-            bbb.IsInstanceOf<EventB>();
+        [TestMethod]
+        public void StandardUnionWithFallback()
+        {
 
-            bbbUnion[1] = 24; // unknown
-            var ccc = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
-            bbb.IsInstanceOf<UnknownEvent>();
+            var uinon = ZeroFormatterSerializer.Serialize<IStandardUnion>(new MessageA1());
+            var hogehoge = ZeroFormatterSerializer.Deserialize<IStandardUnion>(uinon);
+            hogehoge.IsInstanceOf<MessageA1>();
+
+            Internal.BinaryUtil.WriteInt32(ref uinon, 1, 212);
+            var zzzzz = ZeroFormatterSerializer.Deserialize<IStandardUnion>(uinon);
+            zzzzz.IsInstanceOf<UnknownMessage1>();
+
+        }
+
+
+        [Union(new[] { typeof(UnknownMessage1), typeof(MessageA1), typeof(MessageB1) }, typeof(UnknownMessage1))]
+        public interface IStandardUnion
+        {
+            [UnionKey]
+            int A { get; }
+        }
+
+        [ZeroFormattable]
+        public class UnknownMessage1 : IStandardUnion
+        {
+            [IgnoreFormat]
+            public int A
+            {
+                get
+                {
+                    return -1;
+                }
+            }
+        }
+
+        [ZeroFormattable]
+        public class MessageA1 : IStandardUnion
+        {
+            [IgnoreFormat]
+            public int A
+            {
+                get
+                {
+                    return 1;
+                }
+            }
+        }
+        [ZeroFormattable]
+        public class MessageB1 : IStandardUnion
+        {
+            [IgnoreFormat]
+            public int A
+            {
+                get
+                {
+                    return 3;
+                }
+            }
         }
 
 
         [DynamicUnion]
-        public abstract class MyClass
+        public class MessageBase { }
+
+        public class UnknownMessage : MessageBase { }
+        [ZeroFormattable]
+        public class MessageA : MessageBase { }
+        [ZeroFormattable]
+        public class MessageB : MessageBase
         {
-
+            [Index(0)]
+            public virtual List<IEvent> Events { get; set; }
         }
-
 
         [DynamicUnion]
         public interface IEvent { }

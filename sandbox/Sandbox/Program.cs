@@ -151,32 +151,74 @@ namespace Sandbox
         public virtual int BA { get; set; }
     }
 
+
+    [DynamicUnion]
+    public abstract class MyClass
+    {
+
+    }
+
+
+    [DynamicUnion]
+    public interface IEvent { }
+
+
+    public class UnknownEvent : IEvent
+    {
+
+    }
+
+
+    [ZeroFormattable]
+    public class EventA : IEvent { }
+    [ZeroFormattable]
+    public class EventB : IEvent { }
+
     class Program
     {
         static void Main(string[] args)
         {
-            var bytes = new byte[1000];
-            IList<string> variableList = new[] { "abcde", "fghijk" };
-            var record = KeyTuple.Create("aiueo", variableList, "kakikukeko");
+            ZeroFormatter.Formatters.Formatter.AppendDynamicUnionResolver((unionType, resolver) =>
+            {
+                if (unionType == typeof(MyClass))
+                {
 
-            var size = ZeroFormatterSerializer.Serialize(ref bytes, 33, record);
 
-            var newBytes = new byte[2000];
-            Buffer.BlockCopy(bytes, 33, newBytes, 99, size);
+                }
+                else if (unionType == typeof(IEvent))
+                {
+                    resolver.RegisterUnionKeyType(typeof(byte));
+                    resolver.RegisterSubType((byte)13, typeof(EventA));
+                    resolver.RegisterSubType((byte)234, typeof(EventB));
+                    resolver.RegisterFallbackType(typeof(UnknownEvent));
+                }
+            });
 
-            var referenceByte = Encoding.UTF8.GetBytes("abcde");
 
-            var hugahgua = ZeroFormatterSerializer.Deserialize<KeyTuple<string, IList<string>, string>>(newBytes, 99);
+            var emptySerialize = ZeroFormatterSerializer.Serialize(new EventA());
 
-            hugahgua.Item2[0] = "zzzzz";
 
-            var reConvert = ZeroFormatterSerializer.Convert(hugahgua);
+            var union = ZeroFormatterSerializer.Serialize<IEvent>(new EventA());
+            var aaa = ZeroFormatterSerializer.Deserialize<IEvent>(union);
 
-            Console.WriteLine(hugahgua.Item2[0]);
+            var bbbUnion = ZeroFormatterSerializer.Serialize<IEvent>(new EventB());
+            var bbb = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
+
+
+            bbbUnion[1] = 24; // unknown
+
+            int s;
+            //var fff = new CharacterFormatter();
+            //fff.Deserialize(ref bbbUnion, 0, new DirtyTracker(), out s);
+            Console.WriteLine("go!");
+            var ccc = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
+
+            Console.WriteLine(ccc.GetType().FullName);
         }
     }
 
-    
+
+
 
 
     [ZeroFormattable]

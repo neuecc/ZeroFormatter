@@ -693,32 +693,16 @@ namespace ZeroFormatter.Formatters
             }
 
             var unionKeyProperty = unionKeys[0];
-            if (!unionKeyProperty.GetGetMethod().IsAbstract)
+            if (!ti.IsInterface && !unionKeyProperty.GetGetMethod().IsAbstract)
             {
                 throw new InvalidOperationException("Union class requires abstract [UnionKey]property. " + ti.FullName);
             }
-            var subTypes = (ti.GetCustomAttribute(typeof(UnionAttribute)) as UnionAttribute).SubTypes;
+            var unionAttr = (ti.GetCustomAttribute(typeof(UnionAttribute)) as UnionAttribute);
+            var subTypes = unionAttr.SubTypes;
 
-            foreach (var item in subTypes)
-            {
-                var baseType = item.GetTypeInfo().BaseType;
-                var found = false;
-                while (baseType != null)
-                {
-                    if (baseType == t)
-                    {
-                        found = true;
-                        break;
-                    }
-                    baseType = baseType.GetTypeInfo().BaseType;
-                }
-                if (!found)
-                {
-                    throw new InvalidOperationException("All Union subTypes must be inherited type. Type:" + ti.FullName + ", SubType:" + item.Name);
-                }
-            }
+            ValidateTypes(t, subTypes, unionAttr.FallbackType);
 
-            var generateTypeInfo = BuildFormatter(typeof(TTypeResolver), t, unionKeyProperty, unionKeyProperty.PropertyType, subTypes);
+            var generateTypeInfo = BuildFormatter(typeof(TTypeResolver), t, unionKeyProperty, unionKeyProperty.PropertyType, subTypes, unionAttr.FallbackType);
             var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
 
             return formatter;
@@ -730,13 +714,64 @@ namespace ZeroFormatter.Formatters
             var t = typeof(T);
             var ti = t.GetTypeInfo();
 
-            var generateTypeInfo = BuildFormatter(typeof(TTypeResolver), t, null, resolver.unionKeyType, resolver.subTypes.Select(x => x.Item2).ToArray());
+            if (resolver.unionKeyType == null) throw new InvalidOperationException("DynamicUnion needs RegisterUnionKeyType");
+            ValidateTypes(t, resolver.subTypes.Select(x => x.Item2).ToArray(), resolver.fallbackType);
+            var set = new HashSet<object>();
+            foreach (var item in resolver.subTypes)
+            {
+                if (!set.Add(item.Item1)) throw new InvalidOperationException("DynamicUnion does not allow duplicate key. key:" + item);
+                if (item.Item1.GetType() != resolver.unionKeyType) throw new InvalidOperationException(string.Format("UnionKeyType must be same type. unionKeyType: {0} key: {1}", resolver.unionKeyType.Name, item.Item1.GetType().Name));
+            }
+
+            var generateTypeInfo = BuildFormatter(typeof(TTypeResolver), t, null, resolver.unionKeyType, resolver.subTypes.Select(x => x.Item2).ToArray(), resolver.fallbackType);
             var formatter = Activator.CreateInstance(generateTypeInfo.AsType(), new[] { resolver.subTypes.Select(x => x.Item1).ToList() });
 
             return formatter;
         }
 
-        static TypeInfo BuildFormatter(Type resolverType, Type buildType, PropertyInfo unionKeyPropertyInfo, Type unionKeyType, Type[] subTypes)
+        static void ValidateTypes(Type t, Type[] subTypes, Type fallbackType)
+        {
+            if (t.GetTypeInfo().IsInterface)
+            {
+                foreach (var item in subTypes.Concat(new[] { fallbackType }).Where(x => x != null))
+                {
+                    if (!item.GetTypeInfo().GetInterfaces().Any(x => x == t))
+                    {
+                        throw new InvalidOperationException("All Union subTypes must be inherited type. Type:" + t.FullName + ", SubType:" + item.Name);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in subTypes.Concat(new[] { fallbackType }).Where(x => x != null))
+                {
+                    var baseType = item.GetTypeInfo().BaseType;
+                    var found = false;
+                    while (baseType != null)
+                    {
+                        if (baseType == t)
+                        {
+                            found = true;
+                            break;
+                        }
+                        baseType = baseType.GetTypeInfo().BaseType;
+                    }
+                    if (!found)
+                    {
+                        throw new InvalidOperationException("All Union subTypes must be inherited type. Type:" + t.FullName + ", SubType:" + item.Name);
+                    }
+                }
+            }
+            if (fallbackType != null)
+            {
+                if (fallbackType.GetTypeInfo().GetConstructor(Type.EmptyTypes) == null)
+                {
+                    throw new InvalidOperationException("Fallback type must have parameterless constructor.");
+                }
+            }
+        }
+
+        static TypeInfo BuildFormatter(Type resolverType, Type buildType, PropertyInfo unionKeyPropertyInfo, Type unionKeyType, Type[] subTypes, Type fallbackType)
         {
             var moduleBuilder = ZeroFormatter.Segments.DynamicAssemblyHolder.Module;
 
@@ -988,13 +1023,23 @@ namespace ZeroFormatter.Formatters
                 // else....
                 {
                     il.MarkLabel(ifElseLabels.Last());
-                    il.Emit(OpCodes.Ldstr, "Unknown unionKey type of Union: ");
-                    il.Emit(OpCodes.Ldloc_1);
-                    il.Emit(OpCodes.Constrained, unionKeyType);
-                    il.Emit(OpCodes.Callvirt, typeof(object).GetTypeInfo().GetMethod("ToString"));
-                    il.Emit(OpCodes.Call, typeof(string).GetTypeInfo().GetMethods().First(x => x.GetParameters().Length == 2 && x.GetParameters().All(y => y.ParameterType == typeof(string))));
-                    il.Emit(OpCodes.Newobj, typeof(Exception).GetTypeInfo().GetConstructors().First(x => x.GetParameters().Length == 1));
-                    il.Emit(OpCodes.Throw);
+
+                    if (fallbackType == null)
+                    {
+                        il.Emit(OpCodes.Ldstr, "Unknown unionKey type of Union, unionKey: {0}");
+                        il.Emit(OpCodes.Ldloc_1);
+                        if (unionKeyType.GetTypeInfo().IsValueType)
+                        {
+                            il.Emit(OpCodes.Box, unionKeyType);
+                        }
+                        il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("GetException1", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public));
+                        il.Emit(OpCodes.Throw);
+                    }
+                    else
+                    {
+                        il.Emit(OpCodes.Newobj, fallbackType.GetTypeInfo().GetConstructor(Type.EmptyTypes));
+                        il.Emit(OpCodes.Stloc_2);
+                    }
                 }
 
                 // byteSize += size; return result;

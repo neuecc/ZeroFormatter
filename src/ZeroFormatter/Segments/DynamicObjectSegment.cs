@@ -187,6 +187,11 @@ namespace ZeroFormatter.Segments
             return Formatter<TTypeResolver, T>.Default.Serialize(ref bytes, offset, value);
         }
 
+        public static Exception GetException1(string msgFormat, object o)
+        {
+            return new Exception(string.Format(msgFormat, o));
+        }
+
 #if !UNITY
 
         public static bool IsLazySegment(Type type)

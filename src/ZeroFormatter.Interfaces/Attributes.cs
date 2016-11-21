@@ -23,7 +23,7 @@ namespace ZeroFormatter
     {
     }
 
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = false, Inherited = false)]
     public class UnionAttribute : Attribute
     {
         public Type[] SubTypes { get; private set; }
