@@ -16,24 +16,39 @@ namespace ZeroFormatter.Formatters
 
     public interface ITypeResolver
     {
-        bool IsUseBuiltinStaticSerializer { get; }
         bool IsUseBuiltinDynamicSerializer { get; }
         object ResolveFormatter(Type type);
+        void RegisterDynamicUnion(Type unionType, DynamicUnionResolver resolver);
+    }
 
-        // Make the dynamic union?
-        // object ResolveDynamicUnion(Type unionType, DynamicUnionResolver resolver);
+    public class DynamicUnionResolver
+    {
+        internal bool isStartRegister = false;
+        internal Type unionKeyType;
+        internal List<KeyTuple<object, Type>> subTypes = new List<KeyTuple<object, Type>>();
+        internal Type fallbackType;
+
+        public void RegisterUnionKeyType(Type keyType)
+        {
+            this.isStartRegister = true;
+            this.unionKeyType = keyType;
+        }
+
+        public void RegisterSubType(object key, Type subType)
+        {
+            this.isStartRegister = true;
+            this.subTypes.Add(KeyTuple.Create(key, subType));
+        }
+
+        public void RegisterFallbackType(Type type)
+        {
+            this.isStartRegister = true;
+            this.fallbackType = type;
+        }
     }
 
     public class DefaultResolver : ITypeResolver
     {
-        public bool IsUseBuiltinStaticSerializer
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public bool IsUseBuiltinDynamicSerializer
         {
             get
@@ -45,6 +60,11 @@ namespace ZeroFormatter.Formatters
         public object ResolveFormatter(Type type)
         {
             return Formatter.ResolveFormatter(type);
+        }
+
+        public void RegisterDynamicUnion(Type unionType, DynamicUnionResolver resolver)
+        {
+            Formatter.ResolveDynamicUnion(unionType, resolver);
         }
     }
 
@@ -574,24 +594,43 @@ namespace ZeroFormatter.Formatters
                     // custom nullable struct
                     else if (t.GetGenericTypeDefinition() == typeof(Nullable<>) && ti.GetGenericArguments()[0].GetTypeInfo().IsValueType)
                     {
-                        formatter = DynamicStructFormatter.Create<TTypeResolver, T>();
+                        if (resolver.IsUseBuiltinDynamicSerializer)
+                        {
+                            formatter = DynamicStructFormatter.Create<TTypeResolver, T>();
+                        }
                     }
                 }
 
                 else if (ti.GetCustomAttributes(typeof(UnionAttribute), false).FirstOrDefault() != null)
                 {
-                    formatter = DynamicUnionFormatter.Create<TTypeResolver, T>();
+                    if (resolver.IsUseBuiltinDynamicSerializer)
+                    {
+                        formatter = DynamicUnionFormatter.Create<TTypeResolver, T>();
+                    }
+                }
+
+                else if (ti.GetCustomAttributes(typeof(DynamicUnionAttribute), false).FirstOrDefault() != null)
+                {
+                    var unionResolver = new DynamicUnionResolver();
+                    resolver.RegisterDynamicUnion(t, unionResolver);
+                    if (unionResolver.isStartRegister)
+                    {
+                        formatter = DynamicUnionFormatter.CreateRuntimeUnion<TTypeResolver, T>(unionResolver);
+                    }
                 }
 
                 else if (ti.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() != null)
                 {
-                    if (ti.IsValueType)
+                    if (resolver.IsUseBuiltinDynamicSerializer)
                     {
-                        formatter = DynamicStructFormatter.Create<TTypeResolver, T>();
-                    }
-                    else
-                    {
-                        formatter = DynamicFormatter.Create<TTypeResolver, T>();
+                        if (ti.IsValueType)
+                        {
+                            formatter = DynamicStructFormatter.Create<TTypeResolver, T>();
+                        }
+                        else
+                        {
+                            formatter = DynamicFormatter.Create<TTypeResolver, T>();
+                        }
                     }
                 }
 
@@ -660,10 +699,16 @@ namespace ZeroFormatter.Formatters
     public static class Formatter
     {
         static List<Func<Type, object>> formatterResolver = new List<Func<Type, object>>();
+        static List<Action<Type, DynamicUnionResolver>> unionResolver = new List<Action<Type, DynamicUnionResolver>>();
 
         public static void AppendFormatterResolver(Func<Type, object> formatterResolver)
         {
             Formatter.formatterResolver.Add(formatterResolver);
+        }
+
+        public static void AppendDynamicUnionResolver(Action<Type, DynamicUnionResolver> unionResolver)
+        {
+            Formatter.unionResolver.Add(unionResolver);
         }
 
         internal static object ResolveFormatter(Type t)
@@ -680,6 +725,13 @@ namespace ZeroFormatter.Formatters
             return null;
         }
 
+        internal static void ResolveDynamicUnion(Type unionType, DynamicUnionResolver resolver)
+        {
+            foreach (var item in unionResolver)
+            {
+                item(unionType, resolver);
+            }
+        }
 
 
 #if UNITY

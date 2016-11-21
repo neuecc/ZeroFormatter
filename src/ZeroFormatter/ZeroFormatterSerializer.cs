@@ -45,15 +45,7 @@ namespace ZeroFormatter
         /// </summary>
         public static byte[] Serialize<T>(T obj)
         {
-            byte[] bytes = null;
-            var size = Serialize(ref bytes, 0, obj);
-
-            if (bytes.Length != size)
-            {
-                BinaryUtil.FastResize(ref bytes, size);
-            }
-
-            return bytes;
+            return CustomSerializer<DefaultResolver>.Serialize(obj);
         }
 
         /// <summary>
@@ -61,110 +53,32 @@ namespace ZeroFormatter
         /// </summary>
         public static int Serialize<T>(ref byte[] buffer, int offset, T obj)
         {
-            var formatter = Formatter<DefaultResolver, T>.Default;
-            if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
-
-            return formatter.Serialize(ref buffer, offset, obj);
+            return CustomSerializer<DefaultResolver>.Serialize(ref buffer, offset, obj);
         }
 
         public static void Serialize<T>(Stream stream, T obj)
         {
-            // optimized path
-            // TryGetBuffer does not supports before .NET 4.6
-            // MEMO: If allowgetbuffer = false, throws Exception...
-
-            var ms = stream as MemoryStream;
-            if (ms != null && ms.Position == 0)
-            {
-                var zeroFormatterObj = obj as IZeroFormatterSegment;
-                if (zeroFormatterObj != null && zeroFormatterObj.CanDirectCopy())
-                {
-                    var bufferRef = zeroFormatterObj.GetBufferReference();
-
-#if NET_CORE
-                    ArraySegment<byte> buf;
-                    if (ms.TryGetBuffer(out buf))
-                    {
-                        ms.SetLength(bufferRef.Count);
-                        var dest = buf.Array;
-                        Buffer.BlockCopy(bufferRef.Array, bufferRef.Offset, dest, 0, bufferRef.Count);
-                        return;
-                    }
-#else
-                    ms.SetLength(bufferRef.Count);
-                    var dest = ms.GetBuffer();
-                    Buffer.BlockCopy(bufferRef.Array, bufferRef.Offset, dest, 0, bufferRef.Count);
-                    return;
-#endif
-                }
-            }
-
-            var buffer = Serialize<T>(obj);
-            stream.Write(buffer, 0, buffer.Length);
+            CustomSerializer<DefaultResolver>.Serialize(stream, obj);
         }
 
         public static T Deserialize<T>(byte[] bytes)
         {
-            var formatter = Formatter<DefaultResolver, T>.Default;
-            if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
-
-            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
-            int _;
-            return formatter.Deserialize(ref bytes, 0, tracker, out _);
+            return CustomSerializer<DefaultResolver>.Deserialize<T>(bytes);
         }
 
         public static T Deserialize<T>(byte[] bytes, int offset)
         {
-            var formatter = Formatter<DefaultResolver, T>.Default;
-            if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
-
-            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
-            int _;
-            return formatter.Deserialize(ref bytes, offset, tracker, out _);
+            return CustomSerializer<DefaultResolver>.Deserialize<T>(bytes, offset);
         }
 
         public static T Deserialize<T>(Stream stream)
         {
-            var ms = stream as MemoryStream;
-            var formatter = Formatter<DefaultResolver, T>.Default;
-            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
-            if (ms != null)
-            {
-#if NET_CORE
-                ArraySegment<byte> b;
-                if (ms.TryGetBuffer(out b))
-                {
-                    var buffer = b.Array;
-                    int _;
-                    return formatter.Deserialize(ref buffer, b.Offset, tracker, out _);
-                }
-#else
-                var buffer = ms.GetBuffer();
-                int _;
-                return formatter.Deserialize(ref buffer, (int)ms.Position, tracker, out _);
-#endif
-            }
-
-            {
-                var buffer = FillFromStream(stream);
-                var array = buffer.Array;
-                int _;
-                return formatter.Deserialize(ref array, buffer.Offset, tracker, out _);
-            }
+            return CustomSerializer<DefaultResolver>.Deserialize<T>(stream);
         }
 
         public static T Convert<T>(T obj, bool forceConvert = false)
         {
-            var wrapper = obj as IZeroFormatterSegment;
-            if (!forceConvert)
-            {
-                if (wrapper != null && wrapper.CanDirectCopy())
-                {
-                    return obj;
-                }
-            }
-
-            return Deserialize<T>(Serialize(obj));
+            return CustomSerializer<DefaultResolver>.Convert<T>(obj, forceConvert);
         }
 
         public static bool IsFormattedObject<T>(T obj)
@@ -347,5 +261,136 @@ namespace ZeroFormatter
         }
 
 #endif
+
+        public static class CustomSerializer<TTypeResolver>
+            where TTypeResolver : ITypeResolver, new()
+        {
+            /// <summary>
+            /// Serialize to binary.
+            /// </summary>
+            public static byte[] Serialize<T>(T obj)
+            {
+                byte[] bytes = null;
+                var size = Serialize(ref bytes, 0, obj);
+
+                if (bytes.Length != size)
+                {
+                    BinaryUtil.FastResize(ref bytes, size);
+                }
+
+                return bytes;
+            }
+
+            /// <summary>
+            /// Serialize to binary, can accept null buffer that will be filled. return is size and ref buffer is not sized.
+            /// </summary>
+            public static int Serialize<T>(ref byte[] buffer, int offset, T obj)
+            {
+                var formatter = Formatter<TTypeResolver, T>.Default;
+                if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
+
+                return formatter.Serialize(ref buffer, offset, obj);
+            }
+
+            public static void Serialize<T>(Stream stream, T obj)
+            {
+                // optimized path
+                // TryGetBuffer does not supports before .NET 4.6
+                // MEMO: If allowgetbuffer = false, throws Exception...
+
+                var ms = stream as MemoryStream;
+                if (ms != null && ms.Position == 0)
+                {
+                    var zeroFormatterObj = obj as IZeroFormatterSegment;
+                    if (zeroFormatterObj != null && zeroFormatterObj.CanDirectCopy())
+                    {
+                        var bufferRef = zeroFormatterObj.GetBufferReference();
+
+#if NET_CORE
+                    ArraySegment<byte> buf;
+                    if (ms.TryGetBuffer(out buf))
+                    {
+                        ms.SetLength(bufferRef.Count);
+                        var dest = buf.Array;
+                        Buffer.BlockCopy(bufferRef.Array, bufferRef.Offset, dest, 0, bufferRef.Count);
+                        return;
+                    }
+#else
+                        ms.SetLength(bufferRef.Count);
+                        var dest = ms.GetBuffer();
+                        Buffer.BlockCopy(bufferRef.Array, bufferRef.Offset, dest, 0, bufferRef.Count);
+                        return;
+#endif
+                    }
+                }
+
+                var buffer = Serialize<T>(obj);
+                stream.Write(buffer, 0, buffer.Length);
+            }
+
+            public static T Deserialize<T>(byte[] bytes)
+            {
+                var formatter = Formatter<DefaultResolver, T>.Default;
+                if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
+
+                var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
+                int _;
+                return formatter.Deserialize(ref bytes, 0, tracker, out _);
+            }
+
+            public static T Deserialize<T>(byte[] bytes, int offset)
+            {
+                var formatter = Formatter<TTypeResolver, T>.Default;
+                if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
+
+                var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
+                int _;
+                return formatter.Deserialize(ref bytes, offset, tracker, out _);
+            }
+
+            public static T Deserialize<T>(Stream stream)
+            {
+                var ms = stream as MemoryStream;
+                var formatter = Formatter<TTypeResolver, T>.Default;
+                var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
+                if (ms != null)
+                {
+#if NET_CORE
+                ArraySegment<byte> b;
+                if (ms.TryGetBuffer(out b))
+                {
+                    var buffer = b.Array;
+                    int _;
+                    return formatter.Deserialize(ref buffer, b.Offset, tracker, out _);
+                }
+#else
+                    var buffer = ms.GetBuffer();
+                    int _;
+                    return formatter.Deserialize(ref buffer, (int)ms.Position, tracker, out _);
+#endif
+                }
+
+                {
+                    var buffer = FillFromStream(stream);
+                    var array = buffer.Array;
+                    int _;
+                    return formatter.Deserialize(ref array, buffer.Offset, tracker, out _);
+                }
+            }
+
+            public static T Convert<T>(T obj, bool forceConvert = false)
+            {
+                var wrapper = obj as IZeroFormatterSegment;
+                if (!forceConvert)
+                {
+                    if (wrapper != null && wrapper.CanDirectCopy())
+                    {
+                        return obj;
+                    }
+                }
+
+                return Deserialize<T>(Serialize(obj));
+            }
+        }
     }
 }

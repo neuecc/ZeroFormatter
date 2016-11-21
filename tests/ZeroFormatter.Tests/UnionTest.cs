@@ -51,6 +51,72 @@ namespace ZeroFormatter.Tests
             }
         }
 
+        [TestMethod]
+        public void DynamicUnionTest()
+        {
+            Formatters.Formatter.AppendDynamicUnionResolver((unionType, resolver) =>
+            {
+                if (unionType == typeof(MyClass))
+                {
+
+
+                }
+                else if (unionType == typeof(IEvent))
+                {
+                    resolver.RegisterUnionKeyType(typeof(byte));
+                    resolver.RegisterSubType((byte)13, typeof(EventA));
+                    resolver.RegisterSubType((byte)234, typeof(EventB));
+                    resolver.RegisterFallbackType(typeof(UnknownEvent));
+                }
+            });
+
+
+            var emptySerialize = ZeroFormatterSerializer.Serialize(new EventA());
+
+
+            var union = ZeroFormatterSerializer.Serialize<IEvent>(new EventA());
+            var aaa = ZeroFormatterSerializer.Deserialize<IEvent>(union);
+            aaa.IsInstanceOf<EventA>();
+            var bbbUnion = ZeroFormatterSerializer.Serialize<IEvent>(new EventB());
+            var bbb = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
+            bbb.IsInstanceOf<EventB>();
+
+            bbbUnion[1] = 24; // unknown
+            var ccc = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
+            bbb.IsInstanceOf<UnknownEvent>();
+        }
+
+
+        [DynamicUnion]
+        public abstract class MyClass
+        {
+
+        }
+
+
+        [DynamicUnion]
+        public interface IEvent { }
+        [ZeroFormattable]
+        public class UnknownEvent : IEvent { }
+        [ZeroFormattable]
+        public class EventA : IEvent { }
+        [ZeroFormattable]
+        public class EventB : IEvent { }
+
+
+        [ZeroFormattable]
+        public class Hoge
+        {
+
+        }
+
+        [ZeroFormattable]
+        public class Huga
+        {
+
+        }
+
+
         [Union(typeof(MyA), typeof(MyB))]
         public abstract class MyUnion
         {

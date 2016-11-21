@@ -718,13 +718,25 @@ namespace ZeroFormatter.Formatters
                 }
             }
 
-            var generateTypeInfo = BuildFormatter(typeof(TTypeResolver), t, unionKeyProperty, subTypes);
+            var generateTypeInfo = BuildFormatter(typeof(TTypeResolver), t, unionKeyProperty, unionKeyProperty.PropertyType, subTypes);
             var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
 
             return formatter;
         }
 
-        static TypeInfo BuildFormatter(Type resolverType, Type buildType, PropertyInfo unionKeyPropertyInfo, Type[] subTypes)
+        public static object CreateRuntimeUnion<TTypeResolver, T>(DynamicUnionResolver resolver)
+          where TTypeResolver : ITypeResolver, new()
+        {
+            var t = typeof(T);
+            var ti = t.GetTypeInfo();
+
+            var generateTypeInfo = BuildFormatter(typeof(TTypeResolver), t, null, resolver.unionKeyType, resolver.subTypes.Select(x => x.Item2).ToArray());
+            var formatter = Activator.CreateInstance(generateTypeInfo.AsType(), new[] { resolver.subTypes.Select(x => x.Item1).ToList() });
+
+            return formatter;
+        }
+
+        static TypeInfo BuildFormatter(Type resolverType, Type buildType, PropertyInfo unionKeyPropertyInfo, Type unionKeyType, Type[] subTypes)
         {
             var moduleBuilder = ZeroFormatter.Segments.DynamicAssemblyHolder.Module;
 
@@ -734,33 +746,46 @@ namespace ZeroFormatter.Formatters
                 typeof(Formatter<,>).MakeGenericType(resolverType, buildType));
 
             // field
-            var unionKeysField = typeBuilder.DefineField("<>" + "unionKeys", unionKeyPropertyInfo.PropertyType.MakeArrayType(), FieldAttributes.Private | FieldAttributes.InitOnly);
-            var comparer = typeBuilder.DefineField("<>" + "comparer", typeof(EqualityComparer<>).MakeGenericType(unionKeyPropertyInfo.PropertyType), FieldAttributes.Private | FieldAttributes.InitOnly);
+            var unionKeysField = typeBuilder.DefineField("<>" + "unionKeys", unionKeyType.MakeArrayType(), FieldAttributes.Private | FieldAttributes.InitOnly);
+            var comparer = typeBuilder.DefineField("<>" + "comparer", typeof(EqualityComparer<>).MakeGenericType(unionKeyType), FieldAttributes.Private | FieldAttributes.InitOnly);
 
             // .ctor
             {
-                var method = typeBuilder.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, Type.EmptyTypes);
+                var method = (unionKeyPropertyInfo != null)
+                    ? typeBuilder.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, Type.EmptyTypes)
+                    : typeBuilder.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof(List<object>) });
 
                 var il = method.GetILGenerator();
 
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, buildType).GetTypeInfo().GetConstructor(Type.EmptyTypes));
 
-                il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Ldc_I4, subTypes.Length);
-                il.Emit(OpCodes.Newarr, unionKeyPropertyInfo.PropertyType);
-                il.Emit(OpCodes.Stfld, unionKeysField);
 
-                for (int i = 0; i < subTypes.Length; i++)
+                if (unionKeyPropertyInfo != null)
                 {
-                    var subType = subTypes[i];
-
                     il.Emit(OpCodes.Ldarg_0);
-                    il.Emit(OpCodes.Ldfld, unionKeysField);
-                    il.Emit(OpCodes.Ldc_I4, i);
-                    il.Emit(OpCodes.Newobj, subType.GetTypeInfo().GetConstructor(Type.EmptyTypes));
-                    il.Emit(OpCodes.Callvirt, unionKeyPropertyInfo.GetGetMethod());
-                    il.Emit(OpCodes.Stelem_I4);
+                    il.Emit(OpCodes.Ldc_I4, subTypes.Length);
+                    il.Emit(OpCodes.Newarr, unionKeyType);
+                    il.Emit(OpCodes.Stfld, unionKeysField);
+                    for (int i = 0; i < subTypes.Length; i++)
+                    {
+                        var subType = subTypes[i];
+
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, unionKeysField);
+                        il.Emit(OpCodes.Ldc_I4, i);
+                        il.Emit(OpCodes.Newobj, subType.GetTypeInfo().GetConstructor(Type.EmptyTypes));
+                        il.Emit(OpCodes.Callvirt, unionKeyPropertyInfo.GetGetMethod());
+                        il.Emit(OpCodes.Stelem_I4);
+                    }
+                }
+                else
+                {
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Call, typeof(System.Linq.Enumerable).GetTypeInfo().GetMethod("Cast").MakeGenericMethod(unionKeyType));
+                    il.Emit(OpCodes.Call, typeof(System.Linq.Enumerable).GetTypeInfo().GetMethod("ToArray").MakeGenericMethod(unionKeyType));
+                    il.Emit(OpCodes.Stfld, unionKeysField);
                 }
 
                 il.Emit(OpCodes.Ldarg_0);
@@ -817,16 +842,6 @@ namespace ZeroFormatter.Formatters
                 il.Emit(OpCodes.Add);
                 il.Emit(OpCodes.Starg_S, (byte)2);
 
-                il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetProperty("Default").GetGetMethod());
-                il.Emit(OpCodes.Ldarg_1);
-                il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Ldarg_3);
-                il.Emit(OpCodes.Callvirt, unionKeyPropertyInfo.GetGetMethod());
-                il.Emit(OpCodes.Callvirt, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetMethod("Serialize"));
-                il.Emit(OpCodes.Add);
-                il.Emit(OpCodes.Starg_S, (byte)2);
-
                 // if(value is ...)
                 var endLabel = il.DefineLabel();
                 var ifElseLabels = new Label[subTypes.Length + 1];
@@ -844,6 +859,18 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldarg_3);
                     il.Emit(OpCodes.Isinst, subType);
                     il.Emit(OpCodes.Brfalse_S, ifElseLabels[i + 1]);
+
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyType).GetTypeInfo().GetProperty("Default").GetGetMethod());
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldfld, unionKeysField);
+                    il.Emit(OpCodes.Ldc_I4, i);
+                    il.Emit(OpCodes.Ldelem, unionKeyType);
+                    il.Emit(OpCodes.Callvirt, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyType).GetTypeInfo().GetMethod("Serialize"));
+                    il.Emit(OpCodes.Add);
+                    il.Emit(OpCodes.Starg_S, (byte)2);
 
                     il.Emit(OpCodes.Ldarg_2);
                     il.Emit(OpCodes.Call, formatterType.GetProperty("Default").GetGetMethod());
@@ -885,7 +912,7 @@ namespace ZeroFormatter.Formatters
                 var il = method.GetILGenerator();
 
                 il.DeclareLocal(typeof(int)); // size
-                il.DeclareLocal(unionKeyPropertyInfo.PropertyType); // unionKey
+                il.DeclareLocal(unionKeyType); // unionKey
                 il.DeclareLocal(buildType);   // T
 
                 var labelA = il.DefineLabel();
@@ -905,12 +932,12 @@ namespace ZeroFormatter.Formatters
                 il.Emit(OpCodes.Ldc_I4_1);
                 il.Emit(OpCodes.Add);
                 il.Emit(OpCodes.Starg_S, (byte)2);
-                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetProperty("Default").GetGetMethod());
+                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyType).GetTypeInfo().GetProperty("Default").GetGetMethod());
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldarg_3);
                 il.Emit(OpCodes.Ldloca_S, (byte)0);
-                il.Emit(OpCodes.Callvirt, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetMethod("Deserialize"));
+                il.Emit(OpCodes.Callvirt, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyType).GetTypeInfo().GetMethod("Deserialize"));
                 il.Emit(OpCodes.Stloc_1);
                 il.Emit(OpCodes.Ldarg_S, (byte)4);
                 il.Emit(OpCodes.Dup);
@@ -944,7 +971,7 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldfld, unionKeysField);
                     il.Emit(OpCodes.Ldc_I4, i);
-                    il.Emit(OpCodes.Ldelem_I4);
+                    il.Emit(OpCodes.Ldelem, unionKeyType);
 
                     il.Emit(OpCodes.Callvirt, comparer.FieldType.GetTypeInfo().GetMethods().First(x => x.Name == "Equals" && x.DeclaringType == comparer.FieldType));
                     il.Emit(OpCodes.Brfalse_S, ifElseLabels[i + 1]);
@@ -963,7 +990,7 @@ namespace ZeroFormatter.Formatters
                     il.MarkLabel(ifElseLabels.Last());
                     il.Emit(OpCodes.Ldstr, "Unknown unionKey type of Union: ");
                     il.Emit(OpCodes.Ldloc_1);
-                    il.Emit(OpCodes.Constrained, unionKeyPropertyInfo.PropertyType);
+                    il.Emit(OpCodes.Constrained, unionKeyType);
                     il.Emit(OpCodes.Callvirt, typeof(object).GetTypeInfo().GetMethod("ToString"));
                     il.Emit(OpCodes.Call, typeof(string).GetTypeInfo().GetMethods().First(x => x.GetParameters().Length == 2 && x.GetParameters().All(y => y.ParameterType == typeof(string))));
                     il.Emit(OpCodes.Newobj, typeof(Exception).GetTypeInfo().GetConstructors().First(x => x.GetParameters().Length == 1));

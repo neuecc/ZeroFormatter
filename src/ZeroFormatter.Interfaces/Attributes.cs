@@ -27,15 +27,28 @@ namespace ZeroFormatter
     public class UnionAttribute : Attribute
     {
         public Type[] SubTypes { get; private set; }
+        public Type FallbackType { get; private set; }
 
         public UnionAttribute(params Type[] subTypes)
         {
             this.SubTypes = subTypes;
         }
+
+        public UnionAttribute(Type[] subTypes, Type fallbackType)
+        {
+            this.SubTypes = subTypes;
+            this.FallbackType = fallbackType;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class UnionKeyAttribute : Attribute
+    {
+
+    }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = false, Inherited = false)]
+    public class DynamicUnionAttribute : Attribute
     {
 
     }
