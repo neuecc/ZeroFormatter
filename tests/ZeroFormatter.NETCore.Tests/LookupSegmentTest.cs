@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Xunit;
+using ZeroFormatter.Formatters;
 using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.DotNetCore.Tests
@@ -14,7 +15,7 @@ namespace ZeroFormatter.DotNetCore.Tests
             var bytes = ZeroFormatterSerializer.Serialize(lookup);
 
             int _;
-            var segment = LookupSegment<bool, int>.Create(new DirtyTracker(0), bytes, 0, out _);
+            var segment = LookupSegment<DefaultResolver, bool, int>.Create(new DirtyTracker(), bytes, 0, out _);
 
             segment[true].Is(2, 4, 6, 8, 10);
             segment[false].Is(1, 3, 5, 7, 9);

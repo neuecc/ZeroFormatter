@@ -11,7 +11,7 @@ namespace ZeroFormatter.DotNetCore.Tests
 {
     public class DictionarySegmentTest
     {
-        DictionarySegment<int, string> CreateFresh()
+        DictionarySegment<DefaultResolver, int, string> CreateFresh()
         {
             ILazyDictionary<int, string> sampleDict = new Dictionary<int, string>()
             {
@@ -23,7 +23,7 @@ namespace ZeroFormatter.DotNetCore.Tests
             var bytes = ZeroFormatterSerializer.Serialize(sampleDict);
 
             int _;
-            return DictionarySegment<int, string>.Create(new DirtyTracker(0), bytes, 0, out _);
+            return DictionarySegment<DefaultResolver, int, string>.Create(new DirtyTracker(), bytes, 0, out _);
         }
 
         [Fact]
@@ -86,10 +86,10 @@ namespace ZeroFormatter.DotNetCore.Tests
         [Fact]
         public void CollisionCheck()
         {
-            Formatter<HashCollision>.Register(new TestFormatter());
+            Formatter<DefaultResolver, HashCollision>.Register(new TestFormatter());
             ZeroFormatterEqualityComparer<HashCollision>.Register(new HashCollisionEqualityComparer());
 
-            var dict = new DictionarySegment<HashCollision, int>(new DirtyTracker(0), 5);
+            var dict = new DictionarySegment<DefaultResolver, HashCollision, int>(new DirtyTracker(), 5);
             dict.Add(new HashCollision(10, 999), 6);
             dict.Add(new HashCollision(99, 999), 9);
 
@@ -110,7 +110,7 @@ namespace ZeroFormatter.DotNetCore.Tests
         }
     }
 
-    public class TestFormatter : Formatter<HashCollision>
+    public class TestFormatter : Formatter<DefaultResolver, HashCollision>
     {
         public override HashCollision Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
