@@ -73,7 +73,7 @@ namespace ZeroFormatter.Formatters
 
     internal static class DynamicObjectDescriptor
     {
-        public static Tuple<int, EmittableMemberInfo>[] GetMembers(Type type, bool isClass)
+        public static Tuple<int, EmittableMemberInfo>[] GetMembers(Type resolverType, Type type, bool isClass)
         {
             if (isClass)
             {
@@ -165,7 +165,7 @@ namespace ZeroFormatter.Formatters
                 }
 
                 var info = new EmittableMemberInfo(item);
-                VerifyMember(info);
+                VerifyMember(resolverType, info);
                 dict[index.Index] = info;
             }
 
@@ -189,16 +189,16 @@ namespace ZeroFormatter.Formatters
                 }
 
                 var info = new EmittableMemberInfo(item);
-                VerifyMember(info);
+                VerifyMember(resolverType, info);
                 dict[index.Index] = info;
             }
 
             return dict.OrderBy(x => x.Key).Select(x => Tuple.Create(x.Key, x.Value)).ToArray();
         }
 
-        static void VerifyMember(EmittableMemberInfo info)
+        static void VerifyMember(Type resolverType, EmittableMemberInfo info)
         {
-            var formatter = typeof(Formatter<>).MakeGenericType(info.MemberType).GetTypeInfo().GetProperty("Default").GetValue(null, null);
+            var formatter = typeof(Formatter<,>).MakeGenericType(resolverType, info.MemberType).GetTypeInfo().GetProperty("Default").GetValue(null, null);
             var error = formatter as IErrorFormatter;
             if (error != null)
             {
@@ -211,31 +211,33 @@ namespace ZeroFormatter.Formatters
 
     internal static class DynamicFormatter
     {
-        public static object Create<T>()
+        public static object Create<TTypeResolver, T>()
+            where TTypeResolver : ITypeResolver, new()
         {
+            var resolverType = typeof(TTypeResolver);
             var t = typeof(T);
             var ti = t.GetTypeInfo();
             if (ti.IsValueType) throw new InvalidOperationException("Type must be Class. " + t.Name);
 
-            var members = DynamicObjectDescriptor.GetMembers(t, true);
-            var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, t, members);
+            var members = DynamicObjectDescriptor.GetMembers(resolverType, t, true);
+            var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, resolverType, t, members);
             var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
 
             return formatter;
         }
 
-        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, Tuple<int, EmittableMemberInfo>[] memberInfos)
+        static TypeInfo BuildFormatter(ModuleBuilder builder, Type resolverType, Type elementType, Tuple<int, EmittableMemberInfo>[] memberInfos)
         {
             var typeBuilder = builder.DefineType(
                DynamicAssemblyHolder.ModuleName + "." + elementType.FullName + "$Formatter",
                TypeAttributes.Public,
-               typeof(Formatter<>).MakeGenericType(elementType));
+               typeof(Formatter<,>).MakeGenericType(resolverType, elementType));
 
             // field
             var formattersInField = new List<Tuple<int, EmittableMemberInfo, FieldBuilder>>();
             foreach (var item in memberInfos)
             {
-                var field = typeBuilder.DefineField("<>" + item.Item2.Name + "Formatter", typeof(Formatter<>).MakeGenericType(item.Item2.MemberType), FieldAttributes.Private | FieldAttributes.InitOnly);
+                var field = typeBuilder.DefineField("<>" + item.Item2.Name + "Formatter", typeof(Formatter<,>).MakeGenericType(resolverType, item.Item2.MemberType), FieldAttributes.Private | FieldAttributes.InitOnly);
                 formattersInField.Add(Tuple.Create(item.Item1, item.Item2, field));
             }
 
@@ -246,7 +248,7 @@ namespace ZeroFormatter.Formatters
                 var il = method.GetILGenerator();
 
                 il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Call, typeof(Formatter<>).MakeGenericType(elementType).GetTypeInfo().GetConstructor(Type.EmptyTypes));
+                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, elementType).GetTypeInfo().GetConstructor(Type.EmptyTypes));
 
                 foreach (var item in formattersInField)
                 {
@@ -335,6 +337,8 @@ namespace ZeroFormatter.Formatters
                         il.Emit(OpCodes.Ldc_I4, 8 + (4 * item.Item1)); // 8 + 4 * index
                         il.Emit(OpCodes.Add);
                         il.Emit(OpCodes.Ldarg_2);
+                        il.Emit(OpCodes.Ldloc_1);
+                        il.Emit(OpCodes.Sub);
                         if (i == 0)
                         {
                             il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("WriteInt32"));
@@ -408,7 +412,7 @@ namespace ZeroFormatter.Formatters
 
                     il.Emit(OpCodes.Ldarg_3);
                     il.Emit(OpCodes.Ldloc_0);
-                    var ti = typeof(DynamicObjectSegmentBuilder<>).MakeGenericType(elementType).GetTypeInfo().GetMethod("GetProxyType").Invoke(null, null) as TypeInfo;
+                    var ti = typeof(DynamicObjectSegmentBuilder<,>).MakeGenericType(resolverType, elementType).GetTypeInfo().GetMethod("GetProxyType").Invoke(null, null) as TypeInfo;
                     il.Emit(OpCodes.Newobj, ti.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) }));
                     il.Emit(OpCodes.Ret);
                 }
@@ -421,8 +425,10 @@ namespace ZeroFormatter.Formatters
     internal static class DynamicStructFormatter
     {
         // create dynamic struct Formatter<T>
-        public static object Create<T>()
+        public static object Create<TTypeResolver, T>()
+            where TTypeResolver : ITypeResolver, new()
         {
+            var resolverType = typeof(TTypeResolver);
             var t = typeof(T);
             var ti = t.GetTypeInfo();
             if (!ti.IsValueType) throw new InvalidOperationException("Type must be ValueType. " + t.Name);
@@ -430,23 +436,23 @@ namespace ZeroFormatter.Formatters
             if (ti.IsNullable())
             {
                 var elementType = ti.GetGenericArguments()[0];
-                var formatter = typeof(Formatter<>).MakeGenericType(elementType).GetTypeInfo().GetProperty("Default").GetGetMethod().Invoke(null, null);
-                return Activator.CreateInstance(typeof(NullableStructFormatter<>).MakeGenericType(elementType), new[] { formatter });
+                var formatter = typeof(Formatter<,>).MakeGenericType(resolverType, elementType).GetTypeInfo().GetProperty("Default").GetGetMethod().Invoke(null, null);
+                return Activator.CreateInstance(typeof(NullableStructFormatter<,>).MakeGenericType(resolverType, elementType), new[] { formatter });
             }
             else
             {
                 var elementType = t;
 
-                var members = DynamicObjectDescriptor.GetMembers(elementType, false);
-                var length = ValidateAndCalculateLength(elementType, members);
-                var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, elementType, length, members);
+                var members = DynamicObjectDescriptor.GetMembers(resolverType, elementType, false);
+                var length = ValidateAndCalculateLength(resolverType, elementType, members);
+                var generateTypeInfo = BuildFormatter(ZeroFormatter.Segments.DynamicAssemblyHolder.Module, resolverType, elementType, length, members);
                 var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
 
                 return formatter;
             }
         }
 
-        static int? ValidateAndCalculateLength(Type t, IEnumerable<Tuple<int, EmittableMemberInfo>> source)
+        static int? ValidateAndCalculateLength(Type resolverType, Type t, IEnumerable<Tuple<int, EmittableMemberInfo>> source)
         {
             var isNullable = false;
             var lengthSum = 0;
@@ -458,7 +464,7 @@ namespace ZeroFormatter.Formatters
                 if (item.Item1 != expected) throw new InvalidOperationException("Struct index must be started with 0 and be sequential. Type: " + t.FullName + " InvalidIndex:" + item.Item1);
                 expected++;
 
-                var formatter = typeof(Formatter<>).MakeGenericType(item.Item2.MemberType).GetTypeInfo().GetProperty("Default");
+                var formatter = typeof(Formatter<,>).MakeGenericType(resolverType, item.Item2.MemberType).GetTypeInfo().GetProperty("Default");
                 var len = (formatter.GetGetMethod().Invoke(null, Type.EmptyTypes) as IFormatter).GetLength();
                 if (len != null)
                 {
@@ -481,18 +487,18 @@ namespace ZeroFormatter.Formatters
             return isNullable ? (int?)null : lengthSum;
         }
 
-        static TypeInfo BuildFormatter(ModuleBuilder builder, Type elementType, int? length, Tuple<int, EmittableMemberInfo>[] memberInfos)
+        static TypeInfo BuildFormatter(ModuleBuilder builder, Type resolverType, Type elementType, int? length, Tuple<int, EmittableMemberInfo>[] memberInfos)
         {
             var typeBuilder = builder.DefineType(
                 DynamicAssemblyHolder.ModuleName + "." + elementType.FullName + "$Formatter",
                 TypeAttributes.Public,
-                typeof(Formatter<>).MakeGenericType(elementType));
+                typeof(Formatter<,>).MakeGenericType(resolverType, elementType));
 
             // field
             var formattersInField = new List<Tuple<int, EmittableMemberInfo, FieldBuilder>>();
             foreach (var item in memberInfos)
             {
-                var field = typeBuilder.DefineField("<>" + item.Item2.Name + "Formatter", typeof(Formatter<>).MakeGenericType(item.Item2.MemberType), FieldAttributes.Private | FieldAttributes.InitOnly);
+                var field = typeBuilder.DefineField("<>" + item.Item2.Name + "Formatter", typeof(Formatter<,>).MakeGenericType(resolverType, item.Item2.MemberType), FieldAttributes.Private | FieldAttributes.InitOnly);
                 formattersInField.Add(Tuple.Create(item.Item1, item.Item2, field));
             }
             // .ctor
@@ -502,7 +508,7 @@ namespace ZeroFormatter.Formatters
                 var il = method.GetILGenerator();
 
                 il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Call, typeof(Formatter<>).MakeGenericType(elementType).GetTypeInfo().GetConstructor(Type.EmptyTypes));
+                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, elementType).GetTypeInfo().GetConstructor(Type.EmptyTypes));
 
                 foreach (var item in formattersInField)
                 {
@@ -670,7 +676,8 @@ namespace ZeroFormatter.Formatters
     internal static class DynamicUnionFormatter
     {
         // create dynamic union Formatter<T>
-        public static object Create<T>()
+        public static object Create<TTypeResolver, T>()
+            where TTypeResolver : ITypeResolver, new()
         {
             var t = typeof(T);
             var ti = t.GetTypeInfo();
@@ -711,20 +718,20 @@ namespace ZeroFormatter.Formatters
                 }
             }
 
-            var generateTypeInfo = BuildFormatter(t, unionKeyProperty, subTypes);
+            var generateTypeInfo = BuildFormatter(typeof(TTypeResolver), t, unionKeyProperty, subTypes);
             var formatter = Activator.CreateInstance(generateTypeInfo.AsType());
 
             return formatter;
         }
 
-        static TypeInfo BuildFormatter(Type buildType, PropertyInfo unionKeyPropertyInfo, Type[] subTypes)
+        static TypeInfo BuildFormatter(Type resolverType, Type buildType, PropertyInfo unionKeyPropertyInfo, Type[] subTypes)
         {
             var moduleBuilder = ZeroFormatter.Segments.DynamicAssemblyHolder.Module;
 
             var typeBuilder = moduleBuilder.DefineType(
                 DynamicAssemblyHolder.ModuleName + "." + buildType.FullName + "$Formatter",
                 TypeAttributes.Public,
-                typeof(Formatter<>).MakeGenericType(buildType));
+                typeof(Formatter<,>).MakeGenericType(resolverType, buildType));
 
             // field
             var unionKeysField = typeBuilder.DefineField("<>" + "unionKeys", unionKeyPropertyInfo.PropertyType.MakeArrayType(), FieldAttributes.Private | FieldAttributes.InitOnly);
@@ -737,7 +744,7 @@ namespace ZeroFormatter.Formatters
                 var il = method.GetILGenerator();
 
                 il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Call, typeof(Formatter<>).MakeGenericType(buildType).GetTypeInfo().GetConstructor(Type.EmptyTypes));
+                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, buildType).GetTypeInfo().GetConstructor(Type.EmptyTypes));
 
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldc_I4, subTypes.Length);
@@ -811,12 +818,12 @@ namespace ZeroFormatter.Formatters
                 il.Emit(OpCodes.Starg_S, (byte)2);
 
                 il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Call, typeof(Formatter<>).MakeGenericType(unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetProperty("Default").GetGetMethod());
+                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetProperty("Default").GetGetMethod());
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldarg_3);
                 il.Emit(OpCodes.Callvirt, unionKeyPropertyInfo.GetGetMethod());
-                il.Emit(OpCodes.Callvirt, typeof(Formatter<>).MakeGenericType(unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetMethod("Serialize"));
+                il.Emit(OpCodes.Callvirt, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetMethod("Serialize"));
                 il.Emit(OpCodes.Add);
                 il.Emit(OpCodes.Starg_S, (byte)2);
 
@@ -831,7 +838,7 @@ namespace ZeroFormatter.Formatters
                 for (int i = 0; i < subTypes.Length; i++)
                 {
                     var subType = subTypes[i];
-                    var formatterType = typeof(Formatter<>).MakeGenericType(subType).GetTypeInfo();
+                    var formatterType = typeof(Formatter<,>).MakeGenericType(resolverType, subType).GetTypeInfo();
 
                     if (i != 0) il.MarkLabel(ifElseLabels[i]);
                     il.Emit(OpCodes.Ldarg_3);
@@ -898,12 +905,12 @@ namespace ZeroFormatter.Formatters
                 il.Emit(OpCodes.Ldc_I4_1);
                 il.Emit(OpCodes.Add);
                 il.Emit(OpCodes.Starg_S, (byte)2);
-                il.Emit(OpCodes.Call, typeof(Formatter<>).MakeGenericType(unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetProperty("Default").GetGetMethod());
+                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetProperty("Default").GetGetMethod());
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldarg_3);
                 il.Emit(OpCodes.Ldloca_S, (byte)0);
-                il.Emit(OpCodes.Callvirt, typeof(Formatter<>).MakeGenericType(unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetMethod("Deserialize"));
+                il.Emit(OpCodes.Callvirt, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyPropertyInfo.PropertyType).GetTypeInfo().GetMethod("Deserialize"));
                 il.Emit(OpCodes.Stloc_1);
                 il.Emit(OpCodes.Ldarg_S, (byte)4);
                 il.Emit(OpCodes.Dup);
@@ -927,7 +934,7 @@ namespace ZeroFormatter.Formatters
                 for (int i = 0; i < subTypes.Length; i++)
                 {
                     var subType = subTypes[i];
-                    var formatterType = typeof(Formatter<>).MakeGenericType(subType).GetTypeInfo();
+                    var formatterType = typeof(Formatter<,>).MakeGenericType(resolverType, subType).GetTypeInfo();
 
                     if (i != 0) il.MarkLabel(ifElseLabels[i]);
 
@@ -982,12 +989,13 @@ namespace ZeroFormatter.Formatters
 #endif
 
     // public! because used from generated code.
-    public class NullableStructFormatter<T> : Formatter<T?>
+    public class NullableStructFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T> innerFormatter;
+        readonly Formatter<TTypeResolver, T> innerFormatter;
 
-        public NullableStructFormatter(Formatter<T> innerFormatter)
+        public NullableStructFormatter(Formatter<TTypeResolver, T> innerFormatter)
         {
             this.innerFormatter = innerFormatter;
         }

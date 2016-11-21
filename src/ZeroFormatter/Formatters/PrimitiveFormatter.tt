@@ -29,7 +29,6 @@
 #>
 using System;
 using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -38,7 +37,8 @@ namespace ZeroFormatter.Formatters
 
 <# foreach(var tuple in types) { var t = tuple.Item1; #>
 
-    internal class <#= t.Name #>Formatter : Formatter<<#= t.Name #>>
+    internal class <#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.Name #>>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -65,7 +65,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class Nullable<#= t.Name #>Formatter : Formatter<<#= t.Name #>?>
+    internal class Nullable<#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.Name #>?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {

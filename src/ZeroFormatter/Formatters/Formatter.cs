@@ -1,11 +1,9 @@
 ﻿using System;
-using ZeroFormatter.Internal;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Linq;
-using ZeroFormatter.Segments;
-using ZeroFormatter.Comparers;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -16,10 +14,51 @@ namespace ZeroFormatter.Formatters
         int? GetLength();
     }
 
-    public abstract class Formatter<T> : IFormatter
+    public interface ITypeResolver
     {
-        static Formatter<T> defaultFormatter;
-        public static Formatter<T> Default
+        bool IsUseBuiltinStaticSerializer { get; }
+        bool IsUseBuiltinDynamicSerializer { get; }
+        object ResolveFormatter(Type type);
+
+        // Make the dynamic union?
+        // object ResolveDynamicUnion(Type unionType, DynamicUnionResolver resolver);
+    }
+
+    public class DefaultResolver : ITypeResolver
+    {
+        public bool IsUseBuiltinStaticSerializer
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public bool IsUseBuiltinDynamicSerializer
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public object ResolveFormatter(Type type)
+        {
+            return Formatter.ResolveFormatter(type);
+        }
+    }
+
+    internal static class ResolverCache<T>
+         where T : ITypeResolver, new()
+    {
+        internal static readonly T Default = new T();
+    }
+
+    public abstract class Formatter<TTypeResolver, T> : IFormatter
+        where TTypeResolver : ITypeResolver, new()
+    {
+        static Formatter<TTypeResolver, T> defaultFormatter;
+        public static Formatter<TTypeResolver, T> Default
         {
             get
             {
@@ -33,6 +72,8 @@ namespace ZeroFormatter.Formatters
 
         static Formatter()
         {
+            var resolver = ResolverCache<TTypeResolver>.Default;
+
             object formatter = null;
 
             var t = typeof(T);
@@ -43,150 +84,150 @@ namespace ZeroFormatter.Formatters
                 // Primitive
                 if (t == typeof(Int16))
                 {
-                    formatter = new Int16Formatter();
+                    formatter = new Int16Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(Int32))
                 {
-                    formatter = new Int32Formatter();
+                    formatter = new Int32Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(Int64))
                 {
-                    formatter = new Int64Formatter();
+                    formatter = new Int64Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(UInt16))
                 {
-                    formatter = new UInt16Formatter();
+                    formatter = new UInt16Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(UInt32))
                 {
-                    formatter = new UInt32Formatter();
+                    formatter = new UInt32Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(UInt64))
                 {
-                    formatter = new UInt64Formatter();
+                    formatter = new UInt64Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(Single))
                 {
-                    formatter = new SingleFormatter();
+                    formatter = new SingleFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Double))
                 {
-                    formatter = new DoubleFormatter();
+                    formatter = new DoubleFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(bool))
                 {
-                    formatter = new BooleanFormatter();
+                    formatter = new BooleanFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(byte))
                 {
-                    formatter = new ByteFormatter();
+                    formatter = new ByteFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(sbyte))
                 {
-                    formatter = new SByteFormatter();
+                    formatter = new SByteFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(decimal))
                 {
-                    formatter = new DecimalFormatter();
+                    formatter = new DecimalFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(TimeSpan))
                 {
-                    formatter = new TimeSpanFormatter();
+                    formatter = new TimeSpanFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(DateTime))
                 {
-                    formatter = new DateTimeFormatter();
+                    formatter = new DateTimeFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(DateTimeOffset))
                 {
-                    formatter = new DateTimeOffsetFormatter();
+                    formatter = new DateTimeOffsetFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Guid))
                 {
-                    formatter = new GuidFormatter();
+                    formatter = new GuidFormatter<TTypeResolver>();
                 }
                 // Nulllable
                 else if (t == typeof(Nullable<Int16>))
                 {
-                    formatter = new NullableInt16Formatter();
+                    formatter = new NullableInt16Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<Int32>))
                 {
-                    formatter = new NullableInt32Formatter();
+                    formatter = new NullableInt32Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<Int64>))
                 {
-                    formatter = new NullableInt64Formatter();
+                    formatter = new NullableInt64Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<UInt16>))
                 {
-                    formatter = new NullableUInt16Formatter();
+                    formatter = new NullableUInt16Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<UInt32>))
                 {
-                    formatter = new NullableUInt32Formatter();
+                    formatter = new NullableUInt32Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<UInt64>))
                 {
-                    formatter = new NullableUInt64Formatter();
+                    formatter = new NullableUInt64Formatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<Single>))
                 {
-                    formatter = new NullableSingleFormatter();
+                    formatter = new NullableSingleFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<Double>))
                 {
-                    formatter = new NullableDoubleFormatter();
+                    formatter = new NullableDoubleFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<bool>))
                 {
-                    formatter = new NullableBooleanFormatter();
+                    formatter = new NullableBooleanFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<byte>))
                 {
-                    formatter = new NullableByteFormatter();
+                    formatter = new NullableByteFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<sbyte>))
                 {
-                    formatter = new NullableSByteFormatter();
+                    formatter = new NullableSByteFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<decimal>))
                 {
-                    formatter = new NullableDecimalFormatter();
+                    formatter = new NullableDecimalFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<TimeSpan>))
                 {
-                    formatter = new NullableTimeSpanFormatter();
+                    formatter = new NullableTimeSpanFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<DateTime>))
                 {
-                    formatter = new NullableDateTimeFormatter();
+                    formatter = new NullableDateTimeFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Nullable<DateTimeOffset>))
                 {
-                    formatter = new NullableDateTimeOffsetFormatter();
+                    formatter = new NullableDateTimeOffsetFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Guid?))
                 {
-                    formatter = new NullableGuidFormatter();
+                    formatter = new NullableGuidFormatter<TTypeResolver>();
                 }
 
                 // Others
                 else if (t == typeof(String))
                 {
-                    formatter = new NullableStringFormatter();
+                    formatter = new NullableStringFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Char))
                 {
-                    formatter = new CharFormatter();
+                    formatter = new CharFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(Char?))
                 {
-                    formatter = new NullableCharFormatter();
+                    formatter = new NullableCharFormatter<TTypeResolver>();
                 }
                 else if (t == typeof(IList<int>)) // known generic formatter...
                 {
-                    formatter = new ListFormatter<int>();
+                    formatter = new ListFormatter<TTypeResolver, int>();
                 }
                 else if (t.IsArray)
                 {
@@ -194,44 +235,44 @@ namespace ZeroFormatter.Formatters
                     switch (Type.GetTypeCode(elementType))
                     {
                         case TypeCode.Boolean:
-                            formatter = new BooleanArrayFormatter();
+                            formatter = new BooleanArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.Char:
-                            formatter = new CharArrayFormatter();
+                            formatter = new CharArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.SByte:
-                            formatter = new SByteArrayFormatter();
+                            formatter = new SByteArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.Byte:
-                            formatter = new ByteArrayFormatter();
+                            formatter = new ByteArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.Int16:
-                            formatter = new Int16ArrayFormatter();
+                            formatter = new Int16ArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.UInt16:
-                            formatter = new UInt16ArrayFormatter();
+                            formatter = new UInt16ArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.Int32:
-                            formatter = new Int32ArrayFormatter();
+                            formatter = new Int32ArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.UInt32:
-                            formatter = new UInt32ArrayFormatter();
+                            formatter = new UInt32ArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.Int64:
-                            formatter = new Int64ArrayFormatter();
+                            formatter = new Int64ArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.UInt64:
-                            formatter = new UInt64ArrayFormatter();
+                            formatter = new UInt64ArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.Single:
-                            formatter = new SingleArrayFormatter();
+                            formatter = new SingleArrayFormatter<TTypeResolver>();
                             break;
                         case TypeCode.Double:
-                            formatter = new DoubleArrayFormatter();
+                            formatter = new DoubleArrayFormatter<TTypeResolver>();
                             break;
                         default:
 #if !UNITY
-                            var formatterType = typeof(ArrayFormatter<>).MakeGenericType(elementType);
+                            var formatterType = typeof(ArrayFormatter<,>).MakeGenericType(typeof(TTypeResolver), elementType);
                             formatter = Activator.CreateInstance(formatterType);
 #endif
                             break;
@@ -242,14 +283,14 @@ namespace ZeroFormatter.Formatters
 
                 else if (ti.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>))
                 {
-                    var formatterType = typeof(ListFormatter<>).MakeGenericType(ti.GetGenericArguments());
-                    formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    var formatterType = typeof(ListFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                    formatter = Activator.CreateInstance(formatterType);
                 }
 
                 else if (ti.IsGenericType && t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
                 {
-                    var formatterType = typeof(ReadOnlyListFormatter<>).MakeGenericType(ti.GetGenericArguments());
-                    formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                    var formatterType = typeof(ReadOnlyListFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                    formatter = Activator.CreateInstance(formatterType);
                 }
 
                 else if (ti.IsEnum)
@@ -258,28 +299,28 @@ namespace ZeroFormatter.Formatters
                     switch (Type.GetTypeCode(underlyingType))
                     {
                         case TypeCode.SByte:
-                            formatter = new SByteEnumFormatter<T>();
+                            formatter = new SByteEnumFormatter<TTypeResolver, T>();
                             break;
                         case TypeCode.Byte:
-                            formatter = new ByteEnumFormatter<T>();
+                            formatter = new ByteEnumFormatter<TTypeResolver, T>();
                             break;
                         case TypeCode.Int16:
-                            formatter = new Int16EnumFormatter<T>();
+                            formatter = new Int16EnumFormatter<TTypeResolver, T>();
                             break;
                         case TypeCode.UInt16:
-                            formatter = new UInt16EnumFormatter<T>();
+                            formatter = new UInt16EnumFormatter<TTypeResolver, T>();
                             break;
                         case TypeCode.Int32:
-                            formatter = new Int32EnumFormatter<T>();
+                            formatter = new Int32EnumFormatter<TTypeResolver, T>();
                             break;
                         case TypeCode.UInt32:
-                            formatter = new UInt32EnumFormatter<T>();
+                            formatter = new UInt32EnumFormatter<TTypeResolver, T>();
                             break;
                         case TypeCode.Int64:
-                            formatter = new Int64EnumFormatter<T>();
+                            formatter = new Int64EnumFormatter<TTypeResolver, T>();
                             break;
                         case TypeCode.UInt64:
-                            formatter = new UInt64EnumFormatter<T>();
+                            formatter = new UInt64EnumFormatter<TTypeResolver, T>();
                             break;
                         default:
                             throw new Exception();
@@ -293,50 +334,50 @@ namespace ZeroFormatter.Formatters
                     {
                         case TypeCode.SByte:
                             {
-                                var formatterType = typeof(NullableSByteEnumFormatter<>).MakeGenericType(ti.GetGenericArguments()[0]);
-                                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                                var formatterType = typeof(NullableSByteEnumFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                                formatter = Activator.CreateInstance(formatterType);
                             }
                             break;
                         case TypeCode.Byte:
                             {
-                                var formatterType = typeof(NullableByteEnumFormatter<>).MakeGenericType(ti.GetGenericArguments()[0]);
-                                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                                var formatterType = typeof(NullableByteEnumFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                                formatter = Activator.CreateInstance(formatterType);
                             }
                             break;
                         case TypeCode.Int16:
                             {
-                                var formatterType = typeof(NullableInt16EnumFormatter<>).MakeGenericType(ti.GetGenericArguments()[0]);
-                                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                                var formatterType = typeof(NullableInt16EnumFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                                formatter = Activator.CreateInstance(formatterType);
                             }
                             break;
                         case TypeCode.UInt16:
                             {
-                                var formatterType = typeof(NullableUInt16EnumFormatter<>).MakeGenericType(ti.GetGenericArguments()[0]);
-                                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                                var formatterType = typeof(NullableUInt16EnumFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                                formatter = Activator.CreateInstance(formatterType);
                             }
                             break;
                         case TypeCode.Int32:
                             {
-                                var formatterType = typeof(NullableInt32EnumFormatter<>).MakeGenericType(ti.GetGenericArguments()[0]);
-                                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                                var formatterType = typeof(NullableInt32EnumFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                                formatter = Activator.CreateInstance(formatterType);
                             }
                             break;
                         case TypeCode.UInt32:
                             {
-                                var formatterType = typeof(NullableUInt32EnumFormatter<>).MakeGenericType(ti.GetGenericArguments()[0]);
-                                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                                var formatterType = typeof(NullableUInt32EnumFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                                formatter = Activator.CreateInstance(formatterType);
                             }
                             break;
                         case TypeCode.Int64:
                             {
-                                var formatterType = typeof(NullableInt64EnumFormatter<>).MakeGenericType(ti.GetGenericArguments()[0]);
-                                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                                var formatterType = typeof(NullableInt64EnumFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                                formatter = Activator.CreateInstance(formatterType);
                             }
                             break;
                         case TypeCode.UInt64:
                             {
-                                var formatterType = typeof(NullableUInt64EnumFormatter<>).MakeGenericType(ti.GetGenericArguments()[0]);
-                                formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                                var formatterType = typeof(NullableUInt64EnumFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                                formatter = Activator.CreateInstance(formatterType);
                             }
                             break;
                         default:
@@ -348,98 +389,98 @@ namespace ZeroFormatter.Formatters
                 {
                     if (t.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                     {
-                        var formatterType = typeof(InterfaceDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(InterfaceDictionaryFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
                     else if (t.GetGenericTypeDefinition() == typeof(ILazyDictionary<,>))
                     {
-                        var formatterType = typeof(LazyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(LazyDictionaryFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
                     else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
                     {
-                        var formatterType = typeof(InterfaceReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(InterfaceReadOnlyDictionaryFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
                     else if (t.GetGenericTypeDefinition() == typeof(ILazyReadOnlyDictionary<,>))
                     {
-                        var formatterType = typeof(LazyReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(LazyReadOnlyDictionaryFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
-                    else if (t.GetGenericTypeDefinition() == typeof(DictionaryEntry<,>))
+                    else if (t.GetGenericTypeDefinition() == typeof(DictionaryEntry<,,>))
                     {
-                        var formatterType = typeof(DictionaryEntryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(DictionaryEntryFormatter<,,>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (t.GetGenericTypeDefinition() == typeof(ILookup<,>))
                     {
-                        var formatterType = typeof(LookupFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(LookupFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
                     else if (t.GetGenericTypeDefinition() == typeof(ILazyLookup<,>))
                     {
-                        var formatterType = typeof(LazyLookupFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(LazyLookupFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
-                    else if (t.GetGenericTypeDefinition() == typeof(GroupingSegment<,>))
+                    else if (t.GetGenericTypeDefinition() == typeof(GroupingSegment<,,>))
                     {
-                        var formatterType = typeof(GroupingSegmentFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(GroupingSegmentFormatter<,,>).MakeGenericType(ti.GetGenericArguments());
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (ti.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
                     {
-                        var formatterType = typeof(KeyValuePairFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(KeyValuePairFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (t.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                     {
-                        var formatterType = typeof(DictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(DictionaryFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (t.GetGenericTypeDefinition() == typeof(ReadOnlyDictionary<,>))
                     {
-                        var formatterType = typeof(ReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(ReadOnlyDictionaryFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (t.GetGenericTypeDefinition() == typeof(ReadOnlyCollection<>))
                     {
-                        var formatterType = typeof(ReadOnlyCollectionFormatter<>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(ReadOnlyCollectionFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (t.GetGenericTypeDefinition() == typeof(ICollection<>))
                     {
-                        var formatterType = typeof(InterfaceCollectionFormatter<>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(InterfaceCollectionFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                     {
-                        var formatterType = typeof(InterfaceEnumerableFormatter<>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(InterfaceEnumerableFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (t.GetGenericTypeDefinition() == typeof(ISet<>))
                     {
-                        var formatterType = typeof(InterfaceSetFormatter<>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(InterfaceSetFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>))
                     {
-                        var formatterType = typeof(InterfaceReadOnlyCollectionFormatter<>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(InterfaceReadOnlyCollectionFormatter<,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (t.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
                     {
-                        var formatterType = typeof(InterfaceReadOnlyDictionaryFormatter<,>).MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(InterfaceReadOnlyDictionaryFormatter<,,>).MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (ti.FullName.StartsWith("System.Tuple"))
@@ -448,35 +489,35 @@ namespace ZeroFormatter.Formatters
                         switch (ti.GetGenericArguments().Length)
                         {
                             case 1:
-                                tupleFormatterType = typeof(TupleFormatter<>);
-                                break;
-                            case 2:
                                 tupleFormatterType = typeof(TupleFormatter<,>);
                                 break;
-                            case 3:
+                            case 2:
                                 tupleFormatterType = typeof(TupleFormatter<,,>);
                                 break;
-                            case 4:
+                            case 3:
                                 tupleFormatterType = typeof(TupleFormatter<,,,>);
                                 break;
-                            case 5:
+                            case 4:
                                 tupleFormatterType = typeof(TupleFormatter<,,,,>);
                                 break;
-                            case 6:
+                            case 5:
                                 tupleFormatterType = typeof(TupleFormatter<,,,,,>);
                                 break;
-                            case 7:
+                            case 6:
                                 tupleFormatterType = typeof(TupleFormatter<,,,,,,>);
                                 break;
-                            case 8:
+                            case 7:
                                 tupleFormatterType = typeof(TupleFormatter<,,,,,,,>);
+                                break;
+                            case 8:
+                                tupleFormatterType = typeof(TupleFormatter<,,,,,,,,>);
                                 break;
                             default:
                                 break;
                         }
 
-                        var formatterType = tupleFormatterType.MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = tupleFormatterType.MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (ti.GetInterfaces().Any(x => x == typeof(IKeyTuple)))
@@ -485,35 +526,35 @@ namespace ZeroFormatter.Formatters
                         switch (ti.GetGenericArguments().Length)
                         {
                             case 1:
-                                tupleFormatterType = typeof(KeyTupleFormatter<>);
-                                break;
-                            case 2:
                                 tupleFormatterType = typeof(KeyTupleFormatter<,>);
                                 break;
-                            case 3:
+                            case 2:
                                 tupleFormatterType = typeof(KeyTupleFormatter<,,>);
                                 break;
-                            case 4:
+                            case 3:
                                 tupleFormatterType = typeof(KeyTupleFormatter<,,,>);
                                 break;
-                            case 5:
+                            case 4:
                                 tupleFormatterType = typeof(KeyTupleFormatter<,,,,>);
                                 break;
-                            case 6:
+                            case 5:
                                 tupleFormatterType = typeof(KeyTupleFormatter<,,,,,>);
                                 break;
-                            case 7:
+                            case 6:
                                 tupleFormatterType = typeof(KeyTupleFormatter<,,,,,,>);
                                 break;
-                            case 8:
+                            case 7:
                                 tupleFormatterType = typeof(KeyTupleFormatter<,,,,,,,>);
+                                break;
+                            case 8:
+                                tupleFormatterType = typeof(KeyTupleFormatter<,,,,,,,,>);
                                 break;
                             default:
                                 break;
                         }
 
-                        var formatterType = tupleFormatterType.MakeGenericType(ti.GetGenericArguments());
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = tupleFormatterType.MakeGenericType(ti.GetGenericArguments().StartsWith(typeof(TTypeResolver)));
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     else if (ti.GetInterfaces().Any(x =>
@@ -526,31 +567,31 @@ namespace ZeroFormatter.Formatters
                         return false;
                     }))
                     {
-                        var formatterType = typeof(CollectionFormatter<,>).MakeGenericType(ti.GetGenericArguments()[0], t);
-                        formatter = (Formatter<T>)Activator.CreateInstance(formatterType);
+                        var formatterType = typeof(CollectionFormatter<,,>).MakeGenericType(typeof(TTypeResolver), ti.GetGenericArguments()[0], t);
+                        formatter = Activator.CreateInstance(formatterType);
                     }
 
                     // custom nullable struct
                     else if (t.GetGenericTypeDefinition() == typeof(Nullable<>) && ti.GetGenericArguments()[0].GetTypeInfo().IsValueType)
                     {
-                        formatter = DynamicStructFormatter.Create<T>();
+                        formatter = DynamicStructFormatter.Create<TTypeResolver, T>();
                     }
                 }
 
                 else if (ti.GetCustomAttributes(typeof(UnionAttribute), false).FirstOrDefault() != null)
                 {
-                    formatter = DynamicUnionFormatter.Create<T>();
+                    formatter = DynamicUnionFormatter.Create<TTypeResolver, T>();
                 }
 
                 else if (ti.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() != null)
                 {
                     if (ti.IsValueType)
                     {
-                        formatter = DynamicStructFormatter.Create<T>();
+                        formatter = DynamicStructFormatter.Create<TTypeResolver, T>();
                     }
                     else
                     {
-                        formatter = DynamicFormatter.Create<T>();
+                        formatter = DynamicFormatter.Create<TTypeResolver, T>();
                     }
                 }
 
@@ -558,35 +599,35 @@ namespace ZeroFormatter.Formatters
             }
             catch (InvalidOperationException ex)
             {
-                formatter = new ErrorFormatter<T>(ex);
+                formatter = new ErrorFormatter<TTypeResolver, T>(ex);
             }
             catch (Exception ex)
             {
-                formatter = new ErrorFormatter<T>(ex);
+                formatter = new ErrorFormatter<TTypeResolver, T>(ex);
             }
 
             // resolver
-            if (formatter == null || formatter is ErrorFormatter<T>)
+            if (formatter == null || formatter is ErrorFormatter<TTypeResolver, T>)
             {
                 try
                 {
-                    var resolvedFormatter = Formatter.ResolveFormatter<T>();
+                    var resolvedFormatter = resolver.ResolveFormatter(typeof(T));
                     if (resolvedFormatter != null)
                     {
-                        formatter = (Formatter<T>)resolvedFormatter;
+                        formatter = resolvedFormatter;
                     }
                     else if (formatter == null)
                     {
-                        formatter = new ErrorFormatter<T>();
+                        formatter = new ErrorFormatter<TTypeResolver, T>();
                     }
                 }
                 catch (Exception ex)
                 {
-                    formatter = new ErrorFormatter<T>(ex);
+                    formatter = new ErrorFormatter<TTypeResolver, T>(ex);
                 }
             }
 
-            Default = (Formatter<T>)formatter;
+            Default = (Formatter<TTypeResolver, T>)formatter;
         }
 
         [Preserve]
@@ -594,7 +635,7 @@ namespace ZeroFormatter.Formatters
         {
         }
 
-        public static void Register(Formatter<T> formatter)
+        public static void Register(Formatter<TTypeResolver, T> formatter)
         {
             defaultFormatter = formatter;
         }
@@ -625,9 +666,8 @@ namespace ZeroFormatter.Formatters
             Formatter.formatterResolver.Add(formatterResolver);
         }
 
-        internal static object ResolveFormatter<T>()
+        internal static object ResolveFormatter(Type t)
         {
-            var t = typeof(T);
             foreach (var item in formatterResolver)
             {
                 var resolved = item(t);
@@ -912,7 +952,8 @@ namespace ZeroFormatter.Formatters
         InvalidOperationException GetException();
     }
 
-    internal class ErrorFormatter<T> : Formatter<T>, IErrorFormatter
+    internal class ErrorFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>, IErrorFormatter
+         where TTypeResolver : ITypeResolver, new()
     {
         readonly InvalidOperationException exception;
 

@@ -1,21 +1,19 @@
 ﻿using System.Threading;
 
-namespace ZeroFormatter.Segments
+namespace ZeroFormatter
 {
     // Note:Can we change to struct? like CancellationTokenSource, CreateLinkedTokenSource...
 
     public sealed class DirtyTracker
     {
-        internal static readonly DirtyTracker NullTracker = new DirtyTracker(0);
+        internal static readonly DirtyTracker NullTracker = new DirtyTracker();
 
         readonly DirtyTracker parent;
 
-        public int RootOffset { get; private set; }
         public bool IsDirty { get; private set; }
 
-        public DirtyTracker(int rootOffset)
+        public DirtyTracker()
         {
-            this.RootOffset = rootOffset;
             this.IsDirty = false;
         }
 
@@ -23,7 +21,6 @@ namespace ZeroFormatter.Segments
         {
             this.parent = parent;
             IsDirty = parent.IsDirty;
-            RootOffset = parent.RootOffset;
         }
 
         public void Dirty()

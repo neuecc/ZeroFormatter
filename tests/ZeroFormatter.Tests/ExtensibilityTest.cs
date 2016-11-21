@@ -22,7 +22,7 @@ namespace ZeroFormatter.Tests
         }
     }
 
-    public class CannotSerializeFormatter : Formatter<CannotSerialize>
+    public class CannotSerializeFormatter : Formatter<DefaultResolver, CannotSerialize>
     {
         public override int? GetLength()
         {
@@ -32,8 +32,8 @@ namespace ZeroFormatter.Tests
         public override int Serialize(ref byte[] bytes, int offset, CannotSerialize value)
         {
             var start = offset;
-            offset += Formatter<int>.Default.Serialize(ref bytes, offset, value.MyProperty1);
-            offset += Formatter<string>.Default.Serialize(ref bytes, offset, value.MyProperty2);
+            offset += Formatter<DefaultResolver, int>.Default.Serialize(ref bytes, offset, value.MyProperty1);
+            offset += Formatter<DefaultResolver, string>.Default.Serialize(ref bytes, offset, value.MyProperty2);
             return offset - start;
         }
 
@@ -41,17 +41,17 @@ namespace ZeroFormatter.Tests
         {
             var size = 0;
             byteSize = 0;
-            var p1 = Formatter<int>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var p1 = Formatter<DefaultResolver, int>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var p2 = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var p2 = Formatter<DefaultResolver, string>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
             return new CannotSerialize(p1, p2);
         }
     }
 
-    public class KeyValuePairFormatter<TKey, TValue> : Formatter<KeyValuePair<TKey, TValue>>
+    public class KeyValuePairFormatter<TKey, TValue> : Formatter<DefaultResolver, KeyValuePair<TKey, TValue>>
     {
         public override int? GetLength()
         {
@@ -61,8 +61,8 @@ namespace ZeroFormatter.Tests
         public override int Serialize(ref byte[] bytes, int offset, KeyValuePair<TKey, TValue> value)
         {
             var start = offset;
-            offset += Formatter<TKey>.Default.Serialize(ref bytes, offset, value.Key);
-            offset += Formatter<TValue>.Default.Serialize(ref bytes, offset, value.Value);
+            offset += Formatter<DefaultResolver, TKey>.Default.Serialize(ref bytes, offset, value.Key);
+            offset += Formatter<DefaultResolver, TValue>.Default.Serialize(ref bytes, offset, value.Value);
             return offset - start;
         }
 
@@ -70,17 +70,17 @@ namespace ZeroFormatter.Tests
         {
             var size = 0;
             byteSize = 0;
-            var p1 = Formatter<TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var p1 = Formatter<DefaultResolver, TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
-            var p2 = Formatter<TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var p2 = Formatter<DefaultResolver, TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
             return new KeyValuePair<TKey, TValue>(p1, p2);
         }
     }
 
-    public class UriFormatter : Formatter<Uri>
+    public class UriFormatter : Formatter<DefaultResolver, Uri>
     {
         public override int? GetLength()
         {
@@ -90,12 +90,12 @@ namespace ZeroFormatter.Tests
         public override int Serialize(ref byte[] bytes, int offset, Uri value)
         {
             var uri = value.ToString();
-            return Formatter<string>.Default.Serialize(ref bytes, offset, uri);
+            return Formatter<DefaultResolver, string>.Default.Serialize(ref bytes, offset, uri);
         }
 
         public override Uri Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            var str = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out byteSize);
+            var str = Formatter<DefaultResolver, string>.Default.Deserialize(ref bytes, offset, tracker, out byteSize);
             return new Uri(str);
         }
     }

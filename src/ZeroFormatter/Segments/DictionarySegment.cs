@@ -11,16 +11,17 @@ namespace ZeroFormatter.Segments
     // [IList<int> buckets][List<DictionaryEntry> entries]
     //  byteSize == -1 is null
 
-    public sealed class DictionarySegment<TKey, TValue> : IDictionary<TKey, TValue>, IZeroFormatterSegment, ILazyDictionary<TKey, TValue>
+    public sealed class DictionarySegment<TTypeResolver, TKey, TValue> : IDictionary<TKey, TValue>, IZeroFormatterSegment, ILazyDictionary<TKey, TValue>
 #if !UNITY
         , IReadOnlyDictionary<TKey, TValue>, ILazyReadOnlyDictionary<TKey, TValue>
 #endif
+        where TTypeResolver : ITypeResolver, new()
     {
         #region SerializableStates
 
         int count;
         IList<int> buckets; // link index of first entry. empty is -1.
-        IList<DictionaryEntry<TKey, TValue>> entries;
+        IList<DictionaryEntry<TTypeResolver, TKey, TValue>> entries;
 
         #endregion
 
@@ -47,14 +48,14 @@ namespace ZeroFormatter.Segments
             for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
             this.buckets = newBuckets;
 
-            this.entries = new DictionaryEntry<TKey, TValue>[size];
+            this.entries = new DictionaryEntry<TTypeResolver, TKey, TValue>[size];
             this.comparer = ZeroFormatterEqualityComparer<TKey>.Default;
 
             this.freeList = -1;
             this.freeCount = 0;
         }
 
-        internal static DictionarySegment<TKey, TValue> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
+        internal static DictionarySegment<TTypeResolver, TKey, TValue> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
             var byteSizeOrCount = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSizeOrCount == -1)
@@ -64,7 +65,7 @@ namespace ZeroFormatter.Segments
             }
 
             byteSize = byteSizeOrCount;
-            return new DictionarySegment<TKey, TValue>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+            return new DictionarySegment<TTypeResolver, TKey, TValue>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
         }
 
         DictionarySegment(DirtyTracker tracker, ArraySegment<byte> originalBytes)
@@ -78,8 +79,8 @@ namespace ZeroFormatter.Segments
             this.count = BinaryUtil.ReadInt32(ref bytes, offset);
             offset += 4;
 
-            var intListFormatter = Formatter<IList<int>>.Default;
-            var entryListFormatter = Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default;
+            var intListFormatter = Formatter<TTypeResolver, IList<int>>.Default;
+            var entryListFormatter = Formatter<TTypeResolver, IList<DictionaryEntry<TTypeResolver, TKey, TValue>>>.Default;
 
             int size;
             this.buckets = intListFormatter.Deserialize(ref bytes, offset, tracker, out size);
@@ -191,8 +192,8 @@ namespace ZeroFormatter.Segments
             {
                 for (int i = 0; i < buckets.Count; i++) buckets[i] = -1;
 
-                var el = entries as ListSegment<DictionaryEntry<TKey, TValue>>;
-                var ea = entries as DictionaryEntry<TKey, TValue>[];
+                var el = entries as ListSegment<TTypeResolver, DictionaryEntry<TTypeResolver, TKey, TValue>>;
+                var ea = entries as DictionaryEntry<TTypeResolver, TKey, TValue>[];
                 if (el != null)
                 {
                     el.Clear();
@@ -304,7 +305,7 @@ namespace ZeroFormatter.Segments
                             entries[last] = entries[last].WithNext(entries[i].Next);
                         }
 
-                        entries[i] = new DictionaryEntry<TKey, TValue>(-1, freeList, default(TKey), default(TValue));
+                        entries[i] = new DictionaryEntry<TTypeResolver, TKey, TValue>(-1, freeList, default(TKey), default(TValue));
                         freeList = i;
                         freeCount++;
                         return true;
@@ -407,7 +408,7 @@ namespace ZeroFormatter.Segments
                 count++;
             }
 
-            entries[index] = new DictionaryEntry<TKey, TValue>(hashCode, buckets[targetBucket], key, value);
+            entries[index] = new DictionaryEntry<TTypeResolver, TKey, TValue>(hashCode, buckets[targetBucket], key, value);
             buckets[targetBucket] = index;
         }
 
@@ -422,7 +423,7 @@ namespace ZeroFormatter.Segments
             var newBuckets = new int[newSize];
             for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
 
-            var newEntries = new DictionaryEntry<TKey, TValue>[newSize];
+            var newEntries = new DictionaryEntry<TTypeResolver, TKey, TValue>[newSize];
             entries.CopyTo(newEntries, 0);
 
             for (int i = 0; i < count; i++)
@@ -464,8 +465,8 @@ namespace ZeroFormatter.Segments
                     Resize(count);
                 }
 
-                var intListFormatter = Formatter<IList<int>>.Default;
-                var entryListFormatter = Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default;
+                var intListFormatter = Formatter<TTypeResolver, IList<int>>.Default;
+                var entryListFormatter = Formatter<TTypeResolver, IList<DictionaryEntry<TTypeResolver, TKey, TValue>>>.Default;
 
                 var startOffset = offset;
 
@@ -487,7 +488,8 @@ namespace ZeroFormatter.Segments
     public static class DictionaryEntry
     {
         // deserialize immediate:)
-        public static DictionaryEntry<TKey, TValue> Create<TKey, TValue>(byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public static DictionaryEntry<TTypeResolver, TKey, TValue> Create<TTypeResolver, TKey, TValue>(byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+            where TTypeResolver : ITypeResolver, new()
         {
             byteSize = 0;
 
@@ -500,18 +502,19 @@ namespace ZeroFormatter.Segments
             byteSize += 4;
 
             int size;
-            var key = Formatter<TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var key = Formatter<TTypeResolver, TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
-            var value = Formatter<TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var value = Formatter<TTypeResolver, TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
             byteSize += size;
 
-            return new DictionaryEntry<TKey, TValue>(hashCode, next, key, value);
+            return new DictionaryEntry<TTypeResolver, TKey, TValue>(hashCode, next, key, value);
         }
     }
 
-    public struct DictionaryEntry<TKey, TValue>
+    public struct DictionaryEntry<TTypeResolver, TKey, TValue>
+        where TTypeResolver : ITypeResolver, new()
     {
         public readonly int HashCode;
         public readonly int Next;
@@ -526,14 +529,14 @@ namespace ZeroFormatter.Segments
             this.Value = value;
         }
 
-        public DictionaryEntry<TKey, TValue> WithNext(int next)
+        public DictionaryEntry<TTypeResolver, TKey, TValue> WithNext(int next)
         {
-            return new DictionaryEntry<TKey, TValue>(this.HashCode, next, this.Key, this.Value);
+            return new DictionaryEntry<TTypeResolver, TKey, TValue>(this.HashCode, next, this.Key, this.Value);
         }
 
-        public DictionaryEntry<TKey, TValue> WithValue(TValue value)
+        public DictionaryEntry<TTypeResolver, TKey, TValue> WithValue(TValue value)
         {
-            return new DictionaryEntry<TKey, TValue>(this.HashCode, this.Next, this.Key, value);
+            return new DictionaryEntry<TTypeResolver, TKey, TValue>(this.HashCode, this.Next, this.Key, value);
         }
 
         public int Serialize(ref byte[] bytes, int offset)
@@ -541,8 +544,8 @@ namespace ZeroFormatter.Segments
             var size = 0;
             size += BinaryUtil.WriteInt32(ref bytes, offset, HashCode);
             size += BinaryUtil.WriteInt32(ref bytes, offset + size, Next);
-            size += Formatter<TKey>.Default.Serialize(ref bytes, offset + size, Key);
-            size += Formatter<TValue>.Default.Serialize(ref bytes, offset + size, Value);
+            size += Formatter<TTypeResolver, TKey>.Default.Serialize(ref bytes, offset + size, Key);
+            size += Formatter<TTypeResolver, TValue>.Default.Serialize(ref bytes, offset + size, Value);
             return size;
         }
     }

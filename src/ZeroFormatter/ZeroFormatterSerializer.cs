@@ -61,7 +61,7 @@ namespace ZeroFormatter
         /// </summary>
         public static int Serialize<T>(ref byte[] buffer, int offset, T obj)
         {
-            var formatter = Formatter<T>.Default;
+            var formatter = Formatter<DefaultResolver, T>.Default;
             if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
 
             return formatter.Serialize(ref buffer, offset, obj);
@@ -105,20 +105,20 @@ namespace ZeroFormatter
 
         public static T Deserialize<T>(byte[] bytes)
         {
-            var formatter = Formatter<T>.Default;
+            var formatter = Formatter<DefaultResolver, T>.Default;
             if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
 
-            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker(0);
+            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
             int _;
             return formatter.Deserialize(ref bytes, 0, tracker, out _);
         }
 
         public static T Deserialize<T>(byte[] bytes, int offset)
         {
-            var formatter = Formatter<T>.Default;
+            var formatter = Formatter<DefaultResolver, T>.Default;
             if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
 
-            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker(offset);
+            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
             int _;
             return formatter.Deserialize(ref bytes, offset, tracker, out _);
         }
@@ -126,8 +126,8 @@ namespace ZeroFormatter
         public static T Deserialize<T>(Stream stream)
         {
             var ms = stream as MemoryStream;
-            var formatter = Formatter<T>.Default;
-            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker((int)stream.Position);
+            var formatter = Formatter<DefaultResolver, T>.Default;
+            var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
             if (ms != null)
             {
 #if NET_CORE

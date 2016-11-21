@@ -32,7 +32,8 @@ namespace ZeroFormatter.Formatters
 
 <# foreach(var tuple in types) { var t = tuple.Item1; #>
 
-    internal class <#= t.Name #>ArrayFormatter : Formatter<<#= t.Name #>[]>
+    internal class <#= t.Name #>ArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.Name #>[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {

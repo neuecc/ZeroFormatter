@@ -31,7 +31,7 @@ namespace ZeroFormatter.Segments
             var array = originalBytes.Array;
             var readOffset = BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + 4 * index);
             if (readOffset == 0) return -1;
-            return tracker.RootOffset + readOffset;
+            return originalBytes.Offset + readOffset;
         }
 
         public static ArraySegment<byte> GetSegment(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)
@@ -46,21 +46,23 @@ namespace ZeroFormatter.Segments
             return new ArraySegment<byte>(originalBytes.Array, offset, (sliceLength - offset));
         }
 
-        public static T DeserializeSegment<T>(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)
+        public static T DeserializeSegment<TTypeResolver, T>(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)
+            where TTypeResolver : ITypeResolver, new()
         {
             var offset = ObjectSegmentHelper.GetOffset(originalBytes, index, lastIndex, tracker);
             if (offset == -1) return default(T);
 
             int size;
             var array = originalBytes.Array;
-            return Formatter<T>.Default.Deserialize(ref array, offset, tracker, out size);
+            return Formatter<TTypeResolver, T>.Default.Deserialize(ref array, offset, tracker, out size);
         }
 
-        public static int SerializeFixedLength<T>(ref byte[] targetBytes, int startOffset, int offset, int index, int lastIndex, ArraySegment<byte> originalBytes, byte[] extraBytes, DirtyTracker tracker)
+        public static int SerializeFixedLength<TTypeResolver, T>(ref byte[] targetBytes, int startOffset, int offset, int index, int lastIndex, ArraySegment<byte> originalBytes, byte[] extraBytes, DirtyTracker tracker)
+            where TTypeResolver : ITypeResolver, new()
         {
-            BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset);
+            BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset - startOffset);
 
-            var formatter = global::ZeroFormatter.Formatters.Formatter<T>.Default;
+            var formatter = global::ZeroFormatter.Formatters.Formatter<TTypeResolver, T>.Default;
             var len = formatter.GetLength();
 
             BinaryUtil.EnsureCapacity(ref targetBytes, offset, len.Value);
@@ -78,50 +80,54 @@ namespace ZeroFormatter.Segments
             return len.Value;
         }
 
-        public static int SerializeSegment<T>(ref byte[] targetBytes, int startOffset, int offset, int index, T segment)
+        public static int SerializeSegment<TTypeResolver, T>(ref byte[] targetBytes, int startOffset, int offset, int index, T segment)
+            where TTypeResolver : ITypeResolver, new()
         {
-            BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset);
+            BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset - startOffset);
 
-            var formatter = global::ZeroFormatter.Formatters.Formatter<T>.Default;
+            var formatter = global::ZeroFormatter.Formatters.Formatter<TTypeResolver, T>.Default;
             return formatter.Serialize(ref targetBytes, offset, segment);
         }
 
-        public static int SerializeCacheSegment<T>(ref byte[] targetBytes, int startOffset, int offset, int index, CacheSegment<T> segment)
+        public static int SerializeCacheSegment<TTypeResolver, T>(ref byte[] targetBytes, int startOffset, int offset, int index, CacheSegment<TTypeResolver, T> segment)
+            where TTypeResolver : ITypeResolver, new()
         {
-            BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset);
+            BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset - startOffset);
 
             return segment.Serialize(ref targetBytes, offset);
         }
 
-        public static T GetFixedProperty<T>(ArraySegment<byte> bytes, int index, int lastIndex, byte[] extraBytes, DirtyTracker tracker)
+        public static T GetFixedProperty<TTypeResolver, T>(ArraySegment<byte> bytes, int index, int lastIndex, byte[] extraBytes, DirtyTracker tracker)
+            where TTypeResolver : ITypeResolver, new()
         {
             if (index <= lastIndex)
             {
                 var array = bytes.Array;
                 int _;
-                return Formatter<T>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex, tracker), tracker, out _);
+                return Formatter<TTypeResolver, T>.Default.Deserialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex, tracker), tracker, out _);
             }
             else
             {
                 // from extraBytes
                 var offset = GetExtraBytesOffset(extraBytes, lastIndex, index);
                 int _;
-                return Formatter<T>.Default.Deserialize(ref extraBytes, offset, tracker, out _);
+                return Formatter<TTypeResolver, T>.Default.Deserialize(ref extraBytes, offset, tracker, out _);
             }
         }
 
-        public static void SetFixedProperty<T>(ArraySegment<byte> bytes, int index, int lastIndex, byte[] extraBytes, T value, DirtyTracker tracker)
+        public static void SetFixedProperty<TTypeResolver, T>(ArraySegment<byte> bytes, int index, int lastIndex, byte[] extraBytes, T value, DirtyTracker tracker)
+            where TTypeResolver : ITypeResolver, new()
         {
             if (index <= lastIndex)
             {
                 var array = bytes.Array;
-                Formatter<T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex, tracker), value);
+                Formatter<TTypeResolver, T>.Default.Serialize(ref array, ObjectSegmentHelper.GetOffset(bytes, index, lastIndex, tracker), value);
             }
             else
             {
                 // from extraBytes
                 var offset = GetExtraBytesOffset(extraBytes, lastIndex, index);
-                Formatter<T>.Default.Serialize(ref extraBytes, offset, value);
+                Formatter<TTypeResolver, T>.Default.Serialize(ref extraBytes, offset, value);
             }
         }
 
@@ -174,10 +180,11 @@ namespace ZeroFormatter.Segments
             }
         }
 
-        public static int SerializeFromFormatter<T>(ref byte[] bytes, int startOffset, int offset, int index, T value)
+        public static int SerializeFromFormatter<TTypeResolver, T>(ref byte[] bytes, int startOffset, int offset, int index, T value)
+        where TTypeResolver : ITypeResolver, new()
         {
             BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * index), offset);
-            return Formatter<T>.Default.Serialize(ref bytes, offset, value);
+            return Formatter<TTypeResolver, T>.Default.Serialize(ref bytes, offset, value);
         }
 
 #if !UNITY
@@ -234,7 +241,8 @@ namespace ZeroFormatter.Segments
         }
     }
 
-    internal static class DynamicObjectSegmentBuilder<T>
+    internal static class DynamicObjectSegmentBuilder<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static readonly MethodInfo ArraySegmentArrayGet = typeof(ArraySegment<byte>).GetTypeInfo().GetProperty("Array").GetGetMethod();
         static readonly MethodInfo ArraySegmentOffsetGet = typeof(ArraySegment<byte>).GetTypeInfo().GetProperty("Offset").GetGetMethod();
@@ -310,17 +318,18 @@ namespace ZeroFormatter.Segments
 
         static PropertyTuple[] GetPropertiesWithVerify(TypeBuilder typeBuilder)
         {
+            var resolverType = typeof(TTypeResolver);
             var lastIndex = -1;
 
             var list = new List<PropertyTuple>();
 
             // getproperties contains verify.
-            foreach (var p in DynamicObjectDescriptor.GetMembers(typeof(T), true))
+            foreach (var p in DynamicObjectDescriptor.GetMembers(resolverType, typeof(T), true))
             {
                 var propInfo = p.Item2;
                 var index = p.Item1;
 
-                var formatter = (IFormatter)typeof(Formatter<>).MakeGenericType(propInfo.MemberType).GetTypeInfo().GetProperty("Default").GetValue(null, Type.EmptyTypes);
+                var formatter = (IFormatter)typeof(Formatter<,>).MakeGenericType(resolverType, propInfo.MemberType).GetTypeInfo().GetProperty("Default").GetValue(null, Type.EmptyTypes);
 
                 if (formatter == null)
                 {
@@ -332,7 +341,7 @@ namespace ZeroFormatter.Segments
                     if (!ObjectSegmentHelper.IsLazySegment(propInfo.MemberType))
                     {
                         // CacheSegment
-                        var fieldBuilder = typeBuilder.DefineField("<>_" + propInfo.Name, typeof(CacheSegment<>).MakeGenericType(propInfo.MemberType), FieldAttributes.Private);
+                        var fieldBuilder = typeBuilder.DefineField("<>_" + propInfo.Name, typeof(CacheSegment<,>).MakeGenericType(resolverType, propInfo.MemberType), FieldAttributes.Private);
                         list.Add(new PropertyTuple { Index = index, PropertyInfo = propInfo.PropertyInfoUnsafe, IsFixedSize = false, SegmentField = fieldBuilder, IsCacheSegment = true });
                     }
                     else
@@ -472,7 +481,7 @@ namespace ZeroFormatter.Segments
             il.Emit(OpCodes.Ldfld, lastIndex);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, tracker);
-            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("DeserializeSegment").MakeGenericMethod(field.FieldType));
+            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("DeserializeSegment").MakeGenericMethod(typeof(TTypeResolver), field.FieldType));
             il.Emit(OpCodes.Stfld, field);
         }
 
@@ -497,7 +506,7 @@ namespace ZeroFormatter.Segments
                 il.Emit(OpCodes.Ldfld, extraBytes);
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldfld, trackerField);
-                il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("GetFixedProperty").MakeGenericMethod(getMethod.ReturnType));
+                il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("GetFixedProperty").MakeGenericMethod(typeof(TTypeResolver), getMethod.ReturnType));
                 il.Emit(OpCodes.Ret);
 
                 prop.SetGetMethod(method);
@@ -521,7 +530,7 @@ namespace ZeroFormatter.Segments
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldfld, trackerField);
-                il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SetFixedProperty").MakeGenericMethod(getMethod.ReturnType));
+                il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SetFixedProperty").MakeGenericMethod(typeof(TTypeResolver), getMethod.ReturnType));
                 il.Emit(OpCodes.Ret);
 
                 prop.SetSetMethod(method);
@@ -677,19 +686,19 @@ namespace ZeroFormatter.Segments
                             il.Emit(OpCodes.Ldfld, extraBytes);
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, trackerField);
-                            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeFixedLength").MakeGenericMethod(prop.PropertyInfo.PropertyType));
+                            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeFixedLength").MakeGenericMethod(typeof(TTypeResolver), prop.PropertyInfo.PropertyType));
                         }
                         else if (prop.IsCacheSegment)
                         {
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, prop.SegmentField);
-                            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeCacheSegment").MakeGenericMethod(prop.PropertyInfo.PropertyType));
+                            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeCacheSegment").MakeGenericMethod(typeof(TTypeResolver), prop.PropertyInfo.PropertyType));
                         }
                         else
                         {
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, prop.SegmentField);
-                            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeSegment").MakeGenericMethod(prop.PropertyInfo.PropertyType));
+                            il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeSegment").MakeGenericMethod(typeof(TTypeResolver), prop.PropertyInfo.PropertyType));
                         }
                         il.Emit(OpCodes.Add);
                     }

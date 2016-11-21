@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
+using ZeroFormatter.Formatters;
 using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Tests
@@ -21,9 +22,9 @@ namespace ZeroFormatter.Tests
             bw.Write("あいうえおかきくけこさしすえそなにぬねの");
 
             var actual = ms.ToArray();
-            var tracker = new DirtyTracker(0);
+            var tracker = new DirtyTracker();
             tracker.IsDirty.IsFalse();
-            var segment = new CacheSegment<string>(tracker, new ArraySegment<byte>(actual));
+            var segment = new CacheSegment<DefaultResolver, string>(tracker, new ArraySegment<byte>(actual));
 
             segment.Value = "あいうえおかきくけこ";
             tracker.IsDirty.IsTrue();

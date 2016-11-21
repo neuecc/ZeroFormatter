@@ -1,10 +1,10 @@
 ﻿using System;
 using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
-    internal class DateTimeOffsetFormatter : Formatter<DateTimeOffset>
+    internal class DateTimeOffsetFormatter<TTypeResolver> : Formatter<TTypeResolver, DateTimeOffset>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -35,7 +35,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableDateTimeOffsetFormatter : Formatter<DateTimeOffset?>
+    internal class NullableDateTimeOffsetFormatter<TTypeResolver> : Formatter<TTypeResolver, DateTimeOffset?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {

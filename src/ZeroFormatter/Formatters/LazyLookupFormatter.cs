@@ -7,7 +7,8 @@ using ZeroFormatter.Segments;
 namespace ZeroFormatter.Formatters
 {
     [Preserve(AllMembers = true)]
-    internal class LazyLookupFormatter<TKey, TValue> : Formatter<ILazyLookup<TKey, TValue>>
+    internal class LazyLookupFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, ILazyLookup<TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
         [Preserve]
         public LazyLookupFormatter()
@@ -28,10 +29,10 @@ namespace ZeroFormatter.Formatters
                 return 4;
             }
 
-            var lookup = value as LookupSegment<TKey, TValue>;
+            var lookup = value as LookupSegment<TTypeResolver, TKey, TValue>;
             if (lookup == null)
             {
-                lookup = new LookupSegment<TKey, TValue>(value);
+                lookup = new LookupSegment<TTypeResolver, TKey, TValue>(value);
             }
 
             return lookup.Serialize(ref bytes, offset);
@@ -39,12 +40,13 @@ namespace ZeroFormatter.Formatters
 
         public override ILazyLookup<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            return LookupSegment<TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
+            return LookupSegment<TTypeResolver, TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
         }
     }
 
     [Preserve(AllMembers = true)]
-    internal class GroupingSegmentFormatter<TKey, TValue> : Formatter<GroupingSegment<TKey, TValue>>
+    internal class GroupingSegmentFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, GroupingSegment<TTypeResolver, TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
         [Preserve]
         public GroupingSegmentFormatter()
@@ -57,14 +59,14 @@ namespace ZeroFormatter.Formatters
             return null;
         }
 
-        public override int Serialize(ref byte[] bytes, int offset, GroupingSegment<TKey, TValue> value)
+        public override int Serialize(ref byte[] bytes, int offset, GroupingSegment<TTypeResolver, TKey, TValue> value)
         {
             return value.Serialize(ref bytes, offset);
         }
 
-        public override GroupingSegment<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public override GroupingSegment<TTypeResolver, TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            return GroupingSegment<TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
+            return GroupingSegment<TTypeResolver, TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
         }
     }
 }

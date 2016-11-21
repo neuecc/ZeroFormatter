@@ -140,37 +140,43 @@ namespace Sandbox
             A(a.m_val4 == b.m_val4);
         }
     }
+
+
+    [ZeroFormattable]
+    public class Abc
+    {
+        [Index(0)]
+        public virtual int A { get; set; }
+        [Index(1)]
+        public virtual int BA { get; set; }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            var lookup = Enumerable.Empty<int>().ToLookup(x => x % 2 == 0);
-            var a = ZeroFormatterSerializer.Convert(lookup);
+            var bytes = new byte[1000];
+            IList<string> variableList = new[] { "abcde", "fghijk" };
+            var record = KeyTuple.Create("aiueo", variableList, "kakikukeko");
 
-            var lookup2 = Enumerable.Range(1, 10).ToLookup(x => x % 2 == 0);
-            var b = ZeroFormatterSerializer.Convert(lookup2);
+            var size = ZeroFormatterSerializer.Serialize(ref bytes, 33, record);
 
+            var newBytes = new byte[2000];
+            Buffer.BlockCopy(bytes, 33, newBytes, 99, size);
+
+            var referenceByte = Encoding.UTF8.GetBytes("abcde");
+
+            var hugahgua = ZeroFormatterSerializer.Deserialize<KeyTuple<string, IList<string>, string>>(newBytes, 99);
+
+            hugahgua.Item2[0] = "zzzzz";
+
+            var reConvert = ZeroFormatterSerializer.Convert(hugahgua);
+
+            Console.WriteLine(hugahgua.Item2[0]);
         }
     }
 
-    public class UriFormatter : Formatter<Uri>
-    {
-        public override int? GetLength()
-        {
-            return null;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, Uri value)
-        {
-            return Formatter<string>.Default.Serialize(ref bytes, offset, value.ToString());
-        }
-
-        public override Uri Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
-        {
-            var uriString = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out byteSize);
-            return (uriString == null) ? null : new Uri(uriString);
-        }
-    }
+    
 
 
     [ZeroFormattable]

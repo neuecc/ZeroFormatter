@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using ZeroFormatter.Segments;
+﻿using System.Collections.Generic;
 
 namespace ZeroFormatter.Formatters
 {
     // Struct Layouts.
-    internal class KeyValuePairFormatter<TKey, TValue> : Formatter<KeyValuePair<TKey, TValue>>
+    internal class KeyValuePairFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, KeyValuePair<TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override int? GetLength()
         {
@@ -15,8 +14,8 @@ namespace ZeroFormatter.Formatters
         public override int Serialize(ref byte[] bytes, int offset, KeyValuePair<TKey, TValue> value)
         {
             var startOffset = offset;
-            offset += Formatter<TKey>.Default.Serialize(ref bytes, offset, value.Key);
-            offset += Formatter<TValue>.Default.Serialize(ref bytes, offset, value.Value);
+            offset += Formatter<TTypeResolver, TKey>.Default.Serialize(ref bytes, offset, value.Key);
+            offset += Formatter<TTypeResolver, TValue>.Default.Serialize(ref bytes, offset, value.Value);
             return offset - startOffset;
         }
 
@@ -25,11 +24,11 @@ namespace ZeroFormatter.Formatters
             int size;
             byteSize = 0;
 
-            var key = Formatter<TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var key = Formatter<TTypeResolver, TKey>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 
-            var value = Formatter<TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var value = Formatter<TTypeResolver, TValue>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
             byteSize += size;
 

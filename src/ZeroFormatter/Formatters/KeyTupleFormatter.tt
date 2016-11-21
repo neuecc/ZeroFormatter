@@ -7,7 +7,6 @@
 <#@ output extension=".cs" #>
 using System;
 using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -22,17 +21,18 @@ namespace ZeroFormatter.Formatters
 #>
 
     [Preserve(AllMembers = true)]
-    internal class KeyTupleFormatter<<#= ts #>> : Formatter<<#= t #>>
+    internal class KeyTupleFormatter<TTypeResolver, <#= ts #>> : Formatter<TTypeResolver, <#= t #>>
+        where TTypeResolver : ITypeResolver, new()
     {
 <# for(var j = 1; j <= i; j++) { #>
-        readonly Formatter<<#= toT(j) #>> formatter<#= j #>;
+        readonly Formatter<TTypeResolver, <#= toT(j) #>> formatter<#= j #>;
 <# } #>        
 
         [Preserve]
         public KeyTupleFormatter()
         {
 <# for(var j = 1; j <= i; j++) { #>
-            this.formatter<#= j #> = Formatter<<#= toT(j) #>>.Default;
+            this.formatter<#= j #> = Formatter<TTypeResolver, <#= toT(j) #>>.Default;
 <# } #>   
         }
 
@@ -78,17 +78,18 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableKeyTupleFormatter<<#= ts #>> : Formatter<<#= t #>?>
+    internal class NullableKeyTupleFormatter<TTypeResolver, <#= ts #>> : Formatter<TTypeResolver, <#= t #>?>
+        where TTypeResolver : ITypeResolver, new()
     {
 <# for(var j = 1; j <= i; j++) { #>
-        readonly Formatter<<#= toT(j) #>> formatter<#= j #>;
+        readonly Formatter<TTypeResolver, <#= toT(j) #>> formatter<#= j #>;
 <# } #>       
 
         [Preserve]
         public NullableKeyTupleFormatter()
         {
 <# for(var j = 1; j <= i; j++) { #>
-            this.formatter<#= j #> = Formatter<<#= toT(j) #>>.Default;
+            this.formatter<#= j #> = Formatter<TTypeResolver, <#= toT(j) #>>.Default;
 <# } #>   
         }
 

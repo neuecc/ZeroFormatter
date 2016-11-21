@@ -2,7 +2,6 @@
 using System;
 using System.Reflection;
 using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -11,7 +10,8 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class Int16EnumFormatter<T> : Formatter<T>
+    internal class Int16EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static Int16 Identity(Int16 x) { return x; }
 
@@ -52,8 +52,9 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableInt16EnumFormatter<T> : Formatter<T?>
+    internal class NullableInt16EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
         static Int16 Identity(Int16 x) { return x; }
 
@@ -109,7 +110,8 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class Int32EnumFormatter<T> : Formatter<T>
+    internal class Int32EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static Int32 Identity(Int32 x) { return x; }
 
@@ -150,8 +152,9 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableInt32EnumFormatter<T> : Formatter<T?>
+    internal class NullableInt32EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
         static Int32 Identity(Int32 x) { return x; }
 
@@ -207,7 +210,8 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class Int64EnumFormatter<T> : Formatter<T>
+    internal class Int64EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static Int64 Identity(Int64 x) { return x; }
 
@@ -248,8 +252,9 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableInt64EnumFormatter<T> : Formatter<T?>
+    internal class NullableInt64EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
         static Int64 Identity(Int64 x) { return x; }
 
@@ -305,7 +310,8 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class UInt16EnumFormatter<T> : Formatter<T>
+    internal class UInt16EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static UInt16 Identity(UInt16 x) { return x; }
 
@@ -346,8 +352,9 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableUInt16EnumFormatter<T> : Formatter<T?>
+    internal class NullableUInt16EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
         static UInt16 Identity(UInt16 x) { return x; }
 
@@ -403,7 +410,8 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class UInt32EnumFormatter<T> : Formatter<T>
+    internal class UInt32EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static UInt32 Identity(UInt32 x) { return x; }
 
@@ -444,8 +452,9 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableUInt32EnumFormatter<T> : Formatter<T?>
+    internal class NullableUInt32EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
         static UInt32 Identity(UInt32 x) { return x; }
 
@@ -501,7 +510,8 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class UInt64EnumFormatter<T> : Formatter<T>
+    internal class UInt64EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static UInt64 Identity(UInt64 x) { return x; }
 
@@ -542,8 +552,9 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableUInt64EnumFormatter<T> : Formatter<T?>
+    internal class NullableUInt64EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
         static UInt64 Identity(UInt64 x) { return x; }
 
@@ -599,7 +610,8 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class ByteEnumFormatter<T> : Formatter<T>
+    internal class ByteEnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static Byte Identity(Byte x) { return x; }
 
@@ -640,8 +652,9 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableByteEnumFormatter<T> : Formatter<T?>
+    internal class NullableByteEnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
         static Byte Identity(Byte x) { return x; }
 
@@ -697,7 +710,8 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class SByteEnumFormatter<T> : Formatter<T>
+    internal class SByteEnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static SByte Identity(SByte x) { return x; }
 
@@ -738,8 +752,9 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class NullableSByteEnumFormatter<T> : Formatter<T?>
+    internal class NullableSByteEnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
         static SByte Identity(SByte x) { return x; }
 

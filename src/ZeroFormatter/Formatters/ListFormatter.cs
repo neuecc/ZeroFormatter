@@ -8,14 +8,15 @@ namespace ZeroFormatter.Formatters
     // Layout: FixedSize -> [count:int][t format...] -> if count = -1 is null
     // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...] -> if byteSize = -1 is null
     [Preserve(AllMembers = true)]
-    internal class ListFormatter<T> : Formatter<IList<T>>
+    internal class ListFormatter<TTypeResolver, T> : Formatter<TTypeResolver, IList<T>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T> formatter;
+        readonly Formatter<TTypeResolver, T> formatter;
 
         [Preserve]
         public ListFormatter()
         {
-            this.formatter = Formatter<T>.Default;
+            this.formatter = Formatter<TTypeResolver, T>.Default;
         }
 
         public override int? GetLength()
@@ -92,7 +93,7 @@ namespace ZeroFormatter.Formatters
                     for (int i = 0; i < array.Length; i++)
                     {
                         var size = formatter.Serialize(ref bytes, offset, array[i]);
-                        BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset);
+                        BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset - startoffset);
                         offset += size;
                     }
                 }
@@ -104,7 +105,7 @@ namespace ZeroFormatter.Formatters
                         for (int i = 0; i < list.Count; i++)
                         {
                             var size = formatter.Serialize(ref bytes, offset, list[i]);
-                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset);
+                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset - startoffset);
                             offset += size;
                         }
                     }
@@ -114,7 +115,7 @@ namespace ZeroFormatter.Formatters
                         foreach (var item in value)
                         {
                             var size = formatter.Serialize(ref bytes, offset, item);
-                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + count * 4, offset);
+                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + count * 4, offset - startoffset);
                             offset += size;
                             count++;
                         }
@@ -135,11 +136,11 @@ namespace ZeroFormatter.Formatters
             var length = formatter.GetLength();
             if (length != null)
             {
-                return FixedListSegment<T>.Create(tracker, bytes, offset, out byteSize);
+                return FixedListSegment<TTypeResolver, T>.Create(tracker, bytes, offset, out byteSize);
             }
             else
             {
-                return VariableListSegment<T>.Create(tracker, bytes, offset, out byteSize);
+                return VariableListSegment<TTypeResolver, T>.Create(tracker, bytes, offset, out byteSize);
             }
         }
     }
@@ -147,14 +148,15 @@ namespace ZeroFormatter.Formatters
 #if !UNITY
 
     [Preserve(AllMembers = true)]
-    internal class ReadOnlyListFormatter<T> : Formatter<IReadOnlyList<T>>
+    internal class ReadOnlyListFormatter<TTypeResolver, T> : Formatter<TTypeResolver, IReadOnlyList<T>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T> formatter;
+        readonly Formatter<TTypeResolver, T> formatter;
 
         [Preserve]
         public ReadOnlyListFormatter()
         {
-            this.formatter = Formatter<T>.Default;
+            this.formatter = Formatter<TTypeResolver, T>.Default;
         }
 
         public override int? GetLength()
@@ -231,7 +233,7 @@ namespace ZeroFormatter.Formatters
                     for (int i = 0; i < array.Length; i++)
                     {
                         var size = formatter.Serialize(ref bytes, offset, array[i]);
-                        BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset);
+                        BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset - startoffset);
                         offset += size;
                     }
                 }
@@ -243,7 +245,7 @@ namespace ZeroFormatter.Formatters
                         for (int i = 0; i < list.Count; i++)
                         {
                             var size = formatter.Serialize(ref bytes, offset, list[i]);
-                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset);
+                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + i * 4, offset - startoffset);
                             offset += size;
                         }
                     }
@@ -253,7 +255,7 @@ namespace ZeroFormatter.Formatters
                         foreach (var item in value)
                         {
                             var size = formatter.Serialize(ref bytes, offset, item);
-                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + count * 4, offset);
+                            BinaryUtil.WriteInt32Unsafe(ref bytes, indexStartOffset + count * 4, offset - startoffset);
                             offset += size;
                             count++;
                         }
@@ -274,11 +276,11 @@ namespace ZeroFormatter.Formatters
             var length = formatter.GetLength();
             if (length != null)
             {
-                return FixedListSegment<T>.Create(tracker, bytes, offset, out byteSize);
+                return FixedListSegment<TTypeResolver, T>.Create(tracker, bytes, offset, out byteSize);
             }
             else
             {
-                return VariableListSegment<T>.Create(tracker, bytes, offset, out byteSize);
+                return VariableListSegment<TTypeResolver, T>.Create(tracker, bytes, offset, out byteSize);
             }
         }
     }
