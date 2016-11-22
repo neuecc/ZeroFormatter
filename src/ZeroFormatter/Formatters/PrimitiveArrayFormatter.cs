@@ -6,7 +6,8 @@ namespace ZeroFormatter.Formatters
 {
 
 
-    internal class Int16ArrayFormatter : Formatter<Int16[]>
+    internal class Int16ArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, Int16[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -62,7 +63,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class Int32ArrayFormatter : Formatter<Int32[]>
+    internal class Int32ArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, Int32[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -118,7 +120,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class Int64ArrayFormatter : Formatter<Int64[]>
+    internal class Int64ArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, Int64[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -174,7 +177,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class UInt16ArrayFormatter : Formatter<UInt16[]>
+    internal class UInt16ArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, UInt16[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -230,7 +234,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class UInt32ArrayFormatter : Formatter<UInt32[]>
+    internal class UInt32ArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, UInt32[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -286,7 +291,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class UInt64ArrayFormatter : Formatter<UInt64[]>
+    internal class UInt64ArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, UInt64[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -342,7 +348,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class SingleArrayFormatter : Formatter<Single[]>
+    internal class SingleArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, Single[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -398,7 +405,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class DoubleArrayFormatter : Formatter<Double[]>
+    internal class DoubleArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, Double[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -454,7 +462,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class BooleanArrayFormatter : Formatter<Boolean[]>
+    internal class BooleanArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, Boolean[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -510,7 +519,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class ByteArrayFormatter : Formatter<Byte[]>
+    internal class ByteArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, Byte[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -566,7 +576,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class SByteArrayFormatter : Formatter<SByte[]>
+    internal class SByteArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, SByte[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -622,7 +633,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class CharArrayFormatter : Formatter<Char[]>
+    internal class CharArrayFormatter<TTypeResolver> : Formatter<TTypeResolver, Char[]>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {

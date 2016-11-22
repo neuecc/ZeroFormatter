@@ -11,15 +11,16 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class TupleFormatter<T1> : Formatter<Tuple<T1>>
+    internal class TupleFormatter<TTypeResolver, T1> : Formatter<TTypeResolver, Tuple<T1>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T1> formatter1;
+        readonly Formatter<TTypeResolver, T1> formatter1;
         
 
         [Preserve]
         public TupleFormatter()
         {
-            this.formatter1 = Formatter<T1>.Default;
+            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
    
         }
 
@@ -74,17 +75,18 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class TupleFormatter<T1, T2> : Formatter<Tuple<T1, T2>>
+    internal class TupleFormatter<TTypeResolver, T1, T2> : Formatter<TTypeResolver, Tuple<T1, T2>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T1> formatter1;
-        readonly Formatter<T2> formatter2;
+        readonly Formatter<TTypeResolver, T1> formatter1;
+        readonly Formatter<TTypeResolver, T2> formatter2;
         
 
         [Preserve]
         public TupleFormatter()
         {
-            this.formatter1 = Formatter<T1>.Default;
-            this.formatter2 = Formatter<T2>.Default;
+            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
+            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
    
         }
 
@@ -144,19 +146,20 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class TupleFormatter<T1, T2, T3> : Formatter<Tuple<T1, T2, T3>>
+    internal class TupleFormatter<TTypeResolver, T1, T2, T3> : Formatter<TTypeResolver, Tuple<T1, T2, T3>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T1> formatter1;
-        readonly Formatter<T2> formatter2;
-        readonly Formatter<T3> formatter3;
+        readonly Formatter<TTypeResolver, T1> formatter1;
+        readonly Formatter<TTypeResolver, T2> formatter2;
+        readonly Formatter<TTypeResolver, T3> formatter3;
         
 
         [Preserve]
         public TupleFormatter()
         {
-            this.formatter1 = Formatter<T1>.Default;
-            this.formatter2 = Formatter<T2>.Default;
-            this.formatter3 = Formatter<T3>.Default;
+            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
+            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
+            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
    
         }
 
@@ -221,21 +224,22 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class TupleFormatter<T1, T2, T3, T4> : Formatter<Tuple<T1, T2, T3, T4>>
+    internal class TupleFormatter<TTypeResolver, T1, T2, T3, T4> : Formatter<TTypeResolver, Tuple<T1, T2, T3, T4>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T1> formatter1;
-        readonly Formatter<T2> formatter2;
-        readonly Formatter<T3> formatter3;
-        readonly Formatter<T4> formatter4;
+        readonly Formatter<TTypeResolver, T1> formatter1;
+        readonly Formatter<TTypeResolver, T2> formatter2;
+        readonly Formatter<TTypeResolver, T3> formatter3;
+        readonly Formatter<TTypeResolver, T4> formatter4;
         
 
         [Preserve]
         public TupleFormatter()
         {
-            this.formatter1 = Formatter<T1>.Default;
-            this.formatter2 = Formatter<T2>.Default;
-            this.formatter3 = Formatter<T3>.Default;
-            this.formatter4 = Formatter<T4>.Default;
+            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
+            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
+            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
+            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
    
         }
 
@@ -305,23 +309,24 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class TupleFormatter<T1, T2, T3, T4, T5> : Formatter<Tuple<T1, T2, T3, T4, T5>>
+    internal class TupleFormatter<TTypeResolver, T1, T2, T3, T4, T5> : Formatter<TTypeResolver, Tuple<T1, T2, T3, T4, T5>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T1> formatter1;
-        readonly Formatter<T2> formatter2;
-        readonly Formatter<T3> formatter3;
-        readonly Formatter<T4> formatter4;
-        readonly Formatter<T5> formatter5;
+        readonly Formatter<TTypeResolver, T1> formatter1;
+        readonly Formatter<TTypeResolver, T2> formatter2;
+        readonly Formatter<TTypeResolver, T3> formatter3;
+        readonly Formatter<TTypeResolver, T4> formatter4;
+        readonly Formatter<TTypeResolver, T5> formatter5;
         
 
         [Preserve]
         public TupleFormatter()
         {
-            this.formatter1 = Formatter<T1>.Default;
-            this.formatter2 = Formatter<T2>.Default;
-            this.formatter3 = Formatter<T3>.Default;
-            this.formatter4 = Formatter<T4>.Default;
-            this.formatter5 = Formatter<T5>.Default;
+            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
+            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
+            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
+            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
+            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
    
         }
 
@@ -396,25 +401,26 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class TupleFormatter<T1, T2, T3, T4, T5, T6> : Formatter<Tuple<T1, T2, T3, T4, T5, T6>>
+    internal class TupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6> : Formatter<TTypeResolver, Tuple<T1, T2, T3, T4, T5, T6>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T1> formatter1;
-        readonly Formatter<T2> formatter2;
-        readonly Formatter<T3> formatter3;
-        readonly Formatter<T4> formatter4;
-        readonly Formatter<T5> formatter5;
-        readonly Formatter<T6> formatter6;
+        readonly Formatter<TTypeResolver, T1> formatter1;
+        readonly Formatter<TTypeResolver, T2> formatter2;
+        readonly Formatter<TTypeResolver, T3> formatter3;
+        readonly Formatter<TTypeResolver, T4> formatter4;
+        readonly Formatter<TTypeResolver, T5> formatter5;
+        readonly Formatter<TTypeResolver, T6> formatter6;
         
 
         [Preserve]
         public TupleFormatter()
         {
-            this.formatter1 = Formatter<T1>.Default;
-            this.formatter2 = Formatter<T2>.Default;
-            this.formatter3 = Formatter<T3>.Default;
-            this.formatter4 = Formatter<T4>.Default;
-            this.formatter5 = Formatter<T5>.Default;
-            this.formatter6 = Formatter<T6>.Default;
+            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
+            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
+            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
+            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
+            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
+            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
    
         }
 
@@ -494,27 +500,28 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class TupleFormatter<T1, T2, T3, T4, T5, T6, T7> : Formatter<Tuple<T1, T2, T3, T4, T5, T6, T7>>
+    internal class TupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7> : Formatter<TTypeResolver, Tuple<T1, T2, T3, T4, T5, T6, T7>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T1> formatter1;
-        readonly Formatter<T2> formatter2;
-        readonly Formatter<T3> formatter3;
-        readonly Formatter<T4> formatter4;
-        readonly Formatter<T5> formatter5;
-        readonly Formatter<T6> formatter6;
-        readonly Formatter<T7> formatter7;
+        readonly Formatter<TTypeResolver, T1> formatter1;
+        readonly Formatter<TTypeResolver, T2> formatter2;
+        readonly Formatter<TTypeResolver, T3> formatter3;
+        readonly Formatter<TTypeResolver, T4> formatter4;
+        readonly Formatter<TTypeResolver, T5> formatter5;
+        readonly Formatter<TTypeResolver, T6> formatter6;
+        readonly Formatter<TTypeResolver, T7> formatter7;
         
 
         [Preserve]
         public TupleFormatter()
         {
-            this.formatter1 = Formatter<T1>.Default;
-            this.formatter2 = Formatter<T2>.Default;
-            this.formatter3 = Formatter<T3>.Default;
-            this.formatter4 = Formatter<T4>.Default;
-            this.formatter5 = Formatter<T5>.Default;
-            this.formatter6 = Formatter<T6>.Default;
-            this.formatter7 = Formatter<T7>.Default;
+            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
+            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
+            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
+            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
+            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
+            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
+            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
    
         }
 
@@ -599,29 +606,30 @@ namespace ZeroFormatter.Formatters
 
 
     [Preserve(AllMembers = true)]
-    internal class TupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<Tuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
+    internal class TupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, TRest> : Formatter<TTypeResolver, Tuple<T1, T2, T3, T4, T5, T6, T7, TRest>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T1> formatter1;
-        readonly Formatter<T2> formatter2;
-        readonly Formatter<T3> formatter3;
-        readonly Formatter<T4> formatter4;
-        readonly Formatter<T5> formatter5;
-        readonly Formatter<T6> formatter6;
-        readonly Formatter<T7> formatter7;
-        readonly Formatter<TRest> formatter8;
+        readonly Formatter<TTypeResolver, T1> formatter1;
+        readonly Formatter<TTypeResolver, T2> formatter2;
+        readonly Formatter<TTypeResolver, T3> formatter3;
+        readonly Formatter<TTypeResolver, T4> formatter4;
+        readonly Formatter<TTypeResolver, T5> formatter5;
+        readonly Formatter<TTypeResolver, T6> formatter6;
+        readonly Formatter<TTypeResolver, T7> formatter7;
+        readonly Formatter<TTypeResolver, TRest> formatter8;
         
 
         [Preserve]
         public TupleFormatter()
         {
-            this.formatter1 = Formatter<T1>.Default;
-            this.formatter2 = Formatter<T2>.Default;
-            this.formatter3 = Formatter<T3>.Default;
-            this.formatter4 = Formatter<T4>.Default;
-            this.formatter5 = Formatter<T5>.Default;
-            this.formatter6 = Formatter<T6>.Default;
-            this.formatter7 = Formatter<T7>.Default;
-            this.formatter8 = Formatter<TRest>.Default;
+            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
+            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
+            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
+            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
+            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
+            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
+            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
+            this.formatter8 = Formatter<TTypeResolver, TRest>.Default;
    
         }
 

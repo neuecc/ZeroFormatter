@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using UnityEngine;
 using ZeroFormatter;
+using ZeroFormatter.Formatters;
 
 namespace ZeroFormatter.Tests
 {
@@ -65,7 +66,7 @@ namespace ZeroFormatter.Tests
         public void _Init()
         {
             // ZeroFormatter Prepare
-            ZeroFormatter.Formatters.Formatter.RegisterList<Person>();
+            ZeroFormatter.Formatters.Formatter.RegisterList<DefaultResolver, Person>();
 
             // MsgPack Prepare
             MsgPack.Serialization.MessagePackSerializer.PrepareType<Sex>();

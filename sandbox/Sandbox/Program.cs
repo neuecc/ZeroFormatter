@@ -140,37 +140,87 @@ namespace Sandbox
             A(a.m_val4 == b.m_val4);
         }
     }
+
+
+    [ZeroFormattable]
+    public class Abc
+    {
+        [Index(0)]
+        public virtual int A { get; set; }
+        [Index(1)]
+        public virtual int BA { get; set; }
+    }
+
+
+    [DynamicUnion]
+    public abstract class MyClass
+    {
+
+    }
+
+
+    [DynamicUnion]
+    public interface IEvent { }
+
+
+    public class UnknownEvent : IEvent
+    {
+
+    }
+
+
+    [ZeroFormattable]
+    public class EventA : IEvent { }
+    [ZeroFormattable]
+    public class EventB : IEvent { }
+
     class Program
     {
         static void Main(string[] args)
         {
-            var lookup = Enumerable.Empty<int>().ToLookup(x => x % 2 == 0);
-            var a = ZeroFormatterSerializer.Convert(lookup);
 
-            var lookup2 = Enumerable.Range(1, 10).ToLookup(x => x % 2 == 0);
-            var b = ZeroFormatterSerializer.Convert(lookup2);
+            
+            ZeroFormatter.Formatters.Formatter.AppendDynamicUnionResolver((unionType, resolver) =>
+            {
+                if (unionType == typeof(MyClass))
+                {
 
+
+                }
+                else if (unionType == typeof(IEvent))
+                {
+                    resolver.RegisterUnionKeyType(typeof(byte));
+                    resolver.RegisterSubType((byte)13, typeof(EventA));
+                    resolver.RegisterSubType((byte)234, typeof(EventB));
+                    resolver.RegisterFallbackType(typeof(UnknownEvent));
+                }
+            });
+
+
+            var emptySerialize = ZeroFormatterSerializer.Serialize(new EventA());
+
+
+            var union = ZeroFormatterSerializer.Serialize<IEvent>(new EventA());
+            var aaa = ZeroFormatterSerializer.Deserialize<IEvent>(union);
+
+            var bbbUnion = ZeroFormatterSerializer.Serialize<IEvent>(new EventB());
+            var bbb = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
+
+
+            bbbUnion[1] = 24; // unknown
+
+            int s;
+            //var fff = new CharacterFormatter();
+            //fff.Deserialize(ref bbbUnion, 0, new DirtyTracker(), out s);
+            Console.WriteLine("go!");
+            var ccc = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
+
+            Console.WriteLine(ccc.GetType().FullName);
         }
     }
 
-    public class UriFormatter : Formatter<Uri>
-    {
-        public override int? GetLength()
-        {
-            return null;
-        }
 
-        public override int Serialize(ref byte[] bytes, int offset, Uri value)
-        {
-            return Formatter<string>.Default.Serialize(ref bytes, offset, value.ToString());
-        }
 
-        public override Uri Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
-        {
-            var uriString = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out byteSize);
-            return (uriString == null) ? null : new Uri(uriString);
-        }
-    }
 
 
     [ZeroFormattable]

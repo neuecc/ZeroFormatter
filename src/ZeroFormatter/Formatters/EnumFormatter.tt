@@ -33,7 +33,8 @@ namespace ZeroFormatter.Formatters
 <# foreach(var tuple in types) { var t = tuple.Item1; #>
 
     [Preserve(AllMembers = true)]
-    internal class <#= t.Name #>EnumFormatter<T> : Formatter<T>
+    internal class <#= t.Name #>EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
     {
         static <#= t.Name #> Identity(<#= t.Name #> x) { return x; }
 
@@ -74,8 +75,9 @@ namespace ZeroFormatter.Formatters
     }
 
     [Preserve(AllMembers = true)]
-    internal class Nullable<#= t.Name #>EnumFormatter<T> : Formatter<T?>
+    internal class Nullable<#= t.Name #>EnumFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T?>
         where T : struct
+        where TTypeResolver : ITypeResolver, new()
     {
         static <#= t.Name #> Identity(<#= t.Name #> x) { return x; }
 

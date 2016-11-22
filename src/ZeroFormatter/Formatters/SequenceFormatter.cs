@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using ZeroFormatter.Comparers;
 using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -13,14 +12,15 @@ namespace ZeroFormatter.Formatters
     // Layout: [count:int][t format...] -> if count = -1 is null
 
     // Array(Optimized formatter)
-    internal class ArrayFormatter<T> : Formatter<T[]>
+    internal class ArrayFormatter<TTypeResolver, T> : Formatter<TTypeResolver, T[]>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T> formatter;
+        readonly Formatter<TTypeResolver, T> formatter;
         readonly int? formatterLength;
 
         public ArrayFormatter()
         {
-            this.formatter = Formatter<T>.Default;
+            this.formatter = Formatter<TTypeResolver, T>.Default;
             this.formatterLength = formatter.GetLength();
         }
 
@@ -90,16 +90,17 @@ namespace ZeroFormatter.Formatters
     }
 
     // Collection(All concrete collections like List<T>, HashSet<T>, etc...
-    internal class CollectionFormatter<TElement, TCollection> : Formatter<TCollection>
+    internal class CollectionFormatter<TTypeResolver, TElement, TCollection> : Formatter<TTypeResolver, TCollection>
         where TCollection : ICollection<TElement>, new()
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<TElement> formatter;
+        readonly Formatter<TTypeResolver, TElement> formatter;
         readonly int? formatterLength;
         readonly bool isList;
 
         public CollectionFormatter()
         {
-            this.formatter = Formatter<TElement>.Default;
+            this.formatter = Formatter<TTypeResolver, TElement>.Default;
             this.formatterLength = formatter.GetLength();
             this.isList = typeof(TCollection).GetGenericTypeDefinition() == typeof(List<>);
         }
@@ -203,14 +204,15 @@ namespace ZeroFormatter.Formatters
     }
 
     // Same as CollectionFormatter but specialized to ReadOnlyCollection.
-    internal class ReadOnlyCollectionFormatter<T> : Formatter<ReadOnlyCollection<T>>
+    internal class ReadOnlyCollectionFormatter<TTypeResolver, T> : Formatter<TTypeResolver, ReadOnlyCollection<T>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T> formatter;
+        readonly Formatter<TTypeResolver, T> formatter;
         readonly int? formatterLength;
 
         public ReadOnlyCollectionFormatter()
         {
-            this.formatter = Formatter<T>.Default;
+            this.formatter = Formatter<TTypeResolver, T>.Default;
             this.formatterLength = formatter.GetLength();
         }
 
@@ -272,13 +274,14 @@ namespace ZeroFormatter.Formatters
     }
 
     // Same as CollectionFormatter but specialized to Dictionary.
-    internal class DictionaryFormatter<TKey, TValue> : Formatter<Dictionary<TKey, TValue>>
+    internal class DictionaryFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, Dictionary<TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<KeyValuePair<TKey, TValue>> formatter;
+        readonly Formatter<TTypeResolver, KeyValuePair<TKey, TValue>> formatter;
 
         public DictionaryFormatter()
         {
-            this.formatter = Formatter<KeyValuePair<TKey, TValue>>.Default;
+            this.formatter = Formatter<TTypeResolver, KeyValuePair<TKey, TValue>>.Default;
         }
 
         public override bool NoUseDirtyTracker
@@ -343,13 +346,14 @@ namespace ZeroFormatter.Formatters
     }
 
     // well known interfaces, fallback to concrete collection.
-    internal class InterfaceDictionaryFormatter<TKey, TValue> : Formatter<IDictionary<TKey, TValue>>
+    internal class InterfaceDictionaryFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, IDictionary<TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<KeyValuePair<TKey, TValue>> formatter;
+        readonly Formatter<TTypeResolver, KeyValuePair<TKey, TValue>> formatter;
 
         public InterfaceDictionaryFormatter()
         {
-            this.formatter = Formatter<KeyValuePair<TKey, TValue>>.Default;
+            this.formatter = Formatter<TTypeResolver, KeyValuePair<TKey, TValue>>.Default;
         }
 
         public override bool NoUseDirtyTracker
@@ -413,14 +417,15 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class InterfaceCollectionFormatter<T> : Formatter<ICollection<T>>
+    internal class InterfaceCollectionFormatter<TTypeResolver, T> : Formatter<TTypeResolver, ICollection<T>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T> formatter;
+        readonly Formatter<TTypeResolver, T> formatter;
         readonly int? formatterLength;
 
         public InterfaceCollectionFormatter()
         {
-            this.formatter = Formatter<T>.Default;
+            this.formatter = Formatter<TTypeResolver, T>.Default;
             this.formatterLength = formatter.GetLength();
         }
 
@@ -481,13 +486,14 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class InterfaceEnumerableFormatter<T> : Formatter<IEnumerable<T>>
+    internal class InterfaceEnumerableFormatter<TTypeResolver, T> : Formatter<TTypeResolver, IEnumerable<T>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T> formatter;
+        readonly Formatter<TTypeResolver, T> formatter;
 
         public InterfaceEnumerableFormatter()
         {
-            this.formatter = Formatter<T>.Default;
+            this.formatter = Formatter<TTypeResolver, T>.Default;
         }
 
         public override int? GetLength()
@@ -545,17 +551,18 @@ namespace ZeroFormatter.Formatters
     }
 
     // IGrouping<TKey, TElement> was encoded by struct format(key, T[]).
-    internal class LookupFormatter<TKey, TElement> : Formatter<ILookup<TKey, TElement>>
+    internal class LookupFormatter<TTypeResolver, TKey, TElement> : Formatter<TTypeResolver, ILookup<TKey, TElement>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<TKey> keyFormatter;
-        readonly Formatter<TElement> valueFormatter;
-        readonly Formatter<IEnumerable<TElement>> valuesFormatter;
+        readonly Formatter<TTypeResolver, TKey> keyFormatter;
+        readonly Formatter<TTypeResolver, TElement> valueFormatter;
+        readonly Formatter<TTypeResolver, IEnumerable<TElement>> valuesFormatter;
 
         public LookupFormatter()
         {
-            keyFormatter = Formatter<TKey>.Default;
-            valueFormatter = Formatter<TElement>.Default;
-            valuesFormatter = Formatter<IEnumerable<TElement>>.Default;
+            keyFormatter = Formatter<TTypeResolver, TKey>.Default;
+            valueFormatter = Formatter<TTypeResolver, TElement>.Default;
+            valuesFormatter = Formatter<TTypeResolver, IEnumerable<TElement>>.Default;
         }
 
         public override int? GetLength()
@@ -613,10 +620,10 @@ namespace ZeroFormatter.Formatters
             readonly byte[] refBytes;
             readonly DirtyTracker tracker;
             readonly int length;
-            readonly Formatter<TKey> keyFormatter;
-            readonly Formatter<TElement> valueFormatter;
+            readonly Formatter<TTypeResolver, TKey> keyFormatter;
+            readonly Formatter<TTypeResolver, TElement> valueFormatter;
 
-            public DeserializeSequence(byte[] bytes, int offset, DirtyTracker tracker, int length, Formatter<TKey> keyFormatter, Formatter<TElement> valueFormatter)
+            public DeserializeSequence(byte[] bytes, int offset, DirtyTracker tracker, int length, Formatter<TTypeResolver, TKey> keyFormatter, Formatter<TTypeResolver, TElement> valueFormatter)
             {
                 this.refBytes = bytes;
                 this.offset = offset;
@@ -658,14 +665,15 @@ namespace ZeroFormatter.Formatters
 
 #if !UNITY
 
-    internal class InterfaceSetFormatter<T> : Formatter<ISet<T>>
+    internal class InterfaceSetFormatter<TTypeResolver, T> : Formatter<TTypeResolver, ISet<T>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T> formatter;
+        readonly Formatter<TTypeResolver, T> formatter;
         readonly int? formatterLength;
 
         public InterfaceSetFormatter()
         {
-            this.formatter = Formatter<T>.Default;
+            this.formatter = Formatter<TTypeResolver, T>.Default;
             this.formatterLength = formatter.GetLength();
         }
 
@@ -727,14 +735,15 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class InterfaceReadOnlyCollectionFormatter<T> : Formatter<IReadOnlyCollection<T>>
+    internal class InterfaceReadOnlyCollectionFormatter<TTypeResolver, T> : Formatter<TTypeResolver, IReadOnlyCollection<T>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<T> formatter;
+        readonly Formatter<TTypeResolver, T> formatter;
         readonly int? formatterLength;
 
         public InterfaceReadOnlyCollectionFormatter()
         {
-            this.formatter = Formatter<T>.Default;
+            this.formatter = Formatter<TTypeResolver, T>.Default;
             this.formatterLength = formatter.GetLength();
         }
 
@@ -795,13 +804,14 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class ReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<ReadOnlyDictionary<TKey, TValue>>
+    internal class ReadOnlyDictionaryFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, ReadOnlyDictionary<TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<KeyValuePair<TKey, TValue>> formatter;
+        readonly Formatter<TTypeResolver, KeyValuePair<TKey, TValue>> formatter;
 
         public ReadOnlyDictionaryFormatter()
         {
-            this.formatter = Formatter<KeyValuePair<TKey, TValue>>.Default;
+            this.formatter = Formatter<TTypeResolver, KeyValuePair<TKey, TValue>>.Default;
         }
 
         public override bool NoUseDirtyTracker
@@ -865,13 +875,14 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class InterfaceReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<IReadOnlyDictionary<TKey, TValue>>
+    internal class InterfaceReadOnlyDictionaryFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, IReadOnlyDictionary<TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
-        readonly Formatter<KeyValuePair<TKey, TValue>> formatter;
+        readonly Formatter<TTypeResolver, KeyValuePair<TKey, TValue>> formatter;
 
         public InterfaceReadOnlyDictionaryFormatter()
         {
-            this.formatter = Formatter<KeyValuePair<TKey, TValue>>.Default;
+            this.formatter = Formatter<TTypeResolver, KeyValuePair<TKey, TValue>>.Default;
         }
 
         public override bool NoUseDirtyTracker

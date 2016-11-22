@@ -17,7 +17,7 @@ namespace ZeroFormatter.Tests
     {
 
 
-        DictionarySegment<int, string> CreateFresh()
+        DictionarySegment<DefaultResolver, int, string> CreateFresh()
         {
             ILazyDictionary<int, string> sampleDict = new Dictionary<int, string>()
             {
@@ -26,7 +26,7 @@ namespace ZeroFormatter.Tests
                 {-42432, "more mainasu" },
                 {99999, "plus plus" }
             }.AsLazyDictionary();
-            return ZeroFormatter.ZeroFormatterSerializer.Convert(sampleDict) as DictionarySegment<int, string>;
+            return ZeroFormatter.ZeroFormatterSerializer.Convert(sampleDict) as DictionarySegment<DefaultResolver, int, string>;
         }
 
         [TestMethod]

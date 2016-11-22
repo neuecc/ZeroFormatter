@@ -6,13 +6,14 @@ using ZeroFormatter.Internal;
 
 namespace ZeroFormatter.Segments
 {
-    public abstract class ListSegment<T> : IList<T>
+    public abstract class ListSegment<TTypeResolver, T> : IList<T>
 #if !UNITY
         , IReadOnlyList<T>
 #endif
+        where TTypeResolver : ITypeResolver, new()
     {
         protected readonly ArraySegment<byte> originalBytes;
-        protected readonly Formatter<T> formatter;
+        protected readonly Formatter<TTypeResolver, T> formatter;
 
         protected DirtyTracker tracker;
 
@@ -27,13 +28,13 @@ namespace ZeroFormatter.Segments
             this.cache = new T[length];
             this.length = length;
             this.tracker = tracker.CreateChild();
-            this.formatter = Formatters.Formatter<T>.Default;
+            this.formatter = Formatters.Formatter<TTypeResolver, T>.Default;
         }
 
         public ListSegment(DirtyTracker tracker, ArraySegment<byte> originalBytes, int length)
         {
             this.originalBytes = originalBytes;
-            this.formatter = Formatters.Formatter<T>.Default;
+            this.formatter = Formatters.Formatter<TTypeResolver, T>.Default;
             this.length = length;
             this.tracker = tracker.CreateChild();
         }
@@ -216,13 +217,14 @@ namespace ZeroFormatter.Segments
     }
 
     // Layout: FixedSize -> [count:int][t format...] if count== -1 is null
-    public class FixedListSegment<T> : ListSegment<T>, IZeroFormatterSegment
+    public class FixedListSegment<TTypeResolver, T> : ListSegment<TTypeResolver, T>, IZeroFormatterSegment
+        where TTypeResolver : ITypeResolver, new()
     {
         readonly int elementSize;
 
-        internal static FixedListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
+        internal static FixedListSegment<TTypeResolver, T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
-            var formatter = Formatters.Formatter<T>.Default;
+            var formatter = Formatters.Formatter<TTypeResolver, T>.Default;
             var formatterLength = formatter.GetLength();
             if (formatterLength == null) throw new InvalidOperationException("T should be fixed length. Type: " + typeof(T).Name);
 
@@ -234,7 +236,7 @@ namespace ZeroFormatter.Segments
             }
 
             byteSize = formatterLength.Value * length + 4;
-            var list = new FixedListSegment<T>(tracker, new ArraySegment<byte>(bytes, offset, byteSize), length);
+            var list = new FixedListSegment<TTypeResolver, T>(tracker, new ArraySegment<byte>(bytes, offset, byteSize), length);
             return list;
         }
 
@@ -335,9 +337,10 @@ namespace ZeroFormatter.Segments
 
     // Layout: VariableSize -> [int byteSize][count:int][elementOffset:int...][t format...]
     // if byteSize == -1 is null
-    public class VariableListSegment<T> : ListSegment<T>, IZeroFormatterSegment
+    public class VariableListSegment<TTypeResolver, T> : ListSegment<TTypeResolver, T>, IZeroFormatterSegment
+        where TTypeResolver : ITypeResolver, new()
     {
-        internal static VariableListSegment<T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
+        internal static VariableListSegment<TTypeResolver, T> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSize == -1)
@@ -347,7 +350,7 @@ namespace ZeroFormatter.Segments
             }
 
             var length = BinaryUtil.ReadInt32(ref bytes, offset + 4);
-            var list = new VariableListSegment<T>(tracker, new ArraySegment<byte>(bytes, offset, byteSize), length);
+            var list = new VariableListSegment<TTypeResolver, T>(tracker, new ArraySegment<byte>(bytes, offset, byteSize), length);
             return list;
         }
 
@@ -361,7 +364,8 @@ namespace ZeroFormatter.Segments
         protected override int GetOffset(int index)
         {
             var array = originalBytes.Array;
-            return tracker.RootOffset + BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + (4 * index));
+            var relativeOffset = BinaryUtil.ReadInt32(ref array, originalBytes.Offset + 8 + (4 * index));
+            return originalBytes.Offset + relativeOffset; // root + relative.
         }
 
         public override T this[int index]
@@ -432,7 +436,7 @@ namespace ZeroFormatter.Segments
                     var item = this[i];
 
                     var size = formatter.Serialize(ref bytes, offset, item);
-                    BinaryUtil.WriteInt32(ref bytes, (startoffset + 8) + count * 4, offset);
+                    BinaryUtil.WriteInt32(ref bytes, (startoffset + 8) + count * 4, offset - startoffset);
                     offset += size;
                     count++;
                 }

@@ -43,6 +43,7 @@ namespace ZeroFormatter.CodeGenerator
         public string FullName { get; set; }
         public string Namespace { get; set; }
         public string UnionKeyTypeName { get; set; }
+        public string FallbackTypeName { get; set; }
         public string UnionKeyPropertyName { get; set; }
         public string[] SubTypeNames { get; set; }
     }
@@ -108,6 +109,7 @@ namespace ZeroFormatter.CodeGenerator
         public UnionGenerator[] Unions { get; set; }
         public GenericType[] GenericTypes { get; set; }
         public bool UnuseUnityAttribute { get; set; }
+        public string ResolverName { get; set; }
     }
 
     public class GenericType : IEquatable<GenericType>, IComparable<GenericType>

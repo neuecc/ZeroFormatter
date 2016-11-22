@@ -35,7 +35,7 @@ namespace ZeroFormatter.Tests
             Array.Copy(originalBytes, 0, newBytes, 13, originalBytes.Length);
 
             int size;
-            var newT = Formatter<OffsetType>.Default.Deserialize(ref newBytes, 13 + 99, new Segments.DirtyTracker(13 + 99), out size);
+            var newT = Formatter<DefaultResolver, OffsetType>.Default.Deserialize(ref newBytes, 13 + 99, new DirtyTracker(), out size);
 
             size.Is(originalBytes.Length - 99);
             newT.Dummy1.Is(ot.Dummy1);

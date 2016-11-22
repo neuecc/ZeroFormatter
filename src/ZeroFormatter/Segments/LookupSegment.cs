@@ -17,14 +17,15 @@ namespace ZeroFormatter.Segments
     // [IList<IList<GroupingSemengt>>]
 
 
-    public class LookupSegment<TKey, TElement> : ILookup<TKey, TElement>, ILazyLookup<TKey, TElement>, IZeroFormatterSegment
+    public class LookupSegment<TTypeResolver, TKey, TElement> : ILookup<TKey, TElement>, ILazyLookup<TKey, TElement>, IZeroFormatterSegment
+        where TTypeResolver : ITypeResolver, new()
     {
         static TElement[] EmptyArray = new TElement[0];
         readonly IEqualityComparer<TKey> comparer;
 
         // serialize
         int count;
-        IList<IList<GroupingSegment<TKey, TElement>>> groupings;
+        IList<IList<GroupingSegment<TTypeResolver, TKey, TElement>>> groupings;
 
         // others
         internal DirtyTracker tracker;
@@ -34,7 +35,7 @@ namespace ZeroFormatter.Segments
         internal LookupSegment(ILookup<TKey, TElement> source)
         {
             this.comparer = ZeroFormatterEqualityComparer<TKey>.Default;
-            this.groupings = new List<IList<GroupingSegment<TKey, TElement>>>(source.Count);
+            this.groupings = new List<IList<GroupingSegment<TTypeResolver, TKey, TElement>>>(source.Count);
             for (int i = 0; i < source.Count; i++)
             {
                 groupings.Add(null); // null clear
@@ -52,7 +53,7 @@ namespace ZeroFormatter.Segments
             this.count = source.Count;
         }
 
-        public static LookupSegment<TKey, TElement> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
+        public static LookupSegment<TTypeResolver, TKey, TElement> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
             tracker = tracker.CreateChild();
 
@@ -63,12 +64,12 @@ namespace ZeroFormatter.Segments
                 return null;
             }
 
-            var segment = new LookupSegment<TKey, TElement>();
+            var segment = new LookupSegment<TTypeResolver, TKey, TElement>();
 
             byteSize = byteSizeOrCount;
             segment.count = BinaryUtil.ReadInt32(ref bytes, offset + 4);
 
-            var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
+            var formatter = Formatter<TTypeResolver, IList<IList<GroupingSegment<TTypeResolver, TKey, TElement>>>>.Default;
             int _;
             segment.groupings = formatter.Deserialize(ref bytes, offset + 8, tracker, out _);
 
@@ -92,7 +93,7 @@ namespace ZeroFormatter.Segments
         {
             get
             {
-                GroupingSegment<TKey, TElement> grouping = GetGrouping(key, create: false);
+                GroupingSegment<TTypeResolver, TKey, TElement> grouping = GetGrouping(key, create: false);
                 if (grouping != null)
                 {
                     return grouping;
@@ -127,11 +128,11 @@ namespace ZeroFormatter.Segments
             return GetEnumerator();
         }
 
-        GroupingSegment<TKey, TElement> GetGrouping(TKey key, bool create)
+        GroupingSegment<TTypeResolver, TKey, TElement> GetGrouping(TKey key, bool create)
         {
             int hashCode = (key == null) ? 0 : comparer.GetHashCode(key) & 0x7FFFFFFF;
 
-            IList<GroupingSegment<TKey, TElement>> groupList = groupings[hashCode % groupings.Count];
+            IList<GroupingSegment<TTypeResolver, TKey, TElement>> groupList = groupings[hashCode % groupings.Count];
             if (groupList != null)
             {
                 for (int i = 0; i < groupList.Count; i++)
@@ -147,12 +148,12 @@ namespace ZeroFormatter.Segments
             if (create)
             {
                 int index = hashCode % groupings.Count;
-                var g = new GroupingSegment<TKey, TElement>(key, hashCode);
+                var g = new GroupingSegment<TTypeResolver, TKey, TElement>(key, hashCode);
 
                 var list = groupings[index];
                 if (list == null)
                 {
-                    list = groupings[index] = new List<GroupingSegment<TKey, TElement>>();
+                    list = groupings[index] = new List<GroupingSegment<TTypeResolver, TKey, TElement>>();
                 }
                 list.Add(g);
 
@@ -185,7 +186,7 @@ namespace ZeroFormatter.Segments
             {
                 var totalSize = 4;
                 totalSize += BinaryUtil.WriteInt32(ref bytes, offset + 4, count);
-                var formatter = Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default;
+                var formatter = Formatter<TTypeResolver, IList<IList<GroupingSegment<TTypeResolver, TKey, TElement>>>>.Default;
                 totalSize += formatter.Serialize(ref bytes, offset + 8, groupings);
                 BinaryUtil.WriteInt32(ref bytes, offset, totalSize);
 
@@ -197,7 +198,8 @@ namespace ZeroFormatter.Segments
     // [TKey key]
     // [int hashCode]
     // [IList<TElement> elements]
-    public class GroupingSegment<TKey, TElement> : IGrouping<TKey, TElement>, IList<TElement>, IZeroFormatterSegment
+    public class GroupingSegment<TTypeResolver, TKey, TElement> : IGrouping<TKey, TElement>, IList<TElement>, IZeroFormatterSegment
+         where TTypeResolver : ITypeResolver, new()
     {
         // serializestate.
         internal TKey key;
@@ -208,15 +210,15 @@ namespace ZeroFormatter.Segments
         internal DirtyTracker tracker;
         ArraySegment<byte> originalBytes;
 
-        internal static GroupingSegment<TKey, TElement> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
+        internal static GroupingSegment<TTypeResolver, TKey, TElement> Create(DirtyTracker tracker, byte[] bytes, int offset, out int byteSize)
         {
-            var segment = new GroupingSegment<TKey, TElement>();
+            var segment = new GroupingSegment<TTypeResolver, TKey, TElement>();
 
             tracker = tracker.CreateChild();
             segment.tracker = tracker;
 
-            var keyFormatter = Formatter<TKey>.Default;
-            var listFormatter = Formatter<IList<TElement>>.Default;
+            var keyFormatter = Formatter<TTypeResolver, TKey>.Default;
+            var listFormatter = Formatter<TTypeResolver, IList<TElement>>.Default;
 
             int keySize;
             segment.key = keyFormatter.Deserialize(ref bytes, offset, tracker, out keySize);
@@ -351,8 +353,8 @@ namespace ZeroFormatter.Segments
             }
             else
             {
-                var keyFormatter = Formatter<TKey>.Default;
-                var listFormatter = Formatter<IList<TElement>>.Default;
+                var keyFormatter = Formatter<TTypeResolver, TKey>.Default;
+                var listFormatter = Formatter<TTypeResolver, IList<TElement>>.Default;
 
                 var initialOffset = offset;
 

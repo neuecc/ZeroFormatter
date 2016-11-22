@@ -6,7 +6,8 @@ using ZeroFormatter.Segments;
 namespace ZeroFormatter.Formatters
 {
     [Preserve(AllMembers = true)]
-    internal class LazyDictionaryFormatter<TKey, TValue> : Formatter<ILazyDictionary<TKey, TValue>>
+    internal class LazyDictionaryFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, ILazyDictionary<TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
         [Preserve]
         public LazyDictionaryFormatter()
@@ -27,10 +28,10 @@ namespace ZeroFormatter.Formatters
                 return 4;
             }
 
-            var dictionary = value as DictionarySegment<TKey, TValue>;
+            var dictionary = value as DictionarySegment<TTypeResolver, TKey, TValue>;
             if (dictionary == null)
             {
-                dictionary = new DictionarySegment<TKey, TValue>(new DirtyTracker(offset), value.Count);
+                dictionary = new DictionarySegment<TTypeResolver, TKey, TValue>(new DirtyTracker(), value.Count);
                 foreach (var item in value)
                 {
                     dictionary.Add(item.Key, item.Value);
@@ -42,14 +43,15 @@ namespace ZeroFormatter.Formatters
 
         public override ILazyDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            return DictionarySegment<TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
+            return DictionarySegment<TTypeResolver, TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
         }
     }
 
 #if !UNITY
 
     [Preserve(AllMembers = true)]
-    internal class LazyReadOnlyDictionaryFormatter<TKey, TValue> : Formatter<ILazyReadOnlyDictionary<TKey, TValue>>
+    internal class LazyReadOnlyDictionaryFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, ILazyReadOnlyDictionary<TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
         [Preserve]
         public LazyReadOnlyDictionaryFormatter()
@@ -70,10 +72,10 @@ namespace ZeroFormatter.Formatters
                 return 4;
             }
 
-            var dictionary = value as DictionarySegment<TKey, TValue>;
+            var dictionary = value as DictionarySegment<TTypeResolver, TKey, TValue>;
             if (dictionary == null)
             {
-                dictionary = new DictionarySegment<TKey, TValue>(new DirtyTracker(offset), value.Count);
+                dictionary = new DictionarySegment<TTypeResolver, TKey, TValue>(new DirtyTracker(), value.Count);
                 foreach (var item in value)
                 {
                     dictionary.Add(item.Key, item.Value);
@@ -85,14 +87,15 @@ namespace ZeroFormatter.Formatters
 
         public override ILazyReadOnlyDictionary<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            return DictionarySegment<TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
+            return DictionarySegment<TTypeResolver, TKey, TValue>.Create(tracker, bytes, offset, out byteSize);
         }
     }
 
 #endif
 
     [Preserve(AllMembers = true)]
-    internal class DictionaryEntryFormatter<TKey, TValue> : Formatter<DictionaryEntry<TKey, TValue>>
+    internal class DictionaryEntryFormatter<TTypeResolver, TKey, TValue> : Formatter<TTypeResolver, DictionaryEntry<TTypeResolver, TKey, TValue>>
+        where TTypeResolver : ITypeResolver, new()
     {
         [Preserve]
         public DictionaryEntryFormatter()
@@ -105,14 +108,14 @@ namespace ZeroFormatter.Formatters
             return null;
         }
 
-        public override int Serialize(ref byte[] bytes, int offset, DictionaryEntry<TKey, TValue> value)
+        public override int Serialize(ref byte[] bytes, int offset, DictionaryEntry<TTypeResolver, TKey, TValue> value)
         {
             return value.Serialize(ref bytes, offset);
         }
 
-        public override DictionaryEntry<TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public override DictionaryEntry<TTypeResolver, TKey, TValue> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            return DictionaryEntry.Create<TKey, TValue>(bytes, offset, tracker, out byteSize);
+            return DictionaryEntry.Create<TTypeResolver, TKey, TValue>(bytes, offset, tracker, out byteSize);
         }
     }
 }

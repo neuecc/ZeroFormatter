@@ -52,30 +52,31 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write("Formatter : Formatter<");
+            this.Write("Formatter<TTypeResolver> : Formatter<TTypeResolver, ");
             
             #line 18 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
-            this.Write(">\r\n    {\r\n        readonly global::System.Collections.Generic.IEqualityComparer<");
-            
-            #line 20 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyTypeName));
-            
-            #line default
-            #line hidden
-            this.Write("> comparer;\r\n        readonly ");
+            this.Write(">\r\n        where TTypeResolver : ITypeResolver, new()\r\n    {\r\n        readonly gl" +
+                    "obal::System.Collections.Generic.IEqualityComparer<");
             
             #line 21 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyTypeName));
             
             #line default
             #line hidden
+            this.Write("> comparer;\r\n        readonly ");
+            
+            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyTypeName));
+            
+            #line default
+            #line hidden
             this.Write("[] unionKeys;\r\n        \r\n        public ");
             
-            #line 23 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 24 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Name));
             
             #line default
@@ -83,56 +84,56 @@ namespace ZeroFormatter.CodeGenerator
             this.Write("Formatter()\r\n        {\r\n            comparer = global::ZeroFormatter.Comparers.Ze" +
                     "roFormatterEqualityComparer<");
             
-            #line 25 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 26 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyTypeName));
             
             #line default
             #line hidden
             this.Write(">.Default;\r\n            unionKeys = new ");
             
-            #line 26 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 27 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyTypeName));
             
             #line default
             #line hidden
             this.Write("[");
             
-            #line 26 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 27 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.SubTypeNames.Length));
             
             #line default
             #line hidden
             this.Write("];\r\n");
             
-            #line 27 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
  for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; 
             
             #line default
             #line hidden
             this.Write("            unionKeys[");
             
-            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 29 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write("] = new ");
             
-            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 29 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(subType));
             
             #line default
             #line hidden
             this.Write("().");
             
-            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 29 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyPropertyName));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 29 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 30 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
  } 
             
             #line default
@@ -141,7 +142,7 @@ namespace ZeroFormatter.CodeGenerator
                     "           return null;\r\n        }\r\n\r\n        public override int Serialize(ref " +
                     "byte[] bytes, int offset, ");
             
-            #line 37 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 38 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
@@ -150,143 +151,178 @@ namespace ZeroFormatter.CodeGenerator
         {
             if (value == null)
             {
-                return BinaryUtil.WriteBoolean(ref bytes, offset, false);
+                return BinaryUtil.WriteInt32(ref bytes, offset, -1);
             }
 
             var startOffset = offset;
 
-            offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
-            offset += Formatter<");
+            offset += 4;
+            offset += Formatter<TTypeResolver, ");
             
-            #line 47 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 48 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyTypeName));
             
             #line default
             #line hidden
             this.Write(">.Default.Serialize(ref bytes, offset, value.");
             
-            #line 47 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 48 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyPropertyName));
             
             #line default
             #line hidden
             this.Write(");\r\n\r\n");
             
-            #line 49 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 50 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
  for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; 
             
             #line default
             #line hidden
             this.Write("            ");
             
-            #line 50 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 51 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i != 0 ? "else if" : "if"));
             
             #line default
             #line hidden
             this.Write(" (value is ");
             
-            #line 50 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 51 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(subType));
             
             #line default
             #line hidden
-            this.Write(")\r\n            {\r\n                offset += Formatter<");
+            this.Write(")\r\n            {\r\n                offset += Formatter<TTypeResolver, ");
             
-            #line 52 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 53 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(subType));
             
             #line default
             #line hidden
             this.Write(">.Default.Serialize(ref bytes, offset, (");
             
-            #line 52 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 53 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(subType));
             
             #line default
             #line hidden
             this.Write(")value);\r\n            }\r\n");
             
-            #line 54 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 55 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("            \r\n            else\r\n            {\r\n                throw new Exceptio" +
-                    "n(\"Unknown subtype of Union:\" + value.GetType().FullName);\r\n            }\r\n     " +
-                    "   \r\n            return offset - startOffset;\r\n        }\r\n\r\n        public overr" +
-                    "ide ");
+            this.Write(@"            
+            else
+            {
+                throw new Exception(""Unknown subtype of Union:"" + value.GetType().FullName);
+            }
+        
+            var writeSize = offset - startOffset;
+            BinaryUtil.WriteInt32(ref bytes, startOffset, writeSize);
+            return writeSize;
+        }
+
+        public override ");
             
-            #line 63 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 66 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(@" Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            byteSize = 1;
-            if (!BinaryUtil.ReadBoolean(ref bytes, offset))
+            if ((byteSize = BinaryUtil.ReadInt32(ref bytes, offset)) == -1)
             {
+                byteSize = 4;
                 return null;
             }
         
-            offset += 1;
+            offset += 4;
             int size;
-            var unionKey = Formatter<");
+            var unionKey = Formatter<TTypeResolver, ");
             
-            #line 73 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 76 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.UnionKeyTypeName));
             
             #line default
             #line hidden
-            this.Write(">.Default.Deserialize(ref bytes, offset, tracker, out size);\r\n            byteSiz" +
-                    "e += size;\r\n            offset += size;\r\n\r\n            ");
+            this.Write(">.Default.Deserialize(ref bytes, offset, tracker, out size);\r\n            offset " +
+                    "+= size;\r\n\r\n            ");
             
-            #line 77 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 79 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(" result;\r\n");
             
-            #line 78 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 80 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
  for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; 
             
             #line default
             #line hidden
             this.Write("            ");
             
-            #line 79 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 81 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i != 0 ? "else if" : "if"));
             
             #line default
             #line hidden
             this.Write(" (comparer.Equals(unionKey, unionKeys[");
             
-            #line 79 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 81 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
-            this.Write("]))\r\n            {\r\n                result = Formatter<");
+            this.Write("]))\r\n            {\r\n                result = Formatter<TTypeResolver, ");
             
-            #line 81 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 83 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(subType));
             
             #line default
             #line hidden
             this.Write(">.Default.Deserialize(ref bytes, offset, tracker, out size);\r\n            }\r\n");
             
-            #line 83 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 85 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("            else\r\n            {\r\n                throw new Exception(\"Unknown uni" +
-                    "onKey type of Union: \" + unionKey.ToString());\r\n            }\r\n\r\n            byt" +
-                    "eSize += size;\r\n            return result;\r\n        }\r\n    }\r\n\r\n");
+            this.Write("            else\r\n            {\r\n");
             
-            #line 94 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            #line 88 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+ if ( t.FallbackTypeName == null) { 
+            
+            #line default
+            #line hidden
+            this.Write("                throw new Exception(\"Unknown unionKey type of Union: \" + unionKey" +
+                    ".ToString());\r\n");
+            
+            #line 90 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+ } else { 
+            
+            #line default
+            #line hidden
+            this.Write("                result = new ");
+            
+            #line 91 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(t.FallbackTypeName));
+            
+            #line default
+            #line hidden
+            this.Write("();\r\n");
+            
+            #line 92 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("            }\r\n\r\n            return result;\r\n        }\r\n    }\r\n\r\n");
+            
+            #line 99 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\UnionGenerator.tt"
  } 
             
             #line default

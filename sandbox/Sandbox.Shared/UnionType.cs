@@ -1,8 +1,10 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using ZeroFormatter;
 #pragma warning disable ZeroFormatterAnalyzer_PublicPropertyNeedsIndex // Lint of ZeroFormattable Type.
 #pragma warning disable ZeroFormatterAnalyzer_PublicPropertyMustBeVirtual // Lint of ZeroFormattable Type.
+#pragma warning disable ZeroFormatterAnalyzer_TypeMustBeZeroFormattable // Lint of ZeroFormattable Type.
 
 namespace Sandbox.Shared
 {
@@ -90,8 +92,88 @@ namespace Sandbox.Shared
             }
         }
     }
+
+    [ZeroFormattable]
+    public class HasUnionKlass
+    {
+        [Index(0)]
+        public virtual IStandardUnion A { get; set; }
+        [Index(1)]
+        public virtual Character B { get; set; }
+    }
+
+    [Union(new[] { typeof(UnknownMessage1), typeof(MessageA1), typeof(MessageB1) }, typeof(UnknownMessage1))]
+    public interface IStandardUnion
+    {
+        [UnionKey]
+        int A { get; }
+    }
+
+    [ZeroFormattable]
+    public class UnknownMessage1 : IStandardUnion
+    {
+        [IgnoreFormat]
+        public int A
+        {
+            get
+            {
+                return -1;
+            }
+        }
+    }
+
+    [ZeroFormattable]
+    public class MessageA1 : IStandardUnion
+    {
+        [IgnoreFormat]
+        public int A
+        {
+            get
+            {
+                return 1;
+            }
+        }
+    }
+    [ZeroFormattable]
+    public class MessageB1 : IStandardUnion
+    {
+        [IgnoreFormat]
+        public int A
+        {
+            get
+            {
+                return 3;
+            }
+        }
+    }
+
+
+    [DynamicUnion]
+    public class MessageBase { }
+
+    public class UnknownMessage : MessageBase { }
+    [ZeroFormattable]
+    public class MessageA : MessageBase { }
+    [ZeroFormattable]
+    public class MessageB : MessageBase
+    {
+        [Index(0)]
+
+        public virtual IList<IEvent> Events { get; set; }
+    }
+
+    [DynamicUnion]
+    public interface IEvent { }
+    [ZeroFormattable]
+    public class UnknownEvent : IEvent { }
+    [ZeroFormattable]
+    public class EventA : IEvent { }
+    [ZeroFormattable]
+    public class EventB : IEvent { }
+
 }
 
 
 #pragma warning restore ZeroFormatterAnalyzer_PublicPropertyNeedsIndex // Lint of ZeroFormattable Type.
 #pragma warning restore ZeroFormatterAnalyzer_PublicPropertyMustBeVirtual // Lint of ZeroFormattable Type.
+#pragma warning restore ZeroFormatterAnalyzer_TypeMustBeZeroFormattable // Lint of ZeroFormattable Type.

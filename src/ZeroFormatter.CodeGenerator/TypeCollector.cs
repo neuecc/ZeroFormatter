@@ -16,6 +16,7 @@ namespace ZeroFormatter.CodeGenerator
         public const string IndexAttributeShortName = "IndexAttribute";
         public const string IgnoreAttributeShortName = "IgnoreFormatAttribute";
         internal const string UnionAttributeShortName = "UnionAttribute";
+        internal const string DynamicUnionAttributeShortName = "DynamicUnionAttribute";
         internal const string UnionKeyAttributeShortName = "UnionKeyAttribute";
 
         static readonly SymbolDisplayFormat binaryWriteFormat = new SymbolDisplayFormat(
@@ -42,6 +43,7 @@ namespace ZeroFormatter.CodeGenerator
             targetTypes = compilation.GetNamedTypeSymbols()
                 .Where(x => (x.TypeKind == TypeKind.Enum)
                     || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
+                    || ((x.TypeKind == TypeKind.Interface) && x.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
                     || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null)
                     || ((x.TypeKind == TypeKind.Struct) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null)
                     )
@@ -76,6 +78,10 @@ namespace ZeroFormatter.CodeGenerator
                 {
                     CollectObjectSegment(item);
                 }
+            }
+            foreach (var item in targetTypes[TypeKind.Interface])
+            {
+                CollectUnion(item);
             }
             foreach (var item in targetTypes[TypeKind.Struct])
             {
@@ -149,6 +155,15 @@ namespace ZeroFormatter.CodeGenerator
                 return;
             }
             if (KnownFormatterSpec.IsPrimitive(type))
+            {
+                return;
+            }
+            if (type.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
+            {
+                return;
+            }
+
+            if (type.GetAttributes().FindAttributeShortName(DynamicUnionAttributeShortName) != null)
             {
                 return;
             }
@@ -481,25 +496,50 @@ namespace ZeroFormatter.CodeGenerator
             }
 
             var unionKeyProperty = unionKeys[0];
-            if (!unionKeyProperty.GetMethod.IsAbstract)
+            if (type.TypeKind != TypeKind.Interface)
             {
-                throw new Exception($"Union class requires abstract [UnionKey]property. Type: {type.Name}. Location:{type.Locations[0]}");
+                if (!unionKeyProperty.GetMethod.IsAbstract)
+                {
+                    throw new Exception($"Union class requires abstract [UnionKey]property. Type: {type.Name}. Location:{type.Locations[0]}");
+                }
             }
 
-            var constructorArguments = type.GetAttributes().FindAttributeShortName(UnionAttributeShortName)?.ConstructorArguments.FirstOrDefault();
+            var ctorArguments = type.GetAttributes().FindAttributeShortName(UnionAttributeShortName)?.ConstructorArguments;
+            var firstArguments = ctorArguments?.FirstOrDefault();
 
-            if (constructorArguments == null) return;
+            if (firstArguments == null) return;
+            TypedConstant fallbackType = default(TypedConstant);
+            if (ctorArguments.Value.Length == 2)
+            {
+                fallbackType = ctorArguments.Value[1];
+            }
 
             var subTypList = new List<string>();
-            foreach (var item in constructorArguments.Value.Values.Select(x => x.Value).OfType<ITypeSymbol>())
+            if (type.TypeKind != TypeKind.Interface)
             {
-                var found = item.FindBaseTargetType(type.ToDisplayString());
-
-                if (found == null)
+                foreach (var item in firstArguments.Value.Values.Concat(new[] { fallbackType }).Where(x => !x.IsNull).Select(x => x.Value).OfType<ITypeSymbol>())
                 {
-                    throw new Exception($"All Union subTypes must be inherited type. Type: {type.Name}, SubType: {item.Name}. Location:{type.Locations[0]}");
+                    var found = item.FindBaseTargetType(type.ToDisplayString());
+
+                    if (found == null)
+                    {
+                        throw new Exception($"All Union subTypes must be inherited type. Type: {type.Name}, SubType: {item.Name}. Location:{type.Locations[0]}");
+                    }
+                    subTypList.Add(item.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
                 }
-                subTypList.Add(item.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+            }
+            else
+            {
+                foreach (var item in firstArguments.Value.Values.Concat(new[] { fallbackType }).Where(x => !x.IsNull).Select(x => x.Value).OfType<ITypeSymbol>())
+                {
+                    var typeString = type.ToDisplayString();
+                    if (!(item as INamedTypeSymbol).AllInterfaces.Any(x => x.OriginalDefinition?.ToDisplayString() == typeString))
+                    {
+                        throw new Exception($"All Union subTypes must be inherited type. Type: {type.Name}, SubType: {item.Name}. Location:{type.Locations[0]}");
+                    }
+
+                    subTypList.Add(item.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+                }
             }
 
             unionTypeContainer.Add(new UnionType
@@ -510,6 +550,7 @@ namespace ZeroFormatter.CodeGenerator
                 UnionKeyTypeName = unionKeyProperty.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 UnionKeyPropertyName = unionKeyProperty.Name,
                 SubTypeNames = subTypList.ToArray(),
+                FallbackTypeName = fallbackType.IsNull ? null : (fallbackType.Value as INamedTypeSymbol).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
             });
         }
 

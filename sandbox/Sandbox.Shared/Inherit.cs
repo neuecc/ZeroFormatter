@@ -32,4 +32,6 @@ namespace Sandbox.Shared
         public virtual IList<byte[]> HugaHuga { get; set; }
     }
 
+
+
 }

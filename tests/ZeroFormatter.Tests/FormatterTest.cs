@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZeroFormatter.Formatters;
 
 namespace ZeroFormatter.Tests
 {
@@ -215,20 +216,20 @@ namespace ZeroFormatter.Tests
                 ZeroFormatterSerializer.Deserialize<string>(r).IsNull();
             }
             {
-                var f = Formatters.Formatter<string>.Default;
+                var f = Formatters.Formatter<DefaultResolver, string>.Default;
                 byte[] b = null;
                 var size = f.Serialize(ref b, 0, "aiueo");
                 b.Length.Is(size); // just size
                 int size2;
-                f.Deserialize(ref b, 0, Segments.DirtyTracker.NullTracker, out size2).Is("aiueo");
+                f.Deserialize(ref b, 0, DirtyTracker.NullTracker, out size2).Is("aiueo");
             }
             {
-                var f = Formatters.Formatter<string>.Default;
+                var f = Formatters.Formatter<DefaultResolver, string>.Default;
                 byte[] b = new byte[20];
                 var size = f.Serialize(ref b, 5, "aiueo");
                 b.Length.IsNot(size); // not just size
                 int size2;
-                f.Deserialize(ref b, 5, Segments.DirtyTracker.NullTracker, out size2).Is("aiueo");
+                f.Deserialize(ref b, 5, DirtyTracker.NullTracker, out size2).Is("aiueo");
             }
         }
 

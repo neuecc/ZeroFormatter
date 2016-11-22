@@ -15,25 +15,29 @@
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void HandRegisterd()
         {
-            Formatter.RegisterDictionary<int, int>();
-            Formatter.RegisterDictionary<string, string>();
-            Formatter.RegisterDictionary<int, string>();
-            Formatter.RegisterLazyDictionary<int, int>();
-            Formatter.RegisterLazyDictionary<string, string>();
-            Formatter.RegisterLazyDictionary<int, string>();
-            Formatter.RegisterList<int?>();
-            Formatter.RegisterList<double>();
-            Formatter.RegisterList<double?>();
-            Formatter.RegisterList<string>();
+            ZeroFormatterInitializer.Register(); // call before hand register.
 
-            Formatter.RegisterLookup<bool, int>();
-            Formatter.RegisterLookup<int, int>();
-            Formatter.RegisterLazyLookup<bool, int>();
-            Formatter.RegisterLazyLookup<int, int>();
+            Formatter.RegisterDictionary<DefaultResolver, int, int>();
+            Formatter.RegisterDictionary<DefaultResolver, string, string>();
+            Formatter.RegisterDictionary<DefaultResolver, int, string>();
+            Formatter.RegisterLazyDictionary<DefaultResolver, int, int>();
+            Formatter.RegisterLazyDictionary<DefaultResolver, string, string>();
+            Formatter.RegisterLazyDictionary<DefaultResolver, int, string>();
+            Formatter.RegisterList<DefaultResolver, int?>();
+            Formatter.RegisterList<DefaultResolver, double>();
+            Formatter.RegisterList<DefaultResolver, double?>();
+            Formatter.RegisterList<DefaultResolver, string>();
 
-            var structFormatter = new ZeroFormatter.DynamicObjectSegments.UnityEngine.Vector3Formatter();
-             ZeroFormatter.Formatters.Formatter<global::UnityEngine.Vector3>.Register(structFormatter);
-            Formatter.RegisterArray<UnityEngine.Vector3>();
+            Formatter.RegisterLookup<DefaultResolver, bool, int>();
+            Formatter.RegisterLookup<DefaultResolver, int, int>();
+            Formatter.RegisterLazyLookup<DefaultResolver, bool, int>();
+            Formatter.RegisterLazyLookup<DefaultResolver, int, int>();
+
+            var structFormatter = new ZeroFormatter.DynamicObjectSegments.UnityEngine.Vector3Formatter<DefaultResolver>();
+            ZeroFormatter.Formatters.Formatter<DefaultResolver, global::UnityEngine.Vector3>.Register(structFormatter);
+            Formatter.RegisterArray<DefaultResolver, UnityEngine.Vector3>();
+
+            Formatter.RegisterArray<DefaultResolver, Sandbox.Shared.IStandardUnion>();
         }
     }
 }

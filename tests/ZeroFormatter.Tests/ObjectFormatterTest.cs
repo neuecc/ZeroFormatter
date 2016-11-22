@@ -15,7 +15,7 @@ namespace ZeroFormatter.Tests
         [TestMethod]
         public void ObjectFormatter()
         {
-            var tracker = new DirtyTracker(0);
+            var tracker = new DirtyTracker();
             var mc = new MyClass
             {
                 Age = 999,
@@ -26,8 +26,8 @@ namespace ZeroFormatter.Tests
 
             byte[] bytes = null;
             int size;
-            Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc);
-            var mc2 = Formatter<MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
+            Formatter<DefaultResolver, MyClass>.Default.Serialize(ref bytes, 0, mc);
+            var mc2 = Formatter<DefaultResolver, MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
 
             var getAge = mc2.Age;
 
@@ -36,8 +36,8 @@ namespace ZeroFormatter.Tests
             mc2.LastName.Is(mc.LastName);
 
             bytes = null;
-            Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc2);
-            var mc3 = Formatter<MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
+            Formatter<DefaultResolver, MyClass>.Default.Serialize(ref bytes, 0, mc2);
+            var mc3 = Formatter<DefaultResolver, MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
 
             mc3.Age.Is(mc.Age);
             mc3.FirstName.Is(mc.FirstName);
@@ -47,8 +47,8 @@ namespace ZeroFormatter.Tests
             mc3.FirstName = "aiueokakikukekosasisuseso";
 
             bytes = null;
-            Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc3);
-            var mc4 = Formatter<MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
+            Formatter<DefaultResolver, MyClass>.Default.Serialize(ref bytes, 0, mc3);
+            var mc4 = Formatter<DefaultResolver, MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
 
             mc4.Age.Is(99999);
             mc4.FirstName.Is("aiueokakikukekosasisuseso");
@@ -58,8 +58,8 @@ namespace ZeroFormatter.Tests
             mc4.LastName = null;
 
             bytes = null;
-            Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc4);
-            var mc5 = Formatter<MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
+            Formatter<DefaultResolver, MyClass>.Default.Serialize(ref bytes, 0, mc4);
+            var mc5 = Formatter<DefaultResolver, MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
 
             mc5.Age.Is(99999);
             mc5.FirstName.Is("aiueokakikukekosasisuseso");
@@ -223,7 +223,7 @@ namespace ZeroFormatter.Tests
             var newDouble2 = BinaryUtil.ReadDouble(ref newBytes, 0);
 
             newBytes = null;
-            Formatter<double>.Default.Serialize(ref newBytes, 0, 12345.12345);
+            Formatter<DefaultResolver, double>.Default.Serialize(ref newBytes, 0, 12345.12345);
 
 
             var pureBytes = new byte[bytes.Length];

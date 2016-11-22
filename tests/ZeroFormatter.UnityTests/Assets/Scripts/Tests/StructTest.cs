@@ -1,5 +1,6 @@
 ﻿using RuntimeUnitTestToolkit;
 using System;
+using ZeroFormatter.Formatters;
 
 namespace ZeroFormatter.Tests
 {
@@ -24,10 +25,10 @@ namespace ZeroFormatter.Tests
                 var x3 = ZeroFormatterSerializer.Deserialize<MyStructFixed?>(xs3);
                 x3.IsNull();
 
-                var formatter = ZeroFormatter.Formatters.Formatter<MyStructFixed>.Default;
+                var formatter = ZeroFormatter.Formatters.Formatter<DefaultResolver, MyStructFixed>.Default;
                 formatter.GetLength().Is(sizeof(int) + sizeof(long) + sizeof(float));
 
-                var formatter2 = ZeroFormatter.Formatters.Formatter<MyStructFixed?>.Default;
+                var formatter2 = ZeroFormatter.Formatters.Formatter<DefaultResolver, MyStructFixed?>.Default;
                 formatter2.GetLength().Is(sizeof(int) + sizeof(long) + sizeof(float) + 1);
             }
             {
@@ -44,10 +45,10 @@ namespace ZeroFormatter.Tests
                 var y3 = ZeroFormatterSerializer.Convert<MyStructVariable?>(null);
                 y3.IsNull();
 
-                var formatter = ZeroFormatter.Formatters.Formatter<MyStructVariable>.Default;
+                var formatter = ZeroFormatter.Formatters.Formatter<DefaultResolver, MyStructVariable>.Default;
                 formatter.GetLength().IsNull();
 
-                var formatter2 = ZeroFormatter.Formatters.Formatter<MyStructVariable?>.Default;
+                var formatter2 = ZeroFormatter.Formatters.Formatter<DefaultResolver, MyStructVariable?>.Default;
                 formatter2.GetLength().IsNull();
             }
         }

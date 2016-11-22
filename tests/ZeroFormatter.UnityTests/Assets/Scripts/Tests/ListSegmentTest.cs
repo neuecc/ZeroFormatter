@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 using RuntimeUnitTestToolkit;
+using ZeroFormatter.Formatters;
 
 namespace ZeroFormatter.Tests
 {
@@ -11,20 +12,20 @@ namespace ZeroFormatter.Tests
     public class ListSegmentTest
     {
 
-        FixedListSegment<int> CreateFixedList(DirtyTracker tracker)
+        FixedListSegment<DefaultResolver, int> CreateFixedList(DirtyTracker tracker)
         {
-            return ZeroFormatter.ZeroFormatterSerializer.Convert<IList<int>>(new[] { 99, 55, 3, 9423423, -432423, 2423 }) as FixedListSegment<int>;
+            return ZeroFormatter.ZeroFormatterSerializer.Convert<IList<int>>(new[] { 99, 55, 3, 9423423, -432423, 2423 }) as FixedListSegment<DefaultResolver, int>;
         }
 
-        VariableListSegment<string> CraeteVariableList(DirtyTracker tracker)
+        VariableListSegment<DefaultResolver, string> CraeteVariableList(DirtyTracker tracker)
         {
-            return ZeroFormatter.ZeroFormatterSerializer.Convert<IList<string>>(new[] { "hoge", "あああ", "huga", null, "takotako", "chop", "!^ :a<>" }) as VariableListSegment<string>;
+            return ZeroFormatter.ZeroFormatterSerializer.Convert<IList<string>>(new[] { "hoge", "あああ", "huga", null, "takotako", "chop", "!^ :a<>" }) as VariableListSegment<DefaultResolver, string>;
         }
 
         [TestMethod]
         public void FixedListSegment()
         {
-            var tracker = new DirtyTracker(0);
+            var tracker = new DirtyTracker();
 
             var list = CreateFixedList(tracker);
 
@@ -104,7 +105,7 @@ namespace ZeroFormatter.Tests
         [TestMethod]
         public void VariableListSegment()
         {
-            var tracker = new DirtyTracker(0);
+            var tracker = new DirtyTracker();
 
             // "hoge", "あああ", "huga", "takotako", "chop", "かきくけこ", "!^ :a<>"
             var list = CraeteVariableList(tracker);

@@ -1,6 +1,5 @@
 ﻿using System;
 using ZeroFormatter.Internal;
-using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
 {
@@ -8,7 +7,8 @@ namespace ZeroFormatter.Formatters
     // Layout: [hasValue:1][fixedElementSize]
 
 
-    internal class Int16Formatter : Formatter<Int16>
+    internal class Int16Formatter<TTypeResolver> : Formatter<TTypeResolver, Int16>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -35,7 +35,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableInt16Formatter : Formatter<Int16?>
+    internal class NullableInt16Formatter<TTypeResolver> : Formatter<TTypeResolver, Int16?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -78,7 +79,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class Int32Formatter : Formatter<Int32>
+    internal class Int32Formatter<TTypeResolver> : Formatter<TTypeResolver, Int32>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -105,7 +107,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableInt32Formatter : Formatter<Int32?>
+    internal class NullableInt32Formatter<TTypeResolver> : Formatter<TTypeResolver, Int32?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -148,7 +151,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class Int64Formatter : Formatter<Int64>
+    internal class Int64Formatter<TTypeResolver> : Formatter<TTypeResolver, Int64>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -175,7 +179,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableInt64Formatter : Formatter<Int64?>
+    internal class NullableInt64Formatter<TTypeResolver> : Formatter<TTypeResolver, Int64?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -218,7 +223,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class UInt16Formatter : Formatter<UInt16>
+    internal class UInt16Formatter<TTypeResolver> : Formatter<TTypeResolver, UInt16>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -245,7 +251,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableUInt16Formatter : Formatter<UInt16?>
+    internal class NullableUInt16Formatter<TTypeResolver> : Formatter<TTypeResolver, UInt16?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -288,7 +295,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class UInt32Formatter : Formatter<UInt32>
+    internal class UInt32Formatter<TTypeResolver> : Formatter<TTypeResolver, UInt32>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -315,7 +323,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableUInt32Formatter : Formatter<UInt32?>
+    internal class NullableUInt32Formatter<TTypeResolver> : Formatter<TTypeResolver, UInt32?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -358,7 +367,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class UInt64Formatter : Formatter<UInt64>
+    internal class UInt64Formatter<TTypeResolver> : Formatter<TTypeResolver, UInt64>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -385,7 +395,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableUInt64Formatter : Formatter<UInt64?>
+    internal class NullableUInt64Formatter<TTypeResolver> : Formatter<TTypeResolver, UInt64?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -428,7 +439,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class SingleFormatter : Formatter<Single>
+    internal class SingleFormatter<TTypeResolver> : Formatter<TTypeResolver, Single>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -455,7 +467,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableSingleFormatter : Formatter<Single?>
+    internal class NullableSingleFormatter<TTypeResolver> : Formatter<TTypeResolver, Single?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -498,7 +511,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class DoubleFormatter : Formatter<Double>
+    internal class DoubleFormatter<TTypeResolver> : Formatter<TTypeResolver, Double>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -525,7 +539,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableDoubleFormatter : Formatter<Double?>
+    internal class NullableDoubleFormatter<TTypeResolver> : Formatter<TTypeResolver, Double?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -568,7 +583,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class BooleanFormatter : Formatter<Boolean>
+    internal class BooleanFormatter<TTypeResolver> : Formatter<TTypeResolver, Boolean>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -595,7 +611,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableBooleanFormatter : Formatter<Boolean?>
+    internal class NullableBooleanFormatter<TTypeResolver> : Formatter<TTypeResolver, Boolean?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -638,7 +655,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class ByteFormatter : Formatter<Byte>
+    internal class ByteFormatter<TTypeResolver> : Formatter<TTypeResolver, Byte>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -665,7 +683,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableByteFormatter : Formatter<Byte?>
+    internal class NullableByteFormatter<TTypeResolver> : Formatter<TTypeResolver, Byte?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -708,7 +727,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class SByteFormatter : Formatter<SByte>
+    internal class SByteFormatter<TTypeResolver> : Formatter<TTypeResolver, SByte>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -735,7 +755,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableSByteFormatter : Formatter<SByte?>
+    internal class NullableSByteFormatter<TTypeResolver> : Formatter<TTypeResolver, SByte?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -778,7 +799,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class CharFormatter : Formatter<Char>
+    internal class CharFormatter<TTypeResolver> : Formatter<TTypeResolver, Char>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -805,7 +827,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableCharFormatter : Formatter<Char?>
+    internal class NullableCharFormatter<TTypeResolver> : Formatter<TTypeResolver, Char?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -848,7 +871,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class DecimalFormatter : Formatter<Decimal>
+    internal class DecimalFormatter<TTypeResolver> : Formatter<TTypeResolver, Decimal>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -875,7 +899,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableDecimalFormatter : Formatter<Decimal?>
+    internal class NullableDecimalFormatter<TTypeResolver> : Formatter<TTypeResolver, Decimal?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -918,7 +943,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class GuidFormatter : Formatter<Guid>
+    internal class GuidFormatter<TTypeResolver> : Formatter<TTypeResolver, Guid>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -945,7 +971,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableGuidFormatter : Formatter<Guid?>
+    internal class NullableGuidFormatter<TTypeResolver> : Formatter<TTypeResolver, Guid?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -988,7 +1015,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class TimeSpanFormatter : Formatter<TimeSpan>
+    internal class TimeSpanFormatter<TTypeResolver> : Formatter<TTypeResolver, TimeSpan>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -1015,7 +1043,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableTimeSpanFormatter : Formatter<TimeSpan?>
+    internal class NullableTimeSpanFormatter<TTypeResolver> : Formatter<TTypeResolver, TimeSpan?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -1058,7 +1087,8 @@ namespace ZeroFormatter.Formatters
     }
 
 
-    internal class DateTimeFormatter : Formatter<DateTime>
+    internal class DateTimeFormatter<TTypeResolver> : Formatter<TTypeResolver, DateTime>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {
@@ -1085,7 +1115,8 @@ namespace ZeroFormatter.Formatters
         }
     }
 
-    internal class NullableDateTimeFormatter : Formatter<DateTime?>
+    internal class NullableDateTimeFormatter<TTypeResolver> : Formatter<TTypeResolver, DateTime?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override bool NoUseDirtyTracker
         {

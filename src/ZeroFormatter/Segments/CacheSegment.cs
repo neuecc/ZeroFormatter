@@ -18,7 +18,8 @@ namespace ZeroFormatter.Segments
         Dirty = 2
     }
 
-    public sealed class CacheSegment<T> : IZeroFormatterSegment
+    public sealed class CacheSegment<TTypeResolver, T> : IZeroFormatterSegment
+        where TTypeResolver : ITypeResolver, new()
     {
         readonly DirtyTracker tracker;
         SegmentState state;
@@ -47,7 +48,7 @@ namespace ZeroFormatter.Segments
                     case SegmentState.Original:
                         var array = serializedBytes.Array;
                         int _;
-                        this.cached = Formatter<T>.Default.Deserialize(ref array, serializedBytes.Offset, tracker, out _);
+                        this.cached = Formatter<TTypeResolver, T>.Default.Deserialize(ref array, serializedBytes.Offset, tracker, out _);
                         this.state = SegmentState.Cached;
                         return cached;
                     default:
@@ -78,7 +79,7 @@ namespace ZeroFormatter.Segments
 
             if (state == SegmentState.Dirty) // dirty
             {
-                var formatter = Formatter<T>.Default;
+                var formatter = Formatter<TTypeResolver, T>.Default;
 
                 byte[] newBytes = null;
                 var length = formatter.Serialize(ref newBytes, 0, cached);

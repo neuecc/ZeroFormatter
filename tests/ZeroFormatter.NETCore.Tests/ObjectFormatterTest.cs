@@ -43,8 +43,8 @@ namespace ZeroFormatter.Tests
         readonly byte[] __extraFixedBytes;
 
         // generated mutable segements
-        readonly CacheSegment<string> _lastName;
-        readonly CacheSegment<string> _firstName;
+        readonly CacheSegment<DefaultResolver, string> _lastName;
+        readonly CacheSegment<DefaultResolver, string> _firstName;
         IList<int> _myList; // no readonly
 
         // 0
@@ -52,11 +52,11 @@ namespace ZeroFormatter.Tests
         {
             get
             {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
+                return ObjectSegmentHelper.GetFixedProperty<DefaultResolver, int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
             }
             set
             {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+                ObjectSegmentHelper.SetFixedProperty<DefaultResolver, int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value, __tracker);
             }
         }
 
@@ -93,11 +93,11 @@ namespace ZeroFormatter.Tests
         {
             get
             {
-                return ObjectSegmentHelper.GetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, __tracker);
+                return ObjectSegmentHelper.GetFixedProperty<DefaultResolver, int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, __tracker);
             }
             protected set
             {
-                ObjectSegmentHelper.SetFixedProperty<int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+                ObjectSegmentHelper.SetFixedProperty<DefaultResolver, int>(__originalBytes, 3, __binaryLastIndex, __extraFixedBytes, value, __tracker);
             }
         }
 
@@ -128,9 +128,9 @@ namespace ZeroFormatter.Tests
             this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 4, new[] { 4, 4 }); // embed schemaLastIndex, elementSizeSum = should calcurate
 
             // Auto Generate Area
-            _firstName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
-            _lastName = new CacheSegment<string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex, __tracker));
-            _myList = Formatter<IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex, __tracker), __tracker, out __out);
+            _firstName = new CacheSegment<DefaultResolver, string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 1, __binaryLastIndex, __tracker));
+            _lastName = new CacheSegment<DefaultResolver, string>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, 2, __binaryLastIndex, __tracker));
+            _myList = Formatter<DefaultResolver, IList<int>>.Default.Deserialize(ref __array, ObjectSegmentHelper.GetOffset(originalBytes, 4, __binaryLastIndex, __tracker), __tracker, out __out);
 
         }
 
@@ -153,11 +153,11 @@ namespace ZeroFormatter.Tests
                 offset += (8 + 4 * (lastIndex + 1));
 
                 // Auto Generate Area(incr index...)
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 1, _firstName);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<string>(ref targetBytes, startOffset, offset, 2, _lastName);
-                offset += ObjectSegmentHelper.SerializeFixedLength<int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeSegment<IList<int>>(ref targetBytes, startOffset, offset, 4, _myList);
+                offset += ObjectSegmentHelper.SerializeFixedLength<DefaultResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<DefaultResolver, string>(ref targetBytes, startOffset, offset, 1, _firstName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<DefaultResolver, string>(ref targetBytes, startOffset, offset, 2, _lastName);
+                offset += ObjectSegmentHelper.SerializeFixedLength<DefaultResolver, int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+                offset += ObjectSegmentHelper.SerializeSegment<DefaultResolver, IList<int>>(ref targetBytes, startOffset, offset, 4, _myList);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, lastIndex);
             }
@@ -168,7 +168,7 @@ namespace ZeroFormatter.Tests
         }
     }
 
-    public class MyClassFormatter : Formatter<MyClass>
+    public class MyClassFormatter : Formatter<DefaultResolver, MyClass>
     {
         public override int? GetLength()
         {
@@ -193,11 +193,11 @@ namespace ZeroFormatter.Tests
                 var startOffset = offset;
 
                 offset += (8 + 4 * (lastIndex + 1));
-                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 0, value.Age);
-                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 1, value.FirstName);
-                offset += ObjectSegmentHelper.SerializeFromFormatter<string>(ref bytes, startOffset, offset, 2, value.LastName);
-                offset += ObjectSegmentHelper.SerializeFromFormatter<int>(ref bytes, startOffset, offset, 3, value.HogeMoge);
-                offset += ObjectSegmentHelper.SerializeFromFormatter<IList<int>>(ref bytes, startOffset, offset, 4, value.MyList);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<DefaultResolver, int>(ref bytes, startOffset, offset, 0, value.Age);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<DefaultResolver, string>(ref bytes, startOffset, offset, 1, value.FirstName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<DefaultResolver, string>(ref bytes, startOffset, offset, 2, value.LastName);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<DefaultResolver, int>(ref bytes, startOffset, offset, 3, value.HogeMoge);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<DefaultResolver, IList<int>>(ref bytes, startOffset, offset, 4, value.MyList);
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, lastIndex);
             }
@@ -221,7 +221,7 @@ namespace ZeroFormatter.Tests
         [Fact]
         public void ObjectFormatter()
         {
-            var tracker = new DirtyTracker(0);
+            var tracker = new DirtyTracker();
             var mc = new MyClass
             {
                 Age = 999,
@@ -230,12 +230,12 @@ namespace ZeroFormatter.Tests
                 MyList = new List<int> { 1, 10, 100, 1000 }
             };
 
-            Formatter<MyClass>.Register(new MyClassFormatter());
+            Formatter<DefaultResolver, MyClass>.Register(new MyClassFormatter());
 
             byte[] bytes = null;
             int size;
-            Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc);
-            var mc2 = Formatter<MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
+            Formatter<DefaultResolver, MyClass>.Default.Serialize(ref bytes, 0, mc);
+            var mc2 = Formatter<DefaultResolver, MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
 
             var getAge = mc2.Age;
 
@@ -244,8 +244,8 @@ namespace ZeroFormatter.Tests
             mc2.LastName.Is(mc.LastName);
 
             bytes = null;
-            Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc2);
-            var mc3 = Formatter<MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
+            Formatter<DefaultResolver, MyClass>.Default.Serialize(ref bytes, 0, mc2);
+            var mc3 = Formatter<DefaultResolver, MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
 
             mc3.Age.Is(mc.Age);
             mc3.FirstName.Is(mc.FirstName);
@@ -255,8 +255,8 @@ namespace ZeroFormatter.Tests
             mc3.FirstName = "aiueokakikukekosasisuseso";
 
             bytes = null;
-            Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc3);
-            var mc4 = Formatter<MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
+            Formatter<DefaultResolver, MyClass>.Default.Serialize(ref bytes, 0, mc3);
+            var mc4 = Formatter<DefaultResolver, MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
 
             mc4.Age.Is(99999);
             mc4.FirstName.Is("aiueokakikukekosasisuseso");
@@ -266,8 +266,8 @@ namespace ZeroFormatter.Tests
             mc4.LastName = null;
 
             bytes = null;
-            Formatter<MyClass>.Default.Serialize(ref bytes, 0, mc4);
-            var mc5 = Formatter<MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
+            Formatter<DefaultResolver, MyClass>.Default.Serialize(ref bytes, 0, mc4);
+            var mc5 = Formatter<DefaultResolver, MyClass>.Default.Deserialize(ref bytes, 0, tracker, out size);
 
             mc5.Age.Is(99999);
             mc5.FirstName.Is("aiueokakikukekosasisuseso");
@@ -277,7 +277,7 @@ namespace ZeroFormatter.Tests
         [Fact]
         public void DynamicFormatterTest()
         {
-            var dynamicFormatter = Formatters.Formatter<MyClass>.Default;
+            var dynamicFormatter = Formatters.Formatter<DefaultResolver, MyClass>.Default;
 
             byte[] bytes = null;
             var size = dynamicFormatter.Serialize(ref bytes, 0, new MyClass
@@ -291,13 +291,13 @@ namespace ZeroFormatter.Tests
 
 
             var generatedFormatter = new MyClassFormatter();
-            var mc2 = generatedFormatter.Deserialize(ref bytes, 0, new DirtyTracker(0), out size);
+            var mc2 = generatedFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
 
             mc2.Age.Is(999);
             mc2.FirstName.Is("hogehoge");
             mc2.LastName.Is("tako");
 
-            var mc3 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(0), out size);
+            var mc3 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
             mc3.Age.Is(999);
             mc3.FirstName.Is("hogehoge");
             mc3.LastName.Is("tako");
@@ -308,7 +308,7 @@ namespace ZeroFormatter.Tests
 
             bytes = null;
             dynamicFormatter.Serialize(ref bytes, 0, mc3);
-            var mc4 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(0), out size);
+            var mc4 = dynamicFormatter.Deserialize(ref bytes, 0, new DirtyTracker(), out size);
 
             mc4.Age.Is(9);
             mc4.LastName.Is("chop");
@@ -431,7 +431,7 @@ namespace ZeroFormatter.Tests
             var newDouble2 = BinaryUtil.ReadDouble(ref newBytes, 0);
 
             newBytes = null;
-            Formatter<double>.Default.Serialize(ref newBytes, 0, 12345.12345);
+            Formatter<DefaultResolver, double>.Default.Serialize(ref newBytes, 0, 12345.12345);
 
 
             var pureBytes = new byte[bytes.Length];

@@ -7,7 +7,8 @@ namespace ZeroFormatter.Formatters
     // Layout: [size:int][utf8bytes...], if size == -1 string is null.
 
     // C# string is always nullable currently
-    internal class NullableStringFormatter : Formatter<string>
+    internal class NullableStringFormatter<TTypeResolver> : Formatter<TTypeResolver, string>
+        where TTypeResolver : ITypeResolver, new()
     {
         static readonly Encoding encoding = StringEncoding.UTF8;
 
