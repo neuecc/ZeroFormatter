@@ -183,7 +183,7 @@ namespace ZeroFormatter.Segments
         public static int SerializeFromFormatter<TTypeResolver, T>(ref byte[] bytes, int startOffset, int offset, int index, T value)
         where TTypeResolver : ITypeResolver, new()
         {
-            BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * index), offset);
+            BinaryUtil.WriteInt32(ref bytes, startOffset + (8 + 4 * index), offset - startOffset);
             return Formatter<TTypeResolver, T>.Default.Serialize(ref bytes, offset, value);
         }
 
