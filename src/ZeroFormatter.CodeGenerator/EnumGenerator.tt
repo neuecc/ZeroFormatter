@@ -17,7 +17,8 @@ namespace <#= Namespace #>
 
 <# foreach(var t in Types) {  #>
 
-    public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
+    public class <#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override int? GetLength()
         {
@@ -36,7 +37,8 @@ namespace <#= Namespace #>
         }
     }
 
-    public class Nullable<#= t.Name #>Formatter : Formatter<<#= t.FullName #>?>
+    public class Nullable<#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>?>
+        where TTypeResolver : ITypeResolver, new()
     {
         public override int? GetLength()
         {

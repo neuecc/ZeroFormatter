@@ -21,6 +21,7 @@ namespace ZeroFormatter.Analyzer
         internal const string IndexAttributeShortName = "IndexAttribute";
         internal const string IgnoreShortName = "IgnoreFormatAttribute";
         internal const string UnionAttributeShortName = "UnionAttribute";
+        internal const string DynamicUnionAttributeShortName = "DynamicUnionAttribute";
         internal const string UnionKeyAttributeShortName = "UnionKeyAttribute";
 
         internal static readonly DiagnosticDescriptor TypeMustBeZeroFormattable = new DiagnosticDescriptor(
@@ -149,7 +150,7 @@ namespace ZeroFormatter.Analyzer
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration);
+            context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration, SyntaxKind.InterfaceDeclaration);
         }
 
         static void Analyze(SyntaxNodeAnalysisContext context)
@@ -196,6 +197,16 @@ namespace ZeroFormatter.Analyzer
                 return; // it is primitive...
             }
             else if (context.AdditionalAllowTypes.Contains(displayString))
+            {
+                return;
+            }
+
+            if (type.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
+            {
+                return;
+            }
+
+            if (type.GetAttributes().FindAttributeShortName(DynamicUnionAttributeShortName) != null)
             {
                 return;
             }
@@ -483,25 +494,46 @@ namespace ZeroFormatter.Analyzer
             }
 
             var unionKeyProperty = unionKeys[0];
-            if (!unionKeyProperty.GetMethod.IsAbstract)
+            if (type.TypeKind != TypeKind.Interface && !unionKeyProperty.GetMethod.IsAbstract)
             {
                 context.Add(Diagnostic.Create(UnionTypeRequiresUnionKey, callerLocation, type.Locations, type.Name));
                 return;
             }
 
-            var constructorArguments = type.GetAttributes().FindAttributeShortName(UnionAttributeShortName)?.ConstructorArguments.FirstOrDefault();
+            var ctorArguments = type.GetAttributes().FindAttributeShortName(UnionAttributeShortName)?.ConstructorArguments;
+            var firstArguments = ctorArguments?.FirstOrDefault();
 
-            if (constructorArguments == null) return;
+            if (firstArguments == null) return;
 
-
-            foreach (var item in constructorArguments.Value.Values.Select(x => x.Value).OfType<ITypeSymbol>())
+            TypedConstant fallbackType = default(TypedConstant);
+            if (ctorArguments.Value.Length == 2)
             {
-                var found = item.FindBaseTargetType(type.ToDisplayString());
+                fallbackType = ctorArguments.Value[1];
+            }
 
-                if (found == null)
+            if (type.TypeKind != TypeKind.Interface)
+            {
+                foreach (var item in firstArguments.Value.Values.Concat(new[] { fallbackType }).Where(x => !x.IsNull).Select(x => x.Value).OfType<ITypeSymbol>())
                 {
-                    context.Add(Diagnostic.Create(AllUnionSubTypesMustBeInheritedType, callerLocation, type.Locations, type.Name, item.Name));
-                    return;
+                    var found = item.FindBaseTargetType(type.ToDisplayString());
+
+                    if (found == null)
+                    {
+                        context.Add(Diagnostic.Create(AllUnionSubTypesMustBeInheritedType, callerLocation, type.Locations, type.Name, item.Name));
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in firstArguments.Value.Values.Concat(new[] { fallbackType }).Where(x => !x.IsNull).Select(x => x.Value).OfType<ITypeSymbol>())
+                {
+                    var typeString = type.ToDisplayString();
+                    if (!(item as INamedTypeSymbol).AllInterfaces.Any(x => x.OriginalDefinition?.ToDisplayString() == typeString))
+                    {
+                        context.Add(Diagnostic.Create(AllUnionSubTypesMustBeInheritedType, callerLocation, type.Locations, type.Name, item.Name));
+                        return;
+                    }
                 }
             }
         }

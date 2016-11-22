@@ -16,6 +16,7 @@ namespace ZeroFormatter.CodeGenerator
         public const string IndexAttributeShortName = "IndexAttribute";
         public const string IgnoreAttributeShortName = "IgnoreFormatAttribute";
         internal const string UnionAttributeShortName = "UnionAttribute";
+        internal const string DynamicUnionAttributeShortName = "DynamicUnionAttribute";
         internal const string UnionKeyAttributeShortName = "UnionKeyAttribute";
 
         static readonly SymbolDisplayFormat binaryWriteFormat = new SymbolDisplayFormat(
@@ -154,6 +155,15 @@ namespace ZeroFormatter.CodeGenerator
                 return;
             }
             if (KnownFormatterSpec.IsPrimitive(type))
+            {
+                return;
+            }
+            if (type.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
+            {
+                return;
+            }
+
+            if (type.GetAttributes().FindAttributeShortName(DynamicUnionAttributeShortName) != null)
             {
                 return;
             }
@@ -494,14 +504,20 @@ namespace ZeroFormatter.CodeGenerator
                 }
             }
 
-            var constructorArguments = type.GetAttributes().FindAttributeShortName(UnionAttributeShortName)?.ConstructorArguments.FirstOrDefault();
+            var ctorArguments = type.GetAttributes().FindAttributeShortName(UnionAttributeShortName)?.ConstructorArguments;
+            var firstArguments = ctorArguments?.FirstOrDefault();
 
-            if (constructorArguments == null) return;
+            if (firstArguments == null) return;
+            TypedConstant fallbackType = default(TypedConstant);
+            if (ctorArguments.Value.Length == 2)
+            {
+                fallbackType = ctorArguments.Value[1];
+            }
 
             var subTypList = new List<string>();
             if (type.TypeKind != TypeKind.Interface)
             {
-                foreach (var item in constructorArguments.Value.Values.Select(x => x.Value).OfType<ITypeSymbol>())
+                foreach (var item in firstArguments.Value.Values.Concat(new[] { fallbackType }).Where(x => !x.IsNull).Select(x => x.Value).OfType<ITypeSymbol>())
                 {
                     var found = item.FindBaseTargetType(type.ToDisplayString());
 
@@ -514,7 +530,7 @@ namespace ZeroFormatter.CodeGenerator
             }
             else
             {
-                foreach (var item in constructorArguments.Value.Values.Select(x => x.Value).OfType<ITypeSymbol>())
+                foreach (var item in firstArguments.Value.Values.Concat(new[] { fallbackType }).Where(x => !x.IsNull).Select(x => x.Value).OfType<ITypeSymbol>())
                 {
                     var typeString = type.ToDisplayString();
                     if (!(item as INamedTypeSymbol).AllInterfaces.Any(x => x.OriginalDefinition?.ToDisplayString() == typeString))

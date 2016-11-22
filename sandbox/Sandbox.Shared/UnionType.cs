@@ -93,6 +93,15 @@ namespace Sandbox.Shared
         }
     }
 
+    [ZeroFormattable]
+    public class HasUnionKlass
+    {
+        [Index(0)]
+        public virtual IStandardUnion A { get; set; }
+        [Index(1)]
+        public virtual Character B { get; set; }
+    }
+
     [Union(new[] { typeof(UnknownMessage1), typeof(MessageA1), typeof(MessageB1) }, typeof(UnknownMessage1))]
     public interface IStandardUnion
     {

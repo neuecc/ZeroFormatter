@@ -15,10 +15,11 @@ namespace <#= Namespace #>
     using global::ZeroFormatter.Segments;
 
 <# foreach(var t in Types) {  #>
-    public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
+    public class <#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>>
+        where TTypeResolver : ITypeResolver, new()
     {
 <# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
-        readonly Formatter<<#= p.Type #>> formatter<#= i #>;
+        readonly Formatter<TTypeResolver, <#= p.Type #>> formatter<#= i #>;
 <# } #>
         
 <# if (t.Properties.Length != 0) { #>
@@ -38,7 +39,7 @@ namespace <#= Namespace #>
         public <#= t.Name #>Formatter()
         {
 <# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
-            formatter<#= i #> = Formatter<<#= p.Type #>>.Default;
+            formatter<#= i #> = Formatter<TTypeResolver, <#= p.Type #>>.Default;
 <# } #>            
         }
 

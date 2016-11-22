@@ -178,6 +178,8 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
+
+            
             ZeroFormatter.Formatters.Formatter.AppendDynamicUnionResolver((unionType, resolver) =>
             {
                 if (unionType == typeof(MyClass))

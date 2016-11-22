@@ -18,6 +18,7 @@ namespace ZeroFormatter.CodeGenerator
         public List<string> AllowCustomTypes { get; private set; }
         public List<string> ConditionalSymbols { get; private set; }
         public bool IsSeparate { get; private set; }
+        public string ResolverName { get; set; }
 
         public bool IsParsed { get; set; }
 
@@ -25,6 +26,7 @@ namespace ZeroFormatter.CodeGenerator
         {
             AllowCustomTypes = new List<string>();
             ConditionalSymbols = new List<string>();
+            ResolverName = "ZeroFormatter.Formatters.DefaultResolver";
 
             var option = new OptionSet()
             {
@@ -34,6 +36,7 @@ namespace ZeroFormatter.CodeGenerator
                 { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer", _ => { UnuseUnityAttr = true; } },
                 { "t|customtypes=", "[optional, default=empty]comma separated allows custom types", x => { AllowCustomTypes.AddRange(x.Split(',')); } },
                 { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
+                { "r|resolvername=", "[optional, default=DefaultResolver]Register CustomSerializer target.", x => { ResolverName = x; } },
             };
             if (args.Length == 0)
             {
@@ -107,7 +110,7 @@ namespace ZeroFormatter.CodeGenerator
                 Console.WriteLine("String Generation Start");
                 sw.Restart();
                 var sb = new StringBuilder();
-                sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen }.TransformText());
+                sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName }.TransformText());
 
                 foreach (var item in objectGen)
                 {
@@ -136,7 +139,7 @@ namespace ZeroFormatter.CodeGenerator
                 sw.Restart();
 
                 var initializerPath = Path.Combine(outputpath, "ZeroFormatterInitializer.cs");
-                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen }.TransformText());
+                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName= cmdArgs.ResolverName }.TransformText());
 
                 foreach (var item in objectGen.SelectMany(x => x.Types))
                 {

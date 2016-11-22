@@ -108,6 +108,7 @@ namespace ZeroFormatter.CodeGenerator
         public UnionGenerator[] Unions { get; set; }
         public GenericType[] GenericTypes { get; set; }
         public bool UnuseUnityAttribute { get; set; }
+        public string ResolverName { get; set; }
     }
 
     public class GenericType : IEquatable<GenericType>, IComparable<GenericType>

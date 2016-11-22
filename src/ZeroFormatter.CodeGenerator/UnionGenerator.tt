@@ -15,7 +15,8 @@ namespace <#= Namespace #>
     using global::ZeroFormatter.Segments;
 
 <# foreach(var t in Types) {  #>
-    public class <#= t.Name #>Formatter : Formatter<<#= t.FullName #>>
+    public class <#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>>
+        where TTypeResolver : ITypeResolver, new()
     {
         readonly global::System.Collections.Generic.IEqualityComparer<<#= t.UnionKeyTypeName #>> comparer;
         readonly <#= t.UnionKeyTypeName #>[] unionKeys;
@@ -44,12 +45,12 @@ namespace <#= Namespace #>
             var startOffset = offset;
 
             offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
-            offset += Formatter<<#= t.UnionKeyTypeName #>>.Default.Serialize(ref bytes, offset, value.<#= t.UnionKeyPropertyName #>);
+            offset += Formatter<TTypeResolver, <#= t.UnionKeyTypeName #>>.Default.Serialize(ref bytes, offset, value.<#= t.UnionKeyPropertyName #>);
 
 <# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
             <#= i != 0 ? "else if" : "if" #> (value is <#= subType  #>)
             {
-                offset += Formatter<<#= subType  #>>.Default.Serialize(ref bytes, offset, (<#= subType #>)value);
+                offset += Formatter<TTypeResolver, <#= subType  #>>.Default.Serialize(ref bytes, offset, (<#= subType #>)value);
             }
 <# } #>            
             else
@@ -70,7 +71,7 @@ namespace <#= Namespace #>
         
             offset += 1;
             int size;
-            var unionKey = Formatter<<#= t.UnionKeyTypeName #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var unionKey = Formatter<TTypeResolver, <#= t.UnionKeyTypeName #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
             byteSize += size;
             offset += size;
 
@@ -78,7 +79,7 @@ namespace <#= Namespace #>
 <# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
             <#= i != 0 ? "else if" : "if" #> (comparer.Equals(unionKey, unionKeys[<#= i #>]))
             {
-                result = Formatter<<#= subType  #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
+                result = Formatter<TTypeResolver, <#= subType  #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
             }
 <# } #>
             else

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using ZeroFormatter.Comparers;
+using ZeroFormatter.Internal;
 using ZeroFormatter.Segments;
 
 namespace ZeroFormatter.Formatters
@@ -733,150 +735,161 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-
 #if UNITY
 
-        public static void RegisterLookup<TKey, TElement>()
+        public static void RegisterLookup<TTypeResolver, TKey, TElement>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<IEnumerable<TElement>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IEnumerable<TElement>>.Default is IErrorFormatter)
             {
-                Formatter<IEnumerable<TElement>>.Register(new InterfaceEnumerableFormatter<TElement>());
+                Formatter<TTypeResolver, IEnumerable<TElement>>.Register(new InterfaceEnumerableFormatter<TTypeResolver, TElement>());
             }
-            if (Formatter<ILookup<TKey, TElement>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, ILookup<TKey, TElement>>.Default is IErrorFormatter)
             {
-                Formatter<ILookup<TKey, TElement>>.Register(new LookupFormatter<TKey, TElement>());
+                Formatter<TTypeResolver, ILookup<TKey, TElement>>.Register(new LookupFormatter<TTypeResolver, TKey, TElement>());
             }
-            if (Formatter<IList<TElement>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IList<TElement>>.Default is IErrorFormatter)
             {
-                Formatter<IList<TElement>>.Register(new ListFormatter<TElement>());
+                Formatter<TTypeResolver, IList<TElement>>.Register(new ListFormatter<TTypeResolver, TElement>());
             }
         }
 
-        public static void RegisterLazyLookup<TKey, TElement>()
+        public static void RegisterLazyLookup<TTypeResolver, TKey, TElement>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<ILazyLookup<TKey, TElement>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, ILazyLookup<TKey, TElement>>.Default is IErrorFormatter)
             {
-                Formatter<ILazyLookup<TKey, TElement>>.Register(new LazyLookupFormatter<TKey, TElement>());
+                Formatter<TTypeResolver, ILazyLookup<TKey, TElement>>.Register(new LazyLookupFormatter<TTypeResolver, TKey, TElement>());
             }
-            if (Formatter<GroupingSegment<TKey, TElement>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, GroupingSegment<TTypeResolver, TKey, TElement>>.Default is IErrorFormatter)
             {
-                Formatter<GroupingSegment<TKey, TElement>>.Register(new GroupingSegmentFormatter<TKey, TElement>());
+                Formatter<TTypeResolver, GroupingSegment<TTypeResolver, TKey, TElement>>.Register(new GroupingSegmentFormatter<TTypeResolver, TKey, TElement>());
             }
-            if (Formatter<IList<TKey>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IList<TKey>>.Default is IErrorFormatter)
             {
-                Formatter<IList<TKey>>.Register(new ListFormatter<TKey>());
+                Formatter<TTypeResolver, IList<TKey>>.Register(new ListFormatter<TTypeResolver, TKey>());
             }
-            if (Formatter<IList<GroupingSegment<TKey, TElement>>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IList<GroupingSegment<TTypeResolver, TKey, TElement>>>.Default is IErrorFormatter)
             {
-                Formatter<IList<GroupingSegment<TKey, TElement>>>.Register(new ListFormatter<GroupingSegment<TKey, TElement>>());
+                Formatter<TTypeResolver, IList<GroupingSegment<TTypeResolver, TKey, TElement>>>.Register(new ListFormatter<TTypeResolver, GroupingSegment<TTypeResolver, TKey, TElement>>());
             }
-            if (Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IList<IList<GroupingSegment<TTypeResolver, TKey, TElement>>>>.Default is IErrorFormatter)
             {
-                Formatter<IList<IList<GroupingSegment<TKey, TElement>>>>.Register(new ListFormatter<IList<GroupingSegment<TKey, TElement>>>());
+                Formatter<TTypeResolver, IList<IList<GroupingSegment<TTypeResolver, TKey, TElement>>>>.Register(new ListFormatter<TTypeResolver, IList<GroupingSegment<TTypeResolver, TKey, TElement>>>());
             }
-            if (Formatter<IList<TElement>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IList<TElement>>.Default is IErrorFormatter)
             {
-                Formatter<IList<TElement>>.Register(new ListFormatter<TElement>());
+                Formatter<TTypeResolver, IList<TElement>>.Register(new ListFormatter<TTypeResolver, TElement>());
             }
         }
 
-        public static void RegisterDictionary<TKey, TValue>()
+        public static void RegisterDictionary<TTypeResolver, TKey, TValue>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyValuePair<TKey, TValue>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyValuePair<TKey, TValue>>.Default is IErrorFormatter)
             {
-                Formatter<KeyValuePair<TKey, TValue>>.Register(new KeyValuePairFormatter<TKey, TValue>());
+                Formatter<TTypeResolver, KeyValuePair<TKey, TValue>>.Register(new KeyValuePairFormatter<TTypeResolver, TKey, TValue>());
             }
-            if (Formatter<IDictionary<TKey, TValue>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IDictionary<TKey, TValue>>.Default is IErrorFormatter)
             {
-                Formatter<IDictionary<TKey, TValue>>.Register(new InterfaceDictionaryFormatter<TKey, TValue>());
+                Formatter<TTypeResolver, IDictionary<TKey, TValue>>.Register(new InterfaceDictionaryFormatter<TTypeResolver, TKey, TValue>());
             }
-            if (Formatter<Dictionary<TKey, TValue>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, Dictionary<TKey, TValue>>.Default is IErrorFormatter)
             {
-                Formatter<Dictionary<TKey, TValue>>.Register(new DictionaryFormatter<TKey, TValue>());
+                Formatter<TTypeResolver, Dictionary<TKey, TValue>>.Register(new DictionaryFormatter<TTypeResolver, TKey, TValue>());
             }
         }
 
-        public static void RegisterLazyDictionary<TKey, TValue>()
+        public static void RegisterLazyDictionary<TTypeResolver, TKey, TValue>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<ILazyDictionary<TKey, TValue>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, ILazyDictionary<TKey, TValue>>.Default is IErrorFormatter)
             {
-                Formatter<ILazyDictionary<TKey, TValue>>.Register(new LazyDictionaryFormatter<TKey, TValue>());
+                Formatter<TTypeResolver, ILazyDictionary<TKey, TValue>>.Register(new LazyDictionaryFormatter<TTypeResolver, TKey, TValue>());
             }
-            if (Formatter<DictionaryEntry<TKey, TValue>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, DictionaryEntry<TTypeResolver, TKey, TValue>>.Default is IErrorFormatter)
             {
-                Formatter<DictionaryEntry<TKey, TValue>>.Register(new DictionaryEntryFormatter<TKey, TValue>());
+                Formatter<TTypeResolver, DictionaryEntry<TTypeResolver, TKey, TValue>>.Register(new DictionaryEntryFormatter<TTypeResolver, TKey, TValue>());
             }
-            if (Formatter<IList<DictionaryEntry<TKey, TValue>>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IList<DictionaryEntry<TTypeResolver, TKey, TValue>>>.Default is IErrorFormatter)
             {
-                Formatter<IList<DictionaryEntry<TKey, TValue>>>.Register(new ListFormatter<DictionaryEntry<TKey, TValue>>());
+                Formatter<TTypeResolver, IList<DictionaryEntry<TTypeResolver, TKey, TValue>>>.Register(new ListFormatter<TTypeResolver, DictionaryEntry<TTypeResolver, TKey, TValue>>());
             }
         }
 
-        public static void RegisterArray<T>()
+        public static void RegisterArray<TTypeResolver, T>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<T[]>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, T[]>.Default is IErrorFormatter)
             {
-                Formatter<T[]>.Register(new ArrayFormatter<T>());
+                Formatter<TTypeResolver, T[]>.Register(new ArrayFormatter<TTypeResolver, T>());
             }
         }
 
-        public static void RegisterCollection<TElement, TCollection>()
+        public static void RegisterCollection<TTypeResolver, TElement, TCollection>()
             where TCollection : ICollection<TElement>, new()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<TCollection>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, TCollection>.Default is IErrorFormatter)
             {
-                Formatter<TCollection>.Register(new CollectionFormatter<TElement, TCollection>());
+                Formatter<TTypeResolver, TCollection>.Register(new CollectionFormatter<TTypeResolver, TElement, TCollection>());
             }
         }
 
-        public static void RegisterInterfaceCollection<T>()
+        public static void RegisterInterfaceCollection<TTypeResolver, T>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<ICollection<T>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, ICollection<T>>.Default is IErrorFormatter)
             {
-                Formatter<ICollection<T>>.Register(new InterfaceCollectionFormatter<T>());
+                Formatter<TTypeResolver, ICollection<T>>.Register(new InterfaceCollectionFormatter<TTypeResolver, T>());
             }
         }
-        public static void RegisterEnumerable<T>()
+        public static void RegisterEnumerable<TTypeResolver, T>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<IEnumerable<T>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IEnumerable<T>>.Default is IErrorFormatter)
             {
-                Formatter<IEnumerable<T>>.Register(new InterfaceEnumerableFormatter<T>());
-            }
-        }
-
-        public static void RegisterReadOnlyCollection<T>()
-        {
-            if (Formatter<ReadOnlyCollection<T>>.Default is IErrorFormatter)
-            {
-                Formatter<ReadOnlyCollection<T>>.Register(new ReadOnlyCollectionFormatter<T>());
+                Formatter<TTypeResolver, IEnumerable<T>>.Register(new InterfaceEnumerableFormatter<TTypeResolver, T>());
             }
         }
 
-        public static void RegisterList<T>()
+        public static void RegisterReadOnlyCollection<TTypeResolver, T>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<IList<T>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, ReadOnlyCollection<T>>.Default is IErrorFormatter)
             {
-                Formatter<IList<T>>.Register(new ListFormatter<T>());
+                Formatter<TTypeResolver, ReadOnlyCollection<T>>.Register(new ReadOnlyCollectionFormatter<TTypeResolver, T>());
             }
         }
 
-        public static void RegisterKeyValuePair<TKey, TValue>()
+        public static void RegisterList<TTypeResolver, T>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyValuePair<TKey, TValue>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, IList<T>>.Default is IErrorFormatter)
             {
-                Formatter<KeyValuePair<TKey, TValue>>.Register(new KeyValuePairFormatter<TKey, TValue>());
+                Formatter<TTypeResolver, IList<T>>.Register(new ListFormatter<TTypeResolver, T>());
             }
         }
 
-        public static void RegisterKeyTuple<T1>()
+        public static void RegisterKeyValuePair<TTypeResolver, TKey, TValue>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyTuple<T1>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyValuePair<TKey, TValue>>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1>>.Register(new KeyTupleFormatter<T1>());
+                Formatter<TTypeResolver, KeyValuePair<TKey, TValue>>.Register(new KeyValuePairFormatter<TTypeResolver, TKey, TValue>());
             }
-            if (Formatter<KeyTuple<T1>?>.Default is IErrorFormatter)
+        }
+
+        public static void RegisterKeyTuple<TTypeResolver, T1>()
+            where TTypeResolver : ITypeResolver, new()
+        {
+            if (Formatter<TTypeResolver, KeyTuple<T1>>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1>?>.Register(new NullableKeyTupleFormatter<T1>());
+                Formatter<TTypeResolver, KeyTuple<T1>>.Register(new KeyTupleFormatter<TTypeResolver, T1>());
+            }
+            if (Formatter<TTypeResolver, KeyTuple<T1>?>.Default is IErrorFormatter)
+            {
+                Formatter<TTypeResolver, KeyTuple<T1>?>.Register(new NullableKeyTupleFormatter<TTypeResolver, T1>());
             }
             if (ZeroFormatterEqualityComparer<KeyTuple<T1>>.Default is IErrorEqualityComparer)
             {
@@ -884,15 +897,16 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-        public static void RegisterKeyTuple<T1, T2>()
+        public static void RegisterKeyTuple<TTypeResolver, T1, T2>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyTuple<T1, T2>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2>>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2>>.Register(new KeyTupleFormatter<T1, T2>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2>>.Register(new KeyTupleFormatter<TTypeResolver, T1, T2>());
             }
-            if (Formatter<KeyTuple<T1, T2>?>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2>?>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2>?>.Register(new NullableKeyTupleFormatter<T1, T2>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2>?>.Register(new NullableKeyTupleFormatter<TTypeResolver, T1, T2>());
             }
             if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2>>.Default is IErrorEqualityComparer)
             {
@@ -900,15 +914,16 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-        public static void RegisterKeyTuple<T1, T2, T3>()
+        public static void RegisterKeyTuple<TTypeResolver, T1, T2, T3>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyTuple<T1, T2, T3>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3>>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3>>.Register(new KeyTupleFormatter<T1, T2, T3>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3>>.Register(new KeyTupleFormatter<TTypeResolver, T1, T2, T3>());
             }
-            if (Formatter<KeyTuple<T1, T2, T3>?>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3>?>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3>?>.Register(new NullableKeyTupleFormatter<TTypeResolver, T1, T2, T3>());
             }
             if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3>>.Default is IErrorEqualityComparer)
             {
@@ -916,15 +931,16 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-        public static void RegisterKeyTuple<T1, T2, T3, T4>()
+        public static void RegisterKeyTuple<TTypeResolver, T1, T2, T3, T4>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyTuple<T1, T2, T3, T4>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4>>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4>>.Register(new KeyTupleFormatter<T1, T2, T3, T4>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4>>.Register(new KeyTupleFormatter<TTypeResolver, T1, T2, T3, T4>());
             }
-            if (Formatter<KeyTuple<T1, T2, T3, T4>?>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4>?>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4>?>.Register(new NullableKeyTupleFormatter<TTypeResolver, T1, T2, T3, T4>());
             }
             if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4>>.Default is IErrorEqualityComparer)
             {
@@ -932,15 +948,16 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-        public static void RegisterKeyTuple<T1, T2, T3, T4, T5>()
+        public static void RegisterKeyTuple<TTypeResolver, T1, T2, T3, T4, T5>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyTuple<T1, T2, T3, T4, T5>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5>>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4, T5>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5>>.Register(new KeyTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5>());
             }
-            if (Formatter<KeyTuple<T1, T2, T3, T4, T5>?>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5>?>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4, T5>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5>?>.Register(new NullableKeyTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5>());
             }
             if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5>>.Default is IErrorEqualityComparer)
             {
@@ -948,15 +965,16 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-        public static void RegisterKeyTuple<T1, T2, T3, T4, T5, T6>()
+        public static void RegisterKeyTuple<TTypeResolver, T1, T2, T3, T4, T5, T6>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6>>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6>>.Register(new KeyTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6>());
             }
-            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6>?>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6>?>.Register(new NullableKeyTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6>());
             }
             if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6>>.Default is IErrorEqualityComparer)
             {
@@ -964,15 +982,16 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-        public static void RegisterKeyTuple<T1, T2, T3, T4, T5, T6, T7>()
+        public static void RegisterKeyTuple<TTypeResolver, T1, T2, T3, T4, T5, T6, T7>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Register(new KeyTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7>());
             }
-            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6, T7>?>.Register(new NullableKeyTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7>());
             }
             if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7>>.Default is IErrorEqualityComparer)
             {
@@ -980,15 +999,16 @@ namespace ZeroFormatter.Formatters
             }
         }
 
-        public static void RegisterKeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>()
+        public static void RegisterKeyTuple<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8>()
+            where TTypeResolver : ITypeResolver, new()
         {
-            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Register(new KeyTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8>());
             }
-            if (Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>?>.Default is IErrorFormatter)
+            if (Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>?>.Default is IErrorFormatter)
             {
-                Formatter<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>?>.Register(new NullableKeyTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>());
+                Formatter<TTypeResolver, KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>?>.Register(new NullableKeyTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8>());
             }
             if (ZeroFormatterEqualityComparer<KeyTuple<T1, T2, T3, T4, T5, T6, T7, T8>>.Default is IErrorEqualityComparer)
             {
@@ -997,6 +1017,7 @@ namespace ZeroFormatter.Formatters
         }
 
 #endif
+
     }
 
     internal interface IErrorFormatter
