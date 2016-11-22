@@ -159,67 +159,183 @@ namespace Sandbox
     }
 
 
-    [DynamicUnion]
-    public interface IEvent { }
-
-
-    public class UnknownEvent : IEvent
+    [DynamicUnion] // root of DynamicUnion
+    public class MessageBase
     {
 
     }
 
+    public class UnknownMessage : MessageBase { }
 
     [ZeroFormattable]
-    public class EventA : IEvent { }
+    public class MessageA : MessageBase { }
+
     [ZeroFormattable]
-    public class EventB : IEvent { }
+    public class MessageB : MessageBase
+    {
+        [Index(0)]
+        public virtual IList<IEvent> Events { get; set; }
+    }
+
+
+    // If new type received, return new UnknownEvent()
+    [Union(subTypes: new[] { typeof(MailEvent), typeof(NotifyEvent) }, fallbackType: typeof(UnknownEvent))]
+    public interface IEvent
+    {
+        [UnionKey]
+        byte Key { get; }
+    }
+
+    [ZeroFormattable]
+    public class MailEvent : IEvent
+    {
+        [IgnoreFormat]
+        public byte Key => 1;
+
+        [Index(0)]
+        public string Message { get; set; }
+    }
+
+    [ZeroFormattable]
+    public class NotifyEvent : IEvent
+    {
+        [IgnoreFormat]
+        public byte Key => 1;
+
+        [Index(0)]
+        public bool IsCritical { get; set; }
+    }
+
+    [ZeroFormattable]
+    public class UnknownEvent : IEvent
+    {
+        [IgnoreFormat]
+        public byte Key => 0;
+    }
+
+
+
+
+    public class CustomSerializationContext : ITypeResolver
+    {
+        public bool IsUseBuiltinDynamicSerializer
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public object ResolveFormatter(Type type)
+        {
+            // same as Formatter.AppendFormatResolver.
+            return null;
+        }
+
+        public void RegisterDynamicUnion(Type unionType, DynamicUnionResolver resolver)
+        {
+            // same as Formatter.AppendDynamicUnionResolver
+        }
+    }
+
+
 
     class Program
     {
         static void Main(string[] args)
         {
 
-            
+
+
+
             ZeroFormatter.Formatters.Formatter.AppendDynamicUnionResolver((unionType, resolver) =>
             {
-                if (unionType == typeof(MyClass))
-                {
-
-
-                }
-                else if (unionType == typeof(IEvent))
+    //can be easily extended to reflection based scan if library consumer wants it
+    if (unionType == typeof(MessageBase))
                 {
                     resolver.RegisterUnionKeyType(typeof(byte));
-                    resolver.RegisterSubType((byte)13, typeof(EventA));
-                    resolver.RegisterSubType((byte)234, typeof(EventB));
-                    resolver.RegisterFallbackType(typeof(UnknownEvent));
+                    resolver.RegisterSubType(key: (byte)1, subType: typeof(MessageA));
+                    resolver.RegisterSubType(key: (byte)2, subType: typeof(MessageB));
+                    resolver.RegisterFallbackType(typeof(UnknownMessage));
                 }
             });
 
 
-            var emptySerialize = ZeroFormatterSerializer.Serialize(new EventA());
 
-
-            var union = ZeroFormatterSerializer.Serialize<IEvent>(new EventA());
-            var aaa = ZeroFormatterSerializer.Deserialize<IEvent>(union);
-
-            var bbbUnion = ZeroFormatterSerializer.Serialize<IEvent>(new EventB());
-            var bbb = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
-
-
-            bbbUnion[1] = 24; // unknown
-
-            int s;
-            //var fff = new CharacterFormatter();
-            //fff.Deserialize(ref bbbUnion, 0, new DirtyTracker(), out s);
-            Console.WriteLine("go!");
-            var ccc = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
-
-            Console.WriteLine(ccc.GetType().FullName);
         }
     }
 
 
+    public interface Imessage
+    {
+    }
+
+
+
+
+    [Union(new[] { typeof(Human), typeof(Monster) }, typeof(Unknown))]
+    public abstract class Character
+    {
+        [UnionKey]
+        public abstract CharacterType Type { get; }
+    }
+
+    public class Unknown : Character
+    {
+        public override CharacterType Type
+        {
+            get
+            {
+                return CharacterType.Unknown;
+            }
+        }
+    }
+
+    [ZeroFormattable]
+    public class Human : Character
+    {
+        // UnionKey value must return constant value(Type is free, you can use int, string, enum, etc...)
+        public override CharacterType Type
+        {
+            get
+            {
+                return CharacterType.Human;
+            }
+        }
+
+        [Index(0)]
+        public virtual string Name { get; set; }
+
+        [Index(1)]
+        public virtual DateTime Birth { get; set; }
+
+        [Index(2)]
+        public virtual int Age { get; set; }
+
+        [Index(3)]
+        public virtual int Faith { get; set; }
+    }
+
+    [ZeroFormattable]
+    public class Monster : Character
+    {
+        public override CharacterType Type
+        {
+            get
+            {
+                return CharacterType.Monster;
+            }
+        }
+
+        [Index(0)]
+        public virtual string Race { get; set; }
+
+        [Index(1)]
+        public virtual int Power { get; set; }
+
+        [Index(2)]
+        public virtual int Magic { get; set; }
+    }
 
 
 
@@ -244,6 +360,26 @@ namespace Sandbox
         public int MyProperty1;
     }
 
+    public class UriFormatter<TTypeResolver> : Formatter<TTypeResolver, Uri>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            // If size is variable, return null.
+            return null;
+        }
 
+        public override int Serialize(ref byte[] bytes, int offset, Uri value)
+        {
+            // Formatter<T> can get child serializer
+            return Formatter<TTypeResolver, string>.Default.Serialize(ref bytes, offset, value.ToString());
+        }
+
+        public override Uri Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            var uriString = Formatter<TTypeResolver, string>.Default.Deserialize(ref bytes, offset, tracker, out byteSize);
+            return (uriString == null) ? null : new Uri(uriString);
+        }
+    }
 
 }

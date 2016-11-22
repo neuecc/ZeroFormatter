@@ -36,7 +36,7 @@ namespace ZeroFormatter.CodeGenerator
                 { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer", _ => { UnuseUnityAttr = true; } },
                 { "t|customtypes=", "[optional, default=empty]comma separated allows custom types", x => { AllowCustomTypes.AddRange(x.Split(',')); } },
                 { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
-                { "r|resolvername=", "[optional, default=DefaultResolver]Register CustomSerializer target.", x => { ResolverName = x; } },
+                { "r|resolvername=", "[optional, default=DefaultResolver]Register CustomSerializer target", x => { ResolverName = x; } },
             };
             if (args.Length == 0)
             {

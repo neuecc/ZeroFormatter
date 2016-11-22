@@ -290,7 +290,7 @@ public enum CharacterType
     Human, Monster
 }
 
-// UnionAttribute abstract type becomes Union, arguments is union subtypes.
+// UnionAttribute abstract/interface type becomes Union, arguments is union subtypes.
 // It needs single UnionKey to discriminate
 [Union(typeof(Human), typeof(Monster))]
 public abstract class Character
@@ -378,6 +378,79 @@ switch (union.Type)
 }
 ```
 
+If an unknown identification key arrives, an exception is thrown by default. However, it is also possible to return the default type - fallbackType.
+
+```csharp
+// If new type received, return new UnknownEvent()
+[Union(subTypes: new[] { typeof(MailEvent), typeof(NotifyEvent) }, fallbackType: typeof(UnknownEvent))]
+public interface IEvent
+{
+    [UnionKey]
+    byte Key { get; }
+}
+
+[ZeroFormattable]
+public class MailEvent : IEvent
+{
+    [IgnoreFormat]
+    public byte Key => 1;
+
+    [Index(0)]
+    public string Message { get; set; }
+}
+
+[ZeroFormattable]
+public class NotifyEvent : IEvent
+{
+    [IgnoreFormat]
+    public byte Key => 1;
+
+    [Index(0)]
+    public bool IsCritical { get; set; }
+}
+
+[ZeroFormattable]
+public class UnknownEvent : IEvent
+{
+    [IgnoreFormat]
+    public byte Key => 0;
+}
+```
+
+Union can construct on execution time. You can mark `DynamicUnion` and make resolver on `AppendDynamicUnionResolver`.
+
+```csharp
+[DynamicUnion] // root of DynamicUnion
+public class MessageBase
+{
+
+}
+
+public class UnknownMessage : MessageBase { }
+
+[ZeroFormattable]
+public class MessageA : MessageBase { }
+
+[ZeroFormattable]
+public class MessageB : MessageBase
+{
+    [Index(0)]
+    public virtual IList<IEvent> Events { get; set; }
+}
+
+ZeroFormatter.Formatters.Formatter.AppendDynamicUnionResolver((unionType, resolver) =>
+{
+    //can be easily extended to reflection based scan if library consumer wants it
+    if (unionType == typeof(MessageBase))
+    {
+        resolver.RegisterUnionKeyType(typeof(byte));
+        resolver.RegisterSubType(key: (byte)1, subType: typeof(MessageA));
+        resolver.RegisterSubType(key: (byte)2, subType: typeof(MessageB));
+        resolver.RegisterFallbackType(typeof(UnknownMessage));
+    }
+});
+```
+
 Unity Supports
 ---
 Put the `ZeroFormatter.dll` and `ZeroFormatter.Interfaces.dll`, modify Edit -> Project Settings -> Player -> Optimization -> Api Compatibillity Level to `.NET 2.0` or higher.
@@ -394,6 +467,7 @@ zfc arguments help:
   -u, --unuseunityattr          [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer
   -t, --customtypes=VALUE       [optional, default=empty]comma separated allows custom types
   -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
+  -r, --resolvername=VALUE      [optional, default=DefaultResolver]Register CustomSerializer target
 ```
 
 ```
@@ -518,7 +592,9 @@ Extensibility
 ZeroFormatter can become custom binary layout framework. You can create own typed formatter. For example, add supports `Uri`.
 
 ```csharp
-public class UriFormatter : Formatter<Uri>
+// "<TTypeResolver> where TTypeResolver : ITypeResolver, new()" is a common rule. in details, see: configuration section.
+public class UriFormatter<TTypeResolver> : Formatter<TTypeResolver, Uri>
+    where TTypeResolver : ITypeResolver, new()
 {
     public override int? GetLength()
     {
@@ -529,12 +605,12 @@ public class UriFormatter : Formatter<Uri>
     public override int Serialize(ref byte[] bytes, int offset, Uri value)
     {
         // Formatter<T> can get child serializer
-        return Formatter<string>.Default.Serialize(ref bytes, offset, value.ToString());
+        return Formatter<TTypeResolver, string>.Default.Serialize(ref bytes, offset, value.ToString());
     }
 
     public override Uri Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
     {
-        var uriString = Formatter<string>.Default.Deserialize(ref bytes, offset, tracker, out byteSize);
+        var uriString = Formatter<TTypeResolver, string>.Default.Deserialize(ref bytes, offset, tracker, out byteSize);
         return (uriString == null) ? null : new Uri(uriString);
     }
 }
@@ -543,13 +619,15 @@ public class UriFormatter : Formatter<Uri>
 You need to register formatter on application startup. 
 
 ```csharp
-ZeroFormatter.Formatters.Formatter<Uri>.Register(new UriFormatter());
+// What is DefaultResolver? see: configuration section. 
+ZeroFormatter.Formatters.Formatter<DefaultResolver, Uri>.Register(new UriFormatter<DefaultResolver>());
 ```
 
 One more case, how to create generic formatter. For example, If implements `ImmutableList<T>`?
 
 ```csharp
-public class ImmutableListFormatter<T> : Formatter<ImmutableList<T>>
+public class ImmutableListFormatter<TTypeResolver, T> : Formatter<TTypeResolver, ImmutableList<T>>
+    where TTypeResolver : ITypeResolver, new()
 {
     public override int? GetLength()
     {
@@ -568,7 +646,7 @@ public class ImmutableListFormatter<T> : Formatter<ImmutableList<T>>
         var startOffset = offset;
         offset += BinaryUtil.WriteInt32(ref bytes, offset, value.Count);
 
-        var formatter = Formatter<T>.Default;
+        var formatter = Formatter<TTypeResolver, T>.Default;
         foreach (var item in value)
         {
             offset += formatter.Serialize(ref bytes, offset, item);
@@ -583,7 +661,7 @@ public class ImmutableListFormatter<T> : Formatter<ImmutableList<T>>
         var length = BinaryUtil.ReadInt32(ref bytes, offset);
         if (length == -1) return null;
 
-        var formatter = Formatter<T>.Default;
+        var formatter = Formatter<TTypeResolver, T>.Default;
         var builder = ImmutableList<T>.Empty.ToBuilder();
         int size;
         offset += 4;
@@ -602,6 +680,7 @@ public class ImmutableListFormatter<T> : Formatter<ImmutableList<T>>
 And register generic resolver on startup.
 
 ```csharp
+// append to default resolver.
 ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
 {
     if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ImmutableList<>))
@@ -613,6 +692,36 @@ ZeroFormatter.Formatters.Formatter.AppendFormatterResolver(t =>
     return null; // fallback to the next resolver
 });
 ```
+
+Configuration
+---
+If you want to create Formatter based on special rules generated by ResolveFormatter and RegisterDynamicUnion with the same AppDomain, you need to implement ITypeResolver.
+
+```csharp
+public class CustomSerializationContext : ITypeResolver
+{
+    public bool IsUseBuiltinDynamicSerializer
+    {
+        get
+        {
+            return true;
+        }
+    }
+
+    public object ResolveFormatter(Type type)
+    {
+        // same as Formatter.AppendFormatResolver.
+        return null;
+    }
+
+    public void RegisterDynamicUnion(Type unionType, DynamicUnionResolver resolver)
+    {
+        // same as Formatter.AppendDynamicUnionResolver
+    }
+}
+```
+
+`ZeroFormatterSerializer.CustomSerializer<CustomSerializationContext>.Serialize/Deserialize` methods use those contexts. By default, `DefaultResolver` is used.
 
 WireFormat Specification
 ---
@@ -672,7 +781,7 @@ List is variable-length, lazy-evaluation. If field is declared `IList<T>` or `IR
 | Type | Layout | Note |
 | ---- | ------ | ---- |
 | FixedSizeList | [length:int(4)][elements:T...] | T is fixed-length format. if length = -1, indicates null |
-| VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | T is variable-length format. if length = -1, indicates null. indexOffset is absolute position of underlying buffer |
+| VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | T is variable-length format. if length = -1, indicates null. indexOffset is relative position from list start offset |
 
 **Object Format**
 
@@ -684,7 +793,7 @@ Struct is eager-evaluation, if all field types are fixed-length which struct is 
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| Object | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | used by class in default. if length = -1, indicates null, indexOffset = 0, indicates blank. indexOffset is absolute position of underlying buffer |
+| Object | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | used by class in default. if length = -1, indicates null, indexOffset = 0, indicates blank. indexOffset is relative position from object start offset |
 | Struct | [Index1Item:T1, Index2Item:T2,...] | used by struct in default. This format can be fixed-length. versioning is not supported. |
 | Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | used by struct in default. This format can be fixed-length. versioning is not supported. |
 
@@ -694,7 +803,7 @@ Union is variable-length, eager-evaluation, discriminated by key type to each va
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| Union | [hasValue:bool(1)][unionKey:TKey][value:TValue] ||
+| Union | [byteSize:int(4)][unionKey:TKey][value:TValue] ||
 
 **Extension Format**
 

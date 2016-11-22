@@ -10,7 +10,7 @@ namespace Sandbox.Shared
 {
     public enum CharacterType
     {
-        Human, Monster
+        Human, Monster, Unknown
     }
 
     [Union(typeof(Human), typeof(Monster))]
