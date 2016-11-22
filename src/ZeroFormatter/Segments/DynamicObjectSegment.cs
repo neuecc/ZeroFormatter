@@ -287,7 +287,7 @@ namespace ZeroFormatter.Segments
         {
             // public class DynamicObjectSegment.MyClass : MyClass, IZeroFormatterSegment
             var type = moduleBuilder.DefineType(
-                DynamicAssemblyHolder.ModuleName + "." + typeof(T).FullName,
+                DynamicAssemblyHolder.ModuleName + "." + typeof(TTypeResolver).FullName.Replace(".", "_") + "." + typeof(T).FullName,
                 TypeAttributes.Public,
                 typeof(T));
 

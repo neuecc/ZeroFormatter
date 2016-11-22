@@ -229,7 +229,7 @@ namespace ZeroFormatter.Formatters
         static TypeInfo BuildFormatter(ModuleBuilder builder, Type resolverType, Type elementType, Tuple<int, EmittableMemberInfo>[] memberInfos)
         {
             var typeBuilder = builder.DefineType(
-               DynamicAssemblyHolder.ModuleName + "." + elementType.FullName + "$Formatter",
+               DynamicAssemblyHolder.ModuleName + "." + resolverType.FullName.Replace(".", "_") + "." + elementType.FullName + "$Formatter",
                TypeAttributes.Public,
                typeof(Formatter<,>).MakeGenericType(resolverType, elementType));
 
@@ -490,7 +490,7 @@ namespace ZeroFormatter.Formatters
         static TypeInfo BuildFormatter(ModuleBuilder builder, Type resolverType, Type elementType, int? length, Tuple<int, EmittableMemberInfo>[] memberInfos)
         {
             var typeBuilder = builder.DefineType(
-                DynamicAssemblyHolder.ModuleName + "." + elementType.FullName + "$Formatter",
+                DynamicAssemblyHolder.ModuleName + "." + resolverType.FullName.Replace(".", "_") + "." + elementType.FullName + "$Formatter",
                 TypeAttributes.Public,
                 typeof(Formatter<,>).MakeGenericType(resolverType, elementType));
 
@@ -776,7 +776,7 @@ namespace ZeroFormatter.Formatters
             var moduleBuilder = ZeroFormatter.Segments.DynamicAssemblyHolder.Module;
 
             var typeBuilder = moduleBuilder.DefineType(
-                DynamicAssemblyHolder.ModuleName + "." + buildType.FullName + "$Formatter",
+                DynamicAssemblyHolder.ModuleName + "." + resolverType.FullName.Replace(".", "_") + "." + buildType.FullName + "$Formatter",
                 TypeAttributes.Public,
                 typeof(Formatter<,>).MakeGenericType(resolverType, buildType));
 
