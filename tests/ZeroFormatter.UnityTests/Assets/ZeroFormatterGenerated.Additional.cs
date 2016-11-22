@@ -15,6 +15,8 @@
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void HandRegisterd()
         {
+            ZeroFormatterInitializer.Register(); // call before hand register.
+
             Formatter.RegisterDictionary<DefaultResolver, int, int>();
             Formatter.RegisterDictionary<DefaultResolver, string, string>();
             Formatter.RegisterDictionary<DefaultResolver, int, string>();
@@ -34,6 +36,8 @@
             var structFormatter = new ZeroFormatter.DynamicObjectSegments.UnityEngine.Vector3Formatter<DefaultResolver>();
             ZeroFormatter.Formatters.Formatter<DefaultResolver, global::UnityEngine.Vector3>.Register(structFormatter);
             Formatter.RegisterArray<DefaultResolver, UnityEngine.Vector3>();
+
+            Formatter.RegisterArray<DefaultResolver, Sandbox.Shared.IStandardUnion>();
         }
     }
 }

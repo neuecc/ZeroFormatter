@@ -39,12 +39,12 @@ namespace <#= Namespace #>
         {
             if (value == null)
             {
-                return BinaryUtil.WriteBoolean(ref bytes, offset, false);
+                return BinaryUtil.WriteInt32(ref bytes, offset, -1);
             }
 
             var startOffset = offset;
 
-            offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
+            offset += 4;
             offset += Formatter<TTypeResolver, <#= t.UnionKeyTypeName #>>.Default.Serialize(ref bytes, offset, value.<#= t.UnionKeyPropertyName #>);
 
 <# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
@@ -58,21 +58,22 @@ namespace <#= Namespace #>
                 throw new Exception("Unknown subtype of Union:" + value.GetType().FullName);
             }
         
-            return offset - startOffset;
+            var writeSize = offset - startOffset;
+            BinaryUtil.WriteInt32(ref bytes, startOffset, writeSize);
+            return writeSize;
         }
 
         public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            byteSize = 1;
-            if (!BinaryUtil.ReadBoolean(ref bytes, offset))
+            if ((byteSize = BinaryUtil.ReadInt32(ref bytes, offset)) == -1)
             {
+                byteSize = 4;
                 return null;
             }
         
-            offset += 1;
+            offset += 4;
             int size;
             var unionKey = Formatter<TTypeResolver, <#= t.UnionKeyTypeName #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
-            byteSize += size;
             offset += size;
 
             <#= t.FullName #> result;
@@ -84,10 +85,13 @@ namespace <#= Namespace #>
 <# } #>
             else
             {
+<# if ( t.FallbackTypeName == null) { #>
                 throw new Exception("Unknown unionKey type of Union: " + unionKey.ToString());
+<# } else { #>
+                result = new <#= t.FallbackTypeName #>();
+<# } #>
             }
 
-            byteSize += size;
             return result;
         }
     }

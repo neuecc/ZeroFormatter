@@ -80,7 +80,7 @@ namespace RuntimeUnitTestToolkit
 
         public static void IsInstanceOfType(object value, Type expectedType, string message)
         {
-            if (value == null || value.GetType() != expectedType)
+            if (value == null || !expectedType.IsAssignableFrom(value.GetType()))
             {
                 throw new AssertFailedException(string.Format("IsInstanceOfType Failed. valueType:{0} expectedType:{1} message:{2}", (value == null) ? null : value.GetType(), expectedType, message));
             }
@@ -88,7 +88,7 @@ namespace RuntimeUnitTestToolkit
 
         public static void IsNotInstanceOfType(object value, Type expectedType, string message)
         {
-            if (value != null || value.GetType() == expectedType)
+            if (value != null || expectedType.IsAssignableFrom(value.GetType()))
             {
                 throw new AssertFailedException(string.Format("IsNotInstanceOfType Failed. valueType:{0} expectedType:{1} message:{2}", (value == null) ? null : value.GetType(), expectedType, message));
             }

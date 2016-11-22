@@ -550,6 +550,7 @@ namespace ZeroFormatter.CodeGenerator
                 UnionKeyTypeName = unionKeyProperty.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 UnionKeyPropertyName = unionKeyProperty.Name,
                 SubTypeNames = subTypList.ToArray(),
+                FallbackTypeName = fallbackType.IsNull ? null : (fallbackType.Value as INamedTypeSymbol).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
             });
         }
 

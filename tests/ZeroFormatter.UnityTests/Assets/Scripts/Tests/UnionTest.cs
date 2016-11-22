@@ -58,13 +58,39 @@ namespace ZeroFormatter.Tests
 
         public void StandardUnionWithFallback()
         {
-            var uinon = ZeroFormatterSerializer.Serialize<IStandardUnion>(new MessageA1());
-            var hogehoge = ZeroFormatterSerializer.Deserialize<IStandardUnion>(uinon);
-            hogehoge.IsInstanceOf<MessageA1>();
+            var uinon = ZeroFormatterSerializer.Serialize<Sandbox.Shared.IStandardUnion>(new Sandbox.Shared.MessageA1());
+            var hogehoge = ZeroFormatterSerializer.Deserialize<Sandbox.Shared.IStandardUnion>(uinon);
+            hogehoge.IsInstanceOf<Sandbox.Shared.MessageA1>();
 
             Internal.BinaryUtil.WriteInt32(ref uinon, 1, 212);
-            var zzzzz = ZeroFormatterSerializer.Deserialize<IStandardUnion>(uinon);
-            zzzzz.IsInstanceOf<UnknownMessage1>();
+            var zzzzz = ZeroFormatterSerializer.Deserialize<Sandbox.Shared.IStandardUnion>(uinon);
+            zzzzz.IsInstanceOf<Sandbox.Shared.UnknownMessage1>();
         }
+
+        public void IncludeWithFallback()
+        {
+            var huga = new Sandbox.Shared.IStandardUnion[]
+            {
+                (Sandbox.Shared.IStandardUnion)new Sandbox.Shared.MessageA1(),
+                (Sandbox.Shared.IStandardUnion)new Sandbox.Shared.MessageB1(),
+                (Sandbox.Shared.IStandardUnion)new Sandbox.Shared.MessageA1(),
+                (Sandbox.Shared.IStandardUnion)new Sandbox.Shared.MessageB1(),
+            };
+            var ninon = ZeroFormatterSerializer.Serialize(huga);
+            var hoge = ZeroFormatterSerializer.Deserialize<Sandbox.Shared.IStandardUnion[]>(ninon);
+
+            hoge[0].IsInstanceOf<Sandbox.Shared.MessageA1>();
+            hoge[1].IsInstanceOf<Sandbox.Shared.MessageB1>();
+            hoge[2].IsInstanceOf<Sandbox.Shared.MessageA1>();
+            hoge[3].IsInstanceOf<Sandbox.Shared.MessageB1>();
+
+            Internal.BinaryUtil.WriteInt32(ref ninon, 28, 212);
+            var hoge2 = ZeroFormatterSerializer.Deserialize<Sandbox.Shared.IStandardUnion[]>(ninon);
+            hoge2[0].IsInstanceOf<Sandbox.Shared.MessageA1>();
+            hoge2[1].IsInstanceOf<Sandbox.Shared.UnknownMessage1>();
+            hoge2[2].IsInstanceOf<Sandbox.Shared.MessageA1>();
+            hoge2[3].IsInstanceOf<Sandbox.Shared.MessageB1>();
+        }
+
     }
 }

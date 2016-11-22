@@ -14,7 +14,6 @@ namespace ZeroFormatter.Internal
 
     public static partial class ZeroFormatterInitializer
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Register()
         {
             // Enums
@@ -6813,12 +6812,12 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         {
             if (value == null)
             {
-                return BinaryUtil.WriteBoolean(ref bytes, offset, false);
+                return BinaryUtil.WriteInt32(ref bytes, offset, -1);
             }
 
             var startOffset = offset;
 
-            offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
+            offset += 4;
             offset += Formatter<TTypeResolver, global::Sandbox.Shared.CharacterType>.Default.Serialize(ref bytes, offset, value.Type);
 
             if (value is global::Sandbox.Shared.Human)
@@ -6835,21 +6834,22 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 throw new Exception("Unknown subtype of Union:" + value.GetType().FullName);
             }
         
-            return offset - startOffset;
+            var writeSize = offset - startOffset;
+            BinaryUtil.WriteInt32(ref bytes, startOffset, writeSize);
+            return writeSize;
         }
 
         public override global::Sandbox.Shared.Character Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            byteSize = 1;
-            if (!BinaryUtil.ReadBoolean(ref bytes, offset))
+            if ((byteSize = BinaryUtil.ReadInt32(ref bytes, offset)) == -1)
             {
+                byteSize = 4;
                 return null;
             }
         
-            offset += 1;
+            offset += 4;
             int size;
             var unionKey = Formatter<TTypeResolver, global::Sandbox.Shared.CharacterType>.Default.Deserialize(ref bytes, offset, tracker, out size);
-            byteSize += size;
             offset += size;
 
             global::Sandbox.Shared.Character result;
@@ -6866,7 +6866,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 throw new Exception("Unknown unionKey type of Union: " + unionKey.ToString());
             }
 
-            byteSize += size;
             return result;
         }
     }
@@ -6895,12 +6894,12 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         {
             if (value == null)
             {
-                return BinaryUtil.WriteBoolean(ref bytes, offset, false);
+                return BinaryUtil.WriteInt32(ref bytes, offset, -1);
             }
 
             var startOffset = offset;
 
-            offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
+            offset += 4;
             offset += Formatter<TTypeResolver, string>.Default.Serialize(ref bytes, offset, value.UnionKeyDayo);
 
             if (value is global::Sandbox.Shared.SubTest1)
@@ -6917,21 +6916,22 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 throw new Exception("Unknown subtype of Union:" + value.GetType().FullName);
             }
         
-            return offset - startOffset;
+            var writeSize = offset - startOffset;
+            BinaryUtil.WriteInt32(ref bytes, startOffset, writeSize);
+            return writeSize;
         }
 
         public override global::Sandbox.Shared.Union2 Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            byteSize = 1;
-            if (!BinaryUtil.ReadBoolean(ref bytes, offset))
+            if ((byteSize = BinaryUtil.ReadInt32(ref bytes, offset)) == -1)
             {
+                byteSize = 4;
                 return null;
             }
         
-            offset += 1;
+            offset += 4;
             int size;
             var unionKey = Formatter<TTypeResolver, string>.Default.Deserialize(ref bytes, offset, tracker, out size);
-            byteSize += size;
             offset += size;
 
             global::Sandbox.Shared.Union2 result;
@@ -6948,7 +6948,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 throw new Exception("Unknown unionKey type of Union: " + unionKey.ToString());
             }
 
-            byteSize += size;
             return result;
         }
     }
@@ -6979,12 +6978,12 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         {
             if (value == null)
             {
-                return BinaryUtil.WriteBoolean(ref bytes, offset, false);
+                return BinaryUtil.WriteInt32(ref bytes, offset, -1);
             }
 
             var startOffset = offset;
 
-            offset += BinaryUtil.WriteBoolean(ref bytes, offset, true);
+            offset += 4;
             offset += Formatter<TTypeResolver, int>.Default.Serialize(ref bytes, offset, value.A);
 
             if (value is global::Sandbox.Shared.UnknownMessage1)
@@ -7009,21 +7008,22 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 throw new Exception("Unknown subtype of Union:" + value.GetType().FullName);
             }
         
-            return offset - startOffset;
+            var writeSize = offset - startOffset;
+            BinaryUtil.WriteInt32(ref bytes, startOffset, writeSize);
+            return writeSize;
         }
 
         public override global::Sandbox.Shared.IStandardUnion Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
         {
-            byteSize = 1;
-            if (!BinaryUtil.ReadBoolean(ref bytes, offset))
+            if ((byteSize = BinaryUtil.ReadInt32(ref bytes, offset)) == -1)
             {
+                byteSize = 4;
                 return null;
             }
         
-            offset += 1;
+            offset += 4;
             int size;
             var unionKey = Formatter<TTypeResolver, int>.Default.Deserialize(ref bytes, offset, tracker, out size);
-            byteSize += size;
             offset += size;
 
             global::Sandbox.Shared.IStandardUnion result;
@@ -7045,10 +7045,9 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             }
             else
             {
-                throw new Exception("Unknown unionKey type of Union: " + unionKey.ToString());
+                result = new global::Sandbox.Shared.UnknownMessage1();
             }
 
-            byteSize += size;
             return result;
         }
     }
