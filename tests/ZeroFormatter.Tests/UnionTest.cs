@@ -82,7 +82,7 @@ namespace ZeroFormatter.Tests
                 var bbb = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
                 bbb.IsInstanceOf<EventB>();
 
-                bbbUnion[1] = 24; // unknown
+                bbbUnion[4] = 24; // unknown
                 var ccc = ZeroFormatterSerializer.Deserialize<IEvent>(bbbUnion);
                 ccc.IsInstanceOf<UnknownEvent>();
             }
@@ -98,7 +98,7 @@ namespace ZeroFormatter.Tests
                 var bbb = ZeroFormatterSerializer.Deserialize<MessageBase>(bbbUnion);
                 bbb.IsInstanceOf<MessageB>();
 
-                bbbUnion[1] = 13;
+                bbbUnion[4] = 13;
                 var ccc = ZeroFormatterSerializer.Deserialize<MessageBase>(bbbUnion);
                 ccc.IsInstanceOf<UnknownMessage>();
             }
@@ -116,7 +116,32 @@ namespace ZeroFormatter.Tests
             Internal.BinaryUtil.WriteInt32(ref uinon, 1, 212);
             var zzzzz = ZeroFormatterSerializer.Deserialize<IStandardUnion>(uinon);
             zzzzz.IsInstanceOf<UnknownMessage1>();
+        }
 
+        [TestMethod]
+        public void IncludeWithFallback()
+        {
+            var huga = new Sandbox.Shared.IStandardUnion[]
+            {
+                (Sandbox.Shared.IStandardUnion)new Sandbox.Shared.MessageA1(),
+                (Sandbox.Shared.IStandardUnion)new Sandbox.Shared.MessageB1(),
+                (Sandbox.Shared.IStandardUnion)new Sandbox.Shared.MessageA1(),
+                (Sandbox.Shared.IStandardUnion)new Sandbox.Shared.MessageB1(),
+            };
+            var ninon = ZeroFormatterSerializer.Serialize(huga);
+            var hoge = ZeroFormatterSerializer.Deserialize<Sandbox.Shared.IStandardUnion[]>(ninon);
+
+            hoge[0].IsInstanceOf<Sandbox.Shared.MessageA1>();
+            hoge[1].IsInstanceOf<Sandbox.Shared.MessageB1>();
+            hoge[2].IsInstanceOf<Sandbox.Shared.MessageA1>();
+            hoge[3].IsInstanceOf<Sandbox.Shared.MessageB1>();
+
+            Internal.BinaryUtil.WriteInt32(ref ninon, 28, 212);
+            var hoge2 = ZeroFormatterSerializer.Deserialize<Sandbox.Shared.IStandardUnion[]>(ninon);
+            hoge2[0].IsInstanceOf<Sandbox.Shared.MessageA1>();
+            hoge2[1].IsInstanceOf<Sandbox.Shared.UnknownMessage1>();
+            hoge2[2].IsInstanceOf<Sandbox.Shared.MessageA1>();
+            hoge2[3].IsInstanceOf<Sandbox.Shared.MessageB1>();
         }
 
 

@@ -855,6 +855,7 @@ namespace ZeroFormatter.Formatters
                 var il = method.GetILGenerator();
 
                 il.DeclareLocal(typeof(int)); // startOffset
+                il.DeclareLocal(typeof(int)); // writeSize
 
                 var labelA = il.DefineLabel();
 
@@ -862,18 +863,15 @@ namespace ZeroFormatter.Formatters
                 il.Emit(OpCodes.Brtrue_S, labelA);
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Ldc_I4_0);
-                il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("WriteBoolean"));
+                il.Emit(OpCodes.Ldc_I4_M1);
+                il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("WriteInt32"));
                 il.Emit(OpCodes.Ret);
 
                 il.MarkLabel(labelA);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Stloc_0);
                 il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Ldarg_1);
-                il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Ldc_I4_1);
-                il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("WriteBoolean"));
+                il.Emit(OpCodes.Ldc_I4_4);
                 il.Emit(OpCodes.Add);
                 il.Emit(OpCodes.Starg_S, (byte)2);
 
@@ -935,6 +933,13 @@ namespace ZeroFormatter.Formatters
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldloc_0);
                 il.Emit(OpCodes.Sub);
+                il.Emit(OpCodes.Stloc_1); // writeSize
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Ldloc_0);
+                il.Emit(OpCodes.Ldloc_1);
+                il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("WriteInt32"));
+                il.Emit(OpCodes.Pop);
+                il.Emit(OpCodes.Ldloc_1);
                 il.Emit(OpCodes.Ret);
             }
 
@@ -953,18 +958,25 @@ namespace ZeroFormatter.Formatters
                 var labelA = il.DefineLabel();
 
                 il.Emit(OpCodes.Ldarg_S, (byte)4);
-                il.Emit(OpCodes.Ldc_I4_1);
-                il.Emit(OpCodes.Stind_I4);
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("ReadBoolean"));
-                il.Emit(OpCodes.Brtrue_S, labelA);
+                il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("ReadInt32"));
+                il.Emit(OpCodes.Dup);
+                il.Emit(OpCodes.Stloc_1);
+                il.Emit(OpCodes.Stind_I4);
+                il.Emit(OpCodes.Ldloc_1);
+                il.Emit(OpCodes.Ldc_I4_M1);
+
+                il.Emit(OpCodes.Bne_Un, labelA);
+                il.Emit(OpCodes.Ldarg_S, (byte)4);
+                il.Emit(OpCodes.Ldc_I4_4);
+                il.Emit(OpCodes.Stind_I4);
                 il.Emit(OpCodes.Ldnull);
                 il.Emit(OpCodes.Ret);
 
                 il.MarkLabel(labelA);
                 il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Ldc_I4_1);
+                il.Emit(OpCodes.Ldc_I4_4);
                 il.Emit(OpCodes.Add);
                 il.Emit(OpCodes.Starg_S, (byte)2);
                 il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyType).GetTypeInfo().GetProperty("Default").GetGetMethod());
@@ -973,13 +985,8 @@ namespace ZeroFormatter.Formatters
                 il.Emit(OpCodes.Ldarg_3);
                 il.Emit(OpCodes.Ldloca_S, (byte)0);
                 il.Emit(OpCodes.Callvirt, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyType).GetTypeInfo().GetMethod("Deserialize"));
+
                 il.Emit(OpCodes.Stloc_1);
-                il.Emit(OpCodes.Ldarg_S, (byte)4);
-                il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldind_I4);
-                il.Emit(OpCodes.Ldloc_0);
-                il.Emit(OpCodes.Add);
-                il.Emit(OpCodes.Stind_I4);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldloc_0);
                 il.Emit(OpCodes.Add);
@@ -1042,14 +1049,7 @@ namespace ZeroFormatter.Formatters
                     }
                 }
 
-                // byteSize += size; return result;
                 il.MarkLabel(endLabel);
-                il.Emit(OpCodes.Ldarg_S, (byte)4);
-                il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldind_I4);
-                il.Emit(OpCodes.Ldloc_0);
-                il.Emit(OpCodes.Add);
-                il.Emit(OpCodes.Stind_I4);
                 il.Emit(OpCodes.Ldloc_2);
                 il.Emit(OpCodes.Ret);
             }

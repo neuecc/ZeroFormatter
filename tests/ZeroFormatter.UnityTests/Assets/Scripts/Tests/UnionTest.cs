@@ -54,5 +54,17 @@ namespace ZeroFormatter.Tests
                 }
             }
         }
+
+
+        public void StandardUnionWithFallback()
+        {
+            var uinon = ZeroFormatterSerializer.Serialize<IStandardUnion>(new MessageA1());
+            var hogehoge = ZeroFormatterSerializer.Deserialize<IStandardUnion>(uinon);
+            hogehoge.IsInstanceOf<MessageA1>();
+
+            Internal.BinaryUtil.WriteInt32(ref uinon, 1, 212);
+            var zzzzz = ZeroFormatterSerializer.Deserialize<IStandardUnion>(uinon);
+            zzzzz.IsInstanceOf<UnknownMessage1>();
+        }
     }
 }

@@ -20,7 +20,9 @@ namespace ZeroFormatter.Formatters
     {
         bool IsUseBuiltinDynamicSerializer { get; }
         object ResolveFormatter(Type type);
+#if !UNITY
         void RegisterDynamicUnion(Type unionType, DynamicUnionResolver resolver);
+#endif
     }
 
     public class DynamicUnionResolver
@@ -63,11 +65,12 @@ namespace ZeroFormatter.Formatters
         {
             return Formatter.ResolveFormatter(type);
         }
-
+#if !UNITY
         public void RegisterDynamicUnion(Type unionType, DynamicUnionResolver resolver)
         {
             Formatter.ResolveDynamicUnion(unionType, resolver);
         }
+#endif
     }
 
     internal static class ResolverCache<T>
@@ -727,6 +730,8 @@ namespace ZeroFormatter.Formatters
             return null;
         }
 
+#if !UNITY
+
         internal static void ResolveDynamicUnion(Type unionType, DynamicUnionResolver resolver)
         {
             foreach (var item in unionResolver)
@@ -734,6 +739,8 @@ namespace ZeroFormatter.Formatters
                 item(unionType, resolver);
             }
         }
+
+#endif
 
 #if UNITY
 
