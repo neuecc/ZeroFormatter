@@ -95,6 +95,7 @@
     <Compile Include="Internal\EnumerableExtensions.cs" />
     <Compile Include="Internal\HashHelper.cs" />
     <Compile Include="Comparers\ZeroFormatterEqualityComparer.cs" />
+    <Compile Include="Internal\ILGeneratorExtensions.cs" />
     <Compile Include="Internal\PseudoTypeInfo.cs" />
     <Compile Include="Internal\SR.cs" />
     <Compile Include="Internal\StringEncoding.cs" />

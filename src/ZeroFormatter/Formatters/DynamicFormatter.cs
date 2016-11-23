@@ -325,7 +325,7 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldarg_2);
                     il.Emit(OpCodes.Stloc_1);
                     il.Emit(OpCodes.Ldarg_2);
-                    il.Emit(OpCodes.Ldc_I4, calcedBeginOffset);
+                    il.EmitLdc_I4(calcedBeginOffset);
                     il.Emit(OpCodes.Add);
                     il.Emit(OpCodes.Starg_S, (byte)2);
                     for (int i = 0; i < formattersInField.Count; i++)
@@ -334,7 +334,7 @@ namespace ZeroFormatter.Formatters
 
                         il.Emit(OpCodes.Ldarg_1);
                         il.Emit(OpCodes.Ldloc_1);
-                        il.Emit(OpCodes.Ldc_I4, 8 + (4 * item.Item1)); // 8 + 4 * index
+                        il.EmitLdc_I4(8 + (4 * item.Item1)); // 8 + 4 * index
                         il.Emit(OpCodes.Add);
                         il.Emit(OpCodes.Ldarg_2);
                         il.Emit(OpCodes.Ldloc_1);
@@ -363,7 +363,7 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldloc_1);
                     il.Emit(OpCodes.Ldarg_2);
-                    il.Emit(OpCodes.Ldc_I4, schemaLastIndex);
+                    il.EmitLdc_I4(schemaLastIndex);
                     il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("WriteSize"));
                     il.Emit(OpCodes.Ret);
                 }
@@ -573,7 +573,7 @@ namespace ZeroFormatter.Formatters
                 }
                 else
                 {
-                    il.Emit(OpCodes.Ldc_I4, length.Value);
+                    il.EmitLdc_I4(length.Value);
                     il.Emit(OpCodes.Newobj, typeof(int?).GetTypeInfo().GetConstructor(new[] { typeof(int) }));
                     il.Emit(OpCodes.Ret);
                 }
@@ -592,7 +592,7 @@ namespace ZeroFormatter.Formatters
                 {
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldarg_2);
-                    il.Emit(OpCodes.Ldc_I4, length.Value);
+                    il.EmitLdc_I4(length.Value);
                     il.Emit(OpCodes.Call, typeof(BinaryUtil).GetTypeInfo().GetMethod("EnsureCapacity"));
                 }
 
@@ -799,7 +799,7 @@ namespace ZeroFormatter.Formatters
                 if (unionKeyPropertyInfo != null)
                 {
                     il.Emit(OpCodes.Ldarg_0);
-                    il.Emit(OpCodes.Ldc_I4, subTypes.Length);
+                    il.EmitLdc_I4(subTypes.Length);
                     il.Emit(OpCodes.Newarr, unionKeyType);
                     il.Emit(OpCodes.Stfld, unionKeysField);
                     for (int i = 0; i < subTypes.Length; i++)
@@ -808,7 +808,7 @@ namespace ZeroFormatter.Formatters
 
                         il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldfld, unionKeysField);
-                        il.Emit(OpCodes.Ldc_I4, i);
+                        il.EmitLdc_I4(i);
                         il.Emit(OpCodes.Newobj, subType.GetTypeInfo().GetConstructor(Type.EmptyTypes));
                         il.Emit(OpCodes.Callvirt, unionKeyPropertyInfo.GetGetMethod());
                         il.Emit(OpCodes.Stelem_I4);
@@ -899,7 +899,7 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldarg_2);
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldfld, unionKeysField);
-                    il.Emit(OpCodes.Ldc_I4, i);
+                    il.EmitLdc_I4(i);
                     il.Emit(OpCodes.Ldelem, unionKeyType);
                     il.Emit(OpCodes.Callvirt, typeof(Formatter<,>).MakeGenericType(resolverType, unionKeyType).GetTypeInfo().GetMethod("Serialize"));
                     il.Emit(OpCodes.Add);
@@ -1012,7 +1012,7 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldloc_1);
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldfld, unionKeysField);
-                    il.Emit(OpCodes.Ldc_I4, i);
+                    il.EmitLdc_I4(i);
                     il.Emit(OpCodes.Ldelem, unionKeyType);
 
                     il.Emit(OpCodes.Callvirt, comparer.FieldType.GetTypeInfo().GetMethods().First(x => x.Name == "Equals" && x.DeclaringType == comparer.FieldType));
