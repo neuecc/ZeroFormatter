@@ -781,7 +781,7 @@ List is variable-length, lazy-evaluation. If field is declared `IList<T>` or `IR
 | Type | Layout | Note |
 | ---- | ------ | ---- |
 | FixedSizeList | [length:int(4)][elements:T...] | T is fixed-length format. if length = -1, indicates null |
-| VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | T is variable-length format. if length = -1, indicates null. indexOffset is relative position from list start offset |
+| VariableSizeList | [byteSize:int(4)][length:int(4)][elementOffset...:int(4 * length)][elements:T...] | T is variable-length format. if byteSize = -1, indicates null. indexOffset is relative position from list start offset |
 
 **Object Format**
 
@@ -793,7 +793,7 @@ Struct is eager-evaluation, if all field types are fixed-length which struct is 
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| Object | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | used by class in default. if length = -1, indicates null, indexOffset = 0, indicates blank. indexOffset is relative position from object start offset |
+| Object | [byteSize:int(4)][lastIndex:int(4)][indexOffset...:int(4 * lastIndex)][Property1:T1, Property2:T2, ...] | used by class in default. if byteSize = -1, indicates null, indexOffset = 0, indicates blank. indexOffset is relative position from object start offset |
 | Struct | [Index1Item:T1, Index2Item:T2,...] | used by struct in default. This format can be fixed-length. versioning is not supported. |
 | Struct? | [hasValue:bool(1)][Index1Item:T1, Index2Item:T2,...] | used by struct in default. This format can be fixed-length. versioning is not supported. |
 
@@ -803,7 +803,7 @@ Union is variable-length, eager-evaluation, discriminated by key type to each va
 
 | Type | Layout | Note |
 | ---- | ------ | ---- |
-| Union | [byteSize:int(4)][unionKey:TKey][value:TValue] ||
+| Union | [byteSize:int(4)][unionKey:TKey][value:TValue] | if byteSize = -1, indicates null |
 
 **Extension Format**
 
