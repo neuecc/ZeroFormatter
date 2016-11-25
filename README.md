@@ -744,7 +744,7 @@ Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is 
 | Boolean | [bool(1)] |
 | Byte | [byte(1)] |
 | SByte | [sbyte(1)] |
-| Char | [ushort(2)] |
+| Char | [ushort(2)] | UTF16-LE |
 | TimeSpan | [seconds:long(8)][nanos:int(4)] | seconds represents time from 00:00:00 |
 | DateTime | [seconds:long(8)][nanos:int(4)] | seconds represents UTC time since Unix epoch(0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z) |
 | DateTimeOffset | [seconds:long(8)][nanos:int(4)][offsetMinutes:short(2)] | DateTime with a time difference |
@@ -760,7 +760,7 @@ Primitive format is fixed-length(except string), eager-evaluation. C# `Enum` is 
 | Boolean? | [hasValue:bool(1)][bool(1)] |
 | Byte? | [hasValue:bool(1)][byte(1)] |
 | SByte? | [hasValue:bool(1)][sbyte(1)] |
-| Char? | [hasValue:bool(1)][ushort(2)] |
+| Char? | [hasValue:bool(1)][ushort(2)] | UTF16-LE |
 | TimeSpan? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] | seconds represents time from 00:00:00 |
 | DateTime? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)] | seconds represents UTC time since Unix epoch(0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z) |
 | DateTimeOffset? | [hasValue:bool(1)][seconds:long(8)][nanos:int(4)][offsetMinutes:short(2)] | DateTime with a time difference |
