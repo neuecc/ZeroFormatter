@@ -55,6 +55,8 @@ namespace ZeroFormatter.Analyzer
 
             var targets = type.GetAllMembers().OfType<IPropertySymbol>()
                 .Where(x => x.GetAttributes().FindAttributeShortName(ZeroFormatterAnalyzer.IgnoreShortName) == null)
+                .Where(x => !x.IsStatic)
+                .Where(x => x.ExplicitInterfaceImplementations.Length == 0)
                 .ToArray();
 
             var startOrder = targets

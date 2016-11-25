@@ -239,31 +239,41 @@ namespace Sandbox
     }
 
 
+    [ZeroFormattable]
+    public class ArrayDirty
+    {
+        public static ArrayDirty Instance { get; private set; }
+
+        [Index(0)]
+        public virtual Nest MyProperty { get; set; }
+
+        public ArrayDirty()
+        {
+            Instance = this;
+        }
+    }
+
+    [ZeroFormattable]
+    public class Nest
+    {
+        [Index(0)]
+        public virtual int[] MyProperty { get; set; }
+    }
+
 
     class Program
     {
         static void Main(string[] args)
         {
+            var hoge = new ArrayDirty { MyProperty = new Nest { MyProperty = new[] { 1, 10, 100 } } };
+
+            var huga = ZeroFormatterSerializer.Convert(hoge);
 
 
-
-
-            ZeroFormatter.Formatters.Formatter.AppendDynamicUnionResolver((unionType, resolver) =>
-            {
-    //can be easily extended to reflection based scan if library consumer wants it
-    if (unionType == typeof(MessageBase))
-                {
-                    resolver.RegisterUnionKeyType(typeof(byte));
-                    resolver.RegisterSubType(key: (byte)1, subType: typeof(MessageA));
-                    resolver.RegisterSubType(key: (byte)2, subType: typeof(MessageB));
-                    resolver.RegisterFallbackType(typeof(UnknownMessage));
-                }
-            });
-
-
-
+            Console.WriteLine(ArrayDirty.Instance.MyProperty.MyProperty[1]);
         }
     }
+
 
 
     public interface Imessage

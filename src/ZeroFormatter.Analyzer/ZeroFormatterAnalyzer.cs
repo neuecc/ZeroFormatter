@@ -358,6 +358,11 @@ namespace ZeroFormatter.Analyzer
 
         static void VerifyProperty(DiagnosticsReportContext context, IPropertySymbol property, HashSet<ITypeSymbol> alreadyAnalyzed, HashSet<int> definedIndexes)
         {
+            if (property.IsStatic)
+            {
+                return;
+            }
+
             if (property.DeclaredAccessibility != Accessibility.Public)
             {
                 return;
@@ -426,11 +431,25 @@ namespace ZeroFormatter.Analyzer
             if (namedType != null) // if <T> is unnamed type, it can't analyze.
             {
                 VerifyType(context, property.Locations[0], property.Type, alreadyAnalyzed, property);
+                return;
+            }
+
+            if (property.Type.TypeKind == TypeKind.Array)
+            {
+                var array = property.Type as IArrayTypeSymbol;
+                var t = array.ElementType;
+                VerifyType(context, property.Locations[0], property.Type, alreadyAnalyzed, property);
+                return;
             }
         }
 
         static void VerifyField(DiagnosticsReportContext context, IFieldSymbol field, HashSet<ITypeSymbol> alreadyAnalyzed, HashSet<int> definedIndexes)
         {
+            if (field.IsStatic)
+            {
+                return;
+            }
+
             if (field.DeclaredAccessibility != Accessibility.Public)
             {
                 return;
