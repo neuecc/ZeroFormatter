@@ -69,9 +69,6 @@
     <None Include="packages.config" />
     <AdditionalFiles Include="ZeroFormatterAnalyzer.json" />
   </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\packages\ZeroFormatter.Analyzer.1.0.7\analyzers\dotnet\cs\ZeroFormatterAnalyzer.dll" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -298,6 +298,9 @@ namespace ZeroFormatter.CodeGenerator
                 var indexes = new List<Tuple<int, IPropertySymbol>>();
                 foreach (var item in type.GetMembers().OfType<IPropertySymbol>())
                 {
+                    if (item.IsStatic) continue;
+                    if (item.ExplicitInterfaceImplementations.Length != 0) continue;
+
                     var indexAttr = item.GetAttributes().FindAttributeShortName(IndexAttributeShortName);
                     if (indexAttr != null)
                     {
@@ -343,6 +346,9 @@ namespace ZeroFormatter.CodeGenerator
             {
                 if (!distinctName.Add(property.Name)) continue;
 
+
+                if (property.IsStatic) continue;
+
                 var propSymbol = property as IPropertySymbol;
                 var fieldSymbol = property as IFieldSymbol;
 
@@ -352,6 +358,11 @@ namespace ZeroFormatter.CodeGenerator
                 }
 
                 if (property.DeclaredAccessibility != Accessibility.Public)
+                {
+                    continue;
+                }
+
+                if (propSymbol != null && propSymbol.ExplicitInterfaceImplementations.Length != 0)
                 {
                     continue;
                 }

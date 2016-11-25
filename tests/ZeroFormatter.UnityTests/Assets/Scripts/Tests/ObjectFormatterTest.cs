@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RuntimeUnitTestToolkit;
-
+using Sandbox.Shared.Bar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -199,6 +199,15 @@ namespace ZeroFormatter.Tests
             newFooBar.FooMyClass.Mone.Is(Sandbox.Shared.Foo.MogeMoge.Orange);
 
 
+        }
+
+        public void StaticInclude()
+        {
+            var prop = new StaticProperty() { HugaHuga = 999, My2 = new[] { new DameClass { Ok = 9 } } };
+
+            var hoge = ZeroFormatterSerializer.Convert(prop);
+            hoge.HugaHuga.Is(999);
+            hoge.My2[0].Ok.Is(9);
         }
     }
 }

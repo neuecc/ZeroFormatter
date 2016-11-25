@@ -11,28 +11,8 @@ using ZeroFormatter.Segments;
 using ZeroFormatter.Formatters;
 using ZeroFormatter.Internal;
 using Sandbox.Shared;
+using Sandbox.Shared.Bar;
 
-[ZeroFormattable]
-public class MyClass
-{
-    [Index(0)]
-    public virtual int Age { get; set; }
-
-    [Index(1)]
-    public virtual string FirstName { get; set; }
-
-    [Index(2)]
-    public virtual string LastName { get; set; }
-
-    [IgnoreFormat]
-    public string FullName { get { return FirstName + LastName; } }
-
-    [Index(3)]
-    public virtual IList<MogeMoge> List { get; set; }
-
-    [Index(4)]
-    public virtual MogeMoge Mone { get; set; }
-}
 
 
 
@@ -265,22 +245,17 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            var hoge = new ArrayDirty { MyProperty = new Nest { MyProperty = new[] { 1, 10, 100 } } };
+            var prop = new StaticProperty() { HugaHuga = 999, My2 = new[] { new DameClass { Ok = 9 } } };
 
-            var huga = ZeroFormatterSerializer.Convert(hoge);
-
-
-            Console.WriteLine(ArrayDirty.Instance.MyProperty.MyProperty[1]);
+            var hoge = ZeroFormatterSerializer.Convert(prop);
+            Console.WriteLine(hoge.HugaHuga);
+            Console.WriteLine(hoge.My2[0].Ok);
         }
     }
-
-
 
     public interface Imessage
     {
     }
-
-
 
 
     [Union(new[] { typeof(Human), typeof(Monster) }, typeof(Unknown))]

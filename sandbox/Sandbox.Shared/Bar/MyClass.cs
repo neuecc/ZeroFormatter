@@ -6,6 +6,42 @@ using ZeroFormatter;
 
 namespace Sandbox.Shared.Bar
 {
+    public interface ITakoyaki
+    {
+        int HugaHuga { get; }
+    }
+
+    [ZeroFormattable]
+    public class StaticProperty : ITakoyaki
+    {
+        public static int MyProperty { get; set; }
+
+
+        public static StaticProperty Self;
+
+        [Index(0)]
+        public virtual DameClass[] My2 { get; set; }
+
+        [Index(1)]
+        public virtual int HugaHuga { get; set; }
+
+        int ITakoyaki.HugaHuga
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+
+    [ZeroFormattable]
+    public class DameClass
+    {
+        [Index(0)]
+        public virtual int Ok { get; set; }
+    }
+
+
     [ZeroFormattable]
     public class MyClass
     {
