@@ -1,0 +1,1 @@
+zfc -i "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\sandbox\Sandbox.Shared\Sandbox.Shared.csproj" -o "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\tests\ZeroFormatter.UnityTests\Assets\ZeroFormatterGenerated.cs" -c UNITY -u
