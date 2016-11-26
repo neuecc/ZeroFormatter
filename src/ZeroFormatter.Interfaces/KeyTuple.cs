@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ZeroFormatter
 {
@@ -496,10 +497,34 @@ namespace ZeroFormatter
 
     public static class KeyTupleExtensions
     {
-        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue = default(TValue))
+        public static IEnumerable<TValue> Get<TKey1, TKey2, TValue>(this ILookup<KeyTuple<TKey1, TKey2>, TValue> lookup, TKey1 tKey1, TKey2 tKey2)
         {
-            TValue result;
-            return dictionary.TryGetValue(key, out result) ? result : defaultValue;
+            return lookup[KeyTuple.Create(tKey1, tKey2)];
+        }
+
+        public static IEnumerable<TValue> Get<TKey1, TKey2, TKey3, TValue>(this ILookup<KeyTuple<TKey1, TKey2, TKey3>, TValue> lookup, TKey1 tKey1, TKey2 tKey2, TKey3 tKey3)
+        {
+            return lookup[KeyTuple.Create(tKey1, tKey2, tKey3)];
+        }
+
+        public static IEnumerable<TValue> Get<TKey1, TKey2, TKey3, TKey4, TValue>(this ILookup<KeyTuple<TKey1, TKey2, TKey3, TKey4>, TValue> lookup, TKey1 tKey1, TKey2 tKey2, TKey3 tKey3, TKey4 tKey4)
+        {
+            return lookup[KeyTuple.Create(tKey1, tKey2, tKey3, tKey4)];
+        }
+
+        public static IEnumerable<TValue> Get<TKey1, TKey2, TKey3, TKey4, TKey5, TValue>(this ILookup<KeyTuple<TKey1, TKey2, TKey3, TKey4, TKey5>, TValue> lookup, TKey1 tKey1, TKey2 tKey2, TKey3 tKey3, TKey4 tKey4, TKey5 tKey5)
+        {
+            return lookup[KeyTuple.Create(tKey1, tKey2, tKey3, tKey4, tKey5)];
+        }
+
+        public static IEnumerable<TValue> Get<TKey1, TKey2, TKey3, TKey4, TKey5, TKey6, TValue>(this ILookup<KeyTuple<TKey1, TKey2, TKey3, TKey4, TKey5, TKey6>, TValue> lookup, TKey1 tKey1, TKey2 tKey2, TKey3 tKey3, TKey4 tKey4, TKey5 tKey5, TKey6 tKey6)
+        {
+            return lookup[KeyTuple.Create(tKey1, tKey2, tKey3, tKey4, tKey5, tKey6)];
+        }
+
+        public static IEnumerable<TValue> Get<TKey1, TKey2, TKey3, TKey4, TKey5, TKey6, TKey7, TValue>(this ILookup<KeyTuple<TKey1, TKey2, TKey3, TKey4, TKey5, TKey6, TKey7>, TValue> lookup, TKey1 tKey1, TKey2 tKey2, TKey3 tKey3, TKey4 tKey4, TKey5 tKey5, TKey6 tKey6, TKey7 tKey7)
+        {
+            return lookup[KeyTuple.Create(tKey1, tKey2, tKey3, tKey4, tKey5, tKey6, tKey7)];
         }
 
         public static TValue GetValueOrDefault<TKey1, TKey2, TValue>(this IDictionary<KeyTuple<TKey1, TKey2>, TValue> dictionary, TKey1 tKey1, TKey2 tKey2, TValue defaultValue = default(TValue))
@@ -541,7 +566,6 @@ namespace ZeroFormatter
                 ? value
                 : defaultValue;
         }
-
 
         public static TValue GetValueOrDefault<TKey1, TKey2, TKey3, TKey4, TKey5, TKey6, TKey7, TValue>(this IDictionary<KeyTuple<TKey1, TKey2, TKey3, TKey4, TKey5, TKey6, TKey7>, TValue> dictionary, TKey1 tKey1, TKey2 tKey2, TKey3 tKey3, TKey4 tKey4, TKey5 tKey5, TKey6 tKey6, TKey7 tKey7, TValue defaultValue = default(TValue))
         {
