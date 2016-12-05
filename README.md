@@ -471,6 +471,8 @@ zfc arguments help:
   -d, --disallowinternaltype    [optional, default=false]Don't generate internal type
   -e, --propertyenumonly        [optional, default=false]Generate only property enum type only
   -m, --disallowinmetadata      [optional, default=false]Don't generate in metadata type
+  -g, --gencomparekeyonly       [optional, default=false]Don't generate in EnumEqualityComparer except dictionary key
+  -n, --namespace=VALUE         [optional, default=ZeroFormatter]Set namespace root name
 ```
 
 ```

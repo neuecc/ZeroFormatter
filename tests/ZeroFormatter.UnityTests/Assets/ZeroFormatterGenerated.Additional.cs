@@ -1,4 +1,4 @@
-﻿namespace ZeroFormatter.Internal
+﻿namespace ZeroFormatter
 {
     using System;
     using System.Collections.Generic;

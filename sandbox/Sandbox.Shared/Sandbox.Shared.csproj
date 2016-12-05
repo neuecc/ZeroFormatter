@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="AllNewFormat.cs" />
     <Compile Include="Bar\MyClass.cs" />
+    <Compile Include="EnumGenChecker.cs" />
     <Compile Include="Foo\MyClass.cs" />
     <Compile Include="GlobalNamespace.cs" />
     <Compile Include="InnerClass.cs" />

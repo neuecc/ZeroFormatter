@@ -37,6 +37,8 @@ namespace <#= Namespace #>
         }
     }
 
+<# if (t.IncludeNullable) { #>
+
     public class Nullable<#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>?>
         where TTypeResolver : ITypeResolver, new()
     {
@@ -70,6 +72,10 @@ namespace <#= Namespace #>
         }
     }
 
+<# } #>
+
+<# if(t.IsGenerateEqualityComparer) { #>
+
     public class <#= t.Name #>EqualityComparer : IEqualityComparer<<#= t.FullName #>>
     {
         public bool Equals(<#= t.FullName #> x, <#= t.FullName #> y)
@@ -98,6 +104,8 @@ namespace <#= Namespace #>
 <# } #>
         }
     }
+
+<# } #>
 
 <# } #>
 

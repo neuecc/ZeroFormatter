@@ -33,16 +33,20 @@ namespace ZeroFormatter.CodeGenerator
         List<ObjectSegmentType> objectContainer;
         List<GenericType> genericTypeContainer;
         List<UnionType> unionTypeContainer;
-        HashSet<string> alreadyCollected;
+        HashSet<Tuple<string, bool, bool>> alreadyCollected;
 
         HashSet<string> allowCustomTypes;
         bool disallowInMetadata;
+        bool generateComparerKeyTypeEnumOnly;
+        string namespaceRoot;
 
-        public TypeCollector(string csProjPath, IEnumerable<string> conditinalSymbols, IEnumerable<string> allowCustomTypes, bool allowInternal, bool generatePropertyTypeEnumOnly, bool disallowInMetadata)
+        public TypeCollector(string csProjPath, IEnumerable<string> conditinalSymbols, IEnumerable<string> allowCustomTypes, bool allowInternal, bool generatePropertyTypeEnumOnly, bool disallowInMetadata, bool generateComparerKeyTypeEnumOnly, string namespaceRoot)
         {
             this.disallowInMetadata = disallowInMetadata;
             this.csProjPath = csProjPath;
             this.allowCustomTypes = new HashSet<string>(allowCustomTypes);
+            this.generateComparerKeyTypeEnumOnly = generateComparerKeyTypeEnumOnly;
+            this.namespaceRoot = namespaceRoot;
 
             var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, conditinalSymbols.Concat(new[] { CodegeneratorOnlyPreprocessorSymbol }).ToArray()).GetAwaiter().GetResult();
             targetTypes = compilation.GetNamedTypeSymbols()
@@ -72,7 +76,7 @@ namespace ZeroFormatter.CodeGenerator
             structContainer = new List<CodeGenerator.ObjectSegmentType>();
             genericTypeContainer = new List<CodeGenerator.GenericType>();
             unionTypeContainer = new List<CodeGenerator.UnionType>();
-            alreadyCollected = new HashSet<string>();
+            alreadyCollected = new HashSet<Tuple<string, bool, bool>>();
         }
 
         public void Visit(out EnumGenerator[] enumGenerators, out ObjectGenerator[] objectGenerators, out StructGenerator[] structGenerators, out UnionGenerator[] unionGenerators, out GenericType[] genericTypes)
@@ -81,7 +85,7 @@ namespace ZeroFormatter.CodeGenerator
 
             foreach (var item in targetTypes[TypeKind.Enum])
             {
-                CollectEnum(item);
+                CollectEnum(item, true, false);
             }
             foreach (var item in targetTypes[TypeKind.Class])
             {
@@ -91,7 +95,7 @@ namespace ZeroFormatter.CodeGenerator
                 }
                 else
                 {
-                    CollectObjectSegment(item);
+                    CollectObjectSegment(item, false, false);
                 }
             }
             foreach (var item in targetTypes[TypeKind.Interface])
@@ -100,24 +104,35 @@ namespace ZeroFormatter.CodeGenerator
             }
             foreach (var item in targetTypes[TypeKind.Struct])
             {
-                CollectObjectSegment(item);
+                CollectObjectSegment(item, false, false);
             }
 
-            enumGenerators = enumContainer.Distinct()
+            enumGenerators = enumContainer
+                .GroupBy(x => x.FullName)
+                .Select(x =>
+                {
+                    var nullableEnum = x.Any(y => y.IncludeNullable);
+                    var generateEqualityComparer = x.Any(y => y.IsGenerateEqualityComparer);
+
+                    var c = x.First();
+                    c.IncludeNullable = nullableEnum;
+                    c.IsGenerateEqualityComparer = generateEqualityComparer;
+                    return c;
+                })
                .GroupBy(x => x.Namespace)
                .OrderBy(x => x.Key)
-                .Select(x => new EnumGenerator
-                {
-                    Namespace = "ZeroFormatter.DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
-                    Types = x.ToArray()
-                })
-                .ToArray();
+               .Select(x => new EnumGenerator
+               {
+                   Namespace = namespaceRoot + ".DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
+                   Types = x.ToArray()
+               })
+               .ToArray();
 
             objectGenerators = objectContainer
                .GroupBy(x => x.Namespace)
                .Select(x => new ObjectGenerator
                {
-                   Namespace = "ZeroFormatter.DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
+                   Namespace = namespaceRoot+ ".DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
                    Types = x.ToArray(),
                })
                .ToArray();
@@ -126,7 +141,7 @@ namespace ZeroFormatter.CodeGenerator
                .GroupBy(x => x.Namespace)
                .Select(x => new UnionGenerator
                {
-                   Namespace = "ZeroFormatter.DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
+                   Namespace = namespaceRoot + ".DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
                    Types = x.ToArray(),
                })
                .ToArray();
@@ -135,7 +150,7 @@ namespace ZeroFormatter.CodeGenerator
                .GroupBy(x => x.Namespace)
                .Select(x => new StructGenerator
                {
-                   Namespace = "ZeroFormatter.DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
+                   Namespace = namespaceRoot + ".DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
                    Types = x.ToArray(),
                })
                .ToArray();
@@ -145,8 +160,13 @@ namespace ZeroFormatter.CodeGenerator
             genericTypes = genericTypeContainer.Distinct().OrderBy(x => x).ToArray();
         }
 
-        void CollectEnum(INamedTypeSymbol symbol)
+        void CollectEnum(INamedTypeSymbol symbol, bool includeNullable, bool asKey)
         {
+            if (symbol == null)
+            {
+                return;
+            }
+
             if (disallowInMetadata && symbol.Locations[0].IsInMetadata)
             {
                 return;
@@ -158,19 +178,21 @@ namespace ZeroFormatter.CodeGenerator
                 FullName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 Namespace = symbol.ContainingNamespace.IsGlobalNamespace ? null : symbol.ContainingNamespace.ToDisplayString(),
                 UnderlyingType = symbol.EnumUnderlyingType.ToDisplayString(binaryWriteFormat),
-                Length = GetEnumSize(symbol.EnumUnderlyingType)
+                Length = GetEnumSize(symbol.EnumUnderlyingType),
+                IncludeNullable = includeNullable,
+                IsGenerateEqualityComparer = generateComparerKeyTypeEnumOnly ? asKey : true
             };
 
             enumContainer.Add(type);
         }
 
-        void CollectObjectSegment(INamedTypeSymbol type)
+        void CollectObjectSegment(INamedTypeSymbol type, bool fromNullable, bool asKey)
         {
             if (type == null)
             {
                 return;
             }
-            if (!alreadyCollected.Add(type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)))
+            if (!alreadyCollected.Add(Tuple.Create(type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), fromNullable, asKey)))
             {
                 return;
             }
@@ -189,7 +211,7 @@ namespace ZeroFormatter.CodeGenerator
             }
             if (type.TypeKind == TypeKind.Enum)
             {
-                CollectEnum(type);
+                CollectEnum(type, fromNullable, asKey);
                 return;
             }
             if (allowCustomTypes.Contains(type.ToDisplayString()))
@@ -204,14 +226,14 @@ namespace ZeroFormatter.CodeGenerator
 
                 if (genericTypeString == "T?")
                 {
-                    CollectObjectSegment(type.TypeArguments[0] as INamedTypeSymbol);
+                    CollectObjectSegment(type.TypeArguments[0] as INamedTypeSymbol, true, asKey);
                     return;
                 }
                 else if (allowCustomTypes.Contains(genericTypeString))
                 {
                     foreach (var t in type.TypeArguments)
                     {
-                        CollectObjectSegment(t as INamedTypeSymbol);
+                        CollectObjectSegment(t as INamedTypeSymbol, fromNullable, asKey);
                     }
                     return;
                 }
@@ -231,6 +253,7 @@ namespace ZeroFormatter.CodeGenerator
                       || genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
                 {
                     var elementTypes = string.Join(", ", type.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
+                    var isDictionaryKey = false;
 
                     if (genericTypeString == "System.Collections.Generic.IList<>")
                     {
@@ -242,22 +265,27 @@ namespace ZeroFormatter.CodeGenerator
                     }
                     else if (genericTypeString == "System.Collections.Generic.IDictionary<,>" || genericTypeString == "System.Collections.Generic.Dictionary<,>")
                     {
+                        isDictionaryKey = true;
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Dictionary, ElementTypes = elementTypes });
                     }
                     else if (genericTypeString == "ZeroFormatter.ILazyDictionary<,>")
                     {
+                        isDictionaryKey = true;
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.LazyDictionary, ElementTypes = elementTypes });
                     }
                     else if (genericTypeString == "ZeroFormatter.ILazyReadOnlyDictionary<,>")
                     {
+                        isDictionaryKey = true;
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.LazyReadOnlyDictionary, ElementTypes = elementTypes });
                     }
                     else if (genericTypeString == "ZeroFormatter.ILazyLookup<,>")
                     {
+                        isDictionaryKey = true;
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.LazyLookup, ElementTypes = elementTypes });
                     }
                     else if (genericTypeString == "System.Linq.ILookup<,>")
                     {
+                        isDictionaryKey = true;
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Lookup, ElementTypes = elementTypes });
                     }
                     else if (genericTypeString.StartsWith("ZeroFormatter.KeyTuple"))
@@ -282,9 +310,18 @@ namespace ZeroFormatter.CodeGenerator
                         genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.ReadOnlyCollection, ElementTypes = elementTypes });
                     }
 
+                    var argIndex = 0;
                     foreach (var t in type.TypeArguments)
                     {
-                        CollectObjectSegment(t as INamedTypeSymbol);
+                        if (isDictionaryKey && argIndex == 0)
+                        {
+                            CollectObjectSegment(t as INamedTypeSymbol, fromNullable, true);
+                        }
+                        else
+                        {
+                            CollectObjectSegment(t as INamedTypeSymbol, fromNullable, asKey);
+                        }
+                        argIndex++;
                     }
                     return;
                 }
@@ -295,7 +332,7 @@ namespace ZeroFormatter.CodeGenerator
 
                     foreach (var t in type.TypeArguments)
                     {
-                        CollectObjectSegment(t as INamedTypeSymbol);
+                        CollectObjectSegment(t as INamedTypeSymbol, fromNullable, asKey);
                     }
                     return;
                 }
@@ -467,7 +504,7 @@ namespace ZeroFormatter.CodeGenerator
                         if (namedType != null) // if <T> is unnamed type, it can't analyze.
                         {
                             // Recursive
-                            CollectObjectSegment(namedType);
+                            CollectObjectSegment(namedType, fromNullable, asKey);
                             break;
                         }
                         array = t as IArrayTypeSymbol;
@@ -479,7 +516,7 @@ namespace ZeroFormatter.CodeGenerator
                     if (namedType != null) // if <T> is unnamed type, it can't analyze.
                     {
                         // Recursive
-                        CollectObjectSegment(namedType);
+                        CollectObjectSegment(namedType, fromNullable, asKey);
                     }
                 }
 
@@ -544,6 +581,12 @@ namespace ZeroFormatter.CodeGenerator
                     throw new Exception($"Union class requires abstract [UnionKey]property. Type: {type.Name}. Location:{type.Locations[0]}");
                 }
             }
+
+            if (unionKeyProperty.Type.TypeKind == TypeKind.Enum)
+            {
+                CollectEnum(unionKeyProperty.Type as INamedTypeSymbol, false, true);
+            }
+
 
             var ctorArguments = type.GetAttributes().FindAttributeShortName(UnionAttributeShortName)?.ConstructorArguments;
             var firstArguments = ctorArguments?.FirstOrDefault();

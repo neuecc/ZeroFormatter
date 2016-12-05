@@ -22,7 +22,8 @@ namespace ZeroFormatter.CodeGenerator
         public bool DisallowInternalType { get; private set; }
         public bool PropertyEnumOnly { get; private set; }
         public bool DisallowInMetadata { get; private set; }
-        // public string ZeroFormatterInitializerNamespace { get; set; }
+        public bool GenerateComparerKeyEnumOnly { get; private set; }
+        public string NamespaceRoot { get; private set; }
 
         public bool IsParsed { get; set; }
 
@@ -31,6 +32,7 @@ namespace ZeroFormatter.CodeGenerator
             AllowCustomTypes = new List<string>();
             ConditionalSymbols = new List<string>();
             ResolverName = "ZeroFormatter.Formatters.DefaultResolver";
+            NamespaceRoot = "ZeroFormatter";
 
             var option = new OptionSet()
             {
@@ -44,7 +46,8 @@ namespace ZeroFormatter.CodeGenerator
                 { "d|disallowinternaltype", "[optional, default=false]Don't generate internal type", x => { DisallowInternalType = true; } },
                 { "e|propertyenumonly", "[optional, default=false]Generate only property enum type only", x => { PropertyEnumOnly = true; } },
                 { "m|disallowinmetadata", "[optional, default=false]Don't generate in metadata type", x => { DisallowInMetadata = true; } },
-                // { "n|initializernamespace=", "[optional, default=ZeroFormatter.Internal]ZeroFormatterInitializer namespace", _ => { ZeroFormatterInitializerNamespace = true; } },
+                { "g|gencomparekeyonly", "[optional, default=false]Don't generate in EnumEqualityComparer except dictionary key", x => { GenerateComparerKeyEnumOnly = true; } },
+                { "n|namespace=", "[optional, default=ZeroFormatter]Set namespace root name", x => { NamespaceRoot = x; } },
             };
             if (args.Length == 0)
             {
@@ -95,7 +98,7 @@ namespace ZeroFormatter.CodeGenerator
             var sw = Stopwatch.StartNew();
             Console.WriteLine("Project Compilation Start:" + csprojPath);
 
-            var tc = new TypeCollector(csprojPath, cmdArgs.ConditionalSymbols, cmdArgs.AllowCustomTypes, cmdArgs.DisallowInternalType, cmdArgs.PropertyEnumOnly, cmdArgs.DisallowInMetadata);
+            var tc = new TypeCollector(csprojPath, cmdArgs.ConditionalSymbols, cmdArgs.AllowCustomTypes, cmdArgs.DisallowInternalType, cmdArgs.PropertyEnumOnly, cmdArgs.DisallowInMetadata, cmdArgs.GenerateComparerKeyEnumOnly, cmdArgs.NamespaceRoot);
 
             Console.WriteLine("Project Compilation Complete:" + sw.Elapsed.ToString());
             Console.WriteLine();
@@ -118,7 +121,7 @@ namespace ZeroFormatter.CodeGenerator
                 Console.WriteLine("String Generation Start");
                 sw.Restart();
                 var sb = new StringBuilder();
-                sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName }.TransformText());
+                sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName, Namespace = cmdArgs.NamespaceRoot }.TransformText());
 
                 foreach (var item in objectGen)
                 {
@@ -147,7 +150,7 @@ namespace ZeroFormatter.CodeGenerator
                 sw.Restart();
 
                 var initializerPath = Path.Combine(outputpath, "ZeroFormatterInitializer.cs");
-                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName }.TransformText());
+                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName, Namespace = cmdArgs.NamespaceRoot }.TransformText());
 
                 foreach (var item in objectGen.SelectMany(x => x.Types))
                 {

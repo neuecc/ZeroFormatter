@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="ZeroFormatterAnalyzer.343bae8e-c880-437c-9e30-748b9e0f9b6e" Version="1.5.3" Language="en-US" Publisher="neuecc"/>
+        <Identity Id="ZeroFormatterAnalyzer.343bae8e-c880-437c-9e30-748b9e0f9b6e" Version="1.5.4" Language="en-US" Publisher="neuecc"/>
         <DisplayName>ZeroFormatterAnalyzer</DisplayName>
         <Description xml:space="preserve">New Launcher of ZeroFormatter.Analyzer</Description>
     </Metadata>
