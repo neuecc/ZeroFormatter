@@ -51,6 +51,7 @@
     <Compile Include="Bar\MyClass.cs" />
     <Compile Include="Foo\MyClass.cs" />
     <Compile Include="GlobalNamespace.cs" />
+    <Compile Include="InnerClass.cs" />
     <Compile Include="Perf.cs" />
     <Compile Include="PseudoVector.cs" />
     <Compile Include="Inherit.cs" />

@@ -24,6 +24,9 @@ namespace ZeroFormatter.CodeGenerator
                 miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable,
                 typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly);
 
+        static readonly SymbolDisplayFormat typeNameFormat = new SymbolDisplayFormat(
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypes);
+
         ILookup<TypeKind, INamedTypeSymbol> targetTypes;
         List<EnumType> enumContainer;
         List<ObjectSegmentType> structContainer;
@@ -33,15 +36,27 @@ namespace ZeroFormatter.CodeGenerator
         HashSet<string> alreadyCollected;
 
         HashSet<string> allowCustomTypes;
+        bool disallowInMetadata;
 
-        public TypeCollector(string csProjPath, IEnumerable<string> conditinalSymbols, IEnumerable<string> allowCustomTypes)
+        public TypeCollector(string csProjPath, IEnumerable<string> conditinalSymbols, IEnumerable<string> allowCustomTypes, bool allowInternal, bool generatePropertyTypeEnumOnly, bool disallowInMetadata)
         {
+            this.disallowInMetadata = disallowInMetadata;
             this.csProjPath = csProjPath;
             this.allowCustomTypes = new HashSet<string>(allowCustomTypes);
 
             var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, conditinalSymbols.Concat(new[] { CodegeneratorOnlyPreprocessorSymbol }).ToArray()).GetAwaiter().GetResult();
             targetTypes = compilation.GetNamedTypeSymbols()
-                .Where(x => (x.TypeKind == TypeKind.Enum)
+                .Where(x =>
+                {
+                    if (x.DeclaredAccessibility == Accessibility.Public) return true;
+                    if (allowInternal)
+                    {
+                        return (x.DeclaredAccessibility == Accessibility.Friend);
+                    }
+
+                    return false;
+                })
+                .Where(x => (!generatePropertyTypeEnumOnly && x.TypeKind == TypeKind.Enum)
                     || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
                     || ((x.TypeKind == TypeKind.Interface) && x.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null)
                     || ((x.TypeKind == TypeKind.Class) && x.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null)
@@ -132,9 +147,14 @@ namespace ZeroFormatter.CodeGenerator
 
         void CollectEnum(INamedTypeSymbol symbol)
         {
+            if (disallowInMetadata && symbol.Locations[0].IsInMetadata)
+            {
+                return;
+            }
+
             var type = new EnumType
             {
-                Name = symbol.Name,
+                Name = symbol.ToDisplayString(typeNameFormat).Replace(".", "_"),
                 FullName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 Namespace = symbol.ContainingNamespace.IsGlobalNamespace ? null : symbol.ContainingNamespace.ToDisplayString(),
                 UnderlyingType = symbol.EnumUnderlyingType.ToDisplayString(binaryWriteFormat),
@@ -279,6 +299,11 @@ namespace ZeroFormatter.CodeGenerator
                     }
                     return;
                 }
+            }
+
+            if (disallowInMetadata && type.Locations[0].IsInMetadata)
+            {
+                return;
             }
 
             if (type.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) == null)
@@ -477,7 +502,7 @@ namespace ZeroFormatter.CodeGenerator
 
             var segment = new ObjectSegmentType
             {
-                Name = type.Name,
+                Name = type.ToDisplayString(typeNameFormat).Replace(".", "_"),
                 FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 Namespace = type.ContainingNamespace.IsGlobalNamespace ? null : type.ContainingNamespace.ToDisplayString(),
                 LastIndex = list.Select(x => x.Index).DefaultIfEmpty(0).Max(),
@@ -496,6 +521,11 @@ namespace ZeroFormatter.CodeGenerator
 
         void CollectUnion(INamedTypeSymbol type)
         {
+            if (disallowInMetadata && type.Locations[0].IsInMetadata)
+            {
+                return;
+            }
+
             var unionKeys = type.GetMembers().OfType<IPropertySymbol>().Where(x => x.GetAttributes().FindAttributeShortName(UnionKeyAttributeShortName) != null).ToArray();
             if (unionKeys.Length == 0)
             {
@@ -555,7 +585,7 @@ namespace ZeroFormatter.CodeGenerator
 
             unionTypeContainer.Add(new UnionType
             {
-                Name = type.Name,
+                Name = type.ToDisplayString(typeNameFormat).Replace(".", "_"),
                 FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 Namespace = type.ContainingNamespace.IsGlobalNamespace ? null : type.ContainingNamespace.ToDisplayString(),
                 UnionKeyTypeName = unionKeyProperty.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),

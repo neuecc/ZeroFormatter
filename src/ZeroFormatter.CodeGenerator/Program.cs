@@ -18,7 +18,11 @@ namespace ZeroFormatter.CodeGenerator
         public List<string> AllowCustomTypes { get; private set; }
         public List<string> ConditionalSymbols { get; private set; }
         public bool IsSeparate { get; private set; }
-        public string ResolverName { get; set; }
+        public string ResolverName { get; private set; }
+        public bool DisallowInternalType { get; private set; }
+        public bool PropertyEnumOnly { get; private set; }
+        public bool DisallowInMetadata { get; private set; }
+        // public string ZeroFormatterInitializerNamespace { get; set; }
 
         public bool IsParsed { get; set; }
 
@@ -37,6 +41,10 @@ namespace ZeroFormatter.CodeGenerator
                 { "t|customtypes=", "[optional, default=empty]comma separated allows custom types", x => { AllowCustomTypes.AddRange(x.Split(',')); } },
                 { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
                 { "r|resolvername=", "[optional, default=DefaultResolver]Register CustomSerializer target", x => { ResolverName = x; } },
+                { "d|disallowinternaltype", "[optional, default=false]Don't generate internal type", x => { DisallowInternalType = true; } },
+                { "e|propertyenumonly", "[optional, default=false]Generate only property enum type only", x => { PropertyEnumOnly = true; } },
+                { "m|disallowinmetadata", "[optional, default=false]Don't generate in metadata type", x => { DisallowInMetadata = true; } },
+                // { "n|initializernamespace=", "[optional, default=ZeroFormatter.Internal]ZeroFormatterInitializer namespace", _ => { ZeroFormatterInitializerNamespace = true; } },
             };
             if (args.Length == 0)
             {
@@ -87,7 +95,7 @@ namespace ZeroFormatter.CodeGenerator
             var sw = Stopwatch.StartNew();
             Console.WriteLine("Project Compilation Start:" + csprojPath);
 
-            var tc = new TypeCollector(csprojPath, cmdArgs.ConditionalSymbols, cmdArgs.AllowCustomTypes);
+            var tc = new TypeCollector(csprojPath, cmdArgs.ConditionalSymbols, cmdArgs.AllowCustomTypes, cmdArgs.DisallowInternalType, cmdArgs.PropertyEnumOnly, cmdArgs.DisallowInMetadata);
 
             Console.WriteLine("Project Compilation Complete:" + sw.Elapsed.ToString());
             Console.WriteLine();
@@ -139,7 +147,7 @@ namespace ZeroFormatter.CodeGenerator
                 sw.Restart();
 
                 var initializerPath = Path.Combine(outputpath, "ZeroFormatterInitializer.cs");
-                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName= cmdArgs.ResolverName }.TransformText());
+                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName }.TransformText());
 
                 foreach (var item in objectGen.SelectMany(x => x.Types))
                 {
