@@ -198,7 +198,7 @@ namespace Sandbox
 
     public class CustomSerializationContext : ITypeResolver
     {
-        public bool IsUseBuiltinDynamicSerializer
+        public bool IsUseBuiltinSerializer
         {
             get
             {
