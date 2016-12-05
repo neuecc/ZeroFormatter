@@ -468,9 +468,9 @@ zfc arguments help:
   -t, --customtypes=VALUE       [optional, default=empty]comma separated allows custom types
   -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
   -r, --resolvername=VALUE      [optional, default=DefaultResolver]Register CustomSerializer target
-  -d, --disallowinternaltype    [optional, default=false]Don't generate internal type", x => { DisallowInternalType = true; } },
-  -e, --propertyenumonly,       [optional, default=false]Generate only property enum type only", x => { PropertyEnumOnly = true; } },
-  -m, --disallowinmetadata,     [optional, default=false]Don't generate in metadata type", x => { DisallowInMetadata = true; } },
+  -d, --disallowinternaltype    [optional, default=false]Don't generate internal type
+  -e, --propertyenumonly,       [optional, default=false]Generate only property enum type only
+  -m, --disallowinmetadata,     [optional, default=false]Don't generate in metadata type
 ```
 
 ```
