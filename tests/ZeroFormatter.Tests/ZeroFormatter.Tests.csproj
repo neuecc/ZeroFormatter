@@ -94,6 +94,7 @@
     <Compile Include="UnionTest.cs" />
     <Compile Include="EqTest.cs" />
     <Compile Include="VersiongTest.cs" />
+    <Compile Include="ZeroArgumentTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChainingAssertion.Ext.cs" />
