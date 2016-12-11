@@ -87,6 +87,8 @@ namespace ZeroFormatter.CodeGenerator
         {
             get
             {
+                if (Properties.Length == 0) return new int[0];
+
                 var schemaLastIndex = Properties.Select(x => x.Index).LastOrDefault();
                 var dict = Properties.Where(x => x.IsFixedSize).ToDictionary(x => x.Index, x => x.FixedSize);
                 var elementSizes = new int[schemaLastIndex + 1];
@@ -100,6 +102,20 @@ namespace ZeroFormatter.CodeGenerator
 
                 return elementSizes;
             }
+        }
+
+        public int? GetLength()
+        {
+            if (Properties.Length == 0) return 0;
+            
+            var sum = 0;
+            foreach (var item in Properties)
+            {
+                if (!item.IsFixedSize) return null;
+                sum += item.FixedSize;
+            }
+
+            return sum;
         }
     }
 

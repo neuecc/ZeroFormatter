@@ -29,6 +29,7 @@ namespace ZeroFormatter.Tests
             UnitTest.RegisterAllMethods<EqualityCompTest>();
             UnitTest.RegisterAllMethods<SequenceTest>();
             UnitTest.RegisterAllMethods<UnionTest>();
+            UnitTest.RegisterAllMethods<ZeroArgumentTest>();
 
             UnitTest.RegisterAllMethods<PerformanceTest>();
         }

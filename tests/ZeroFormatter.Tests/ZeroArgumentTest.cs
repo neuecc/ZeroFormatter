@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZeroFormatter.Formatters;
 
 namespace ZeroFormatter.Tests
 {
@@ -32,6 +33,9 @@ namespace ZeroFormatter.Tests
         public void Struct()
         {
             ZeroFormatterSerializer.Convert(new ZeroStruct()).IsInstanceOf<ZeroStruct>();
+            var len = ZeroFormatter.Formatters.Formatter<DefaultResolver, ZeroStruct>.Default.GetLength();
+            len.IsNotNull();
+            len.Is(0);
         }
     }
 }

@@ -149,6 +149,7 @@ namespace ZeroFormatter
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.EventB>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.EventBFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Standard>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.StandardFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Large>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.LargeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.ZeroClass>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.ZeroClassFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.StaticProperty>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.StaticPropertyFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.DameClass>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.DameClassFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.MyClass>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MyClassFormatter<ZeroFormatter.Formatters.DefaultResolver>());
@@ -204,6 +205,11 @@ namespace ZeroFormatter
                 var structFormatter = new ZeroFormatter.DynamicObjectSegments.UnityEngine.Vector3Formatter<ZeroFormatter.Formatters.DefaultResolver>();
                 ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::UnityEngine.Vector3>.Register(structFormatter);
                 ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::UnityEngine.Vector3?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<ZeroFormatter.Formatters.DefaultResolver, global::UnityEngine.Vector3>(structFormatter));
+            }
+            {
+                var structFormatter = new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.ZeroStructFormatter<ZeroFormatter.Formatters.DefaultResolver>();
+                ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.ZeroStruct>.Register(structFormatter);
+                ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.ZeroStruct?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.ZeroStruct>(structFormatter));
             }
             // Unions
             {
@@ -2324,7 +2330,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
     public class UnknownMessage1ObjectSegment<TTypeResolver> : global::Sandbox.Shared.UnknownMessage1, IZeroFormatterSegment
         where TTypeResolver : ITypeResolver, new()
     {
-        static readonly int[] __elementSizes = new int[]{ 0 };
+        static readonly int[] __elementSizes = new int[]{  };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
@@ -2417,7 +2423,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
     public class MessageA1ObjectSegment<TTypeResolver> : global::Sandbox.Shared.MessageA1, IZeroFormatterSegment
         where TTypeResolver : ITypeResolver, new()
     {
-        static readonly int[] __elementSizes = new int[]{ 0 };
+        static readonly int[] __elementSizes = new int[]{  };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
@@ -2510,7 +2516,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
     public class MessageB1ObjectSegment<TTypeResolver> : global::Sandbox.Shared.MessageB1, IZeroFormatterSegment
         where TTypeResolver : ITypeResolver, new()
     {
-        static readonly int[] __elementSizes = new int[]{ 0 };
+        static readonly int[] __elementSizes = new int[]{  };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
@@ -2603,7 +2609,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
     public class MessageAObjectSegment<TTypeResolver> : global::Sandbox.Shared.MessageA, IZeroFormatterSegment
         where TTypeResolver : ITypeResolver, new()
     {
-        static readonly int[] __elementSizes = new int[]{ 0 };
+        static readonly int[] __elementSizes = new int[]{  };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
@@ -2807,7 +2813,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
     public class UnknownEventObjectSegment<TTypeResolver> : global::Sandbox.Shared.UnknownEvent, IZeroFormatterSegment
         where TTypeResolver : ITypeResolver, new()
     {
-        static readonly int[] __elementSizes = new int[]{ 0 };
+        static readonly int[] __elementSizes = new int[]{  };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
@@ -2900,7 +2906,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
     public class EventAObjectSegment<TTypeResolver> : global::Sandbox.Shared.EventA, IZeroFormatterSegment
         where TTypeResolver : ITypeResolver, new()
     {
-        static readonly int[] __elementSizes = new int[]{ 0 };
+        static readonly int[] __elementSizes = new int[]{  };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
@@ -2993,7 +2999,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
     public class EventBObjectSegment<TTypeResolver> : global::Sandbox.Shared.EventB, IZeroFormatterSegment
         where TTypeResolver : ITypeResolver, new()
     {
-        static readonly int[] __elementSizes = new int[]{ 0 };
+        static readonly int[] __elementSizes = new int[]{  };
 
         readonly ArraySegment<byte> __originalBytes;
         readonly DirtyTracker __tracker;
@@ -3396,6 +3402,99 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 20, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 20);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class ZeroClassFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.ZeroClass>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.ZeroClass value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (0 + 1));
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 0);
+            }
+        }
+
+        public override global::Sandbox.Shared.ZeroClass Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new ZeroClassObjectSegment<TTypeResolver>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class ZeroClassObjectSegment<TTypeResolver> : global::Sandbox.Shared.ZeroClass, IZeroFormatterSegment
+        where TTypeResolver : ITypeResolver, new()
+    {
+        static readonly int[] __elementSizes = new int[]{  };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+
+
+        public ZeroClassObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 0, __elementSizes);
+
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (0 + 1));
+
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
             }
             else
             {
@@ -7096,6 +7195,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
         public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyStructFixed value)
         {
+            BinaryUtil.EnsureCapacity(ref bytes, offset, 16);
             var startOffset = offset;
             offset += formatter0.Serialize(ref bytes, offset, value.MyProperty1);
             offset += formatter1.Serialize(ref bytes, offset, value.MyProperty2);
@@ -7209,6 +7309,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
 
         public override int Serialize(ref byte[] bytes, int offset, global::ZeroFormatter.Tests.MyVector value)
         {
+            BinaryUtil.EnsureCapacity(ref bytes, offset, 8);
             var startOffset = offset;
             offset += formatter0.Serialize(ref bytes, offset, value.X);
             offset += formatter1.Serialize(ref bytes, offset, value.Y);
@@ -7329,6 +7430,7 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
 
         public override int Serialize(ref byte[] bytes, int offset, global::UnityEngine.Vector2 value)
         {
+            BinaryUtil.EnsureCapacity(ref bytes, offset, 8);
             var startOffset = offset;
             offset += formatter0.Serialize(ref bytes, offset, value.x);
             offset += formatter1.Serialize(ref bytes, offset, value.y);
@@ -7383,6 +7485,7 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
 
         public override int Serialize(ref byte[] bytes, int offset, global::UnityEngine.Vector3 value)
         {
+            BinaryUtil.EnsureCapacity(ref bytes, offset, 12);
             var startOffset = offset;
             offset += formatter0.Serialize(ref bytes, offset, value.x);
             offset += formatter1.Serialize(ref bytes, offset, value.y);
@@ -7405,6 +7508,55 @@ namespace ZeroFormatter.DynamicObjectSegments.UnityEngine
             byteSize += size;
             
             return new global::UnityEngine.Vector3(item0, item1, item2);
+        }
+    }
+
+
+}
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
+{
+    using global::System;
+    using global::ZeroFormatter.Formatters;
+    using global::ZeroFormatter.Internal;
+    using global::ZeroFormatter.Segments;
+
+    public class ZeroStructFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.ZeroStruct>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        
+
+        public ZeroStructFormatter()
+        {
+            
+        }
+
+        public override int? GetLength()
+        {
+            return 0;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.ZeroStruct value)
+        {
+            BinaryUtil.EnsureCapacity(ref bytes, offset, 0);
+            var startOffset = offset;
+            return offset - startOffset;
+        }
+
+        public override global::Sandbox.Shared.ZeroStruct Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 0;
+            int size;
+            
+            return new global::Sandbox.Shared.ZeroStruct();
         }
     }
 

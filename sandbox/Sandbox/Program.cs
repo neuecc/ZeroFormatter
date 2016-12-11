@@ -241,15 +241,18 @@ namespace Sandbox
     }
 
 
+    [ZeroFormattable]
+    public struct ZeroA
+    {
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            var a = ZeroFormatterSerializer.Convert(new InnerClassA.InnerObject());
-            var b = ZeroFormatterSerializer.Convert(new InnerClassB.InnerObject());
+            var a = ZeroFormatterSerializer.Serialize(default(ZeroA));
+            
 
-            Console.WriteLine(a.GetType().FullName);
-            Console.WriteLine(b.GetType().FullName);
         }
     }
 
