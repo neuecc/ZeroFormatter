@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ZeroFormatter.Comparers
 {
-    public class NullableEqualityComparer<T> : EqualityComparer<Nullable<T>>
+    public class NullableEqualityComparer<T> : IEqualityComparer<Nullable<T>>
         where T : struct
     {
         readonly IEqualityComparer<T> innerComparer;
@@ -14,7 +14,7 @@ namespace ZeroFormatter.Comparers
             this.innerComparer = ZeroFormatterEqualityComparer<T>.Default;
         }
 
-        public override bool Equals(T? x, T? y)
+        public bool Equals(T? x, T? y)
         {
             if (x == null && y == null) return true;
             if (x == null || y == null) return false;
@@ -22,7 +22,7 @@ namespace ZeroFormatter.Comparers
             return innerComparer.Equals(x.Value, y.Value);
         }
 
-        public override int GetHashCode(T? obj)
+        public int GetHashCode(T? obj)
         {
             if (obj == null) return 0;
             return innerComparer.GetHashCode(obj.Value);

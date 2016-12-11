@@ -12,6 +12,9 @@ namespace ZeroFormatter.Comparers
     public static class ZeroFormatterEqualityComparer<T>
     {
         static IEqualityComparer<T> defaultComparer;
+
+        // In Unity, EqualityComparer<Enum> is slow
+        // zfc.exe generates fast EqualityComparer and this method can use it.
         public static IEqualityComparer<T> Default
         {
             get
@@ -24,22 +27,12 @@ namespace ZeroFormatter.Comparers
             }
         }
 
-        // In Unity, EqualityComparer<Enum> is slow
-        // zfc.exe generates fast EqualityComparer and this method can use it.
         public static IEqualityComparer<T> NondeterministicSafeFallbacked
         {
             get
             {
                 var comparer = defaultComparer;
-                if (comparer is StringEqualityComparer
-                 || comparer is SingleEqualityComparer
-                 || comparer is DoubleEqualityComparer
-                 || comparer is DecimalEqualityComparer
-                 || comparer is GuidEqualityComparer
-                 || comparer is TimeSpanEqualityComparer
-                 || comparer is DeteTimeEqualityComparer
-                 || comparer is DeteTimeOffsetEqualityComparer
-                 || comparer is IErrorEqualityComparer)
+                if (ZeroFormatterEqualityComparerHelper.IsSlowBuiltinComparer(comparer))
                 {
                     // native EqualityComparer<string> is faster than deterministic embeded comparer.
                     return EqualityComparer<T>.Default;
@@ -51,9 +44,56 @@ namespace ZeroFormatter.Comparers
 
         static ZeroFormatterEqualityComparer()
         {
+            var comparer = ZeroFormatterEqualityComparerHelper.GetBuiltinComparer
+#if !UNITY
+                <T>
+#endif
+                (typeof(T));
+
+            if (comparer == null)
+            {
+                comparer = new ErrorEqualityComparer<T>();
+            }
+
+            defaultComparer = (IEqualityComparer<T>)comparer;
+        }
+
+        public static void Register(IEqualityComparer<T> comparer)
+        {
+            defaultComparer = comparer;
+        }
+    }
+
+    // If Unity, IL2CPP generates large codes on static constructor, this helper avoid it.
+    internal static class ZeroFormatterEqualityComparerHelper
+    {
+        internal static bool IsSlowBuiltinComparer(object comparer)
+        {
+            if (comparer == null
+             || comparer is StringEqualityComparer
+             || comparer is SingleEqualityComparer
+             || comparer is DoubleEqualityComparer
+             || comparer is DecimalEqualityComparer
+             || comparer is GuidEqualityComparer
+             || comparer is TimeSpanEqualityComparer
+             || comparer is DeteTimeEqualityComparer
+             || comparer is DeteTimeOffsetEqualityComparer
+             || comparer is IErrorEqualityComparer)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        internal static object GetBuiltinComparer
+#if !UNITY
+            <T>
+#endif
+            (Type t)
+        {
             object comparer = null;
 
-            var t = typeof(T);
             if (t == typeof(Int16))
             {
                 comparer = new Int16EqualityComparer();
@@ -247,23 +287,12 @@ namespace ZeroFormatter.Comparers
 
             else if (t.GetTypeInfo().IsNullable() && t.GetTypeInfo().GenericTypeArguments[0].GetTypeInfo().IsEnum)
             {
-                var formatterType =  typeof(NullableEqualityComparer<>).MakeGenericType(t.GetTypeInfo().GenericTypeArguments[0]);
+                var formatterType = typeof(NullableEqualityComparer<>).MakeGenericType(t.GetTypeInfo().GenericTypeArguments[0]);
                 comparer = Activator.CreateInstance(formatterType);
             }
 
 #endif
-
-            else
-            {
-                comparer = new ErrorEqualityComparer<T>();
-            }
-
-            defaultComparer = (IEqualityComparer<T>)comparer;
-        }
-
-        public static void Register(IEqualityComparer<T> comparer)
-        {
-            defaultComparer = comparer;
+            return comparer;
         }
     }
 

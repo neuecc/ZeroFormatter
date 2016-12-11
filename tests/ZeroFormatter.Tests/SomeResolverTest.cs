@@ -10,7 +10,7 @@ namespace ZeroFormatter.Tests
 {
     public class CustomResolver : ITypeResolver
     {
-        public bool IsUseBuiltinDynamicSerializer
+        public bool IsUseBuiltinSerializer
         {
             get
             {

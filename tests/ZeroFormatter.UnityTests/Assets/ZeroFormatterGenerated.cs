@@ -2,7 +2,7 @@
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 168
-namespace ZeroFormatter.Internal
+namespace ZeroFormatter
 {
     using global::System;
     using global::System.Collections.Generic;
@@ -17,78 +17,121 @@ namespace ZeroFormatter.Internal
         public static void Register()
         {
             // Enums
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::DataRoot.DataTypeVersion>.Register(new ZeroFormatter.DynamicObjectSegments.DataTypeVersionFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::DataRoot.DataTypeVersion?>.Register(new ZeroFormatter.DynamicObjectSegments.NullableDataTypeVersionFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::DataRoot.DataTypeVersion>.Register(new ZeroFormatter.DynamicObjectSegments.DataTypeVersionEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::DataRoot.DataTypeVersion>.Register(new ZeroFormatter.DynamicObjectSegments.DataRoot_DataTypeVersionFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::DataRoot.DataTypeVersion>.Register(new ZeroFormatter.DynamicObjectSegments.DataRoot_DataTypeVersionEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::DataRoot.DataTypeVersion?>.Register(new ZeroFormatter.DynamicObjectSegments.NullableDataRoot_DataTypeVersionFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::DataRoot.DataTypeVersion?>.Register(new NullableEqualityComparer<global::DataRoot.DataTypeVersion>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::MyGlobal>.Register(new ZeroFormatter.DynamicObjectSegments.MyGlobalFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::MyGlobal?>.Register(new ZeroFormatter.DynamicObjectSegments.NullableMyGlobalFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::MyGlobal>.Register(new ZeroFormatter.DynamicObjectSegments.MyGlobalEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::MyGlobal?>.Register(new ZeroFormatter.DynamicObjectSegments.NullableMyGlobalFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::MyGlobal?>.Register(new NullableEqualityComparer<global::MyGlobal>());
+            
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.StandardEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.StandardEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.StandardEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.StandardEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.StandardEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableStandardEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.StandardEnum?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.StandardEnum>());
+            
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InnerClassA.InnerEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InnerClassA_InnerEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.InnerClassA.InnerEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InnerClassA_InnerEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InnerClassA.InnerEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableInnerClassA_InnerEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.InnerClassA.InnerEnum?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.InnerClassA.InnerEnum>());
+            
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InnerClassB.InnerEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InnerClassB_InnerEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.InnerClassB.InnerEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InnerClassB_InnerEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InnerClassB.InnerEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableInnerClassB_InnerEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.InnerClassB.InnerEnum?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.InnerClassB.InnerEnum>());
+            
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.OutSideEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.OutSideEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.OutSideEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.OutSideEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.OutSideEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableOutSideEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.OutSideEnum?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.OutSideEnum>());
+            
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InsideEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InsideEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.InsideEnum>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InsideEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InsideEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableInsideEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.InsideEnum?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.InsideEnum>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Sex>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.SexFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Sex?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableSexFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Sex>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.SexEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Sex?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableSexFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Sex?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Sex>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.CharacterType>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CharacterTypeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.CharacterType?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableCharacterTypeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.CharacterType>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CharacterTypeEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.CharacterType?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.NullableCharacterTypeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.CharacterType?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.CharacterType>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMogeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.MogeMoge?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.NullableMogeMogeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMogeEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.MogeMoge?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.NullableMogeMogeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMoge2Formatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.MogeMoge2?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.NullableMogeMoge2Formatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.MogeMoge2EqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.MogeMoge2?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar.NullableMogeMoge2Formatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge2?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge2>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Foo.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMogeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Foo.MogeMoge?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.NullableMogeMogeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMogeEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Foo.MogeMoge?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.NullableMogeMogeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Foo.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMoge2Formatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Foo.MogeMoge2?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.NullableMogeMoge2Formatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge2>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.MogeMoge2EqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Foo.MogeMoge2?>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo.NullableMogeMoge2Formatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge2?>.Register(new NullableEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge2>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::System.TypeCode>.Register(new ZeroFormatter.DynamicObjectSegments.System.TypeCodeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::System.TypeCode?>.Register(new ZeroFormatter.DynamicObjectSegments.System.NullableTypeCodeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::System.TypeCode>.Register(new ZeroFormatter.DynamicObjectSegments.System.TypeCodeEqualityComparer());
-            ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::System.TypeCode?>.Register(new NullableEqualityComparer<global::System.TypeCode>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.IntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.IntEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.IntEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableIntEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.IntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.IntEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.IntEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableIntEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.IntEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.IntEnum>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.UIntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.UIntEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.UIntEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableUIntEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.UIntEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.UIntEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.UIntEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableUIntEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.UIntEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.UIntEnum>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.ShortEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ShortEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.ShortEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableShortEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ShortEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ShortEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.ShortEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableShortEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ShortEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.ShortEnum>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.UShortEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.UShortEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.UShortEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableUShortEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.UShortEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.UShortEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.UShortEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableUShortEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.UShortEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.UShortEnum>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.ByteEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ByteEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.ByteEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableByteEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ByteEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ByteEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.ByteEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableByteEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ByteEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.ByteEnum>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.SByteEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.SByteEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.SByteEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableSByteEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.SByteEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.SByteEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.SByteEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableSByteEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.SByteEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.SByteEnum>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.LongEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.LongEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.LongEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableLongEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.LongEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.LongEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.LongEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableLongEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.LongEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.LongEnum>());
+            
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.ULongEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ULongEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.ULongEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableULongEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ULongEnum>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.ULongEnumEqualityComparer());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.ULongEnum?>.Register(new ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests.NullableULongEnumFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::ZeroFormatter.Tests.ULongEnum?>.Register(new NullableEqualityComparer<global::ZeroFormatter.Tests.ULongEnum>());
+            
             // Objects
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.AllNewFormat>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.AllNewFormatFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.CustomFormat>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.CustomFormatFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.SequenceFormat>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.SequenceFormatFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.EnumGenChecker>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.EnumGenCheckerFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InnerClassA.InnerObject>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InnerClassA_InnerObjectFormatter<ZeroFormatter.Formatters.DefaultResolver>());
+            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InnerClassB.InnerObject>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InnerClassB_InnerObjectFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Person>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.PersonFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InheritBase>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InheritBaseFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Inherit>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InheritFormatter<ZeroFormatter.Formatters.DefaultResolver>());
@@ -176,6 +219,7 @@ namespace ZeroFormatter.Internal
                 ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.IStandardUnion>.Register(unionFormatter);
             }
             // Generics
+            ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<ZeroFormatter.Formatters.DefaultResolver, int, global::Sandbox.Shared.StandardEnum, string>();
             ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<ZeroFormatter.Formatters.DefaultResolver, int, string>();
             ZeroFormatter.Formatters.Formatter.RegisterList<ZeroFormatter.Formatters.DefaultResolver, byte[]>();
             ZeroFormatter.Formatters.Formatter.RegisterList<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.MogeMoge>();
@@ -191,6 +235,7 @@ namespace ZeroFormatter.Internal
             ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<ZeroFormatter.Formatters.DefaultResolver, string, int>();
             ZeroFormatter.Formatters.Formatter.RegisterLookup<ZeroFormatter.Formatters.DefaultResolver, bool, int>();
             ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<ZeroFormatter.Formatters.DefaultResolver, bool, int>();
+            ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.KeyTuple<int, global::Sandbox.Shared.StandardEnum, string>, int>();
             ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<ZeroFormatter.Formatters.DefaultResolver, int?, string>();
             ZeroFormatter.Formatters.Formatter.RegisterArray<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Bar.DameClass>();
             ZeroFormatter.Formatters.Formatter.RegisterArray<ZeroFormatter.Formatters.DefaultResolver, global::ZeroFormatter.Tests.MyStructFixed>();
@@ -948,6 +993,363 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 11, _LookupFormat);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 11);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class EnumGenCheckerFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.EnumGenChecker>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.EnumGenChecker value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (0 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<TTypeResolver, global::ZeroFormatter.ILazyLookup<global::ZeroFormatter.KeyTuple<int, global::Sandbox.Shared.StandardEnum, string>, int>>(ref bytes, startOffset, offset, 0, value.MyProperty);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 0);
+            }
+        }
+
+        public override global::Sandbox.Shared.EnumGenChecker Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new EnumGenCheckerObjectSegment<TTypeResolver>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class EnumGenCheckerObjectSegment<TTypeResolver> : global::Sandbox.Shared.EnumGenChecker, IZeroFormatterSegment
+        where TTypeResolver : ITypeResolver, new()
+    {
+        static readonly int[] __elementSizes = new int[]{ 0 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+        global::ZeroFormatter.ILazyLookup<global::ZeroFormatter.KeyTuple<int, global::Sandbox.Shared.StandardEnum, string>, int> _MyProperty;
+
+        // 0
+        public override global::ZeroFormatter.ILazyLookup<global::ZeroFormatter.KeyTuple<int, global::Sandbox.Shared.StandardEnum, string>, int> MyProperty
+        {
+            get
+            {
+                return _MyProperty;
+            }
+            set
+            {
+                __tracker.Dirty();
+                _MyProperty = value;
+            }
+        }
+
+
+        public EnumGenCheckerObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 0, __elementSizes);
+
+            _MyProperty = ObjectSegmentHelper.DeserializeSegment<TTypeResolver, global::ZeroFormatter.ILazyLookup<global::ZeroFormatter.KeyTuple<int, global::Sandbox.Shared.StandardEnum, string>, int>>(originalBytes, 0, __binaryLastIndex, __tracker);
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (0 + 1));
+
+                offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::ZeroFormatter.ILazyLookup<global::ZeroFormatter.KeyTuple<int, global::Sandbox.Shared.StandardEnum, string>, int>>(ref targetBytes, startOffset, offset, 0, _MyProperty);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class InnerClassA_InnerObjectFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.InnerClassA.InnerObject>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.InnerClassA.InnerObject value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (0 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<TTypeResolver, int>(ref bytes, startOffset, offset, 0, value.MyProperty);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 0);
+            }
+        }
+
+        public override global::Sandbox.Shared.InnerClassA.InnerObject Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new InnerClassA_InnerObjectObjectSegment<TTypeResolver>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class InnerClassA_InnerObjectObjectSegment<TTypeResolver> : global::Sandbox.Shared.InnerClassA.InnerObject, IZeroFormatterSegment
+        where TTypeResolver : ITypeResolver, new()
+    {
+        static readonly int[] __elementSizes = new int[]{ 4 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+
+        // 0
+        public override int MyProperty
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<TTypeResolver, int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<TTypeResolver, int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+            }
+        }
+
+
+        public InnerClassA_InnerObjectObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 0, __elementSizes);
+
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (0 + 1));
+
+                offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
+            }
+            else
+            {
+                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
+            }
+        }
+    }
+
+    public class InnerClassB_InnerObjectFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.InnerClassB.InnerObject>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return null;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.InnerClassB.InnerObject value)
+        {
+            var segment = value as IZeroFormatterSegment;
+            if (segment != null)
+            {
+                return segment.Serialize(ref bytes, offset);
+            }
+            else if (value == null)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset, -1);
+                return 4;
+            }
+            else
+            {
+                var startOffset = offset;
+
+                offset += (8 + 4 * (2 + 1));
+                offset += ObjectSegmentHelper.SerializeFromFormatter<TTypeResolver, int>(ref bytes, startOffset, offset, 0, value.MyProperty);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<TTypeResolver, global::Sandbox.Shared.InsideEnum>(ref bytes, startOffset, offset, 1, value.MyProperty2);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<TTypeResolver, global::System.TypeCode>(ref bytes, startOffset, offset, 2, value.MyProperty3);
+
+                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 2);
+            }
+        }
+
+        public override global::Sandbox.Shared.InnerClassB.InnerObject Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
+            if (byteSize == -1)
+            {
+                byteSize = 4;
+                return null;
+            }
+            return new InnerClassB_InnerObjectObjectSegment<TTypeResolver>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+        }
+    }
+
+    public class InnerClassB_InnerObjectObjectSegment<TTypeResolver> : global::Sandbox.Shared.InnerClassB.InnerObject, IZeroFormatterSegment
+        where TTypeResolver : ITypeResolver, new()
+    {
+        static readonly int[] __elementSizes = new int[]{ 4, 4, 4 };
+
+        readonly ArraySegment<byte> __originalBytes;
+        readonly DirtyTracker __tracker;
+        readonly int __binaryLastIndex;
+        readonly byte[] __extraFixedBytes;
+
+
+        // 0
+        public override int MyProperty
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<TTypeResolver, int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<TTypeResolver, int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+            }
+        }
+
+        // 1
+        public override global::Sandbox.Shared.InsideEnum MyProperty2
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<TTypeResolver, global::Sandbox.Shared.InsideEnum>(__originalBytes, 1, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<TTypeResolver, global::Sandbox.Shared.InsideEnum>(__originalBytes, 1, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+            }
+        }
+
+        // 2
+        public override global::System.TypeCode MyProperty3
+        {
+            get
+            {
+                return ObjectSegmentHelper.GetFixedProperty<TTypeResolver, global::System.TypeCode>(__originalBytes, 2, __binaryLastIndex, __extraFixedBytes, __tracker);
+            }
+            set
+            {
+                ObjectSegmentHelper.SetFixedProperty<TTypeResolver, global::System.TypeCode>(__originalBytes, 2, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+            }
+        }
+
+
+        public InnerClassB_InnerObjectObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        {
+            var __array = originalBytes.Array;
+
+            this.__originalBytes = originalBytes;
+            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
+            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
+
+            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 2, __elementSizes);
+
+        }
+
+        public bool CanDirectCopy()
+        {
+            return !__tracker.IsDirty;
+        }
+
+        public ArraySegment<byte> GetBufferReference()
+        {
+            return __originalBytes;
+        }
+
+        public int Serialize(ref byte[] targetBytes, int offset)
+        {
+            if (__extraFixedBytes != null || __tracker.IsDirty)
+            {
+                var startOffset = offset;
+                offset += (8 + 4 * (2 + 1));
+
+                offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+                offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::Sandbox.Shared.InsideEnum>(ref targetBytes, startOffset, offset, 1, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+                offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::System.TypeCode>(ref targetBytes, startOffset, offset, 2, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+
+                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 2);
             }
             else
             {
@@ -7308,7 +7710,7 @@ namespace ZeroFormatter.DynamicObjectSegments
     using global::ZeroFormatter.Segments;
 
 
-    public class DataTypeVersionFormatter<TTypeResolver> : Formatter<TTypeResolver, global::DataRoot.DataTypeVersion>
+    public class DataRoot_DataTypeVersionFormatter<TTypeResolver> : Formatter<TTypeResolver, global::DataRoot.DataTypeVersion>
         where TTypeResolver : ITypeResolver, new()
     {
         public override int? GetLength()
@@ -7328,7 +7730,8 @@ namespace ZeroFormatter.DynamicObjectSegments
         }
     }
 
-    public class NullableDataTypeVersionFormatter<TTypeResolver> : Formatter<TTypeResolver, global::DataRoot.DataTypeVersion?>
+
+    public class NullableDataRoot_DataTypeVersionFormatter<TTypeResolver> : Formatter<TTypeResolver, global::DataRoot.DataTypeVersion?>
         where TTypeResolver : ITypeResolver, new()
     {
         public override int? GetLength()
@@ -7361,7 +7764,9 @@ namespace ZeroFormatter.DynamicObjectSegments
         }
     }
 
-    public class DataTypeVersionEqualityComparer : IEqualityComparer<global::DataRoot.DataTypeVersion>
+
+
+    public class DataRoot_DataTypeVersionEqualityComparer : IEqualityComparer<global::DataRoot.DataTypeVersion>
     {
         public bool Equals(global::DataRoot.DataTypeVersion x, global::DataRoot.DataTypeVersion y)
         {
@@ -7373,6 +7778,7 @@ namespace ZeroFormatter.DynamicObjectSegments
             return (int)x;
         }
     }
+
 
 
     public class MyGlobalFormatter<TTypeResolver> : Formatter<TTypeResolver, global::MyGlobal>
@@ -7394,6 +7800,7 @@ namespace ZeroFormatter.DynamicObjectSegments
             return (global::MyGlobal)BinaryUtil.ReadInt32(ref bytes, offset);
         }
     }
+
 
     public class NullableMyGlobalFormatter<TTypeResolver> : Formatter<TTypeResolver, global::MyGlobal?>
         where TTypeResolver : ITypeResolver, new()
@@ -7428,6 +7835,8 @@ namespace ZeroFormatter.DynamicObjectSegments
         }
     }
 
+
+
     public class MyGlobalEqualityComparer : IEqualityComparer<global::MyGlobal>
     {
         public bool Equals(global::MyGlobal x, global::MyGlobal y)
@@ -7440,6 +7849,7 @@ namespace ZeroFormatter.DynamicObjectSegments
             return (int)x;
         }
     }
+
 
 
 }
@@ -7458,6 +7868,361 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
     using global::ZeroFormatter.Formatters;
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
+
+
+    public class StandardEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.StandardEnum>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 4;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.StandardEnum value)
+        {
+            return BinaryUtil.WriteInt32(ref bytes, offset, (Int32)value);
+        }
+
+        public override global::Sandbox.Shared.StandardEnum Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 4;
+            return (global::Sandbox.Shared.StandardEnum)BinaryUtil.ReadInt32(ref bytes, offset);
+        }
+    }
+
+
+    public class NullableStandardEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.StandardEnum?>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 5;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.StandardEnum? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset + 1, (Int32)value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
+            }
+
+            return 5;
+        }
+
+        public override global::Sandbox.Shared.StandardEnum? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 5;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
+
+            return (global::Sandbox.Shared.StandardEnum)BinaryUtil.ReadInt32(ref bytes, offset + 1);
+        }
+    }
+
+
+
+    public class StandardEnumEqualityComparer : IEqualityComparer<global::Sandbox.Shared.StandardEnum>
+    {
+        public bool Equals(global::Sandbox.Shared.StandardEnum x, global::Sandbox.Shared.StandardEnum y)
+        {
+            return (Int32)x == (Int32)y;
+        }
+
+        public int GetHashCode(global::Sandbox.Shared.StandardEnum x)
+        {
+            return (int)x;
+        }
+    }
+
+
+
+    public class InnerClassA_InnerEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.InnerClassA.InnerEnum>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 4;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.InnerClassA.InnerEnum value)
+        {
+            return BinaryUtil.WriteInt32(ref bytes, offset, (Int32)value);
+        }
+
+        public override global::Sandbox.Shared.InnerClassA.InnerEnum Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 4;
+            return (global::Sandbox.Shared.InnerClassA.InnerEnum)BinaryUtil.ReadInt32(ref bytes, offset);
+        }
+    }
+
+
+    public class NullableInnerClassA_InnerEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.InnerClassA.InnerEnum?>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 5;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.InnerClassA.InnerEnum? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset + 1, (Int32)value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
+            }
+
+            return 5;
+        }
+
+        public override global::Sandbox.Shared.InnerClassA.InnerEnum? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 5;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
+
+            return (global::Sandbox.Shared.InnerClassA.InnerEnum)BinaryUtil.ReadInt32(ref bytes, offset + 1);
+        }
+    }
+
+
+
+    public class InnerClassA_InnerEnumEqualityComparer : IEqualityComparer<global::Sandbox.Shared.InnerClassA.InnerEnum>
+    {
+        public bool Equals(global::Sandbox.Shared.InnerClassA.InnerEnum x, global::Sandbox.Shared.InnerClassA.InnerEnum y)
+        {
+            return (Int32)x == (Int32)y;
+        }
+
+        public int GetHashCode(global::Sandbox.Shared.InnerClassA.InnerEnum x)
+        {
+            return (int)x;
+        }
+    }
+
+
+
+    public class InnerClassB_InnerEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.InnerClassB.InnerEnum>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 4;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.InnerClassB.InnerEnum value)
+        {
+            return BinaryUtil.WriteInt32(ref bytes, offset, (Int32)value);
+        }
+
+        public override global::Sandbox.Shared.InnerClassB.InnerEnum Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 4;
+            return (global::Sandbox.Shared.InnerClassB.InnerEnum)BinaryUtil.ReadInt32(ref bytes, offset);
+        }
+    }
+
+
+    public class NullableInnerClassB_InnerEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.InnerClassB.InnerEnum?>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 5;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.InnerClassB.InnerEnum? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset + 1, (Int32)value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
+            }
+
+            return 5;
+        }
+
+        public override global::Sandbox.Shared.InnerClassB.InnerEnum? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 5;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
+
+            return (global::Sandbox.Shared.InnerClassB.InnerEnum)BinaryUtil.ReadInt32(ref bytes, offset + 1);
+        }
+    }
+
+
+
+    public class InnerClassB_InnerEnumEqualityComparer : IEqualityComparer<global::Sandbox.Shared.InnerClassB.InnerEnum>
+    {
+        public bool Equals(global::Sandbox.Shared.InnerClassB.InnerEnum x, global::Sandbox.Shared.InnerClassB.InnerEnum y)
+        {
+            return (Int32)x == (Int32)y;
+        }
+
+        public int GetHashCode(global::Sandbox.Shared.InnerClassB.InnerEnum x)
+        {
+            return (int)x;
+        }
+    }
+
+
+
+    public class OutSideEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.OutSideEnum>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 4;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.OutSideEnum value)
+        {
+            return BinaryUtil.WriteInt32(ref bytes, offset, (Int32)value);
+        }
+
+        public override global::Sandbox.Shared.OutSideEnum Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 4;
+            return (global::Sandbox.Shared.OutSideEnum)BinaryUtil.ReadInt32(ref bytes, offset);
+        }
+    }
+
+
+    public class NullableOutSideEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.OutSideEnum?>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 5;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.OutSideEnum? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset + 1, (Int32)value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
+            }
+
+            return 5;
+        }
+
+        public override global::Sandbox.Shared.OutSideEnum? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 5;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
+
+            return (global::Sandbox.Shared.OutSideEnum)BinaryUtil.ReadInt32(ref bytes, offset + 1);
+        }
+    }
+
+
+
+    public class OutSideEnumEqualityComparer : IEqualityComparer<global::Sandbox.Shared.OutSideEnum>
+    {
+        public bool Equals(global::Sandbox.Shared.OutSideEnum x, global::Sandbox.Shared.OutSideEnum y)
+        {
+            return (Int32)x == (Int32)y;
+        }
+
+        public int GetHashCode(global::Sandbox.Shared.OutSideEnum x)
+        {
+            return (int)x;
+        }
+    }
+
+
+
+    public class InsideEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.InsideEnum>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 4;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.InsideEnum value)
+        {
+            return BinaryUtil.WriteInt32(ref bytes, offset, (Int32)value);
+        }
+
+        public override global::Sandbox.Shared.InsideEnum Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 4;
+            return (global::Sandbox.Shared.InsideEnum)BinaryUtil.ReadInt32(ref bytes, offset);
+        }
+    }
+
+
+    public class NullableInsideEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.InsideEnum?>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public override int? GetLength()
+        {
+            return 5;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.InsideEnum? value)
+        {
+            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
+            if (value.HasValue)
+            {
+                BinaryUtil.WriteInt32(ref bytes, offset + 1, (Int32)value.Value);
+            }
+            else
+            {
+                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
+            }
+
+            return 5;
+        }
+
+        public override global::Sandbox.Shared.InsideEnum? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 5;
+            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
+            if (!hasValue) return null;
+
+            return (global::Sandbox.Shared.InsideEnum)BinaryUtil.ReadInt32(ref bytes, offset + 1);
+        }
+    }
+
+
+
+    public class InsideEnumEqualityComparer : IEqualityComparer<global::Sandbox.Shared.InsideEnum>
+    {
+        public bool Equals(global::Sandbox.Shared.InsideEnum x, global::Sandbox.Shared.InsideEnum y)
+        {
+            return (Int32)x == (Int32)y;
+        }
+
+        public int GetHashCode(global::Sandbox.Shared.InsideEnum x)
+        {
+            return (int)x;
+        }
+    }
+
 
 
     public class SexFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.Sex>
@@ -7479,6 +8244,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             return (global::Sandbox.Shared.Sex)BinaryUtil.ReadSByte(ref bytes, offset);
         }
     }
+
 
     public class NullableSexFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.Sex?>
         where TTypeResolver : ITypeResolver, new()
@@ -7513,6 +8279,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         }
     }
 
+
+
     public class SexEqualityComparer : IEqualityComparer<global::Sandbox.Shared.Sex>
     {
         public bool Equals(global::Sandbox.Shared.Sex x, global::Sandbox.Shared.Sex y)
@@ -7525,6 +8293,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
              return (int)(SByte)x ^ (int)(SByte)x << 8; 
         }
     }
+
 
 
     public class CharacterTypeFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.CharacterType>
@@ -7546,6 +8315,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             return (global::Sandbox.Shared.CharacterType)BinaryUtil.ReadInt32(ref bytes, offset);
         }
     }
+
 
     public class NullableCharacterTypeFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.CharacterType?>
         where TTypeResolver : ITypeResolver, new()
@@ -7580,6 +8350,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         }
     }
 
+
+
     public class CharacterTypeEqualityComparer : IEqualityComparer<global::Sandbox.Shared.CharacterType>
     {
         public bool Equals(global::Sandbox.Shared.CharacterType x, global::Sandbox.Shared.CharacterType y)
@@ -7592,6 +8364,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
             return (int)x;
         }
     }
+
 
 
 }
@@ -7632,6 +8405,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
         }
     }
 
+
     public class NullableMogeMogeFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.Bar.MogeMoge?>
         where TTypeResolver : ITypeResolver, new()
     {
@@ -7665,6 +8439,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
         }
     }
 
+
+
     public class MogeMogeEqualityComparer : IEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge>
     {
         public bool Equals(global::Sandbox.Shared.Bar.MogeMoge x, global::Sandbox.Shared.Bar.MogeMoge y)
@@ -7677,6 +8453,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
             return (int)x;
         }
     }
+
 
 
     public class MogeMoge2Formatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.Bar.MogeMoge2>
@@ -7698,6 +8475,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
             return (global::Sandbox.Shared.Bar.MogeMoge2)BinaryUtil.ReadInt32(ref bytes, offset);
         }
     }
+
 
     public class NullableMogeMoge2Formatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.Bar.MogeMoge2?>
         where TTypeResolver : ITypeResolver, new()
@@ -7732,6 +8510,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
         }
     }
 
+
+
     public class MogeMoge2EqualityComparer : IEqualityComparer<global::Sandbox.Shared.Bar.MogeMoge2>
     {
         public bool Equals(global::Sandbox.Shared.Bar.MogeMoge2 x, global::Sandbox.Shared.Bar.MogeMoge2 y)
@@ -7744,6 +8524,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
             return (int)x;
         }
     }
+
 
 
 }
@@ -7784,6 +8565,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
         }
     }
 
+
     public class NullableMogeMogeFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.Foo.MogeMoge?>
         where TTypeResolver : ITypeResolver, new()
     {
@@ -7817,6 +8599,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
         }
     }
 
+
+
     public class MogeMogeEqualityComparer : IEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge>
     {
         public bool Equals(global::Sandbox.Shared.Foo.MogeMoge x, global::Sandbox.Shared.Foo.MogeMoge y)
@@ -7829,6 +8613,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
             return (int)x;
         }
     }
+
 
 
     public class MogeMoge2Formatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.Foo.MogeMoge2>
@@ -7850,6 +8635,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
             return (global::Sandbox.Shared.Foo.MogeMoge2)BinaryUtil.ReadInt32(ref bytes, offset);
         }
     }
+
 
     public class NullableMogeMoge2Formatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.Foo.MogeMoge2?>
         where TTypeResolver : ITypeResolver, new()
@@ -7884,6 +8670,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
         }
     }
 
+
+
     public class MogeMoge2EqualityComparer : IEqualityComparer<global::Sandbox.Shared.Foo.MogeMoge2>
     {
         public bool Equals(global::Sandbox.Shared.Foo.MogeMoge2 x, global::Sandbox.Shared.Foo.MogeMoge2 y)
@@ -7896,6 +8684,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
             return (int)x;
         }
     }
+
 
 
 }
@@ -7936,38 +8725,7 @@ namespace ZeroFormatter.DynamicObjectSegments.System
         }
     }
 
-    public class NullableTypeCodeFormatter<TTypeResolver> : Formatter<TTypeResolver, global::System.TypeCode?>
-        where TTypeResolver : ITypeResolver, new()
-    {
-        public override int? GetLength()
-        {
-            return 5;
-        }
 
-        public override int Serialize(ref byte[] bytes, int offset, global::System.TypeCode? value)
-        {
-            BinaryUtil.WriteBoolean(ref bytes, offset, value.HasValue);
-            if (value.HasValue)
-            {
-                BinaryUtil.WriteInt32(ref bytes, offset + 1, (Int32)value.Value);
-            }
-            else
-            {
-                BinaryUtil.EnsureCapacity(ref bytes, offset, offset + 5);
-            }
-
-            return 5;
-        }
-
-        public override global::System.TypeCode? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
-        {
-            byteSize = 5;
-            var hasValue = BinaryUtil.ReadBoolean(ref bytes, offset);
-            if (!hasValue) return null;
-
-            return (global::System.TypeCode)BinaryUtil.ReadInt32(ref bytes, offset + 1);
-        }
-    }
 
     public class TypeCodeEqualityComparer : IEqualityComparer<global::System.TypeCode>
     {
@@ -7981,6 +8739,7 @@ namespace ZeroFormatter.DynamicObjectSegments.System
             return (int)x;
         }
     }
+
 
 
 }
@@ -8021,6 +8780,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         }
     }
 
+
     public class NullableIntEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.IntEnum?>
         where TTypeResolver : ITypeResolver, new()
     {
@@ -8054,6 +8814,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         }
     }
 
+
+
     public class IntEnumEqualityComparer : IEqualityComparer<global::ZeroFormatter.Tests.IntEnum>
     {
         public bool Equals(global::ZeroFormatter.Tests.IntEnum x, global::ZeroFormatter.Tests.IntEnum y)
@@ -8066,6 +8828,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (int)x;
         }
     }
+
 
 
     public class UIntEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.UIntEnum>
@@ -8087,6 +8850,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (global::ZeroFormatter.Tests.UIntEnum)BinaryUtil.ReadUInt32(ref bytes, offset);
         }
     }
+
 
     public class NullableUIntEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.UIntEnum?>
         where TTypeResolver : ITypeResolver, new()
@@ -8121,6 +8885,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         }
     }
 
+
+
     public class UIntEnumEqualityComparer : IEqualityComparer<global::ZeroFormatter.Tests.UIntEnum>
     {
         public bool Equals(global::ZeroFormatter.Tests.UIntEnum x, global::ZeroFormatter.Tests.UIntEnum y)
@@ -8133,6 +8899,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (int)(UInt32)x;
         }
     }
+
 
 
     public class ShortEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.ShortEnum>
@@ -8154,6 +8921,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (global::ZeroFormatter.Tests.ShortEnum)BinaryUtil.ReadInt16(ref bytes, offset);
         }
     }
+
 
     public class NullableShortEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.ShortEnum?>
         where TTypeResolver : ITypeResolver, new()
@@ -8188,6 +8956,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         }
     }
 
+
+
     public class ShortEnumEqualityComparer : IEqualityComparer<global::ZeroFormatter.Tests.ShortEnum>
     {
         public bool Equals(global::ZeroFormatter.Tests.ShortEnum x, global::ZeroFormatter.Tests.ShortEnum y)
@@ -8200,6 +8970,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (int)((Int16)x) | (int)(Int16)x << 16;
         }
     }
+
 
 
     public class UShortEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.UShortEnum>
@@ -8221,6 +8992,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (global::ZeroFormatter.Tests.UShortEnum)BinaryUtil.ReadUInt16(ref bytes, offset);
         }
     }
+
 
     public class NullableUShortEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.UShortEnum?>
         where TTypeResolver : ITypeResolver, new()
@@ -8255,6 +9027,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         }
     }
 
+
+
     public class UShortEnumEqualityComparer : IEqualityComparer<global::ZeroFormatter.Tests.UShortEnum>
     {
         public bool Equals(global::ZeroFormatter.Tests.UShortEnum x, global::ZeroFormatter.Tests.UShortEnum y)
@@ -8267,6 +9041,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (int)(UInt16)x;
         }
     }
+
 
 
     public class ByteEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.ByteEnum>
@@ -8288,6 +9063,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (global::ZeroFormatter.Tests.ByteEnum)BinaryUtil.ReadByte(ref bytes, offset);
         }
     }
+
 
     public class NullableByteEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.ByteEnum?>
         where TTypeResolver : ITypeResolver, new()
@@ -8322,6 +9098,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         }
     }
 
+
+
     public class ByteEnumEqualityComparer : IEqualityComparer<global::ZeroFormatter.Tests.ByteEnum>
     {
         public bool Equals(global::ZeroFormatter.Tests.ByteEnum x, global::ZeroFormatter.Tests.ByteEnum y)
@@ -8334,6 +9112,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (int)(Byte)x;
         }
     }
+
 
 
     public class SByteEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.SByteEnum>
@@ -8355,6 +9134,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (global::ZeroFormatter.Tests.SByteEnum)BinaryUtil.ReadSByte(ref bytes, offset);
         }
     }
+
 
     public class NullableSByteEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.SByteEnum?>
         where TTypeResolver : ITypeResolver, new()
@@ -8389,6 +9169,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         }
     }
 
+
+
     public class SByteEnumEqualityComparer : IEqualityComparer<global::ZeroFormatter.Tests.SByteEnum>
     {
         public bool Equals(global::ZeroFormatter.Tests.SByteEnum x, global::ZeroFormatter.Tests.SByteEnum y)
@@ -8401,6 +9183,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
              return (int)(SByte)x ^ (int)(SByte)x << 8; 
         }
     }
+
 
 
     public class LongEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.LongEnum>
@@ -8422,6 +9205,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (global::ZeroFormatter.Tests.LongEnum)BinaryUtil.ReadInt64(ref bytes, offset);
         }
     }
+
 
     public class NullableLongEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.LongEnum?>
         where TTypeResolver : ITypeResolver, new()
@@ -8456,6 +9240,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         }
     }
 
+
+
     public class LongEnumEqualityComparer : IEqualityComparer<global::ZeroFormatter.Tests.LongEnum>
     {
         public bool Equals(global::ZeroFormatter.Tests.LongEnum x, global::ZeroFormatter.Tests.LongEnum y)
@@ -8468,6 +9254,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (int)(Int64)x ^ (int)((Int64)x >> 32);
         }
     }
+
 
 
     public class ULongEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.ULongEnum>
@@ -8489,6 +9276,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (global::ZeroFormatter.Tests.ULongEnum)BinaryUtil.ReadUInt64(ref bytes, offset);
         }
     }
+
 
     public class NullableULongEnumFormatter<TTypeResolver> : Formatter<TTypeResolver, global::ZeroFormatter.Tests.ULongEnum?>
         where TTypeResolver : ITypeResolver, new()
@@ -8523,6 +9311,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         }
     }
 
+
+
     public class ULongEnumEqualityComparer : IEqualityComparer<global::ZeroFormatter.Tests.ULongEnum>
     {
         public bool Equals(global::ZeroFormatter.Tests.ULongEnum x, global::ZeroFormatter.Tests.ULongEnum y)
@@ -8535,6 +9325,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
             return (int)(UInt64)x ^ (int)((UInt64)x >> 32);
         }
     }
+
 
 
 }

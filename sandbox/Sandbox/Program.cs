@@ -198,7 +198,7 @@ namespace Sandbox
 
     public class CustomSerializationContext : ITypeResolver
     {
-        public bool IsUseBuiltinDynamicSerializer
+        public bool IsUseBuiltinSerializer
         {
             get
             {
@@ -245,11 +245,11 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            var prop = new StaticProperty() { HugaHuga = 999, My2 = new[] { new DameClass { Ok = 9 } } };
+            var a = ZeroFormatterSerializer.Convert(new InnerClassA.InnerObject());
+            var b = ZeroFormatterSerializer.Convert(new InnerClassB.InnerObject());
 
-            var hoge = ZeroFormatterSerializer.Convert(prop);
-            Console.WriteLine(hoge.HugaHuga);
-            Console.WriteLine(hoge.My2[0].Ok);
+            Console.WriteLine(a.GetType().FullName);
+            Console.WriteLine(b.GetType().FullName);
         }
     }
 

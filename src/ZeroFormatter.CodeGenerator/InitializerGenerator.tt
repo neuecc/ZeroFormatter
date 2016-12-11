@@ -7,7 +7,7 @@
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 168
-namespace ZeroFormatter.Internal
+namespace <#= Namespace #>
 {
     using global::System;
     using global::System.Collections.Generic;
@@ -27,9 +27,16 @@ namespace ZeroFormatter.Internal
             // Enums
 <# foreach(var g in Enums) { foreach(var t in g.Types) {   #>
             ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>Formatter<<#= ResolverName #>>());
-            ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>?>.Register(new <#= g.Namespace + ".Nullable" + t.Name #>Formatter<<#= ResolverName #>>());
+<# if(t.IsGenerateEqualityComparer) { #>
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<<#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>EqualityComparer());
+<# } #>
+<# if (t.IncludeNullable) { #>
+            ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>?>.Register(new <#= g.Namespace + ".Nullable" + t.Name #>Formatter<<#= ResolverName #>>());
+<# if(t.IsGenerateEqualityComparer) { #>
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<<#= t.FullName #>?>.Register(new NullableEqualityComparer<<#= t.FullName #>>());
+<# } #>
+<# } #>
+            
 <# } } #>
             // Objects
 <# foreach(var g in Objects) { foreach(var t in g.Types) {   #>

@@ -19,6 +19,8 @@ namespace ZeroFormatter.CodeGenerator
         public string Namespace { get; set; }
         public string UnderlyingType { get; set; }
         public int Length { get; set; }
+        public bool IncludeNullable { get; set; }
+        public bool IsGenerateEqualityComparer { get; set; }
 
         public bool Equals(EnumType other)
         {
@@ -110,6 +112,7 @@ namespace ZeroFormatter.CodeGenerator
         public GenericType[] GenericTypes { get; set; }
         public bool UnuseUnityAttribute { get; set; }
         public string ResolverName { get; set; }
+        public string Namespace { get; set; }
     }
 
     public class GenericType : IEquatable<GenericType>, IComparable<GenericType>
