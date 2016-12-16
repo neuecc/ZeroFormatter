@@ -15,10 +15,10 @@ namespace ZeroFormatter.Tests
             ZeroFormatterSerializer.Convert(xs, true).IsCollection(StandardEnum.A, StandardEnum.B, StandardEnum.C);
 
             IList<StandardEnum> ys = new List<StandardEnum> { StandardEnum.A, StandardEnum.B, StandardEnum.C };
-            //ZeroFormatterSerializer.Convert(ys, true).IsCollection(StandardEnum.A, StandardEnum.B, StandardEnum.C);
+            ZeroFormatterSerializer.Convert(ys, true).IsCollection(StandardEnum.A, StandardEnum.B, StandardEnum.C);
 
             List<StandardEnum> zs = new List<StandardEnum> { StandardEnum.A, StandardEnum.B, StandardEnum.C };
-            //ZeroFormatterSerializer.Convert(zs, true).IsCollection(StandardEnum.A, StandardEnum.B, StandardEnum.C);
+            ZeroFormatterSerializer.Convert(zs, true).IsCollection(StandardEnum.A, StandardEnum.B, StandardEnum.C);
         }
     }
 }

@@ -1,5 +1,5 @@
 {
-	"version": "1.5.5-*",
+	"version": "1.5.6-*",
 	"testRunner": "xunit",
 	"dependencies": {
 		"Microsoft.CSharp": "4.0.1",
@@ -8,11 +8,11 @@
 		"System.Dynamic.Runtime": "4.0.11",
 		"xunit": "2.2.0-beta3-build3402",
 		"dotnet-test-xunit": "2.2.0-preview2-build1029",
-		"ZeroFormatter.Interfaces.NETCore": "1.5.5",
-		"ZeroFormatter.NETCore": "1.5.5"
+		"ZeroFormatter.Interfaces.NETCore": "1.5.6",
+		"ZeroFormatter.NETCore": "1.5.6"
 	},
 	"frameworks": {
-		"netcoreapp1.5.5": {
+		"netcoreapp1.5.6": {
 			"dependencies": {
 				"Microsoft.NETCore.App": {
 					"type": "platform",
