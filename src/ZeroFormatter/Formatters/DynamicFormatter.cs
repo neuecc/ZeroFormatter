@@ -478,10 +478,13 @@ namespace ZeroFormatter.Formatters
                 constructorTypes.Add(item.Item2.MemberType);
             }
 
-            var info = t.GetTypeInfo().GetConstructor(constructorTypes.ToArray());
-            if (info == null)
+            if (expected != 0)
             {
-                throw new InvalidOperationException("Struct needs full parameter constructor of index property types. Type:" + t.FullName);
+                var info = t.GetTypeInfo().GetConstructor(constructorTypes.ToArray());
+                if (info == null)
+                {
+                    throw new InvalidOperationException("Struct needs full parameter constructor of index property types. Type:" + t.FullName);
+                }
             }
 
             return isNullable ? (int?)null : lengthSum;
@@ -627,45 +630,55 @@ namespace ZeroFormatter.Formatters
 
                 var il = method.GetILGenerator();
 
-                il.DeclareLocal(typeof(int)); // size
-                foreach (var item in formattersInField)
+                if (memberInfos.Length != 0)
                 {
-                    il.DeclareLocal(item.Item2.MemberType); // item1, item2...
-                }
-                il.DeclareLocal(elementType); // result
+                    il.DeclareLocal(typeof(int)); // size
+                    foreach (var item in formattersInField)
+                    {
+                        il.DeclareLocal(item.Item2.MemberType); // item1, item2...
+                    }
+                    il.DeclareLocal(elementType); // result
 
-                il.Emit(OpCodes.Ldarg_S, (byte)4);
-                il.Emit(OpCodes.Ldc_I4_0);
-                il.Emit(OpCodes.Stind_I4);
-                foreach (var item in formattersInField)
-                {
-                    il.Emit(OpCodes.Ldarg_0);
-                    il.Emit(OpCodes.Ldfld, item.Item3);
-                    il.Emit(OpCodes.Ldarg_1);
-                    il.Emit(OpCodes.Ldarg_2);
-                    il.Emit(OpCodes.Ldarg_3);
-                    il.Emit(OpCodes.Ldloca_S, (byte)0);
-                    il.Emit(OpCodes.Callvirt, item.Item3.FieldType.GetTypeInfo().GetMethod("Deserialize"));
-                    il.Emit(OpCodes.Stloc, item.Item1 + 1);
-                    il.Emit(OpCodes.Ldarg_2);
-                    il.Emit(OpCodes.Ldloc_0);
-                    il.Emit(OpCodes.Add);
-                    il.Emit(OpCodes.Starg_S, (byte)2);
                     il.Emit(OpCodes.Ldarg_S, (byte)4);
-                    il.Emit(OpCodes.Dup);
-                    il.Emit(OpCodes.Ldind_I4);
-                    il.Emit(OpCodes.Ldloc_0);
-                    il.Emit(OpCodes.Add);
+                    il.Emit(OpCodes.Ldc_I4_0);
                     il.Emit(OpCodes.Stind_I4);
-                }
+                    foreach (var item in formattersInField)
+                    {
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, item.Item3);
+                        il.Emit(OpCodes.Ldarg_1);
+                        il.Emit(OpCodes.Ldarg_2);
+                        il.Emit(OpCodes.Ldarg_3);
+                        il.Emit(OpCodes.Ldloca_S, (byte)0);
+                        il.Emit(OpCodes.Callvirt, item.Item3.FieldType.GetTypeInfo().GetMethod("Deserialize"));
+                        il.Emit(OpCodes.Stloc, item.Item1 + 1);
+                        il.Emit(OpCodes.Ldarg_2);
+                        il.Emit(OpCodes.Ldloc_0);
+                        il.Emit(OpCodes.Add);
+                        il.Emit(OpCodes.Starg_S, (byte)2);
+                        il.Emit(OpCodes.Ldarg_S, (byte)4);
+                        il.Emit(OpCodes.Dup);
+                        il.Emit(OpCodes.Ldind_I4);
+                        il.Emit(OpCodes.Ldloc_0);
+                        il.Emit(OpCodes.Add);
+                        il.Emit(OpCodes.Stind_I4);
+                    }
 
-                for (int i = 0; i < memberInfos.Length; i++)
+                    for (int i = 0; i < memberInfos.Length; i++)
+                    {
+                        il.Emit(OpCodes.Ldloc, i + 1);
+                    }
+
+                    var constructor = elementType.GetTypeInfo().GetConstructor(memberInfos.Select(x => x.Item2.MemberType).ToArray());
+                    il.Emit(OpCodes.Newobj, constructor);
+                }
+                else
                 {
-                    il.Emit(OpCodes.Ldloc, i + 1);
+                    il.DeclareLocal(elementType);
+                    il.Emit(OpCodes.Ldloca_S, (byte)0);
+                    il.Emit(OpCodes.Initobj, elementType);
+                    il.Emit(OpCodes.Ldloc_0);
                 }
-
-                var constructor = elementType.GetTypeInfo().GetConstructor(memberInfos.Select(x => x.Item2.MemberType).ToArray());
-                il.Emit(OpCodes.Newobj, constructor);
                 il.Emit(OpCodes.Ret);
             }
 

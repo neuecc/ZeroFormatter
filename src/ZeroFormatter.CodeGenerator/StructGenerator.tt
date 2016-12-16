@@ -45,11 +45,14 @@ namespace <#= Namespace #>
 
         public override int? GetLength()
         {
-            return <#= t.ElementFixedSizes.Any(x => x == 0)  ? "null" : t.ElementFixedSizes.Sum().ToString() #>;
+            return <#= (t.GetLength() == null) ? "null" : t.GetLength().ToString() #>;
         }
 
         public override int Serialize(ref byte[] bytes, int offset, <#= t.FullName #> value)
         {
+<# if (t.GetLength() != null) { #>
+            BinaryUtil.EnsureCapacity(ref bytes, offset, <#= t.GetLength() #>);
+<# } #>
             var startOffset = offset;
 <# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
             offset += formatter<#= i #>.Serialize(ref bytes, offset, value.<#= p.Name #>);

@@ -241,18 +241,17 @@ namespace Sandbox
     }
 
 
+    [ZeroFormattable]
+    public struct ZeroA
+    {
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-
-
-            var bytes = ZeroFormatterSerializer.Serialize(Tuple.Create(100, 200));
-
-            foreach (var item in bytes)
-            {
-                Console.WriteLine(item);
-            }
+            var a = ZeroFormatterSerializer.Serialize(default(ZeroA));
+            
 
         }
     }
