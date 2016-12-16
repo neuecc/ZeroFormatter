@@ -245,11 +245,15 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            var a = ZeroFormatterSerializer.Convert(new InnerClassA.InnerObject());
-            var b = ZeroFormatterSerializer.Convert(new InnerClassB.InnerObject());
 
-            Console.WriteLine(a.GetType().FullName);
-            Console.WriteLine(b.GetType().FullName);
+
+            var bytes = ZeroFormatterSerializer.Serialize(Tuple.Create(100, 200));
+
+            foreach (var item in bytes)
+            {
+                Console.WriteLine(item);
+            }
+
         }
     }
 

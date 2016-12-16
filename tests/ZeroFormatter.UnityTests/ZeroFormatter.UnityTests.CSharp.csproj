@@ -90,6 +90,7 @@
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\Assert.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\ChainingAssertion.Unity.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\UnitTestRunner.cs" />
+    <Compile Include="Assets\Scripts\Tests\ArrayTest.cs" />
     <Compile Include="Assets\Scripts\Tests\EqualityCompTest.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Shim.cs" />
     <Compile Include="Assets\Scripts\TestUtils\Tuple.cs" />

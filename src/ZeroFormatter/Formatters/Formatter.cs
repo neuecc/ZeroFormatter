@@ -354,50 +354,60 @@ namespace ZeroFormatter.Formatters
             else if (t.IsArray)
             {
                 var elementType = t.GetElementType();
-                switch (Type.GetTypeCode(elementType))
+                if (elementType.GetTypeInfo().IsEnum)
                 {
-                    case TypeCode.Boolean:
-                        formatter = new BooleanArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Char:
-                        formatter = new CharArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.SByte:
-                        formatter = new SByteArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Byte:
-                        formatter = new ByteArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Int16:
-                        formatter = new Int16ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.UInt16:
-                        formatter = new UInt16ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Int32:
-                        formatter = new Int32ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.UInt32:
-                        formatter = new UInt32ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Int64:
-                        formatter = new Int64ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.UInt64:
-                        formatter = new UInt64ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Single:
-                        formatter = new SingleArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Double:
-                        formatter = new DoubleArrayFormatter<TTypeResolver>();
-                        break;
-                    default:
 #if !UNITY
-                        var formatterType = typeof(ArrayFormatter<,>).MakeGenericType(typeof(TTypeResolver), elementType);
-                        formatter = Activator.CreateInstance(formatterType);
+                    var formatterType = typeof(ArrayFormatter<,>).MakeGenericType(typeof(TTypeResolver), elementType);
+                    formatter = Activator.CreateInstance(formatterType);
 #endif
-                        break;
+                }
+                else
+                {
+                    switch (Type.GetTypeCode(elementType))
+                    {
+                        case TypeCode.Boolean:
+                            formatter = new BooleanArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Char:
+                            formatter = new CharArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.SByte:
+                            formatter = new SByteArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Byte:
+                            formatter = new ByteArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Int16:
+                            formatter = new Int16ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.UInt16:
+                            formatter = new UInt16ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Int32:
+                            formatter = new Int32ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.UInt32:
+                            formatter = new UInt32ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Int64:
+                            formatter = new Int64ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.UInt64:
+                            formatter = new UInt64ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Single:
+                            formatter = new SingleArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Double:
+                            formatter = new DoubleArrayFormatter<TTypeResolver>();
+                            break;
+                        default:
+#if !UNITY
+                            var formatterType = typeof(ArrayFormatter<,>).MakeGenericType(typeof(TTypeResolver), elementType);
+                            formatter = Activator.CreateInstance(formatterType);
+#endif
+                            break;
+                    }
                 }
             }
 
