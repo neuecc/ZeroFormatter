@@ -38,22 +38,24 @@ namespace ZeroFormatter.CodeGenerator
         HashSet<string> allowCustomTypes;
         bool disallowInMetadata;
         bool generateComparerKeyTypeEnumOnly;
+        bool disallowInternal;
         string namespaceRoot;
 
-        public TypeCollector(string csProjPath, IEnumerable<string> conditinalSymbols, IEnumerable<string> allowCustomTypes, bool allowInternal, bool generatePropertyTypeEnumOnly, bool disallowInMetadata, bool generateComparerKeyTypeEnumOnly, string namespaceRoot)
+        public TypeCollector(string csProjPath, IEnumerable<string> conditinalSymbols, IEnumerable<string> allowCustomTypes, bool disallowInternal, bool generatePropertyTypeEnumOnly, bool disallowInMetadata, bool generateComparerKeyTypeEnumOnly, string namespaceRoot)
         {
             this.disallowInMetadata = disallowInMetadata;
             this.csProjPath = csProjPath;
             this.allowCustomTypes = new HashSet<string>(allowCustomTypes);
             this.generateComparerKeyTypeEnumOnly = generateComparerKeyTypeEnumOnly;
             this.namespaceRoot = namespaceRoot;
+            this.disallowInternal = disallowInternal;
 
             var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, conditinalSymbols.Concat(new[] { CodegeneratorOnlyPreprocessorSymbol }).ToArray()).GetAwaiter().GetResult();
             targetTypes = compilation.GetNamedTypeSymbols()
                 .Where(x =>
                 {
                     if (x.DeclaredAccessibility == Accessibility.Public) return true;
-                    if (allowInternal)
+                    if (!disallowInternal)
                     {
                         return (x.DeclaredAccessibility == Accessibility.Friend);
                     }
@@ -132,7 +134,7 @@ namespace ZeroFormatter.CodeGenerator
                .GroupBy(x => x.Namespace)
                .Select(x => new ObjectGenerator
                {
-                   Namespace = namespaceRoot+ ".DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
+                   Namespace = namespaceRoot + ".DynamicObjectSegments" + ((x.Key != null) ? ("." + x.Key) : ""),
                    Types = x.ToArray(),
                })
                .ToArray();
@@ -168,6 +170,11 @@ namespace ZeroFormatter.CodeGenerator
             }
 
             if (disallowInMetadata && symbol.Locations[0].IsInMetadata)
+            {
+                return;
+            }
+
+            if (!IsAllowType(symbol))
             {
                 return;
             }
@@ -215,6 +222,16 @@ namespace ZeroFormatter.CodeGenerator
                 return;
             }
             if (allowCustomTypes.Contains(type.ToDisplayString()))
+            {
+                return;
+            }
+
+            if (disallowInMetadata && type.Locations[0].IsInMetadata)
+            {
+                return;
+            }
+
+            if (!IsAllowType(type))
             {
                 return;
             }
@@ -336,11 +353,6 @@ namespace ZeroFormatter.CodeGenerator
                     }
                     return;
                 }
-            }
-
-            if (disallowInMetadata && type.Locations[0].IsInMetadata)
-            {
-                return;
             }
 
             if (type.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) == null)
@@ -500,8 +512,8 @@ namespace ZeroFormatter.CodeGenerator
                             genericTypeContainer.Add(new GenericType { TypeKind = GenericTypeKind.Array, ElementTypes = t.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) });
                         }
 
-                        var namedType = memberType as INamedTypeSymbol;
-                        if (namedType != null) // if <T> is unnamed type, it can't analyze.
+                        var namedType = t as INamedTypeSymbol;
+                        if (namedType != null && namedType.Kind != SymbolKind.ArrayType) // if <T> is unnamed type, it can't analyze.
                         {
                             // Recursive
                             CollectObjectSegment(namedType, fromNullable, asKey);
@@ -636,6 +648,29 @@ namespace ZeroFormatter.CodeGenerator
                 SubTypeNames = subTypList.ToArray(),
                 FallbackTypeName = fallbackType.IsNull ? null : (fallbackType.Value as INamedTypeSymbol).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
             });
+        }
+
+        bool IsAllowType(INamedTypeSymbol symbol)
+        {
+            do
+            {
+                if (symbol.DeclaredAccessibility != Accessibility.Public)
+                {
+                    if (disallowInternal)
+                    {
+                        return false;
+                    }
+
+                    if (symbol.DeclaredAccessibility != Accessibility.Internal)
+                    {
+                        return true;
+                    }
+                }
+
+                symbol = symbol.ContainingType;
+            } while (symbol != null);
+
+            return true;
         }
 
         static int GetEnumSize(INamedTypeSymbol enumUnderlyingType)
