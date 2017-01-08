@@ -4,13 +4,13 @@ namespace ZeroFormatter
 {
     // Note:Can we change to struct? like CancellationTokenSource, CreateLinkedTokenSource...
 
-    public sealed class DirtyTracker
+    public class DirtyTracker
     {
-        internal static readonly DirtyTracker NullTracker = new DirtyTracker();
+        public static readonly DirtyTracker NullTracker = new NullDirtyTracker();
 
         readonly DirtyTracker parent;
 
-        public bool IsDirty { get; private set; }
+        public virtual bool IsDirty { get; private set; }
 
         public DirtyTracker()
         {
@@ -23,7 +23,7 @@ namespace ZeroFormatter
             IsDirty = parent.IsDirty;
         }
 
-        public void Dirty()
+        public virtual void Dirty()
         {
             IsDirty = true;
             if (parent != null)
@@ -32,9 +32,35 @@ namespace ZeroFormatter
             }
         }
 
-        public DirtyTracker CreateChild()
+        public virtual DirtyTracker CreateChild()
         {
             return new DirtyTracker(this);
+        }
+
+        sealed class NullDirtyTracker : DirtyTracker
+        {
+            public NullDirtyTracker()
+                : base()
+            {
+
+            }
+
+            public override bool IsDirty
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
+            public override DirtyTracker CreateChild()
+            {
+                return this;
+            }
+
+            public override void Dirty()
+            {
+            }
         }
     }
 }

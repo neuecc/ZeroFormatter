@@ -73,7 +73,7 @@ namespace <#= Namespace #>
 <# foreach(var p in t.Properties) { #>
 <# if(p.IsFixedSize) { #>
 <# } else if(p.IsCacheSegment) { #>
-        readonly CacheSegment<TTypeResolver, <#= p.Type #>> _<#= p.Name #>;
+        CacheSegment<TTypeResolver, <#= p.Type #>> _<#= p.Name #>;
 <# } else { #>
         <#= p.Type #> _<#= p.Name #>;
 <# } } #>
@@ -156,7 +156,7 @@ namespace <#= Namespace #>
 <# if (p.IsFixedSize) { #>
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 <# } else if(p.IsCacheSegment) { #>
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, _<#= p.Name #>);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, ref _<#= p.Name #>);
 <# } else { #>
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, _<#= p.Name #>);
 <# } } #>

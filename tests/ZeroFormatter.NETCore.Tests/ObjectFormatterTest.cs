@@ -43,8 +43,8 @@ namespace ZeroFormatter.Tests
         readonly byte[] __extraFixedBytes;
 
         // generated mutable segements
-        readonly CacheSegment<DefaultResolver, string> _lastName;
-        readonly CacheSegment<DefaultResolver, string> _firstName;
+        CacheSegment<DefaultResolver, string> _lastName;
+        CacheSegment<DefaultResolver, string> _firstName;
         IList<int> _myList; // no readonly
 
         // 0

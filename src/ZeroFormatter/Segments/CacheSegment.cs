@@ -18,7 +18,7 @@ namespace ZeroFormatter.Segments
         Dirty = 2
     }
 
-    public sealed class CacheSegment<TTypeResolver, T> : IZeroFormatterSegment
+    public struct CacheSegment<TTypeResolver, T> : IZeroFormatterSegment
         where TTypeResolver : ITypeResolver, new()
     {
         readonly DirtyTracker tracker;

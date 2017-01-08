@@ -201,7 +201,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write("        readonly CacheSegment<TTypeResolver, ");
+            this.Write("        CacheSegment<TTypeResolver, ");
             
             #line 76 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(p.Type));
@@ -583,7 +583,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(", _");
+            this.Write(", ref _");
             
             #line 159 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(p.Name));

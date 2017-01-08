@@ -14,8 +14,13 @@ namespace ZeroFormatter
 
     public static partial class ZeroFormatterInitializer
     {
+        static bool registered = false;
+
         public static void Register()
         {
+            if(registered) return;
+            registered = true;
+
             // Enums
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::DataRoot.DataTypeVersion>.Register(new ZeroFormatter.DynamicObjectSegments.DataRoot_DataTypeVersionFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<global::DataRoot.DataTypeVersion>.Register(new ZeroFormatter.DynamicObjectSegments.DataRoot_DataTypeVersionEqualityComparer());
@@ -150,7 +155,6 @@ namespace ZeroFormatter
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.EnumGenChecker>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.EnumGenCheckerFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InnerClassA.InnerObject>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InnerClassA_InnerObjectFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InnerClassB.InnerObject>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InnerClassB_InnerObjectFormatter<ZeroFormatter.Formatters.DefaultResolver>());
-            ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InternalOkGenerateType>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InternalOkGenerateTypeFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Person>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.PersonFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.InheritBase>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InheritBaseFormatter<ZeroFormatter.Formatters.DefaultResolver>());
             ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::Sandbox.Shared.Inherit>.Register(new ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.InheritFormatter<ZeroFormatter.Formatters.DefaultResolver>());
@@ -568,14 +572,14 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<int, string>> _MyProperty1;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<int, string>> _MyProperty1;
         global::System.Collections.Generic.IList<int> _MyProperty2;
         global::System.Collections.Generic.IList<string> _MyProperty3;
-        readonly CacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>> _MyProperty4;
+        CacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>> _MyProperty4;
         global::ZeroFormatter.Tests.MyFormatClass _MyProperty5;
-        readonly CacheSegment<TTypeResolver, byte[]> _MyProperty6;
-        readonly CacheSegment<TTypeResolver, string> _MyProperty7;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>> _MyProperty8;
+        CacheSegment<TTypeResolver, byte[]> _MyProperty6;
+        CacheSegment<TTypeResolver, string> _MyProperty7;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>> _MyProperty8;
 
         // 0
         public override global::System.Collections.Generic.IDictionary<int, string> MyProperty1
@@ -722,14 +726,14 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
                 offset += (8 + 4 * (7 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<int, string>>(ref targetBytes, startOffset, offset, 0, _MyProperty1);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<int, string>>(ref targetBytes, startOffset, offset, 0, ref _MyProperty1);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<int>>(ref targetBytes, startOffset, offset, 1, _MyProperty2);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<string>>(ref targetBytes, startOffset, offset, 2, _MyProperty3);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 3, _MyProperty4);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 3, ref _MyProperty4);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::ZeroFormatter.Tests.MyFormatClass>(ref targetBytes, startOffset, offset, 4, _MyProperty5);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, byte[]>(ref targetBytes, startOffset, offset, 5, _MyProperty6);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 6, _MyProperty7);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 7, _MyProperty8);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, byte[]>(ref targetBytes, startOffset, offset, 5, ref _MyProperty6);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 6, ref _MyProperty7);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 7, ref _MyProperty8);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 7);
             }
@@ -797,8 +801,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _FirstName;
-        readonly CacheSegment<TTypeResolver, string> _LastName;
+        CacheSegment<TTypeResolver, string> _FirstName;
+        CacheSegment<TTypeResolver, string> _LastName;
         global::System.Collections.Generic.IList<int> _MyList;
 
         // 0
@@ -901,8 +905,8 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 offset += (8 + 4 * (4 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, _FirstName);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, _LastName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, ref _FirstName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, ref _LastName);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<int>>(ref targetBytes, startOffset, offset, 4, _MyList);
 
@@ -973,7 +977,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly byte[] __extraFixedBytes;
 
         global::System.Collections.Generic.IList<int> _MyProperty4;
-        readonly CacheSegment<TTypeResolver, string> _MyProperty5;
+        CacheSegment<TTypeResolver, string> _MyProperty5;
 
         // 1
         public override int MyProperty1
@@ -1077,7 +1081,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 2, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<int>>(ref targetBytes, startOffset, offset, 4, _MyProperty4);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 5, _MyProperty5);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 5, ref _MyProperty5);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 5);
             }
@@ -1636,7 +1640,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>> _KeyTupleDictionary;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>> _KeyTupleDictionary;
 
         // 0
         public override global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass> KeyTupleDictionary
@@ -1682,7 +1686,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
                 offset += (8 + 4 * (0 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(ref targetBytes, startOffset, offset, 0, _KeyTupleDictionary);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<global::ZeroFormatter.KeyTuple<int, string>, global::ZeroFormatter.Tests.MyClass>>(ref targetBytes, startOffset, offset, 0, ref _KeyTupleDictionary);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
             }
@@ -1747,7 +1751,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _Prop2;
+        CacheSegment<TTypeResolver, string> _Prop2;
 
         // 0
         public override int Prop1
@@ -1807,7 +1811,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 offset += (8 + 4 * (1 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, _Prop2);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, ref _Prop2);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
             }
@@ -1875,9 +1879,9 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _Dummy2;
+        CacheSegment<TTypeResolver, string> _Dummy2;
         global::System.Collections.Generic.IList<string> _VariableSizeList;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>> _Dictionary;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>> _Dictionary;
         global::ZeroFormatter.Tests.Offset2 _ObjectProp;
 
         // 0
@@ -1982,9 +1986,9 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 offset += (8 + 4 * (4 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, _Dummy2);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, ref _Dummy2);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<string>>(ref targetBytes, startOffset, offset, 2, _VariableSizeList);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 3, _Dictionary);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 3, ref _Dictionary);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::ZeroFormatter.Tests.Offset2>(ref targetBytes, startOffset, offset, 4, _ObjectProp);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 4);
@@ -2281,7 +2285,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyStructVariable> _MyProperty1;
+        CacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyStructVariable> _MyProperty1;
 
         // 0
         public override global::ZeroFormatter.Tests.MyStructFixed MyProperty0
@@ -2341,7 +2345,7 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 offset += (8 + 4 * (1 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::ZeroFormatter.Tests.MyStructFixed>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyStructVariable>(ref targetBytes, startOffset, offset, 1, _MyProperty1);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyStructVariable>(ref targetBytes, startOffset, offset, 1, ref _MyProperty1);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
             }
@@ -2408,9 +2412,9 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>> _D0;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>> _D0;
         global::ZeroFormatter.ILazyDictionary<string, int> _D1;
-        readonly CacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>> _D2;
+        CacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>> _D2;
         global::ZeroFormatter.ILazyLookup<bool, int> _D3;
 
         // 0
@@ -2501,9 +2505,9 @@ namespace ZeroFormatter.DynamicObjectSegments.ZeroFormatter.Tests
                 var startOffset = offset;
                 offset += (8 + 4 * (3 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 0, _D0);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 0, ref _D0);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::ZeroFormatter.ILazyDictionary<string, int>>(ref targetBytes, startOffset, offset, 1, _D1);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 2, _D2);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 2, ref _D2);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::ZeroFormatter.ILazyLookup<bool, int>>(ref targetBytes, startOffset, offset, 3, _D3);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 3);
@@ -2861,24 +2865,24 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, short[]> _A1;
-        readonly CacheSegment<TTypeResolver, int[]> _A2;
-        readonly CacheSegment<TTypeResolver, long[]> _A3;
-        readonly CacheSegment<TTypeResolver, ushort[]> _A4;
-        readonly CacheSegment<TTypeResolver, uint[]> _A5;
-        readonly CacheSegment<TTypeResolver, ulong[]> _A6;
-        readonly CacheSegment<TTypeResolver, float[]> _A7;
-        readonly CacheSegment<TTypeResolver, double[]> _A8;
-        readonly CacheSegment<TTypeResolver, bool[]> _A9;
-        readonly CacheSegment<TTypeResolver, byte[]> _A10;
-        readonly CacheSegment<TTypeResolver, sbyte[]> _A11;
-        readonly CacheSegment<TTypeResolver, char[]> _A12;
-        readonly CacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyVector[]> _V1;
-        readonly CacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyVectorClass[]> _V2;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.Dictionary<int, string>> _V3;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.List<int>> _V4;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.HashSet<string>> _V5;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.KeyValuePair<int, string>> _V6;
+        CacheSegment<TTypeResolver, short[]> _A1;
+        CacheSegment<TTypeResolver, int[]> _A2;
+        CacheSegment<TTypeResolver, long[]> _A3;
+        CacheSegment<TTypeResolver, ushort[]> _A4;
+        CacheSegment<TTypeResolver, uint[]> _A5;
+        CacheSegment<TTypeResolver, ulong[]> _A6;
+        CacheSegment<TTypeResolver, float[]> _A7;
+        CacheSegment<TTypeResolver, double[]> _A8;
+        CacheSegment<TTypeResolver, bool[]> _A9;
+        CacheSegment<TTypeResolver, byte[]> _A10;
+        CacheSegment<TTypeResolver, sbyte[]> _A11;
+        CacheSegment<TTypeResolver, char[]> _A12;
+        CacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyVector[]> _V1;
+        CacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyVectorClass[]> _V2;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.Dictionary<int, string>> _V3;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.List<int>> _V4;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.HashSet<string>> _V5;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.KeyValuePair<int, string>> _V6;
 
         // 0
         public override short[] A1
@@ -3162,24 +3166,24 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 var startOffset = offset;
                 offset += (8 + 4 * (17 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, short[]>(ref targetBytes, startOffset, offset, 0, _A1);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, int[]>(ref targetBytes, startOffset, offset, 1, _A2);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, long[]>(ref targetBytes, startOffset, offset, 2, _A3);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, ushort[]>(ref targetBytes, startOffset, offset, 3, _A4);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, uint[]>(ref targetBytes, startOffset, offset, 4, _A5);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, ulong[]>(ref targetBytes, startOffset, offset, 5, _A6);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, float[]>(ref targetBytes, startOffset, offset, 6, _A7);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, double[]>(ref targetBytes, startOffset, offset, 7, _A8);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, bool[]>(ref targetBytes, startOffset, offset, 8, _A9);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, byte[]>(ref targetBytes, startOffset, offset, 9, _A10);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, sbyte[]>(ref targetBytes, startOffset, offset, 10, _A11);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, char[]>(ref targetBytes, startOffset, offset, 11, _A12);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyVector[]>(ref targetBytes, startOffset, offset, 12, _V1);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyVectorClass[]>(ref targetBytes, startOffset, offset, 13, _V2);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.Dictionary<int, string>>(ref targetBytes, startOffset, offset, 14, _V3);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.List<int>>(ref targetBytes, startOffset, offset, 15, _V4);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.HashSet<string>>(ref targetBytes, startOffset, offset, 16, _V5);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.KeyValuePair<int, string>>(ref targetBytes, startOffset, offset, 17, _V6);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, short[]>(ref targetBytes, startOffset, offset, 0, ref _A1);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, int[]>(ref targetBytes, startOffset, offset, 1, ref _A2);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, long[]>(ref targetBytes, startOffset, offset, 2, ref _A3);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, ushort[]>(ref targetBytes, startOffset, offset, 3, ref _A4);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, uint[]>(ref targetBytes, startOffset, offset, 4, ref _A5);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, ulong[]>(ref targetBytes, startOffset, offset, 5, ref _A6);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, float[]>(ref targetBytes, startOffset, offset, 6, ref _A7);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, double[]>(ref targetBytes, startOffset, offset, 7, ref _A8);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, bool[]>(ref targetBytes, startOffset, offset, 8, ref _A9);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, byte[]>(ref targetBytes, startOffset, offset, 9, ref _A10);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, sbyte[]>(ref targetBytes, startOffset, offset, 10, ref _A11);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, char[]>(ref targetBytes, startOffset, offset, 11, ref _A12);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyVector[]>(ref targetBytes, startOffset, offset, 12, ref _V1);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyVectorClass[]>(ref targetBytes, startOffset, offset, 13, ref _V2);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.Dictionary<int, string>>(ref targetBytes, startOffset, offset, 14, ref _V3);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.List<int>>(ref targetBytes, startOffset, offset, 15, ref _V4);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.HashSet<string>>(ref targetBytes, startOffset, offset, 16, ref _V5);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.KeyValuePair<int, string>>(ref targetBytes, startOffset, offset, 17, ref _V6);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 17);
             }
@@ -3358,14 +3362,14 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyStructFixed[]> _ArrayFormat;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.List<int>> _CollectionFormat;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.ObjectModel.ReadOnlyCollection<int>> _ReadOnlyCollectionFormat;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.Dictionary<int, int>> _DictionaryFormat;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<int, int>> _InterafceDictionaryFormat;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.ICollection<int>> _InterfaceCollectionFormat;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.IEnumerable<int>> _InterfaceEnumerableFormat;
-        readonly CacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>> _LookupFormat;
+        CacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyStructFixed[]> _ArrayFormat;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.List<int>> _CollectionFormat;
+        CacheSegment<TTypeResolver, global::System.Collections.ObjectModel.ReadOnlyCollection<int>> _ReadOnlyCollectionFormat;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.Dictionary<int, int>> _DictionaryFormat;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<int, int>> _InterafceDictionaryFormat;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.ICollection<int>> _InterfaceCollectionFormat;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.IEnumerable<int>> _InterfaceEnumerableFormat;
+        CacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>> _LookupFormat;
 
         // 0
         public override global::ZeroFormatter.Tests.MyStructFixed[] ArrayFormat
@@ -3509,14 +3513,14 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 var startOffset = offset;
                 offset += (8 + 4 * (11 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyStructFixed[]>(ref targetBytes, startOffset, offset, 0, _ArrayFormat);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.List<int>>(ref targetBytes, startOffset, offset, 1, _CollectionFormat);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.ObjectModel.ReadOnlyCollection<int>>(ref targetBytes, startOffset, offset, 2, _ReadOnlyCollectionFormat);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.Dictionary<int, int>>(ref targetBytes, startOffset, offset, 3, _DictionaryFormat);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<int, int>>(ref targetBytes, startOffset, offset, 4, _InterafceDictionaryFormat);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.ICollection<int>>(ref targetBytes, startOffset, offset, 5, _InterfaceCollectionFormat);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IEnumerable<int>>(ref targetBytes, startOffset, offset, 6, _InterfaceEnumerableFormat);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 11, _LookupFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::ZeroFormatter.Tests.MyStructFixed[]>(ref targetBytes, startOffset, offset, 0, ref _ArrayFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.List<int>>(ref targetBytes, startOffset, offset, 1, ref _CollectionFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.ObjectModel.ReadOnlyCollection<int>>(ref targetBytes, startOffset, offset, 2, ref _ReadOnlyCollectionFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.Dictionary<int, int>>(ref targetBytes, startOffset, offset, 3, ref _DictionaryFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<int, int>>(ref targetBytes, startOffset, offset, 4, ref _InterafceDictionaryFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.ICollection<int>>(ref targetBytes, startOffset, offset, 5, ref _InterfaceCollectionFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IEnumerable<int>>(ref targetBytes, startOffset, offset, 6, ref _InterfaceEnumerableFormat);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 11, ref _LookupFormat);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 11);
             }
@@ -3884,114 +3888,6 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         }
     }
 
-    public class InternalOkGenerateTypeFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.InternalOkGenerateType>
-        where TTypeResolver : ITypeResolver, new()
-    {
-        public override int? GetLength()
-        {
-            return null;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, global::Sandbox.Shared.InternalOkGenerateType value)
-        {
-            var segment = value as IZeroFormatterSegment;
-            if (segment != null)
-            {
-                return segment.Serialize(ref bytes, offset);
-            }
-            else if (value == null)
-            {
-                BinaryUtil.WriteInt32(ref bytes, offset, -1);
-                return 4;
-            }
-            else
-            {
-                var startOffset = offset;
-
-                offset += (8 + 4 * (0 + 1));
-                offset += ObjectSegmentHelper.SerializeFromFormatter<TTypeResolver, int>(ref bytes, startOffset, offset, 0, value.MyProperty);
-
-                return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, 0);
-            }
-        }
-
-        public override global::Sandbox.Shared.InternalOkGenerateType Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
-        {
-            byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
-            if (byteSize == -1)
-            {
-                byteSize = 4;
-                return null;
-            }
-            return new InternalOkGenerateTypeObjectSegment<TTypeResolver>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
-        }
-    }
-
-    public class InternalOkGenerateTypeObjectSegment<TTypeResolver> : global::Sandbox.Shared.InternalOkGenerateType, IZeroFormatterSegment
-        where TTypeResolver : ITypeResolver, new()
-    {
-        static readonly int[] __elementSizes = new int[]{ 4 };
-
-        readonly ArraySegment<byte> __originalBytes;
-        readonly DirtyTracker __tracker;
-        readonly int __binaryLastIndex;
-        readonly byte[] __extraFixedBytes;
-
-
-        // 0
-        public override int MyProperty
-        {
-            get
-            {
-                return ObjectSegmentHelper.GetFixedProperty<TTypeResolver, int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, __tracker);
-            }
-            set
-            {
-                ObjectSegmentHelper.SetFixedProperty<TTypeResolver, int>(__originalBytes, 0, __binaryLastIndex, __extraFixedBytes, value, __tracker);
-            }
-        }
-
-
-        public InternalOkGenerateTypeObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
-        {
-            var __array = originalBytes.Array;
-
-            this.__originalBytes = originalBytes;
-            this.__tracker = dirtyTracker = dirtyTracker.CreateChild();
-            this.__binaryLastIndex = BinaryUtil.ReadInt32(ref __array, originalBytes.Offset + 4);
-
-            this.__extraFixedBytes = ObjectSegmentHelper.CreateExtraFixedBytes(this.__binaryLastIndex, 0, __elementSizes);
-
-        }
-
-        public bool CanDirectCopy()
-        {
-            return !__tracker.IsDirty;
-        }
-
-        public ArraySegment<byte> GetBufferReference()
-        {
-            return __originalBytes;
-        }
-
-        public int Serialize(ref byte[] targetBytes, int offset)
-        {
-            if (__extraFixedBytes != null || __tracker.IsDirty)
-            {
-                var startOffset = offset;
-                offset += (8 + 4 * (0 + 1));
-
-                offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-
-                return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 0);
-            }
-            else
-            {
-                return ObjectSegmentHelper.DirectCopyAll(__originalBytes, ref targetBytes, offset);
-            }
-        }
-    }
-
     public class PersonFormatter<TTypeResolver> : Formatter<TTypeResolver, global::Sandbox.Shared.Person>
         where TTypeResolver : ITypeResolver, new()
     {
@@ -4048,8 +3944,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _FirstName;
-        readonly CacheSegment<TTypeResolver, string> _LastName;
+        CacheSegment<TTypeResolver, string> _FirstName;
+        CacheSegment<TTypeResolver, string> _LastName;
 
         // 0
         public override int Age
@@ -4136,8 +4032,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 offset += (8 + 4 * (3 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, _FirstName);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, _LastName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, ref _FirstName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, ref _LastName);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::Sandbox.Shared.Sex>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 3);
@@ -4561,7 +4457,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _Name;
+        CacheSegment<TTypeResolver, string> _Name;
 
         // 0
         public override string Name
@@ -4633,7 +4529,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 var startOffset = offset;
                 offset += (8 + 4 * (2 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 0, _Name);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 0, ref _Name);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 1, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 2, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
@@ -4701,7 +4597,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _Race;
+        CacheSegment<TTypeResolver, string> _Race;
 
         // 0
         public override string Race
@@ -4773,7 +4669,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 var startOffset = offset;
                 offset += (8 + 4 * (2 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 0, _Race);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 0, ref _Race);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 1, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 2, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
@@ -4840,8 +4736,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, global::Sandbox.Shared.IStandardUnion> _A;
-        readonly CacheSegment<TTypeResolver, global::Sandbox.Shared.Character> _B;
+        CacheSegment<TTypeResolver, global::Sandbox.Shared.IStandardUnion> _A;
+        CacheSegment<TTypeResolver, global::Sandbox.Shared.Character> _B;
 
         // 0
         public override global::Sandbox.Shared.IStandardUnion A
@@ -4901,8 +4797,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 var startOffset = offset;
                 offset += (8 + 4 * (1 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::Sandbox.Shared.IStandardUnion>(ref targetBytes, startOffset, offset, 0, _A);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::Sandbox.Shared.Character>(ref targetBytes, startOffset, offset, 1, _B);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::Sandbox.Shared.IStandardUnion>(ref targetBytes, startOffset, offset, 0, ref _A);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::Sandbox.Shared.Character>(ref targetBytes, startOffset, offset, 1, ref _B);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
             }
@@ -5859,11 +5755,11 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _MyProperty6;
+        CacheSegment<TTypeResolver, string> _MyProperty6;
         global::System.Collections.Generic.IList<int> _MyProperty10;
-        readonly CacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>> _MyProperty11;
+        CacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>> _MyProperty11;
         global::System.Collections.Generic.IList<string> _MyProperty13;
-        readonly CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>> _MyProperty15;
+        CacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>> _MyProperty15;
 
         // 0
         public override int MyProperty0
@@ -6022,11 +5918,11 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, long>(ref targetBytes, startOffset, offset, 5, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 7, _MyProperty6);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 7, ref _MyProperty6);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<int>>(ref targetBytes, startOffset, offset, 10, _MyProperty10);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 11, _MyProperty11);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Linq.ILookup<bool, int>>(ref targetBytes, startOffset, offset, 11, ref _MyProperty11);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<string>>(ref targetBytes, startOffset, offset, 13, _MyProperty13);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 15, _MyProperty15);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::System.Collections.Generic.IDictionary<string, int>>(ref targetBytes, startOffset, offset, 15, ref _MyProperty15);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 20, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 20);
@@ -6311,7 +6207,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, global::Sandbox.Shared.Bar.DameClass[]> _My2;
+        CacheSegment<TTypeResolver, global::Sandbox.Shared.Bar.DameClass[]> _My2;
 
         // 0
         public override global::Sandbox.Shared.Bar.DameClass[] My2
@@ -6370,7 +6266,7 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
                 var startOffset = offset;
                 offset += (8 + 4 * (1 + 1));
 
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::Sandbox.Shared.Bar.DameClass[]>(ref targetBytes, startOffset, offset, 0, _My2);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, global::Sandbox.Shared.Bar.DameClass[]>(ref targetBytes, startOffset, offset, 0, ref _My2);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 1, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 1);
@@ -6439,8 +6335,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _FirstName;
-        readonly CacheSegment<TTypeResolver, string> _LastName;
+        CacheSegment<TTypeResolver, string> _FirstName;
+        CacheSegment<TTypeResolver, string> _LastName;
         global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge> _List;
 
         // 0
@@ -6543,8 +6439,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
                 offset += (8 + 4 * (4 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, _FirstName);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, _LastName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, ref _FirstName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, ref _LastName);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>(ref targetBytes, startOffset, offset, 3, _List);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::Sandbox.Shared.Bar.MogeMoge>(ref targetBytes, startOffset, offset, 4, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
@@ -6614,8 +6510,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _FirstName;
-        readonly CacheSegment<TTypeResolver, string> _LastName;
+        CacheSegment<TTypeResolver, string> _FirstName;
+        CacheSegment<TTypeResolver, string> _LastName;
         global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge> _List;
 
         // 0
@@ -6718,8 +6614,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Bar
                 offset += (8 + 4 * (4 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, _FirstName);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, _LastName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, ref _FirstName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, ref _LastName);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<global::Sandbox.Shared.Bar.MogeMoge>>(ref targetBytes, startOffset, offset, 3, _List);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::Sandbox.Shared.Bar.MogeMoge>(ref targetBytes, startOffset, offset, 4, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
@@ -6807,8 +6703,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _FirstName;
-        readonly CacheSegment<TTypeResolver, string> _LastName;
+        CacheSegment<TTypeResolver, string> _FirstName;
+        CacheSegment<TTypeResolver, string> _LastName;
         global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge> _List;
 
         // 0
@@ -6911,8 +6807,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
                 offset += (8 + 4 * (4 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, _FirstName);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, _LastName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, ref _FirstName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, ref _LastName);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>(ref targetBytes, startOffset, offset, 3, _List);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::Sandbox.Shared.Foo.MogeMoge>(ref targetBytes, startOffset, offset, 4, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
@@ -6982,8 +6878,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, string> _FirstName;
-        readonly CacheSegment<TTypeResolver, string> _LastName;
+        CacheSegment<TTypeResolver, string> _FirstName;
+        CacheSegment<TTypeResolver, string> _LastName;
         global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge> _List;
 
         // 0
@@ -7086,8 +6982,8 @@ namespace ZeroFormatter.DynamicObjectSegments.Sandbox.Shared.Foo
                 offset += (8 + 4 * (4 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, _FirstName);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, _LastName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 1, ref _FirstName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, string>(ref targetBytes, startOffset, offset, 2, ref _LastName);
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, global::System.Collections.Generic.IList<global::Sandbox.Shared.Foo.MogeMoge>>(ref targetBytes, startOffset, offset, 3, _List);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::Sandbox.Shared.Foo.MogeMoge>(ref targetBytes, startOffset, offset, 4, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
@@ -7173,7 +7069,7 @@ namespace ZeroFormatter.DynamicObjectSegments
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
-        readonly CacheSegment<TTypeResolver, byte[]> _Data;
+        CacheSegment<TTypeResolver, byte[]> _Data;
 
         // 0
         public override global::DataRoot.DataTypeVersion DataType
@@ -7246,7 +7142,7 @@ namespace ZeroFormatter.DynamicObjectSegments
                 offset += (8 + 4 * (2 + 1));
 
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::DataRoot.DataTypeVersion>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, byte[]>(ref targetBytes, startOffset, offset, 1, _Data);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, byte[]>(ref targetBytes, startOffset, offset, 1, ref _Data);
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, global::MyGlobal>(ref targetBytes, startOffset, offset, 2, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, 2);
