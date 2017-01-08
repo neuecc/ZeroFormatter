@@ -867,6 +867,14 @@ ZeroFormatter spec has two stages + ex.
 * Stage2: FixedSizeList, VariableSizeList and Object supports lazy-evaluation, does not support Extension Format.
 * StageEx: Supports C# Extension Format
 
+List of port libraries
+
+* Go, [shamaton/zeroformatter](https://github.com/shamaton/zeroformatter)
+* Ruby, [aki017/zero_formatter](https://github.com/aki017/zero_formatter)
+* Swift, [yaslab/ZeroFormatter.swift](https://github.com/yaslab/ZeroFormatter.swift)
+* Scala, [pocketberserker/scala-zero-formatter](https://github.com/pocketberserker/scala-zero-formatter/)
+* Rust, [pocketberserker/zero-formatter.rs](https://github.com/pocketberserker/zero-formatter.rs)
+
 Author Info
 ---
 Yoshifumi Kawai(a.k.a. neuecc) is a software developer in Japan.  
