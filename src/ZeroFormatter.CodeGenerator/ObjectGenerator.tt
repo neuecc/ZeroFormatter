@@ -48,7 +48,7 @@ namespace <#= Namespace #>
             }
         }
 
-        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, global::ZeroFormatter.DirtyTracker tracker, out int byteSize)
         {
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSize == -1)
@@ -66,7 +66,7 @@ namespace <#= Namespace #>
         static readonly int[] __elementSizes = new int[]{ <#= string.Join(", ", t.ElementFixedSizes) #> };
 
         readonly ArraySegment<byte> __originalBytes;
-        readonly DirtyTracker __tracker;
+        readonly global::ZeroFormatter.DirtyTracker __tracker;
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
@@ -115,7 +115,7 @@ namespace <#= Namespace #>
 
 <# } #>
 
-        public <#= t.Name #>ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        public <#= t.Name #>ObjectSegment(global::ZeroFormatter.DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
 

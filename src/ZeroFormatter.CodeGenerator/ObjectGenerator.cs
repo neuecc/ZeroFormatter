@@ -142,7 +142,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(@" Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+            this.Write(@" Deserialize(ref byte[] bytes, int offset, global::ZeroFormatter.DirtyTracker tracker, out int byteSize)
         {
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSize == -1)
@@ -180,9 +180,9 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(" };\r\n\r\n        readonly ArraySegment<byte> __originalBytes;\r\n        readonly Dir" +
-                    "tyTracker __tracker;\r\n        readonly int __binaryLastIndex;\r\n        readonly " +
-                    "byte[] __extraFixedBytes;\r\n\r\n");
+            this.Write(" };\r\n\r\n        readonly ArraySegment<byte> __originalBytes;\r\n        readonly glo" +
+                    "bal::ZeroFormatter.DirtyTracker __tracker;\r\n        readonly int __binaryLastInd" +
+                    "ex;\r\n        readonly byte[] __extraFixedBytes;\r\n\r\n");
             
             #line 73 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\ObjectGenerator.tt"
  foreach(var p in t.Properties) { 
@@ -413,7 +413,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(@"ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+            this.Write(@"ObjectSegment(global::ZeroFormatter.DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
 
