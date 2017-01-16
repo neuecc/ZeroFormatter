@@ -60,7 +60,7 @@ namespace <#= Namespace #>
             return offset - startOffset;
         }
 
-        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, global::ZeroFormatter.DirtyTracker tracker, out int byteSize)
         {
             byteSize = 0;
             int size;

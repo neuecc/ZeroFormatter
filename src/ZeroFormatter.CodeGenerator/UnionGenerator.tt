@@ -63,7 +63,7 @@ namespace <#= Namespace #>
             return writeSize;
         }
 
-        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, global::ZeroFormatter.DirtyTracker tracker, out int byteSize)
         {
             if ((byteSize = BinaryUtil.ReadInt32(ref bytes, offset)) == -1)
             {

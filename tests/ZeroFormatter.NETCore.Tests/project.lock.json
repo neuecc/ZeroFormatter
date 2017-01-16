@@ -2,7 +2,7 @@
   "locked": false,
   "version": 2,
   "targets": {
-    ".NETCoreApp,Version=v1.5.7": {
+    ".NETCoreApp,Version=v1.6": {
       "dotnet-test-xunit/2.2.0-preview2-build1029": {
         "type": "package",
         "dependencies": {
@@ -7590,12 +7590,12 @@
       "NETStandard.Library >= 1.6.0",
       "System.Diagnostics.Contracts >= 4.0.1",
       "System.Dynamic.Runtime >= 4.0.11",
-      "ZeroFormatter.Interfaces.NETCore >= 1.5.7",
-      "ZeroFormatter.NETCore >= 1.5.7",
+      "ZeroFormatter.Interfaces.NETCore >= 1.6.0",
+      "ZeroFormatter.NETCore >= 1.6.0",
       "dotnet-test-xunit >= 2.2.0-preview2-build1029",
       "xunit >= 2.2.0-beta3-build3402"
     ],
-    ".NETCoreApp,Version=v1.5.7": [
+    ".NETCoreApp,Version=v1.6": [
       "Microsoft.NETCore.App >= 1.0.1"
     ]
   },
