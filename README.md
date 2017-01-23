@@ -490,6 +490,16 @@ zfc.exe -i "..\src\Sandbox.Shared.csproj" -s -o "..\unity\ZfcCompiled\"
 
 Generated formatters must need to register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
 
+For Unity Unit Tests, the generated formatters must be registered in the `SetUp` method:
+
+```csharp
+    [SetUp]
+    public void RegisterZeroFormatter()
+    {
+        ZeroFormatterInitializer.Register();
+    }
+```
+
 ZeroFormatter can not serialize Unity native types by default but you can make custom formatter by define pseudo type. For example create `Vector2` to ZeroFormatter target. 
 
 ```csharp
