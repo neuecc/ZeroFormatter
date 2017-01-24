@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>ZeroFormatter.Unity</id>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
         <title>ZeroFormatter.Unity</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
@@ -17,7 +17,7 @@
         </frameworkAssemblies>
         <dependencies>
             <group targetFramework="Unity Full v3.5">
-                <dependency id="ZeroFormatter.Interfaces" version="1.6.0" />
+                <dependency id="ZeroFormatter.Interfaces" version="1.6.1" />
             </group>
         </dependencies>
     </metadata>
