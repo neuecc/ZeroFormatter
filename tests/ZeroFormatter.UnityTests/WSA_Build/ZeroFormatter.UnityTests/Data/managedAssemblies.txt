@@ -1,0 +1,6 @@
+Assembly-CSharp.dll
+UnityEngine.UI.dll
+Sandbox.Shared.dll
+ZeroFormatter.Interfaces.dll
+ZeroFormatter.Portable.dll
+UnityEngine.Networking.dll

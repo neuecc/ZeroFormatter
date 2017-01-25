@@ -7,7 +7,7 @@
 //     コードが再生成されるときに損失したりします。
 // </auto-generated>
 //------------------------------------------------------------------------------
-
+#if !WINDOWS_UWP
 namespace Sandbox.Shared.GeneratedSerializers {
     
     
@@ -31,3 +31,4 @@ namespace Sandbox.Shared.GeneratedSerializers {
         }
     }
 }
+#endif

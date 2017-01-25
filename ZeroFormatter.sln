@@ -48,6 +48,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.Shared", "sandbox\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceComparison", "sandbox\PerformanceComparison\PerformanceComparison.csproj", "{0FB6577C-2FCD-430B-8BB3-E4ED0833E8FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter.Portable", "src\ZeroFormatter.Portable\ZeroFormatter.Portable.csproj", "{EEB02197-AE4B-4559-BF3D-D187AD69744F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroFormatter.Interfaces.Portable", "src\ZeroFormatter.Interfaces.Portable\ZeroFormatter.Interfaces.Portable.csproj", "{F1365355-4B82-4A13-9865-25573E5DBEB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +137,18 @@ Global
 		{0FB6577C-2FCD-430B-8BB3-E4ED0833E8FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0FB6577C-2FCD-430B-8BB3-E4ED0833E8FC}.Unity|Any CPU.ActiveCfg = Release|Any CPU
 		{0FB6577C-2FCD-430B-8BB3-E4ED0833E8FC}.Unity|Any CPU.Build.0 = Release|Any CPU
+		{EEB02197-AE4B-4559-BF3D-D187AD69744F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEB02197-AE4B-4559-BF3D-D187AD69744F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEB02197-AE4B-4559-BF3D-D187AD69744F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEB02197-AE4B-4559-BF3D-D187AD69744F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEB02197-AE4B-4559-BF3D-D187AD69744F}.Unity|Any CPU.ActiveCfg = Release|Any CPU
+		{EEB02197-AE4B-4559-BF3D-D187AD69744F}.Unity|Any CPU.Build.0 = Release|Any CPU
+		{F1365355-4B82-4A13-9865-25573E5DBEB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1365355-4B82-4A13-9865-25573E5DBEB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1365355-4B82-4A13-9865-25573E5DBEB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1365355-4B82-4A13-9865-25573E5DBEB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1365355-4B82-4A13-9865-25573E5DBEB0}.Unity|Any CPU.ActiveCfg = Release|Any CPU
+		{F1365355-4B82-4A13-9865-25573E5DBEB0}.Unity|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,5 +167,7 @@ Global
 		{0763A385-4EE0-45F3-8B20-0B0A71C74870} = {4A106901-0A11-4D37-B5E6-D4DB7A43C41C}
 		{944F22D3-20B1-4F6D-83FA-9331CD4ADF75} = {F29BFD74-5462-485D-851E-69B683F08C84}
 		{0FB6577C-2FCD-430B-8BB3-E4ED0833E8FC} = {F29BFD74-5462-485D-851E-69B683F08C84}
+		{EEB02197-AE4B-4559-BF3D-D187AD69744F} = {2CE059FD-1C8D-49B7-851E-4A5B385F63D5}
+		{F1365355-4B82-4A13-9865-25573E5DBEB0} = {2CE059FD-1C8D-49B7-851E-4A5B385F63D5}
 	EndGlobalSection
 EndGlobal

@@ -1,6 +1,8 @@
-﻿using MsgPack.Serialization;
-using Sandbox.Shared;
+﻿#if !WINDOWS_UWP
+using MsgPack.Serialization;
 using Sandbox.Shared.GeneratedSerializers;
+#endif
+using Sandbox.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,20 +61,20 @@ namespace ZeroFormatter.Tests
         //byte[] msgpackv3ArrayBytes;
         //byte[] jsonv3Bytes;
         //byte[] jsonv3ArrayBytes;
-
+#if !WINDOWS_UWP
         SerializationContext msgPackContext;
-
+#endif
         // Test Initialize:)
         public void _Init()
         {
             // ZeroFormatter Prepare
             ZeroFormatter.Formatters.Formatter.RegisterList<DefaultResolver, Person>();
-
+#if !WINDOWS_UWP
             // MsgPack Prepare
             MsgPack.Serialization.MessagePackSerializer.PrepareType<Sex>();
             this.msgPackContext = new MsgPack.Serialization.SerializationContext();
             this.msgPackContext.ResolveSerializer += SerializationContext_ResolveSerializer;
-
+#endif
             this.p = new Person
             {
                 Age = 99999,
@@ -94,11 +96,12 @@ namespace ZeroFormatter.Tests
 
             zeroFormatterSingleBytes = ZeroFormatterSerializer.Serialize(p);
             zeroFormatterArrayBytes = ZeroFormatterSerializer.Serialize(l);
+#if !WINDOWS_UWP
             var serializer1 = this.msgPackContext.GetSerializer<Person>();
             msgpackSingleBytes = serializer1.PackSingleObject(p);
             var serializer2 = this.msgPackContext.GetSerializer<IList<Person>>();
             msgpackArrayBytes = serializer2.PackSingleObject(l);
-
+#endif
             jsonSingleBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(p2));
             jsonArrayBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(l2));
 
@@ -119,13 +122,13 @@ namespace ZeroFormatter.Tests
             //jsonv3Bytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(v3));
             //jsonv3ArrayBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(v3Array));
         }
-
+#if !WINDOWS_UWP
         private void SerializationContext_ResolveSerializer(object sender, ResolveSerializerEventArgs e)
         {
             if (e.TargetType == typeof(Person)) { e.SetSerializer(new PersonSerializer(e.Context)); return; }
             if (e.TargetType == typeof(Sex)) { e.SetSerializer(new SexSerializer(e.Context)); return; }
         }
-
+#endif
         public void ZeroFormatterSerializeSingle()
         {
             for (int i = 0; i < Iteration; i++)
@@ -157,7 +160,7 @@ namespace ZeroFormatter.Tests
                 ZeroFormatterSerializer.Deserialize<IList<Person>>(zeroFormatterArrayBytes);
             }
         }
-
+#if !WINDOWS_UWP
         public void MsgPackSerializeSingle()
         {
             var serializer = this.msgPackContext.GetSerializer<Person>();
@@ -193,7 +196,7 @@ namespace ZeroFormatter.Tests
                 serializer.UnpackSingleObject(msgpackArrayBytes);
             }
         }
-
+#endif
         public void JsonUtilitySerializeSingle()
         {
             for (int i = 0; i < Iteration; i++)

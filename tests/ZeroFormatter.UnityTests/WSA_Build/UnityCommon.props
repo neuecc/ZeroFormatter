@@ -1,0 +1,10 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <UnityInstallationDir>C:\Program Files\Unity\Editor\</UnityInstallationDir>
+        <UnityWSASolutionName>ZeroFormatter.UnityTests</UnityWSASolutionName>
+        <UnityWSASolutionDir>E:\GitHub\ZeroFormatter\tests\ZeroFormatter.UnityTests\WSA_Build\</UnityWSASolutionDir>
+        <UnityWSAPlayerDir>C:\Program Files\Unity\Editor\Data\PlaybackEngines\MetroSupport\</UnityWSAPlayerDir>
+        <UnityWSAToolsDir>$(UnityWSASolutionDir)Unity\Tools\</UnityWSAToolsDir>
+        <UnityProjectDir>E:\GitHub\ZeroFormatter\tests\ZeroFormatter.UnityTests\</UnityProjectDir>
+    </PropertyGroup>
+</Project>
