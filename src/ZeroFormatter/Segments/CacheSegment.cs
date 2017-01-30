@@ -65,7 +65,14 @@ namespace ZeroFormatter.Segments
 
         public bool CanDirectCopy()
         {
-            return (state == SegmentState.Original) || (state == SegmentState.Cached);
+            if (Formatter<TTypeResolver, T>.Default.NoUseDirtyTracker)
+            {
+                return (state == SegmentState.Original || state == SegmentState.Cached);
+            }
+            else
+            {
+                return state == SegmentState.Original;
+            }
         }
 
         public ArraySegment<byte> GetBufferReference()
@@ -77,14 +84,21 @@ namespace ZeroFormatter.Segments
         {
             if (targetBytes == null) throw new ArgumentNullException("targetBytes");
 
-            if (state == SegmentState.Dirty) // dirty
+            if (!CanDirectCopy())
             {
                 var formatter = Formatter<TTypeResolver, T>.Default;
-
-                byte[] newBytes = null;
-                var length = formatter.Serialize(ref newBytes, 0, cached);
-                serializedBytes = new ArraySegment<byte>(newBytes, 0, newBytes.Length);
-                state = SegmentState.Cached;
+                if (formatter.NoUseDirtyTracker)
+                {
+                    byte[] newBytes = null;
+                    var length = formatter.Serialize(ref newBytes, 0, Value);
+                    serializedBytes = new ArraySegment<byte>(newBytes, 0, newBytes.Length);
+                    state = SegmentState.Cached;
+                }
+                else
+                {
+                    // direct direct write.
+                    return formatter.Serialize(ref targetBytes, offset, Value);
+                }
             }
 
             BinaryUtil.EnsureCapacity(ref targetBytes, offset, serializedBytes.Count);
