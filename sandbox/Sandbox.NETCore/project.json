@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1-*",
+  "version": "1.6.2-*",
   "buildOptions": {
     "emitEntryPoint": true
   },
@@ -9,8 +9,8 @@
       "type": "platform",
       "version": "1.0.0"
     },
-    "ZeroFormatter.Interfaces.NETCore": "1.6.1",
-    "ZeroFormatter.NETCore": "1.6.1"
+    "ZeroFormatter.Interfaces.NETCore": "1.6.2",
+    "ZeroFormatter.NETCore": "1.6.2"
   },
 
   "frameworks": {

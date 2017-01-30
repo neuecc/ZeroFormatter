@@ -486,6 +486,8 @@ zfc.exe -i "..\src\Sandbox.Shared.csproj" -o "..\unity\ZfcCompiled\ZeroFormatter
 zfc.exe -i "..\src\Sandbox.Shared.csproj" -s -o "..\unity\ZfcCompiled\" 
 ```
 
+`zfc.exe` can setup on csproj's `PreBuildEvent`(useful to generate file path under self project) or `PostBuildEvent`(useful to generate file path is another project).
+
 > Note: zfc.exe is currently only run on Windows. It is .NET Core's [Roslyn](https://github.com/dotnet/roslyn) workspace API limitation but I want to implements to all platforms...
 
 Generated formatters must need to register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
