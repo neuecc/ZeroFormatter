@@ -105,8 +105,10 @@ namespace ZeroFormatter.Formatters
             var resolver = ResolverCache<TTypeResolver>.Default;
             try
             {
+                formatter = resolver.ResolveFormatter(t);
+
                 // If Unity, should avoid long static constructor and <T> code because IL2CPP generate every <T>.
-                if (resolver.IsUseBuiltinSerializer)
+                if (formatter == null && resolver.IsUseBuiltinSerializer)
                 {
                     formatter = Formatter.GetBuiltinFormatter<TTypeResolver
 #if !UNITY
@@ -117,15 +119,7 @@ namespace ZeroFormatter.Formatters
 
                 if (formatter == null)
                 {
-                    var resolvedFormatter = resolver.ResolveFormatter(t);
-                    if (resolvedFormatter != null)
-                    {
-                        formatter = resolvedFormatter;
-                    }
-                    else
-                    {
-                        formatter = new ErrorFormatter<TTypeResolver, T>();
-                    }
+                    formatter = new ErrorFormatter<TTypeResolver, T>();
                 }
             }
             catch (Exception ex)
