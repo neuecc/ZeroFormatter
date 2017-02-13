@@ -193,7 +193,7 @@ namespace ZeroFormatter.Tests
             var r4 = ZeroFormatterSerializer.Deserialize<OtherSchema3>(bytes);
             r4.MyProperty7.Is(0);
             r4.MyProperty8.IsNull();
-            r4.MyProperty10 = 0;
+            r4.MyProperty10.Is(0);
 
             r4.MyProperty3 = 3;
             r4.MyProperty8 = 99999999;
