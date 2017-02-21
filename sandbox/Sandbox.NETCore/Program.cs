@@ -27,6 +27,20 @@ namespace Sandbox.DotNetCore
         public virtual string MyProperty4 { get; set; }
     }
 
+    [ZeroFormattable]
+    public class WhatC
+    {
+        [Index(0)]
+        public virtual IReadOnlyList<int> MyReadOnlyListOne { get; set; }
+        [Index(1)]
+        public virtual IReadOnlyList<string> MyReadOnlyListTwo { get; set; }
+        [Index(2)]
+        public virtual IReadOnlyDictionary<int, string> MyReadOnlyDictOne { get; set; }
+        [Index(3)]
+        public virtual IReadOnlyDictionary<KeyTuple<int, string>, string> MyReadOnlyDictTwo { get; set; }
+    }
+
+
     public class Program
     {
         static int IntGetHashCode(int x) { return x; }
@@ -48,13 +62,17 @@ namespace Sandbox.DotNetCore
 
         public static void Main(string[] args)
         {
-            var methods = typeof(ZeroFormatterSerializer).GetTypeInfo().GetMethods();
-
-            foreach (var item in methods)
+            var mc = new WhatC
             {
-                Console.WriteLine(item.Name + ":" + string.Join(", ", item.GetParameters().Select(x => x.Name)));
-            }
+                MyReadOnlyListOne = new List<int> { 1, 10, 100, 1000 },
+                MyReadOnlyListTwo = new string[] { "a", "bcde", "fghijklmnop" },
+                MyReadOnlyDictOne = new Dictionary<int, string> { { 0, "a" }, { 100, "bcd" } },
+                MyReadOnlyDictTwo = new Dictionary<KeyTuple<int, string>, string> { { KeyTuple.Create(10, "aiueo"), "AAA" }, { KeyTuple.Create(999, "nano"), "sa" } }
+            };
 
+            var converted = ZeroFormatterSerializer.Convert(mc);
+            var huga = converted.MyReadOnlyListOne;
+            Console.WriteLine(huga[0]);
         }
     }
 }

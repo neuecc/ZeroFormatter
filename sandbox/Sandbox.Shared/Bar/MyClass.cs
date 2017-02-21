@@ -87,6 +87,18 @@ namespace Sandbox.Shared.Bar
         public virtual MogeMoge Mone { get; set; }
     }
 
+    [ZeroFormattable]
+    public struct GetOnly
+    {
+        [Index(0)]
+        public int X { get; }
+
+        public GetOnly(int x)
+        {
+            this.X = x;
+        }
+    }
+
     public enum MogeMoge
     {
         Apple, Orange

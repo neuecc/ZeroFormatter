@@ -246,13 +246,23 @@ namespace Sandbox
     {
     }
 
+    [ZeroFormattable]
+    public class StringZ
+    {
+        [Index(0)]
+        public virtual string MyProp { get; set; }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            var a = ZeroFormatterSerializer.Serialize(default(ZeroA));
-            
+            var c = ZeroFormatterSerializer.Convert(new StringZ { MyProp = "a" });
+            c.MyProp = "b";
 
+            var re = ZeroFormatterSerializer.Convert(c);
+
+            Console.WriteLine(re.MyProp);
         }
     }
 

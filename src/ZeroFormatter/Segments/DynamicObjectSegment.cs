@@ -89,7 +89,7 @@ namespace ZeroFormatter.Segments
             return formatter.Serialize(ref targetBytes, offset, segment);
         }
 
-        public static int SerializeCacheSegment<TTypeResolver, T>(ref byte[] targetBytes, int startOffset, int offset, int index, CacheSegment<TTypeResolver, T> segment)
+        public static int SerializeCacheSegment<TTypeResolver, T>(ref byte[] targetBytes, int startOffset, int offset, int index, ref CacheSegment<TTypeResolver, T> segment)
             where TTypeResolver : ITypeResolver, new()
         {
             BinaryUtil.WriteInt32(ref targetBytes, startOffset + (8 + 4 * index), offset - startOffset);
@@ -555,8 +555,8 @@ namespace ZeroFormatter.Segments
                 var il = method.GetILGenerator();
 
                 il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Ldfld, property.SegmentField);
-                il.Emit(OpCodes.Callvirt, property.SegmentField.FieldType.GetTypeInfo().GetProperty("Value").GetGetMethod());
+                il.Emit(OpCodes.Ldflda, property.SegmentField);
+                il.Emit(OpCodes.Call, property.SegmentField.FieldType.GetTypeInfo().GetProperty("Value").GetGetMethod());
                 il.Emit(OpCodes.Ret);
 
                 prop.SetGetMethod(method);
@@ -571,9 +571,9 @@ namespace ZeroFormatter.Segments
                 var il = method.GetILGenerator();
 
                 il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Ldfld, property.SegmentField);
+                il.Emit(OpCodes.Ldflda, property.SegmentField);
                 il.Emit(OpCodes.Ldarg_1);
-                il.Emit(OpCodes.Callvirt, property.SegmentField.FieldType.GetTypeInfo().GetProperty("Value").GetSetMethod());
+                il.Emit(OpCodes.Call, property.SegmentField.FieldType.GetTypeInfo().GetProperty("Value").GetSetMethod());
                 il.Emit(OpCodes.Ret);
 
                 prop.SetSetMethod(method);
@@ -696,7 +696,7 @@ namespace ZeroFormatter.Segments
                         else if (prop.IsCacheSegment)
                         {
                             il.Emit(OpCodes.Ldarg_0);
-                            il.Emit(OpCodes.Ldfld, prop.SegmentField);
+                            il.Emit(OpCodes.Ldflda, prop.SegmentField);
                             il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("SerializeCacheSegment").MakeGenericMethod(typeof(TTypeResolver), prop.PropertyInfo.PropertyType));
                         }
                         else

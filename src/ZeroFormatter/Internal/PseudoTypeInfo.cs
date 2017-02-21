@@ -23,9 +23,12 @@ namespace ZeroFormatter.Internal
             return type.GetGenericArguments();
         }
 
-        public bool IsEnum()
+        public bool IsEnum
         {
-            return type.IsEnum;
+            get
+            {
+                return type.IsEnum;
+            }
         }
 
         public bool IsGenericType

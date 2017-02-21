@@ -48,7 +48,7 @@ namespace <#= Namespace #>
             }
         }
 
-        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public override <#= t.FullName #> Deserialize(ref byte[] bytes, int offset, global::ZeroFormatter.DirtyTracker tracker, out int byteSize)
         {
             byteSize = BinaryUtil.ReadInt32(ref bytes, offset);
             if (byteSize == -1)
@@ -66,14 +66,14 @@ namespace <#= Namespace #>
         static readonly int[] __elementSizes = new int[]{ <#= string.Join(", ", t.ElementFixedSizes) #> };
 
         readonly ArraySegment<byte> __originalBytes;
-        readonly DirtyTracker __tracker;
+        readonly global::ZeroFormatter.DirtyTracker __tracker;
         readonly int __binaryLastIndex;
         readonly byte[] __extraFixedBytes;
 
 <# foreach(var p in t.Properties) { #>
 <# if(p.IsFixedSize) { #>
 <# } else if(p.IsCacheSegment) { #>
-        readonly CacheSegment<TTypeResolver, <#= p.Type #>> _<#= p.Name #>;
+        CacheSegment<TTypeResolver, <#= p.Type #>> _<#= p.Name #>;
 <# } else { #>
         <#= p.Type #> _<#= p.Name #>;
 <# } } #>
@@ -115,7 +115,7 @@ namespace <#= Namespace #>
 
 <# } #>
 
-        public <#= t.Name #>ObjectSegment(DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
+        public <#= t.Name #>ObjectSegment(global::ZeroFormatter.DirtyTracker dirtyTracker, ArraySegment<byte> originalBytes)
         {
             var __array = originalBytes.Array;
 
@@ -156,7 +156,7 @@ namespace <#= Namespace #>
 <# if (p.IsFixedSize) { #>
                 offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 <# } else if(p.IsCacheSegment) { #>
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, _<#= p.Name #>);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, ref _<#= p.Name #>);
 <# } else { #>
                 offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, _<#= p.Name #>);
 <# } } #>

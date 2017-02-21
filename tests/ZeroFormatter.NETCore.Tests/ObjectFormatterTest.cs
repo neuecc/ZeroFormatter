@@ -43,8 +43,8 @@ namespace ZeroFormatter.Tests
         readonly byte[] __extraFixedBytes;
 
         // generated mutable segements
-        readonly CacheSegment<DefaultResolver, string> _lastName;
-        readonly CacheSegment<DefaultResolver, string> _firstName;
+        CacheSegment<DefaultResolver, string> _lastName;
+        CacheSegment<DefaultResolver, string> _firstName;
         IList<int> _myList; // no readonly
 
         // 0
@@ -154,8 +154,8 @@ namespace ZeroFormatter.Tests
 
                 // Auto Generate Area(incr index...)
                 offset += ObjectSegmentHelper.SerializeFixedLength<DefaultResolver, int>(ref targetBytes, startOffset, offset, 0, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<DefaultResolver, string>(ref targetBytes, startOffset, offset, 1, _firstName);
-                offset += ObjectSegmentHelper.SerializeCacheSegment<DefaultResolver, string>(ref targetBytes, startOffset, offset, 2, _lastName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<DefaultResolver, string>(ref targetBytes, startOffset, offset, 1, ref _firstName);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<DefaultResolver, string>(ref targetBytes, startOffset, offset, 2, ref _lastName);
                 offset += ObjectSegmentHelper.SerializeFixedLength<DefaultResolver, int>(ref targetBytes, startOffset, offset, 3, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
                 offset += ObjectSegmentHelper.SerializeSegment<DefaultResolver, IList<int>>(ref targetBytes, startOffset, offset, 4, _myList);
 

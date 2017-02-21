@@ -19,11 +19,16 @@ namespace <#= Namespace #>
 
     public static partial class ZeroFormatterInitializer
     {
+        static bool registered = false;
+
 <# if( !UnuseUnityAttribute) { #>
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
 <# } #>
         public static void Register()
         {
+            if(registered) return;
+            registered = true;
+
             // Enums
 <# foreach(var g in Enums) { foreach(var t in g.Types) {   #>
             ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>Formatter<<#= ResolverName #>>());

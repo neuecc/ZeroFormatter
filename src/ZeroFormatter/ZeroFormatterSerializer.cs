@@ -330,7 +330,7 @@ namespace ZeroFormatter
 
             public static T Deserialize<T>(byte[] bytes)
             {
-                var formatter = Formatter<DefaultResolver, T>.Default;
+                var formatter = Formatter<TTypeResolver, T>.Default;
                 if (formatter == null) throw new InvalidOperationException("Formatter not found, " + typeof(T).Name);
 
                 var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();

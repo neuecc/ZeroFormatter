@@ -105,8 +105,10 @@ namespace ZeroFormatter.Formatters
             var resolver = ResolverCache<TTypeResolver>.Default;
             try
             {
+                formatter = resolver.ResolveFormatter(t);
+
                 // If Unity, should avoid long static constructor and <T> code because IL2CPP generate every <T>.
-                if (resolver.IsUseBuiltinSerializer)
+                if (formatter == null && resolver.IsUseBuiltinSerializer)
                 {
                     formatter = Formatter.GetBuiltinFormatter<TTypeResolver
 #if !UNITY
@@ -117,15 +119,7 @@ namespace ZeroFormatter.Formatters
 
                 if (formatter == null)
                 {
-                    var resolvedFormatter = resolver.ResolveFormatter(t);
-                    if (resolvedFormatter != null)
-                    {
-                        formatter = resolvedFormatter;
-                    }
-                    else
-                    {
-                        formatter = new ErrorFormatter<TTypeResolver, T>();
-                    }
+                    formatter = new ErrorFormatter<TTypeResolver, T>();
                 }
             }
             catch (Exception ex)
@@ -354,50 +348,60 @@ namespace ZeroFormatter.Formatters
             else if (t.IsArray)
             {
                 var elementType = t.GetElementType();
-                switch (Type.GetTypeCode(elementType))
+                if (elementType.GetTypeInfo().IsEnum)
                 {
-                    case TypeCode.Boolean:
-                        formatter = new BooleanArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Char:
-                        formatter = new CharArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.SByte:
-                        formatter = new SByteArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Byte:
-                        formatter = new ByteArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Int16:
-                        formatter = new Int16ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.UInt16:
-                        formatter = new UInt16ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Int32:
-                        formatter = new Int32ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.UInt32:
-                        formatter = new UInt32ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Int64:
-                        formatter = new Int64ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.UInt64:
-                        formatter = new UInt64ArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Single:
-                        formatter = new SingleArrayFormatter<TTypeResolver>();
-                        break;
-                    case TypeCode.Double:
-                        formatter = new DoubleArrayFormatter<TTypeResolver>();
-                        break;
-                    default:
 #if !UNITY
-                        var formatterType = typeof(ArrayFormatter<,>).MakeGenericType(typeof(TTypeResolver), elementType);
-                        formatter = Activator.CreateInstance(formatterType);
+                    var formatterType = typeof(ArrayFormatter<,>).MakeGenericType(typeof(TTypeResolver), elementType);
+                    formatter = Activator.CreateInstance(formatterType);
 #endif
-                        break;
+                }
+                else
+                {
+                    switch (Type.GetTypeCode(elementType))
+                    {
+                        case TypeCode.Boolean:
+                            formatter = new BooleanArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Char:
+                            formatter = new CharArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.SByte:
+                            formatter = new SByteArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Byte:
+                            formatter = new ByteArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Int16:
+                            formatter = new Int16ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.UInt16:
+                            formatter = new UInt16ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Int32:
+                            formatter = new Int32ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.UInt32:
+                            formatter = new UInt32ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Int64:
+                            formatter = new Int64ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.UInt64:
+                            formatter = new UInt64ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Single:
+                            formatter = new SingleArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Double:
+                            formatter = new DoubleArrayFormatter<TTypeResolver>();
+                            break;
+                        default:
+#if !UNITY
+                            var formatterType = typeof(ArrayFormatter<,>).MakeGenericType(typeof(TTypeResolver), elementType);
+                            formatter = Activator.CreateInstance(formatterType);
+#endif
+                            break;
+                    }
                 }
             }
 

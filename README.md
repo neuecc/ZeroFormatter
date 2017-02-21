@@ -486,9 +486,21 @@ zfc.exe -i "..\src\Sandbox.Shared.csproj" -o "..\unity\ZfcCompiled\ZeroFormatter
 zfc.exe -i "..\src\Sandbox.Shared.csproj" -s -o "..\unity\ZfcCompiled\" 
 ```
 
+`zfc.exe` can setup on csproj's `PreBuildEvent`(useful to generate file path under self project) or `PostBuildEvent`(useful to generate file path is another project).
+
 > Note: zfc.exe is currently only run on Windows. It is .NET Core's [Roslyn](https://github.com/dotnet/roslyn) workspace API limitation but I want to implements to all platforms...
 
 Generated formatters must need to register on Startup. By default, zfc generate automatic register code on `RuntimeInitializeOnLoad` timing.
+
+For Unity Unit Tests, the generated formatters must be registered in the `SetUp` method:
+
+```csharp
+    [SetUp]
+    public void RegisterZeroFormatter()
+    {
+        ZeroFormatterInitializer.Register();
+    }
+```
 
 ZeroFormatter can not serialize Unity native types by default but you can make custom formatter by define pseudo type. For example create `Vector2` to ZeroFormatter target. 
 
@@ -866,6 +878,14 @@ ZeroFormatter spec has two stages + ex.
 * Stage1: All formats are eager-evaluation, does not support Extension Format.
 * Stage2: FixedSizeList, VariableSizeList and Object supports lazy-evaluation, does not support Extension Format.
 * StageEx: Supports C# Extension Format
+
+List of port libraries
+
+* Go, [shamaton/zeroformatter](https://github.com/shamaton/zeroformatter)
+* Ruby, [aki017/zero_formatter](https://github.com/aki017/zero_formatter)
+* Swift, [yaslab/ZeroFormatter.swift](https://github.com/yaslab/ZeroFormatter.swift)
+* Scala, [pocketberserker/scala-zero-formatter](https://github.com/pocketberserker/scala-zero-formatter/)
+* Rust, [pocketberserker/zero-formatter.rs](https://github.com/pocketberserker/zero-formatter.rs)
 
 Author Info
 ---

@@ -65,6 +65,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="EnumArraySerialize.cs" />
     <Compile Include="MoreAdditionalCollectionTest.cs" />
     <Compile Include="RelativeTest.cs" />
     <Compile Include="SequenceFormatterTest.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="ExtensibilityTest.cs" />
     <Compile Include="InheritanceTest.cs" />
     <Compile Include="SomeResolverTest.cs" />
+    <Compile Include="StructObject.cs" />
     <Compile Include="TupleFormatterTest.cs" />
     <Compile Include="DictionarySegmentTest.cs" />
     <Compile Include="FormatterTest.cs" />

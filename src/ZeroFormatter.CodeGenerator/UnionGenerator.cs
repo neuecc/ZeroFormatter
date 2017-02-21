@@ -231,7 +231,7 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(@" Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+            this.Write(@" Deserialize(ref byte[] bytes, int offset, global::ZeroFormatter.DirtyTracker tracker, out int byteSize)
         {
             if ((byteSize = BinaryUtil.ReadInt32(ref bytes, offset)) == -1)
             {

@@ -1,5 +1,5 @@
 {
-	"version": "1.5.5",
+	"version": "1.6.2",
 	"buildOptions": {
 		"allowUnsafe": true,
 		"outputName": "ZeroFormatter",
@@ -24,7 +24,7 @@
 		"System.Text.Encoding.Extensions": "4.0.11",
 		"System.Collections.Concurrent": "4.0.12",
 		"System.ObjectModel": "4.0.12",
-		"ZeroFormatter.Interfaces.NETCore": "1.5.5"
+		"ZeroFormatter.Interfaces.NETCore": "1.6.2"
 	},
 	"frameworks": {
 		"netstandard1.6": {

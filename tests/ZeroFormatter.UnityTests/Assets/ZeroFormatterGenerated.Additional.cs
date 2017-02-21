@@ -38,6 +38,10 @@
             Formatter.RegisterArray<DefaultResolver, UnityEngine.Vector3>();
 
             Formatter.RegisterArray<DefaultResolver, Sandbox.Shared.IStandardUnion>();
+
+            Formatter.RegisterArray<DefaultResolver, Sandbox.Shared.StandardEnum>();
+            Formatter.RegisterList<DefaultResolver, Sandbox.Shared.StandardEnum>();
+            Formatter.RegisterCollection<DefaultResolver, Sandbox.Shared.StandardEnum, List<Sandbox.Shared.StandardEnum>>();
         }
     }
 }

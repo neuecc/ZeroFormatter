@@ -96,8 +96,8 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write(" Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize" +
-                    ")\r\n        {\r\n            byteSize = ");
+            this.Write(" Deserialize(ref byte[] bytes, int offset, global::ZeroFormatter.DirtyTracker tra" +
+                    "cker, out int byteSize)\r\n        {\r\n            byteSize = ");
             
             #line 35 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Length));
@@ -193,8 +193,8 @@ namespace ZeroFormatter.CodeGenerator
             
             #line default
             #line hidden
-            this.Write("? Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSiz" +
-                    "e)\r\n        {\r\n            byteSize = ");
+            this.Write("? Deserialize(ref byte[] bytes, int offset, global::ZeroFormatter.DirtyTracker tr" +
+                    "acker, out int byteSize)\r\n        {\r\n            byteSize = ");
             
             #line 67 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\EnumGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Length + 1));
