@@ -60,6 +60,10 @@
       <HintPath>..\..\packages\Jil.2.14.5\lib\net45\Jil.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MessagePack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>MessagePackCSharp_Alpha\MessagePack.dll</HintPath>
+    </Reference>
     <Reference Include="MsgPack, Version=0.9.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MsgPack.Cli.0.9.0-beta1\lib\net46\MsgPack.dll</HintPath>
       <Private>True</Private>
@@ -132,6 +136,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="FlatBuffers\flatc.exe" />
+    <Content Include="MessagePackCSharp_Alpha\MessagePack.dll" />
     <Content Include="Protobuf3\protoc.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

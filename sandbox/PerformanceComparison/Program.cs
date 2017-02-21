@@ -9,6 +9,7 @@
 // Install-Package Wire -Pre
 // Install-Package NetSerializer -Pre
 
+using MessagePack;
 using MsgPack.Serialization;
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -26,25 +27,30 @@ using ZeroFormatter;
 [Serializable]
 [ProtoContract]
 [DataContract]
+[MessagePackObject]
 public class Person : IEquatable<Person>
 {
     [Index(0)]
     [MessagePackMember(0)]
+    [Key(0)]
     [ProtoMember(1)]
     [DataMember]
     public virtual int Age { get; set; }
     [Index(1)]
     [MessagePackMember(1)]
+    [Key(1)]
     [ProtoMember(2)]
     [DataMember]
     public virtual string FirstName { get; set; }
     [Index(2)]
     [MessagePackMember(2)]
+    [Key(2)]
     [ProtoMember(3)]
     [DataMember]
     public virtual string LastName { get; set; }
     [Index(3)]
     [MessagePackMember(3)]
+    [Key(3)]
     [ProtoMember(4)]
     [DataMember]
     public virtual Sex Sex { get; set; }
@@ -64,21 +70,25 @@ public enum Sex : sbyte
 [Serializable]
 [ProtoContract]
 [DataContract]
+[MessagePackObject]
 public struct Vector3
 {
     [Index(0)]
     [MessagePackMember(0)]
+    [Key(0)]
     [ProtoMember(1)]
     [DataMember]
     public float x;
 
     [Index(1)]
     [MessagePackMember(1)]
+    [Key(1)]
     [ProtoMember(2)]
     [DataMember]
     public float y;
 
     [Index(2)]
+    [Key(2)]
     [MessagePackMember(3)]
     [ProtoMember(3)]
     [DataMember]
@@ -120,6 +130,8 @@ class Program
         Console.WriteLine("Warming-up"); Console.WriteLine();
         SerializeZeroFormatter(p); SerializeZeroFormatter(l);
         SerializeZeroFormatter(integer); SerializeZeroFormatter(v3); SerializeZeroFormatter(largeString); SerializeZeroFormatter(v3List);
+        SerializeMessagePackCSharp(p); SerializeMessagePackCSharp(l);
+        SerializeMessagePackCSharp(integer); SerializeMessagePackCSharp(v3); SerializeMessagePackCSharp(largeString); SerializeMessagePackCSharp(v3List);
         SerializeProtobuf(p); SerializeProtobuf(l);
         SerializeProtobuf(integer); SerializeProtobuf(v3); SerializeProtobuf(largeString); SerializeProtobuf(v3List);
         SerializeMsgPack(p); SerializeMsgPack(l);
@@ -142,6 +154,7 @@ class Program
         Console.WriteLine($"Small Object(int,string,string,enum) {Iteration} Iteration"); Console.WriteLine();
 
         var a = SerializeZeroFormatter(p); Console.WriteLine();
+        var a2 = SerializeMessagePackCSharp(p); Console.WriteLine();
         var b = SerializeProtobuf(p); Console.WriteLine();
         var c = SerializeMsgPack(p); Console.WriteLine();
         var d = SerializeJsonNet(p); Console.WriteLine();
@@ -157,6 +170,7 @@ class Program
         Console.WriteLine($"Large Array(SmallObject[1000]) {Iteration} Iteration"); Console.WriteLine();
 
         var A = SerializeZeroFormatter(l); Console.WriteLine();
+        var A2 = SerializeMessagePackCSharp(l); Console.WriteLine();
         var B = SerializeProtobuf(l); Console.WriteLine();
         var C = SerializeMsgPack(l); Console.WriteLine();
         var D = SerializeJsonNet(l); Console.WriteLine();
@@ -170,6 +184,7 @@ class Program
         var L = SerializeNetSerializer((Person[])(object)l);
 
         Validate("ZeroFormatter", p, l, a, A);
+        Validate("MessagePack C#", p, l, a2, A2);
         Validate("protobuf-net", p, l, b, B);
         Validate("MsgPack-CLI", p, l, c, C);
         Validate("JSON.NET", p, l, d, D);
@@ -188,6 +203,7 @@ class Program
         Console.WriteLine($"Int32(1) {Iteration} Iteration"); Console.WriteLine();
 
         var W1 = SerializeZeroFormatter(integer); Console.WriteLine();
+        var W0 = SerializeMessagePackCSharp(integer); Console.WriteLine();
         var W2 = SerializeMsgPack(integer); Console.WriteLine();
         var W3 = SerializeProtobuf(integer); Console.WriteLine();
         var W4 = SerializeWire(integer); Console.WriteLine();
@@ -196,6 +212,7 @@ class Program
         Console.WriteLine($"Vector3(float, float, float) {Iteration} Iteration"); Console.WriteLine();
 
         var X1 = SerializeZeroFormatter(v3); Console.WriteLine();
+        var X0 = SerializeMessagePackCSharp(v3); Console.WriteLine();
         var X2 = SerializeMsgPack(v3); Console.WriteLine();
         var X3 = SerializeProtobuf(v3); Console.WriteLine();
         var X4 = SerializeWire(v3); Console.WriteLine();
@@ -204,6 +221,7 @@ class Program
         Console.WriteLine($"HtmlString({Encoding.UTF8.GetByteCount(largeString)}bytes) {Iteration} Iteration"); Console.WriteLine();
 
         var Y1 = SerializeZeroFormatter(largeString); Console.WriteLine();
+        var Y0 = SerializeMessagePackCSharp(largeString); Console.WriteLine();
         var Y2 = SerializeMsgPack(largeString); Console.WriteLine();
         var Y3 = SerializeProtobuf(largeString); Console.WriteLine();
         var Y4 = SerializeWire(largeString); Console.WriteLine();
@@ -212,15 +230,19 @@ class Program
         Console.WriteLine($"Vector3[100] {Iteration} Iteration"); Console.WriteLine();
 
         var Z1 = SerializeZeroFormatter(v3List); Console.WriteLine();
+        var Z0 = SerializeMessagePackCSharp(v3List); Console.WriteLine();
         var Z2 = SerializeMsgPack(v3List); Console.WriteLine();
         var Z3 = SerializeProtobuf(v3List); Console.WriteLine();
         var Z4 = SerializeWire(v3List); Console.WriteLine();
         var Z5 = SerializeNetSerializer((Vector3[])(object)v3List); Console.WriteLine();
 
-        Validate2("ZeroFormatter", W1, integer); Validate2("MsgPack-Cli", W2, integer); Validate2("MsgPack", W3, integer); Validate2("Wire", W4, integer); Validate2("NetSerializer", W5, integer);
-        Validate2("ZeroFormatter", X1, v3); Validate2("MsgPack-Cli", X2, v3); Validate2("MsgPack", X3, v3); Validate2("Wire", X4, v3); Validate2("NetSerializer", X5, v3);
-        Validate2("ZeroFormatter", Y1, largeString); Validate2("MsgPack-Cli", Y2, largeString); Validate2("MsgPack", Y3, largeString); Validate2("Wire", Y4, largeString); Validate2("NetSerializer", Y5, largeString);
-        Validate2("ZeroFormatter", Z1, v3List); Validate2("MsgPack-Cli", Z2, v3List); Validate2("MsgPack", Z3, v3List); Validate2("Wire", Z4, v3List); Validate2("NetSerializer", Z5, v3List);
+        Validate2("ZeroFormatter", W1, integer); Validate2("MessagePack C#", W0, integer); Validate2("MsgPack-Cli", W2, integer); Validate2("MsgPack", W3, integer); Validate2("Wire", W4, integer); Validate2("NetSerializer", W5, integer);
+        Validate2("ZeroFormatter", X1, v3); Validate2("MessagePack C#", X0, v3); Validate2("MsgPack-Cli", X2, v3); Validate2("MsgPack", X3, v3); Validate2("Wire", X4, v3); Validate2("NetSerializer", X5, v3);
+        Validate2("ZeroFormatter", Y1, largeString); Validate2("MessagePack C#", Y0, largeString); Validate2("MsgPack-Cli", Y2, largeString); Validate2("MsgPack", Y3, largeString); Validate2("Wire", Y4, largeString); Validate2("NetSerializer", Y5, largeString);
+        Validate2("ZeroFormatter", Z1, v3List); Validate2("MessagePack C#", Z0, v3List); Validate2("MsgPack-Cli", Z2, v3List); Validate2("MsgPack", Z3, v3List); Validate2("Wire", Z4, v3List); Validate2("NetSerializer", Z5, v3List);
+
+        Console.WriteLine("Press key to exit.");
+        Console.ReadLine();
     }
 
     static void Validate(string label, Person original, IList<Person> originalList, Person copy, IList<Person> copyList)
@@ -262,11 +284,34 @@ class Program
             }
         }
 
-        using (new Measure("ReSerialize"))
+        if (!dryRun)
+        {
+            Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(bytes.Length)));
+        }
+
+        return copy;
+    }
+
+    static T SerializeMessagePackCSharp<T>(T original)
+    {
+        Console.WriteLine("MessagePack C#");
+
+        T copy = default(T);
+        byte[] bytes = null;
+
+        using (new Measure("Serialize"))
         {
             for (int i = 0; i < Iteration; i++)
             {
-                bytes = ZeroFormatterSerializer.Serialize(copy);
+                bytes = MessagePack.MessagePackSerializer.Serialize(original);
+            }
+        }
+
+        using (new Measure("Deserialize"))
+        {
+            for (int i = 0; i < Iteration; i++)
+            {
+                copy = MessagePack.MessagePackSerializer.Deserialize<T>(bytes);
             }
         }
 
@@ -299,14 +344,6 @@ class Program
             {
                 stream.Position = 0;
                 netSerializer.DeserializeDirect<T>(stream, out copy);
-            }
-        }
-
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                netSerializer.SerializeDirect<T>(stream = new MemoryStream(), copy);
             }
         }
 
@@ -344,14 +381,6 @@ class Program
             }
         }
 
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                wireSerializer.Serialize(original, stream = new MemoryStream());
-            }
-        }
-
         if (!dryRun)
         {
             Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
@@ -384,14 +413,6 @@ class Program
             }
         }
 
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                ProtoBuf.Serializer.Serialize<T>(stream = new MemoryStream(), copy);
-            }
-        }
-
         if (!dryRun)
         {
             Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
@@ -413,7 +434,7 @@ class Program
         // so, get serializer at first.
         // and If enum serialization options to ByUnderlyingValue, gets more fast but we check default option only.
 
-        var serializer = MessagePackSerializer.Get<T>();
+        var serializer = MsgPack.Serialization.MessagePackSerializer.Get<T>();
 
         using (new Measure("Serialize"))
         {
@@ -428,14 +449,6 @@ class Program
             for (int i = 0; i < Iteration; i++)
             {
                 copy = serializer.UnpackSingleObject(bytes);
-            }
-        }
-
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                bytes = serializer.PackSingleObject(copy);
             }
         }
 
@@ -481,19 +494,6 @@ class Program
             }
         }
 
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                stream = new MemoryStream();
-                using (var tw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                using (var jw = new JsonTextWriter(tw))
-                {
-                    jsonSerializer.Serialize(jw, copy);
-                }
-            }
-        }
-
         if (!dryRun)
         {
             Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
@@ -534,18 +534,6 @@ class Program
             }
         }
 
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                stream = new MemoryStream();
-                using (var tw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                {
-                    Jil.JSON.Serialize(original, tw);
-                }
-            }
-        }
-
         if (!dryRun)
         {
             Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
@@ -579,14 +567,6 @@ class Program
             }
         }
 
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                serializer.Serialize(stream = new MemoryStream(), copy);
-            }
-        }
-
         if (!dryRun)
         {
             Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
@@ -616,14 +596,6 @@ class Program
             {
                 stream.Position = 0;
                 copy = (T)new DataContractSerializer(typeof(T)).ReadObject(stream);
-            }
-        }
-
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                new DataContractSerializer(typeof(T)).WriteObject(stream = new MemoryStream(), copy);
             }
         }
 
@@ -660,14 +632,6 @@ class Program
             }
         }
 
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                serializer.Serialize<T>(stream = new MemoryStream(), copy, leaveOpen: true);
-            }
-        }
-
         if (!dryRun)
         {
             Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
@@ -701,16 +665,6 @@ class Program
             for (int i = 0; i < Iteration; i++)
             {
                 copy = FlatBuffersObject.Person.GetRootAsPerson(new FlatBuffers.ByteBuffer(bytes));
-            }
-        }
-
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                var bb = copy.ByteBuffer;
-                var newbytes = new byte[bb.Length];
-                Buffer.BlockCopy(bb.Data, 0, newbytes, 0, bb.Length);
             }
         }
 
@@ -759,16 +713,6 @@ class Program
             for (int i = 0; i < Iteration; i++)
             {
                 copy = FlatBuffersObject.PersonVector.GetRootAsPersonVector(new FlatBuffers.ByteBuffer(bytes));
-            }
-        }
-
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                var bb = copy.ByteBuffer;
-                var newbytes = new byte[bb.Length];
-                Buffer.BlockCopy(bb.Data, 0, newbytes, 0, bb.Length);
             }
         }
 
@@ -832,18 +776,6 @@ class Program
             }
         }
 
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                using (var writeStream = new Google.Protobuf.CodedOutputStream(stream = new MemoryStream(), true))
-                {
-                    copy.WriteTo(writeStream);
-                }
-
-            }
-        }
-
         if (!dryRun)
         {
             Console.WriteLine(string.Format("{0,15}   {1}", "Binary Size", ToHumanReadableSize(stream.Position)));
@@ -886,18 +818,6 @@ class Program
             for (int i = 0; i < Iteration; i++)
             {
                 copy = Proto3Objects.PersonVector.Parser.ParseFrom(inputBytes);
-            }
-        }
-
-        using (new Measure("ReSerialize"))
-        {
-            for (int i = 0; i < Iteration; i++)
-            {
-                using (var writeStream = new Google.Protobuf.CodedOutputStream(stream = new MemoryStream(), true))
-                {
-                    copy.WriteTo(writeStream);
-                }
-
             }
         }
 
