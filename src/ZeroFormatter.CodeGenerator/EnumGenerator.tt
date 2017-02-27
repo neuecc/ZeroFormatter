@@ -15,10 +15,16 @@ namespace <#= Namespace #>
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
 
+<#
+   var resolverName = (ForceDefaultResolver) ? "ZeroFormatter.Formatters.DefaultResolver" : "TTypeResolver";
+   var resolverNameGenericArg = (ForceDefaultResolver) ? "" : "<TTypeResolver>";
+#>
 <# foreach(var t in Types) {  #>
 
-    public class <#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>>
-        where TTypeResolver : ITypeResolver, new()
+    public class <#= t.Name #>Formatter<#= resolverNameGenericArg #> : Formatter<<#= resolverName #>, <#= t.FullName #>>
+<# if(!ForceDefaultResolver) { #>
+        where <#= resolverName #> : ITypeResolver, new()
+<# } #>
     {
         public override int? GetLength()
         {
@@ -39,8 +45,10 @@ namespace <#= Namespace #>
 
 <# if (t.IncludeNullable) { #>
 
-    public class Nullable<#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>?>
-        where TTypeResolver : ITypeResolver, new()
+    public class Nullable<#= t.Name #>Formatter<#= resolverNameGenericArg #> : Formatter<<#= resolverName #>, <#= t.FullName #>?>
+<# if(!ForceDefaultResolver) { #>
+        where <#= resolverName #> : ITypeResolver, new()
+<# } #>
     {
         public override int? GetLength()
         {

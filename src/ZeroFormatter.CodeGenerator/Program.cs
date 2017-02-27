@@ -24,6 +24,7 @@ namespace ZeroFormatter.CodeGenerator
         public bool DisallowInMetadata { get; private set; }
         public bool GenerateComparerKeyEnumOnly { get; private set; }
         public string NamespaceRoot { get; private set; }
+        public bool ForceDefaultResolver { get; private set; }
 
         public bool IsParsed { get; set; }
 
@@ -48,6 +49,7 @@ namespace ZeroFormatter.CodeGenerator
                 { "m|disallowinmetadata", "[optional, default=false]Don't generate in metadata type", x => { DisallowInMetadata = true; } },
                 { "g|gencomparekeyonly", "[optional, default=false]Don't generate in EnumEqualityComparer except dictionary key", x => { GenerateComparerKeyEnumOnly = true; } },
                 { "n|namespace=", "[optional, default=ZeroFormatter]Set namespace root name", x => { NamespaceRoot = x; } },
+                { "f|forcedefaultresolver", "[optional, default=false]Force use DefaultResolver", x => { ForceDefaultResolver = true; } },
             };
             if (args.Length == 0)
             {
@@ -121,22 +123,26 @@ namespace ZeroFormatter.CodeGenerator
                 Console.WriteLine("String Generation Start");
                 sw.Restart();
                 var sb = new StringBuilder();
-                sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName, Namespace = cmdArgs.NamespaceRoot }.TransformText());
+                sb.AppendLine(new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName, Namespace = cmdArgs.NamespaceRoot, ForceDefaultResolver = cmdArgs.ForceDefaultResolver }.TransformText());
 
                 foreach (var item in objectGen)
                 {
+                    item.ForceDefaultResolver = cmdArgs.ForceDefaultResolver;
                     sb.AppendLine(item.TransformText());
                 }
                 foreach (var item in structGen)
                 {
+                    item.ForceDefaultResolver = cmdArgs.ForceDefaultResolver;
                     sb.AppendLine(item.TransformText());
                 }
                 foreach (var item in unionGen)
                 {
+                    item.ForceDefaultResolver = cmdArgs.ForceDefaultResolver;
                     sb.AppendLine(item.TransformText());
                 }
                 foreach (var item in enumGen)
                 {
+                    item.ForceDefaultResolver = cmdArgs.ForceDefaultResolver;
                     sb.AppendLine(item.TransformText());
                 }
                 Console.WriteLine("String Generation Complete:" + sw.Elapsed.ToString());
@@ -150,26 +156,26 @@ namespace ZeroFormatter.CodeGenerator
                 sw.Restart();
 
                 var initializerPath = Path.Combine(outputpath, "ZeroFormatterInitializer.cs");
-                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName, Namespace = cmdArgs.NamespaceRoot }.TransformText());
+                Output(initializerPath, new InitializerGenerator() { Objects = objectGen, Enums = enumGen, Structs = structGen, GenericTypes = genericTypes, UnuseUnityAttribute = unuse, Unions = unionGen, ResolverName = cmdArgs.ResolverName, Namespace = cmdArgs.NamespaceRoot, ForceDefaultResolver = cmdArgs.ForceDefaultResolver }.TransformText());
 
                 foreach (var item in objectGen.SelectMany(x => x.Types))
                 {
                     var path = Path.Combine(outputpath, item.FullName.Replace(".", "\\") + ".cs");
-                    var gen = new ObjectGenerator { Namespace = item.Namespace, Types = new[] { item } };
+                    var gen = new ObjectGenerator { Namespace = item.Namespace, Types = new[] { item }, ForceDefaultResolver = cmdArgs.ForceDefaultResolver };
                     Output(path, gen.TransformText());
                 }
 
                 foreach (var item in structGen.SelectMany(x => x.Types))
                 {
                     var path = Path.Combine(outputpath, item.FullName.Replace(".", "\\") + ".cs");
-                    var gen = new StructGenerator { Namespace = item.Namespace, Types = new[] { item } };
+                    var gen = new StructGenerator { Namespace = item.Namespace, Types = new[] { item }, ForceDefaultResolver = cmdArgs.ForceDefaultResolver };
                     Output(path, gen.TransformText());
                 }
 
                 foreach (var item in unionGen.SelectMany(x => x.Types))
                 {
                     var path = Path.Combine(outputpath, item.FullName.Replace(".", "\\") + ".cs");
-                    var gen = new UnionGenerator { Namespace = item.Namespace, Types = new[] { item } };
+                    var gen = new UnionGenerator { Namespace = item.Namespace, Types = new[] { item }, ForceDefaultResolver = cmdArgs.ForceDefaultResolver };
                     Output(path, gen.TransformText());
                 }
 
@@ -178,7 +184,7 @@ namespace ZeroFormatter.CodeGenerator
                     foreach (var item in e.Types)
                     {
                         var path = Path.Combine(outputpath, item.FullName.Replace(".", "\\") + ".cs");
-                        var gen = new EnumGenerator { Namespace = e.Namespace, Types = new[] { item } };
+                        var gen = new EnumGenerator { Namespace = e.Namespace, Types = new[] { item }, ForceDefaultResolver = cmdArgs.ForceDefaultResolver };
                         Output(path, gen.TransformText());
                     }
                 }

@@ -14,12 +14,18 @@ namespace <#= Namespace #>
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
 
+<#
+   var resolverName = (ForceDefaultResolver) ? "ZeroFormatter.Formatters.DefaultResolver" : "TTypeResolver";
+   var resolverNameGenericArg = (ForceDefaultResolver) ? "" : "<TTypeResolver>";
+#>
 <# foreach(var t in Types) {  #>
-    public class <#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>>
-        where TTypeResolver : ITypeResolver, new()
+    public class <#= t.Name #>Formatter<#= resolverNameGenericArg #> : Formatter<<#= resolverName #>, <#= t.FullName #>>
+<# if(!ForceDefaultResolver) { #>
+        where <#= resolverName #> : ITypeResolver, new()
+<# } #>
     {
 <# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
-        readonly Formatter<TTypeResolver, <#= p.Type #>> formatter<#= i #>;
+        readonly Formatter<<#= resolverName #>, <#= p.Type #>> formatter<#= i #>;
 <# } #>
         
 <# if (t.Properties.Length != 0) { #>
@@ -39,7 +45,7 @@ namespace <#= Namespace #>
         public <#= t.Name #>Formatter()
         {
 <# for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; #>
-            formatter<#= i #> = Formatter<TTypeResolver, <#= p.Type #>>.Default;
+            formatter<#= i #> = Formatter<<#= resolverName #>, <#= p.Type #>>.Default;
 <# } #>            
         }
 

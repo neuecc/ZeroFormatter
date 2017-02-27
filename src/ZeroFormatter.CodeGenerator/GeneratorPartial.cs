@@ -10,6 +10,7 @@ namespace ZeroFormatter.CodeGenerator
     {
         public string Namespace { get; set; }
         public EnumType[] Types { get; set; }
+        public bool ForceDefaultResolver { get; set; }
     }
 
     public class EnumType : IEquatable<EnumType>
@@ -37,6 +38,7 @@ namespace ZeroFormatter.CodeGenerator
     {
         public string Namespace { get; set; }
         public UnionType[] Types { get; set; }
+        public bool ForceDefaultResolver { get; set; }
     }
 
     public class UnionType
@@ -54,12 +56,14 @@ namespace ZeroFormatter.CodeGenerator
     {
         public string Namespace { get; set; }
         public ObjectSegmentType[] Types { get; set; }
+        public bool ForceDefaultResolver { get; set; }
     }
 
     public partial class StructGenerator
     {
         public string Namespace { get; set; }
         public ObjectSegmentType[] Types { get; set; }
+        public bool ForceDefaultResolver { get; set; }
     }
 
     public class ObjectSegmentType
@@ -127,6 +131,7 @@ namespace ZeroFormatter.CodeGenerator
         public UnionGenerator[] Unions { get; set; }
         public GenericType[] GenericTypes { get; set; }
         public bool UnuseUnityAttribute { get; set; }
+        public bool ForceDefaultResolver { get; set; }
         public string ResolverName { get; set; }
         public string Namespace { get; set; }
     }

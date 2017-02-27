@@ -14,9 +14,15 @@ namespace <#= Namespace #>
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
 
+<#
+   var resolverName = (ForceDefaultResolver) ? "ZeroFormatter.Formatters.DefaultResolver" : "TTypeResolver";
+   var resolverNameGenericArg = (ForceDefaultResolver) ? "" : "<TTypeResolver>";
+#>
 <# foreach(var t in Types) {  #>
-    public class <#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>>
-        where TTypeResolver : ITypeResolver, new()
+    public class <#= t.Name #>Formatter<#= resolverNameGenericArg #> : Formatter<<#= resolverName #>, <#= t.FullName #>>
+<# if(!ForceDefaultResolver) { #>
+        where <#= resolverName #> : ITypeResolver, new()
+<# } #>
     {
         readonly global::System.Collections.Generic.IEqualityComparer<<#= t.UnionKeyTypeName #>> comparer;
         readonly <#= t.UnionKeyTypeName #>[] unionKeys;
@@ -45,12 +51,12 @@ namespace <#= Namespace #>
             var startOffset = offset;
 
             offset += 4;
-            offset += Formatter<TTypeResolver, <#= t.UnionKeyTypeName #>>.Default.Serialize(ref bytes, offset, value.<#= t.UnionKeyPropertyName #>);
+            offset += Formatter<<#= resolverName #>, <#= t.UnionKeyTypeName #>>.Default.Serialize(ref bytes, offset, value.<#= t.UnionKeyPropertyName #>);
 
 <# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
             <#= i != 0 ? "else if" : "if" #> (value is <#= subType  #>)
             {
-                offset += Formatter<TTypeResolver, <#= subType  #>>.Default.Serialize(ref bytes, offset, (<#= subType #>)value);
+                offset += Formatter<<#= resolverName #>, <#= subType  #>>.Default.Serialize(ref bytes, offset, (<#= subType #>)value);
             }
 <# } #>            
             else
@@ -73,14 +79,14 @@ namespace <#= Namespace #>
         
             offset += 4;
             int size;
-            var unionKey = Formatter<TTypeResolver, <#= t.UnionKeyTypeName #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
+            var unionKey = Formatter<<#= resolverName #>, <#= t.UnionKeyTypeName #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
             offset += size;
 
             <#= t.FullName #> result;
 <# for(var i = 0; i < t.SubTypeNames.Length; i++) { var subType = t.SubTypeNames[i]; #>
             <#= i != 0 ? "else if" : "if" #> (comparer.Equals(unionKey, unionKeys[<#= i #>]))
             {
-                result = Formatter<TTypeResolver, <#= subType  #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
+                result = Formatter<<#= resolverName #>, <#= subType  #>>.Default.Deserialize(ref bytes, offset, tracker, out size);
             }
 <# } #>
             else

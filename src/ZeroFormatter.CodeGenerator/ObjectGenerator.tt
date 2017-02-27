@@ -14,9 +14,15 @@ namespace <#= Namespace #>
     using global::ZeroFormatter.Internal;
     using global::ZeroFormatter.Segments;
 
+<#
+   var resolverName = (ForceDefaultResolver) ? "ZeroFormatter.Formatters.DefaultResolver" : "TTypeResolver";
+   var resolverNameGenericArg = (ForceDefaultResolver) ? "" : "<TTypeResolver>";
+#>
 <# foreach(var t in Types) {  #>
-    public class <#= t.Name #>Formatter<TTypeResolver> : Formatter<TTypeResolver, <#= t.FullName #>>
+    public class <#= t.Name #>Formatter<#= resolverNameGenericArg #> : Formatter<<#= resolverName #>, <#= t.FullName #>>
+<# if(!ForceDefaultResolver) { #>
         where TTypeResolver : ITypeResolver, new()
+<# } #>
     {
         public override int? GetLength()
         {
@@ -41,7 +47,7 @@ namespace <#= Namespace #>
 
                 offset += (8 + 4 * (<#= t.LastIndex #> + 1));
 <# foreach(var p in t.Properties) { #>
-                offset += ObjectSegmentHelper.SerializeFromFormatter<TTypeResolver, <#= p.Type #>>(ref bytes, startOffset, offset, <#= p.Index #>, value.<#= p.Name #>);
+                offset += ObjectSegmentHelper.SerializeFromFormatter<<#= resolverName #>, <#= p.Type #>>(ref bytes, startOffset, offset, <#= p.Index #>, value.<#= p.Name #>);
 <# } #>
 
                 return ObjectSegmentHelper.WriteSize(ref bytes, startOffset, offset, <#= t.LastIndex #>);
@@ -56,13 +62,14 @@ namespace <#= Namespace #>
                 byteSize = 4;
                 return null;
             }
-            return new <#= t.Name #>ObjectSegment<TTypeResolver>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
+            return new <#= t.Name #>ObjectSegment<#= resolverNameGenericArg #>(tracker, new ArraySegment<byte>(bytes, offset, byteSize));
         }
     }
 
-    public class <#= t.Name #>ObjectSegment<TTypeResolver> : <#= t.FullName #>, IZeroFormatterSegment
+    public class <#= t.Name #>ObjectSegment<#= resolverNameGenericArg #> : <#= t.FullName #>, IZeroFormatterSegment
+<# if(!ForceDefaultResolver) { #>
         where TTypeResolver : ITypeResolver, new()
-    {
+<# } #>    {
         static readonly int[] __elementSizes = new int[]{ <#= string.Join(", ", t.ElementFixedSizes) #> };
 
         readonly ArraySegment<byte> __originalBytes;
@@ -73,7 +80,7 @@ namespace <#= Namespace #>
 <# foreach(var p in t.Properties) { #>
 <# if(p.IsFixedSize) { #>
 <# } else if(p.IsCacheSegment) { #>
-        CacheSegment<TTypeResolver, <#= p.Type #>> _<#= p.Name #>;
+        CacheSegment<<#= resolverName #>, <#= p.Type #>> _<#= p.Name #>;
 <# } else { #>
         <#= p.Type #> _<#= p.Name #>;
 <# } } #>
@@ -85,11 +92,11 @@ namespace <#= Namespace #>
 <# if(p.IsFixedSize) { #>
             <#= (p.IsGetProtected ? "protected " : "") + "get" #>
             {
-                return ObjectSegmentHelper.GetFixedProperty<TTypeResolver, <#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, __tracker);
+                return ObjectSegmentHelper.GetFixedProperty<<#= resolverName #>, <#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, __tracker);
             }
             <#= (p.IsSetProtected ? "protected " : "") + "set" #>
             {
-                ObjectSegmentHelper.SetFixedProperty<TTypeResolver, <#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, value, __tracker);
+                ObjectSegmentHelper.SetFixedProperty<<#= resolverName #>, <#= p.Type #>>(__originalBytes, <#= p.Index #>, __binaryLastIndex, __extraFixedBytes, value, __tracker);
             }
 <# } else if(p.IsCacheSegment) { #>
             <#= (p.IsGetProtected ? "protected " : "") + "get" #>
@@ -128,9 +135,9 @@ namespace <#= Namespace #>
 <# foreach(var p in t.Properties) { #>
 <# if (p.IsFixedSize) { #>
 <# } else if(p.IsCacheSegment) { #>
-            _<#= p.Name #> = new CacheSegment<TTypeResolver, <#= p.Type #>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, <#= p.Index #>, __binaryLastIndex, __tracker));
+            _<#= p.Name #> = new CacheSegment<<#= resolverName #>, <#= p.Type #>>(__tracker, ObjectSegmentHelper.GetSegment(originalBytes, <#= p.Index #>, __binaryLastIndex, __tracker));
 <# } else { #>
-            _<#= p.Name #> = ObjectSegmentHelper.DeserializeSegment<TTypeResolver, <#= p.Type #>>(originalBytes, <#= p.Index #>, __binaryLastIndex, __tracker);
+            _<#= p.Name #> = ObjectSegmentHelper.DeserializeSegment<<#= resolverName #>, <#= p.Type #>>(originalBytes, <#= p.Index #>, __binaryLastIndex, __tracker);
 <# } #>
 <# } #>
         }
@@ -154,11 +161,11 @@ namespace <#= Namespace #>
 
 <# foreach(var p in t.Properties) { #>
 <# if (p.IsFixedSize) { #>
-                offset += ObjectSegmentHelper.SerializeFixedLength<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
+                offset += ObjectSegmentHelper.SerializeFixedLength<<#= resolverName #>, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, __binaryLastIndex, __originalBytes, __extraFixedBytes, __tracker);
 <# } else if(p.IsCacheSegment) { #>
-                offset += ObjectSegmentHelper.SerializeCacheSegment<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, ref _<#= p.Name #>);
+                offset += ObjectSegmentHelper.SerializeCacheSegment<<#= resolverName #>, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, ref _<#= p.Name #>);
 <# } else { #>
-                offset += ObjectSegmentHelper.SerializeSegment<TTypeResolver, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, _<#= p.Name #>);
+                offset += ObjectSegmentHelper.SerializeSegment<<#= resolverName #>, <#= p.Type #>>(ref targetBytes, startOffset, offset, <#= p.Index #>, _<#= p.Name #>);
 <# } } #>
 
                 return ObjectSegmentHelper.WriteSize(ref targetBytes, startOffset, offset, <#= t.LastIndex #>);

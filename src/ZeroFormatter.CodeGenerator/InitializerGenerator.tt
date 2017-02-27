@@ -28,15 +28,18 @@ namespace <#= Namespace #>
         {
             if(registered) return;
             registered = true;
-
+<#
+   var resolverName = (ForceDefaultResolver) ? "ZeroFormatter.Formatters.DefaultResolver" : ResolverName;
+   var resolverNameGenericArg = (ForceDefaultResolver) ? "" : "<" + ResolverName + ">";
+#>
             // Enums
 <# foreach(var g in Enums) { foreach(var t in g.Types) {   #>
-            ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>Formatter<<#= ResolverName #>>());
+            ZeroFormatter.Formatters.Formatter<<#= resolverName #>, <#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>Formatter<#= resolverNameGenericArg #>());
 <# if(t.IsGenerateEqualityComparer) { #>
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<<#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>EqualityComparer());
 <# } #>
 <# if (t.IncludeNullable) { #>
-            ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>?>.Register(new <#= g.Namespace + ".Nullable" + t.Name #>Formatter<<#= ResolverName #>>());
+            ZeroFormatter.Formatters.Formatter<<#= resolverName #>, <#= t.FullName #>?>.Register(new <#= g.Namespace + ".Nullable" + t.Name #>Formatter<#= resolverNameGenericArg #>());
 <# if(t.IsGenerateEqualityComparer) { #>
             ZeroFormatter.Comparers.ZeroFormatterEqualityComparer<<#= t.FullName #>?>.Register(new NullableEqualityComparer<<#= t.FullName #>>());
 <# } #>
@@ -45,53 +48,53 @@ namespace <#= Namespace #>
 <# } } #>
             // Objects
 <# foreach(var g in Objects) { foreach(var t in g.Types) {   #>
-            ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>Formatter<<#= ResolverName #>>());
+            ZeroFormatter.Formatters.Formatter<<#= resolverName #>, <#= t.FullName #>>.Register(new <#= g.Namespace + "." + t.Name #>Formatter<#= resolverNameGenericArg #>());
 <# } } #>
             // Structs
 <# foreach(var g in Structs) { foreach(var t in g.Types) {   #>
             {
-                var structFormatter = new <#= g.Namespace + "." + t.Name #>Formatter<<#= ResolverName #>>();
-                ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>>.Register(structFormatter);
-                ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<<#= ResolverName #>, <#= t.FullName #>>(structFormatter));
+                var structFormatter = new <#= g.Namespace + "." + t.Name #>Formatter<#= resolverNameGenericArg #>();
+                ZeroFormatter.Formatters.Formatter<<#= resolverName #>, <#= t.FullName #>>.Register(structFormatter);
+                ZeroFormatter.Formatters.Formatter<<#= resolverName #>, <#= t.FullName #>?>.Register(new global::ZeroFormatter.Formatters.NullableStructFormatter<<#= resolverName #>, <#= t.FullName #>>(structFormatter));
             }
 <# } } #>
             // Unions
 <# foreach(var g in Unions) { foreach(var t in g.Types) {   #>
             {
-                var unionFormatter = new <#= g.Namespace + "." + t.Name #>Formatter<<#= ResolverName #>>();
-                ZeroFormatter.Formatters.Formatter<<#= ResolverName #>, <#= t.FullName #>>.Register(unionFormatter);
+                var unionFormatter = new <#= g.Namespace + "." + t.Name #>Formatter<#= resolverNameGenericArg #>();
+                ZeroFormatter.Formatters.Formatter<<#= resolverName #>, <#= t.FullName #>>.Register(unionFormatter);
             }
 <# } } #>
             // Generics
 <# foreach(var g in GenericTypes) { #>
 <# if (g.TypeKind == GenericTypeKind.KeyTuple) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterKeyTuple<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.List) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterList<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterList<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Array) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterArray<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterArray<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Collection) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterCollection<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterCollection<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.ReadOnlyList) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyList<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyList<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Dictionary) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterDictionary<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterDictionary<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.LazyDictionary) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterLazyDictionary<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.LazyReadOnlyDictionary) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterLazyReadOnlyDictionary<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterLazyReadOnlyDictionary<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Lookup) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterLookup<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterLookup<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.InterfaceCollection) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterInterfaceCollection<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterInterfaceCollection<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.Enumerable) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterEnumerable<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterEnumerable<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.ReadOnlyCollection) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyCollection<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterReadOnlyCollection<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.KeyValuePair) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterKeyValuePair<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterKeyValuePair<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } else if(g.TypeKind == GenericTypeKind.LazyLookup) { #>
-            ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<<#= ResolverName #>, <#= g.ElementTypes #>>();
+            ZeroFormatter.Formatters.Formatter.RegisterLazyLookup<<#= resolverName #>, <#= g.ElementTypes #>>();
 <# } } #>
         }
     }
