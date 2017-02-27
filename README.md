@@ -473,7 +473,10 @@ zfc arguments help:
   -m, --disallowinmetadata      [optional, default=false]Don't generate in metadata type
   -g, --gencomparekeyonly       [optional, default=false]Don't generate in EnumEqualityComparer except dictionary key
   -n, --namespace=VALUE         [optional, default=ZeroFormatter]Set namespace root name
+  -f, --forcedefaultresolver    [optional, default=false]Force use DefaultResolver
 ```
+
+> Note: Some options is important for reduce code generation size and startup speed on IL2CPP, especially `-f` is recommend if you use only DefaultResolver.
 
 ```
 // Simple Case:

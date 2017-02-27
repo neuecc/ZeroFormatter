@@ -1,5 +1,5 @@
 {
-	"version": "1.6.2",
+	"version": "1.6.3",
 	"buildOptions": {
 		"outputName": "ZeroFormatter.Interfaces",
 		"compile": "../ZeroFormatter.Interfaces/*.cs"

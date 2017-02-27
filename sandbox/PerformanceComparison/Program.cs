@@ -428,19 +428,11 @@ class Program
         T copy = default(T);
         byte[] bytes = null;
 
-        // Note:We should check MessagePackSerializer.Get<T>() on every iteration
-        // But currenly MsgPack-Cli has bug of get serializer
-        // https://github.com/msgpack/msgpack-cli/issues/191
-        // so, get serializer at first.
-        // and If enum serialization options to ByUnderlyingValue, gets more fast but we check default option only.
-
-        var serializer = MsgPack.Serialization.MessagePackSerializer.Get<T>();
-
         using (new Measure("Serialize"))
         {
             for (int i = 0; i < Iteration; i++)
             {
-                bytes = serializer.PackSingleObject(original);
+                bytes = MsgPack.Serialization.MessagePackSerializer.Get<T>().PackSingleObject(original);
             }
         }
 
@@ -448,7 +440,7 @@ class Program
         {
             for (int i = 0; i < Iteration; i++)
             {
-                copy = serializer.UnpackSingleObject(bytes);
+                copy = MsgPack.Serialization.MessagePackSerializer.Get<T>().UnpackSingleObject(bytes);
             }
         }
 
