@@ -889,6 +889,7 @@ List of port libraries
 * Swift, [yaslab/ZeroFormatter.swift](https://github.com/yaslab/ZeroFormatter.swift)
 * Scala, [pocketberserker/scala-zero-formatter](https://github.com/pocketberserker/scala-zero-formatter/)
 * Rust, [pocketberserker/zero-formatter.rs](https://github.com/pocketberserker/zero-formatter.rs)
+* F#, [pocketberserker/ZeroFormatter.FSharpExtensions](https://github.com/pocketberserker/ZeroFormatter.FSharpExtensions)
 
 Author Info
 ---
