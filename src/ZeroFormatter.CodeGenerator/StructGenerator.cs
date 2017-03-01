@@ -41,55 +41,106 @@ namespace ZeroFormatter.CodeGenerator
                     "\r\n\r\n");
             
             #line 17 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+
+   var resolverName = (ForceDefaultResolver) ? "ZeroFormatter.Formatters.DefaultResolver" : "TTypeResolver";
+   var resolverNameGenericArg = (ForceDefaultResolver) ? "" : "<TTypeResolver>";
+
+            
+            #line default
+            #line hidden
+            
+            #line 21 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  foreach(var t in Types) {  
             
             #line default
             #line hidden
             this.Write("    public class ");
             
-            #line 18 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Name));
             
             #line default
             #line hidden
-            this.Write("Formatter<TTypeResolver> : Formatter<TTypeResolver, ");
+            this.Write("Formatter");
             
-            #line 18 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(resolverNameGenericArg));
+            
+            #line default
+            #line hidden
+            this.Write(" : Formatter<");
+            
+            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(resolverName));
+            
+            #line default
+            #line hidden
+            this.Write(", ");
+            
+            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
-            this.Write(">\r\n        where TTypeResolver : ITypeResolver, new()\r\n    {\r\n");
+            this.Write(">\r\n");
             
-            #line 21 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 23 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+ if(!ForceDefaultResolver) { 
+            
+            #line default
+            #line hidden
+            this.Write("        where ");
+            
+            #line 24 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(resolverName));
+            
+            #line default
+            #line hidden
+            this.Write(" : ITypeResolver, new()\r\n");
+            
+            #line 25 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("    {\r\n");
+            
+            #line 27 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; 
             
             #line default
             #line hidden
-            this.Write("        readonly Formatter<TTypeResolver, ");
+            this.Write("        readonly Formatter<");
             
-            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(resolverName));
+            
+            #line default
+            #line hidden
+            this.Write(", ");
+            
+            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(p.Type));
             
             #line default
             #line hidden
             this.Write("> formatter");
             
-            #line 22 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 28 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 23 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 29 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  } 
             
             #line default
             #line hidden
             this.Write("        \r\n");
             
-            #line 25 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 31 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  if (t.Properties.Length != 0) { 
             
             #line default
@@ -97,63 +148,70 @@ namespace ZeroFormatter.CodeGenerator
             this.Write("        public override bool NoUseDirtyTracker\r\n        {\r\n            get\r\n     " +
                     "       {\r\n                return formatter0.NoUseDirtyTracker\r\n");
             
-            #line 31 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 37 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  for(var i = 1; i < t.Properties.Length; i++) { var p = t.Properties[i]; 
             
             #line default
             #line hidden
             this.Write("                    && formatter");
             
-            #line 32 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 38 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write(".NoUseDirtyTracker\r\n");
             
-            #line 33 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 39 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  } 
             
             #line default
             #line hidden
             this.Write("                ;\r\n            }\r\n        }\r\n");
             
-            #line 37 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 43 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  } 
             
             #line default
             #line hidden
             this.Write("\r\n        public ");
             
-            #line 39 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 45 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.Name));
             
             #line default
             #line hidden
             this.Write("Formatter()\r\n        {\r\n");
             
-            #line 41 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 47 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; 
             
             #line default
             #line hidden
             this.Write("            formatter");
             
-            #line 42 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 48 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
-            this.Write(" = Formatter<TTypeResolver, ");
+            this.Write(" = Formatter<");
             
-            #line 42 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 48 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(resolverName));
+            
+            #line default
+            #line hidden
+            this.Write(", ");
+            
+            #line 48 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(p.Type));
             
             #line default
             #line hidden
             this.Write(">.Default;\r\n");
             
-            #line 43 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 49 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  } 
             
             #line default
@@ -161,7 +219,7 @@ namespace ZeroFormatter.CodeGenerator
             this.Write("            \r\n        }\r\n\r\n        public override int? GetLength()\r\n        {\r\n " +
                     "           return ");
             
-            #line 48 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 54 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture((t.GetLength() == null) ? "null" : t.GetLength().ToString()));
             
             #line default
@@ -169,63 +227,63 @@ namespace ZeroFormatter.CodeGenerator
             this.Write(";\r\n        }\r\n\r\n        public override int Serialize(ref byte[] bytes, int offse" +
                     "t, ");
             
-            #line 51 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 57 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write(" value)\r\n        {\r\n");
             
-            #line 53 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 59 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  if (t.GetLength() != null) { 
             
             #line default
             #line hidden
             this.Write("            BinaryUtil.EnsureCapacity(ref bytes, offset, ");
             
-            #line 54 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 60 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.GetLength()));
             
             #line default
             #line hidden
             this.Write(");\r\n");
             
-            #line 55 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 61 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  } 
             
             #line default
             #line hidden
             this.Write("            var startOffset = offset;\r\n");
             
-            #line 57 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 63 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; 
             
             #line default
             #line hidden
             this.Write("            offset += formatter");
             
-            #line 58 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 64 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write(".Serialize(ref bytes, offset, value.");
             
-            #line 58 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 64 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(p.Name));
             
             #line default
             #line hidden
             this.Write(");\r\n");
             
-            #line 59 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 65 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  } 
             
             #line default
             #line hidden
             this.Write("            return offset - startOffset;\r\n        }\r\n\r\n        public override ");
             
-            #line 63 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 69 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
@@ -234,21 +292,21 @@ namespace ZeroFormatter.CodeGenerator
                     "cker, out int byteSize)\r\n        {\r\n            byteSize = 0;\r\n            int s" +
                     "ize;\r\n");
             
-            #line 67 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 73 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  for(var i = 0; i < t.Properties.Length; i++) { var p = t.Properties[i]; 
             
             #line default
             #line hidden
             this.Write("            var item");
             
-            #line 68 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 74 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write(" = formatter");
             
-            #line 68 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 74 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
@@ -256,28 +314,28 @@ namespace ZeroFormatter.CodeGenerator
             this.Write(".Deserialize(ref bytes, offset, tracker, out size);\r\n            offset += size;\r" +
                     "\n            byteSize += size;\r\n");
             
-            #line 71 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 77 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  } 
             
             #line default
             #line hidden
             this.Write("            \r\n            return new ");
             
-            #line 73 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 79 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(t.FullName));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 73 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 79 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ",  t.Properties.Select((_, i)=> "item" + i).ToArray())));
             
             #line default
             #line hidden
             this.Write(");\r\n        }\r\n    }\r\n\r\n");
             
-            #line 77 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
+            #line 83 "C:\Users\y.kawai\Documents\neuecc\ZeroFormatter\src\ZeroFormatter.CodeGenerator\StructGenerator.tt"
  } 
             
             #line default

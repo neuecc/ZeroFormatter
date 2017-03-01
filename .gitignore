@@ -113,3 +113,10 @@ tests/ZeroFormatter.UnityTests/bin/*
 tests/ZeroFormatter.UnityTests/Library/*
 tests/ZeroFormatter.UnityTests/obj/*
 tests/ZeroFormatter.UnityTests/Temp/*
+
+#OTHERS
+
+nuget/*.zip
+nuget/*.nupkg
+nuget/zfc.exe
+nuget/zfc.exe.config

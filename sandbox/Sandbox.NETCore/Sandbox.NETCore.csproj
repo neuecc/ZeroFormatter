@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <VersionPrefix>1.6.4</VersionPrefix>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <AssemblyName>Sandbox.NETCore</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>Sandbox.NETCore</PackageId>
+    <RuntimeFrameworkVersion>1.0.3</RuntimeFrameworkVersion>
+    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ZeroFormatter.Interfaces.NETCore\ZeroFormatter.Interfaces.NETCore.csproj" />
+    <ProjectReference Include="..\..\src\ZeroFormatter.NETCore\ZeroFormatter.NETCore.csproj" />
+  </ItemGroup>
+
+</Project>
