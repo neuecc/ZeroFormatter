@@ -61,8 +61,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="MessagePack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MessagePack.0.1.0-beta\lib\net45\MessagePack.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\..\packages\MessagePack.0.8.2\lib\net45\MessagePack.dll</HintPath>
     </Reference>
     <Reference Include="MsgPack, Version=0.9.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MsgPack.Cli.0.9.0-beta2\lib\net46\MsgPack.dll</HintPath>
