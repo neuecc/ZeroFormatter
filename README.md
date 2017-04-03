@@ -580,10 +580,6 @@ Deserialize speed is Infinitely fast(but of course, it is **unfair**, ZeroFormat
 
 The result is achieved from both sides of implementation and binary layout. ZeroFormatter's binary layout is tuned for serialize/deserialize speed(this is advantage than other serializer).
 
-**Compare with MessagePack for C#**
-
-Author also created [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp). It is fast, compact general purpose serializer. MessagePack for C# is a good choice if you are looking for a JSON-like, general purpose fast binary serializer. Built-in LZ4 support makes it suitable for network communication and storage in Redis. If you need infintely fast deserializer, ZeroFormatter is good choice.
-
 **In Unity**
 
 Result run on iPhone 6s Plus and IL2CPP build.
@@ -598,6 +594,10 @@ ZeroFormatter is faster than JsonUtility so yes, faster than native serializer! 
 ![image](https://cloud.githubusercontent.com/assets/46207/20140306/c6b1b0fc-a6cd-11e6-9193-303179d23764.png)
 
 ZeroFormatter is optimized for all types(small struct to large object!). I know why protobuf-net is slow on integer test, currently [protobuf-net's internal serialize method](https://github.com/mgravell/protobuf-net/blob/0d0bb407865600c7dad1b833a9a1f71ef48c7106/protobuf-net/Meta/TypeModel.cs#L210) has only `object value` so it causes boxing and critical for performance. Anyway, ZeroFormatter's simple struct and struct array(struct array is serialized FixedSizeList format internally, it is faster than class array)'s serialization/deserialization speed is very fast that effective storing value to KeyValueStore(like Redis) or network gaming(transport many transform position), etc.
+
+Compare with MessagePack for C#
+---
+Author also created [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp). It is fast, compact general purpose serializer. MessagePack for C# is a good choice if you are looking for a JSON-like, general purpose fast binary serializer. Built-in LZ4 support makes it suitable for network communication and storage in Redis. If you need infintely fast deserializer, ZeroFormatter is good choice.
 
 ZeroFormatterSerializer API
 ---
