@@ -580,6 +580,10 @@ Deserialize speed is Infinitely fast(but of course, it is **unfair**, ZeroFormat
 
 The result is achieved from both sides of implementation and binary layout. ZeroFormatter's binary layout is tuned for serialize/deserialize speed(this is advantage than other serializer).
 
+**Compare with MessagePack for C#**
+
+Author also created [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp). It is fast, compact general purpose serializer. MessagePack for C# is a good choice if you are looking for a JSON-like, general purpose fast binary serializer. Built-in LZ4 support makes it suitable for network communication and storage in Redis. If you need infintely fast deserializer, ZeroFormatter is good choice.
+
 **In Unity**
 
 Result run on iPhone 6s Plus and IL2CPP build.
