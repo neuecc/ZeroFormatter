@@ -7,10 +7,9 @@
 //     コードが再生成されるときに損失したりします。
 // </auto-generated>
 //------------------------------------------------------------------------------
-
+#if !WINDOWS_UWP
 namespace Sandbox.Shared.GeneratedSerializers {
-    
-    
+
     [System.CodeDom.Compiler.GeneratedCodeAttribute("MsgPack.Serialization.CodeDomSerializers.CodeDomSerializerBuilder", "0.9.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public class PersonSerializer : MsgPack.Serialization.MessagePackSerializer<Person> {
@@ -229,3 +228,4 @@ namespace Sandbox.Shared.GeneratedSerializers {
         }
     }
 }
+#endif

@@ -5,6 +5,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using System.Collections;
+#if WINDOWS_UWP
+using System.Reflection;
+#endif
 
 namespace RuntimeUnitTestToolkit
 {
@@ -14,7 +17,11 @@ namespace RuntimeUnitTestToolkit
         {
             try
             {
+#if WINDOWS_UWP
+                AddTest(test.Target.GetType().GetTypeInfo().Name, test.GetMethodInfo().Name, test);
+#else
                 AddTest(test.Target.GetType().Name, test.Method.Name, test);
+#endif
             }
             catch (Exception ex)
             {
@@ -38,7 +45,11 @@ namespace RuntimeUnitTestToolkit
         {
             try
             {
+#if WINDOWS_UWP
+                AddAsyncTest(asyncTestCoroutine.Target.GetType().Name, asyncTestCoroutine.GetMethodInfo().Name, asyncTestCoroutine);
+#else
                 AddAsyncTest(asyncTestCoroutine.Target.GetType().Name, asyncTestCoroutine.Method.Name, asyncTestCoroutine);
+#endif
             }
             catch (Exception ex)
             {
@@ -84,12 +95,20 @@ namespace RuntimeUnitTestToolkit
 
                     if (item.ReturnType == typeof(IEnumerator))
                     {
+#if WINDOWS_UWP
+                        var factory = (Func<IEnumerator>)item.CreateDelegate(typeof(Func<IEnumerator>), test);
+#else
                         var factory = (Func<IEnumerator>)Delegate.CreateDelegate(typeof(Func<IEnumerator>), test, item);
+#endif
                         AddAsyncTest(factory);
                     }
                     else if (item.ReturnType == typeof(void))
                     {
+#if WINDOWS_UWP
+                        var invoke = (Action)item.CreateDelegate(typeof(Action), test);
+#else
                         var invoke = (Action)Delegate.CreateDelegate(typeof(Action), test, item);
+#endif
                         AddTest(invoke);
                     }
                 }

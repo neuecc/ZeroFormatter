@@ -357,6 +357,46 @@ namespace ZeroFormatter.Formatters
                 }
                 else
                 {
+#if PORTABLE
+                    switch (Helpers.GetTypeCode(elementType))
+                    {
+                        case TypeCode.Boolean:
+                            formatter = new BooleanArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Char:
+                            formatter = new CharArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.SByte:
+                            formatter = new SByteArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Byte:
+                            formatter = new ByteArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Int16:
+                            formatter = new Int16ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.UInt16:
+                            formatter = new UInt16ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Int32:
+                            formatter = new Int32ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.UInt32:
+                            formatter = new UInt32ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Int64:
+                            formatter = new Int64ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.UInt64:
+                            formatter = new UInt64ArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Single:
+                            formatter = new SingleArrayFormatter<TTypeResolver>();
+                            break;
+                        case TypeCode.Double:
+                            formatter = new DoubleArrayFormatter<TTypeResolver>();
+                            break;
+#else
                     switch (Type.GetTypeCode(elementType))
                     {
                         case TypeCode.Boolean:
@@ -395,12 +435,13 @@ namespace ZeroFormatter.Formatters
                         case TypeCode.Double:
                             formatter = new DoubleArrayFormatter<TTypeResolver>();
                             break;
-                        default:
+#endif
 #if !UNITY
+                        default:
                             var formatterType = typeof(ArrayFormatter<,>).MakeGenericType(typeof(TTypeResolver), elementType);
                             formatter = Activator.CreateInstance(formatterType);
-#endif
                             break;
+#endif
                     }
                 }
             }
@@ -1051,7 +1092,11 @@ namespace ZeroFormatter.Formatters
             if (ti.IsGenericType)
             {
                 // depth 1 only:)
+#if PORTABLE
+                message = t.Name + "<" + string.Join(", ", ti.GenericTypeArguments.Select(x => x.Name).ToArray()) + ">";
+#else
                 message = t.Name + "<" + string.Join(", ", ti.GetGenericArguments().Select(x => x.Name).ToArray()) + ">";
+#endif
             }
             else
             {

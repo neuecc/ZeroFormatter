@@ -1,0 +1,352 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\UnityCommon.props" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{13a45c13-3265-47b8-bc48-a553b569df55}</ProjectGuid>
+    <OutputType>AppContainerExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ZeroFormatter.UnityTests</RootNamespace>
+    <AssemblyName>ZeroFormatter.UnityTests</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
+    <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <PackageCertificateKeyFile>WSATestCertificate.pfx</PackageCertificateKeyFile>
+    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+    <PlatformShortName>$(Platform)</PlatformShortName>
+    <AllowedReferenceRelatedFileExtensions>
+      $(AllowedReferenceRelatedFileExtensions);
+      _UAP_$(Platform)_$(Configuration)_dotnet.pdb;
+      .pdb;
+    </AllowedReferenceRelatedFileExtensions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP;UNITY_METRO;UNITY_WSA;UNITY_UWP;UNITY_WSA_10_0</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>False</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <OutputPath>bin\ARM\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UNITY_METRO;UNITY_WSA;UNITY_UWP;UNITY_WSA_10_0</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>False</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Master|ARM'">
+    <OutputPath>bin\ARM\Master\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UNITY_METRO;UNITY_WSA;UNITY_UWP;UNITY_WSA_10_0</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>True</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP;UNITY_METRO;UNITY_WSA;UNITY_UWP;UNITY_WSA_10_0</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>False</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UNITY_METRO;UNITY_WSA;UNITY_UWP;UNITY_WSA_10_0</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>False</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Master|x64'">
+    <OutputPath>bin\x64\Master\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UNITY_METRO;UNITY_WSA;UNITY_UWP;UNITY_WSA_10_0</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>True</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP;UNITY_METRO;UNITY_WSA;UNITY_UWP;UNITY_WSA_10_0</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>False</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UNITY_METRO;UNITY_WSA;UNITY_UWP;UNITY_WSA_10_0</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>False</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Master|x86'">
+    <OutputPath>bin\x86\Master\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP;UNITY_METRO;UNITY_WSA;UNITY_UWP;UNITY_WSA_10_0</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>True</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
+    <UnityBits>64</UnityBits>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' != 'x64'">
+    <UnityBits>32</UnityBits>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="project.json" />
+    <SDKReference Include="Microsoft.VCLibs, Version=14.0">
+      <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
+    </SDKReference>
+    <SDKReference Include="WindowsMobile, Version=10.0.14393.0">
+      <Name>Windows Mobile Extensions for the UWP</Name>
+    </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App.cs">
+    </Compile>
+    <Content Include="Resource.res">
+    </Content>
+    <Content Include="Assets\SplashScreen.scale-200.png">
+    </Content>
+    <Content Include="Assets\Square150x150Logo.scale-200.png">
+    </Content>
+    <Content Include="Assets\Square44x44Logo.scale-200.png">
+    </Content>
+    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
+    </Content>
+    <Content Include="Assets\StoreLogo.png">
+    </Content>
+    <Content Include="Assets\Wide310x150Logo.scale-200.png">
+    </Content>
+    <Compile Include="Properties\AssemblyInfo.cs">
+    </Compile>
+    <Content Include="Properties\Default.rd.xml">
+    </Content>
+    <Compile Include="UnityGenerated.cs">
+    </Compile>
+    <Reference Include="UnityEngine">
+      <HintPath>.\Unprocessed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="WinRTLegacy">
+      <HintPath>.\Unprocessed\WinRTLegacy.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>.\Unprocessed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Sandbox.Shared">
+      <HintPath>.\Unprocessed\Sandbox.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="ZeroFormatter.Interfaces">
+      <HintPath>.\Unprocessed\ZeroFormatter.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ZeroFormatter.Portable">
+      <HintPath>.\Unprocessed\ZeroFormatter.Portable.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>.\Unprocessed\UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Content Include="Data\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+    <None Include="WSATestCertificate.pfx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="E:\GitHub\ZeroFormatter\tests\ZeroFormatter.UnityTests\WSA_Build\GeneratedProjects\UWP\Assembly-CSharp\Assembly-CSharp.csproj">
+      <Project>{1be7ed0b-570a-4483-bf63-f7f1d316a7bd}</Project>
+      <Name>Assembly-CSharp</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="E:\GitHub\ZeroFormatter\tests\ZeroFormatter.UnityTests\WSA_Build\GeneratedProjects\UWP\Assembly-CSharp-firstpass\Assembly-CSharp-firstpass.csproj">
+      <Project>{46621c82-568b-4096-9101-51621cafbbd8}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>  <ItemGroup>
+    <Reference Include="UnityPlayer">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(UnityWSAPlayerDir)Players\UAP\dotnet\$(PlatformTarget)\$(Configuration)\UnityPlayer.winmd</HintPath>
+    </Reference>
+    <Reference Include="WinRTBridge">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(UnityWSAPlayerDir)Players\UAP\dotnet\$(PlatformTarget)\$(Configuration)\WinRTBridge.winmd</HintPath>
+    </Reference>
+    <Reference Include="BridgeInterface">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(UnityWSAPlayerDir)Players\UAP\dotnet\$(PlatformTarget)\$(Configuration)\BridgeInterface.winmd</HintPath>
+    </Reference>
+    <Reference Include="UnityEngineDelegates">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(UnityWSAPlayerDir)Players\UAP\dotnet\$(PlatformTarget)\$(Configuration)\UnityEngineDelegates.winmd</HintPath>
+    </Reference>
+    <Reference Include="UnityEngineProxy">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(UnityWSAPlayerDir)Players\UAP\dotnet\$(PlatformTarget)\$(Configuration)\UnityEngineProxy.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
+    <VisualStudioVersion>14.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <ItemGroup>
+    <UnprocessedFile Include="$(ProjectDir)Unprocessed\*" />
+  </ItemGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+
+  -->
+    <PropertyGroup>
+   <_GenerateAppxManifestDependsOn>
+    ModifyAppXPackage;
+    $(_GenerateAppxManifestDependsOn)
+   </_GenerateAppxManifestDependsOn>
+  </PropertyGroup>
+
+  <Target Name="ModifyAppXPackage" Condition="'$(BuildingProject)' == 'true'" > 
+        <Message Importance="high" Text="UnityInstallationDir &quot;$(UnityInstallationDir)&quot;." />
+        <Message Importance="high" Text="UnityWSAPlayerDir &quot;$(UnityWSAPlayerDir)&quot;." />
+        <Message Importance="high" Text="UnityProjectDir &quot;$(UnityProjectDir)&quot;." />
+        <Message Importance="high" Text="Copying unprocessed assemblies..." />
+        <Copy SourceFiles="@(UnprocessedFile)" DestinationFolder="$(ProjectDir)" />
+        <Copy SourceFiles="$(UnityWSASolutionDir)\GeneratedProjects\UWP\Assembly-CSharp\bin\$(PlatformName)\$(ConfigurationName)\Assembly-CSharp.dll" DestinationFiles="$(ProjectDir)Assembly-CSharp.dll" />
+        <Copy SourceFiles="$(UnityWSASolutionDir)\GeneratedProjects\UWP\Assembly-CSharp\bin\$(PlatformName)\$(ConfigurationName)\Assembly-CSharp.pdb" DestinationFiles="$(ProjectDir)Assembly-CSharp.pdb" Condition="Exists('$(UnityWSASolutionDir)\GeneratedProjects\UWP\Assembly-CSharp\bin\$(PlatformName)\$(ConfigurationName)\Assembly-CSharp.pdb')" />
+        <Copy SourceFiles="$(UnityWSASolutionDir)GeneratedProjects\UWP\Assembly-CSharp-firstpass\bin\$(PlatformName)\$(ConfigurationName)\Assembly-CSharp-firstpass.dll" DestinationFiles="$(ProjectDir)Assembly-CSharp-firstpass.dll" />
+        <Copy SourceFiles="$(UnityWSASolutionDir)GeneratedProjects\UWP\Assembly-CSharp-firstpass\bin\$(PlatformName)\$(ConfigurationName)\Assembly-CSharp-firstpass.pdb" DestinationFiles="$(ProjectDir)Assembly-CSharp-firstpass.pdb" Condition="Exists('$(UnityWSASolutionDir)GeneratedProjects\UWP\Assembly-CSharp-firstpass\bin\$(PlatformName)\$(ConfigurationName)\Assembly-CSharp-firstpass.pdb')" />
+        <PropertyGroup Condition=" '$(Configuration)' == 'Master' ">
+           <RemoveDebuggableAttribute>True</RemoveDebuggableAttribute>
+        </PropertyGroup>
+        <PropertyGroup Condition=" '$(Configuration)' != 'Master' ">
+           <RemoveDebuggableAttribute>False</RemoveDebuggableAttribute>
+        </PropertyGroup>
+        <Message Importance="high" Text="Running AssemblyConverter..." />
+        <Exec Command="&quot;$(UnityWSAToolsDir)AssemblyConverter.exe&quot; -platform=uap -lock=&quot;$(ProjectDir)project.lock.json&quot; -bits=$(UnityBits) -configuration=$(Configuration) -removeDebuggableAttribute=$(RemoveDebuggableAttribute) -path=&quot;.&quot; -path=&quot;$(UnityWSAPlayerDir)Players\UAP\dotnet\$(PlatformTarget)\$(Configuration)&quot; &quot;$(ProjectDir)Assembly-CSharp.dll&quot; &quot;$(ProjectDir)Assembly-CSharp-firstpass.dll&quot; &quot;$(ProjectDir)UnityEngine.dll&quot; &quot;$(ProjectDir)UnityEngine.UI.dll&quot; &quot;$(ProjectDir)Sandbox.Shared.dll&quot; &quot;$(ProjectDir)ZeroFormatter.Interfaces.dll&quot; &quot;$(ProjectDir)ZeroFormatter.Portable.dll&quot; &quot;$(ProjectDir)UnityEngine.Networking.dll&quot;" />
+        <Message Importance="high" Text="AssemblyConverter done." />
+        <Message Importance="high" Text="Modifying AppxPackagePayload" />
+        <ItemGroup>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'UnityEngine.dll'" />
+            <AppxPackagePayload Include="$(ProjectDir)UnityEngine.dll">
+                <TargetPath>UnityEngine.dll</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'UnityEngine.pdb'" />
+            <AppxPackagePayload Include="$(ProjectDir)UnityEngine.pdb">
+                <TargetPath>UnityEngine.pdb</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'UnityEngine.UI.dll'" />
+            <AppxPackagePayload Include="$(ProjectDir)UnityEngine.UI.dll">
+                <TargetPath>UnityEngine.UI.dll</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'UnityEngine.UI.pdb'" />
+            <AppxPackagePayload Include="$(ProjectDir)UnityEngine.UI.pdb">
+                <TargetPath>UnityEngine.UI.pdb</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'Sandbox.Shared.dll'" />
+            <AppxPackagePayload Include="$(ProjectDir)Sandbox.Shared.dll">
+                <TargetPath>Sandbox.Shared.dll</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'Sandbox.Shared.pdb'" />
+            <AppxPackagePayload Include="$(ProjectDir)Sandbox.Shared.pdb">
+                <TargetPath>Sandbox.Shared.pdb</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'ZeroFormatter.Interfaces.dll'" />
+            <AppxPackagePayload Include="$(ProjectDir)ZeroFormatter.Interfaces.dll">
+                <TargetPath>ZeroFormatter.Interfaces.dll</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'ZeroFormatter.Interfaces.pdb'" />
+            <AppxPackagePayload Include="$(ProjectDir)ZeroFormatter.Interfaces.pdb">
+                <TargetPath>ZeroFormatter.Interfaces.pdb</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'ZeroFormatter.Portable.dll'" />
+            <AppxPackagePayload Include="$(ProjectDir)ZeroFormatter.Portable.dll">
+                <TargetPath>ZeroFormatter.Portable.dll</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'ZeroFormatter.Portable.pdb'" />
+            <AppxPackagePayload Include="$(ProjectDir)ZeroFormatter.Portable.pdb">
+                <TargetPath>ZeroFormatter.Portable.pdb</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'UnityEngine.Networking.dll'" />
+            <AppxPackagePayload Include="$(ProjectDir)UnityEngine.Networking.dll">
+                <TargetPath>UnityEngine.Networking.dll</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'UnityEngine.Networking.pdb'" />
+            <AppxPackagePayload Include="$(ProjectDir)UnityEngine.Networking.pdb">
+                <TargetPath>UnityEngine.Networking.pdb</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'Assembly-CSharp.dll'" />
+            <AppxPackagePayload Include="$(ProjectDir)Assembly-CSharp.dll">
+                <TargetPath>Assembly-CSharp.dll</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'Assembly-CSharp.pdb'" />
+            <AppxPackagePayload Include="$(ProjectDir)Assembly-CSharp.pdb">
+                <TargetPath>Assembly-CSharp.pdb</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'Assembly-CSharp-firstpass.dll'" />
+            <AppxPackagePayload Include="$(ProjectDir)Assembly-CSharp-firstpass.dll">
+                <TargetPath>Assembly-CSharp-firstpass.dll</TargetPath>
+            </AppxPackagePayload>
+            <AppxPackagePayload Remove="@(AppxPackagePayload)" Condition="'%(TargetPath)' == 'Assembly-CSharp-firstpass.pdb'" />
+            <AppxPackagePayload Include="$(ProjectDir)Assembly-CSharp-firstpass.pdb">
+                <TargetPath>Assembly-CSharp-firstpass.pdb</TargetPath>
+            </AppxPackagePayload>
+        </ItemGroup>
+   </Target>
+  <PropertyGroup>
+    <Win32Resource>Resource.res</Win32Resource>
+  </PropertyGroup>
+
+
+</Project>

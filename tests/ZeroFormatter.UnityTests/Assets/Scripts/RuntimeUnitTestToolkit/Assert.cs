@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections;
+#if WINDOWS_UWP
+using System.Reflection;
+#endif
 
 namespace RuntimeUnitTestToolkit
 {
@@ -80,7 +83,11 @@ namespace RuntimeUnitTestToolkit
 
         public static void IsInstanceOfType(object value, Type expectedType, string message)
         {
+#if WINDOWS_UWP
+            if (value == null || !expectedType.GetTypeInfo().IsAssignableFrom(value.GetType().GetTypeInfo()))
+#else
             if (value == null || !expectedType.IsAssignableFrom(value.GetType()))
+#endif
             {
                 throw new AssertFailedException(string.Format("IsInstanceOfType Failed. valueType:{0} expectedType:{1} message:{2}", (value == null) ? null : value.GetType(), expectedType, message));
             }
@@ -88,7 +95,11 @@ namespace RuntimeUnitTestToolkit
 
         public static void IsNotInstanceOfType(object value, Type expectedType, string message)
         {
-            if (value != null || expectedType.IsAssignableFrom(value.GetType()))
+#if WINDOWS_UWP
+            if (value == null || !expectedType.GetTypeInfo().IsAssignableFrom(value.GetType().GetTypeInfo()))
+#else
+            if (value == null || !expectedType.IsAssignableFrom(value.GetType()))
+#endif
             {
                 throw new AssertFailedException(string.Format("IsNotInstanceOfType Failed. valueType:{0} expectedType:{1} message:{2}", (value == null) ? null : value.GetType(), expectedType, message));
             }

@@ -306,7 +306,7 @@ namespace ZeroFormatter
                     {
                         var bufferRef = zeroFormatterObj.GetBufferReference();
 
-#if NET_CORE
+#if NET_CORE && !PORTABLE
                     ArraySegment<byte> buf;
                     if (ms.TryGetBuffer(out buf))
                     {
@@ -315,6 +315,11 @@ namespace ZeroFormatter
                         Buffer.BlockCopy(bufferRef.Array, bufferRef.Offset, dest, 0, bufferRef.Count);
                         return;
                     }
+#elif PORTABLE
+                        ms.SetLength(bufferRef.Count);
+                        var dest = ms.ToArray();
+                        Buffer.BlockCopy(bufferRef.Array, bufferRef.Offset, dest, 0, bufferRef.Count);
+                        return;
 #else
                         ms.SetLength(bufferRef.Count);
                         var dest = ms.GetBuffer();
@@ -355,14 +360,18 @@ namespace ZeroFormatter
                 var tracker = formatter.NoUseDirtyTracker ? DirtyTracker.NullTracker : new DirtyTracker();
                 if (ms != null)
                 {
-#if NET_CORE
-                ArraySegment<byte> b;
-                if (ms.TryGetBuffer(out b))
-                {
-                    var buffer = b.Array;
+#if NET_CORE &&!PORTABLE
+                    ArraySegment<byte> b;
+                    if (ms.TryGetBuffer(out b))
+                    {
+                        var buffer = b.Array;
+                        int _;
+                        return formatter.Deserialize(ref buffer, b.Offset, tracker, out _);
+                    }
+#elif PORTABLE
+                    var buffer = ms.ToArray();
                     int _;
-                    return formatter.Deserialize(ref buffer, b.Offset, tracker, out _);
-                }
+                    return formatter.Deserialize(ref buffer, (int)ms.Position, tracker, out _);
 #else
                     var buffer = ms.GetBuffer();
                     int _;

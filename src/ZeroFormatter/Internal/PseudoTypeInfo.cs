@@ -1,4 +1,4 @@
-﻿#if UNITY
+﻿#if UNITY && !PORTABLE
 
 using System;
 
