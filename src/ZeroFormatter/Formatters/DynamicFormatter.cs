@@ -117,6 +117,9 @@ namespace ZeroFormatter.Formatters
                         foundUnionKey = true;
                         break;
                     }
+
+                    if (propInfo.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) break;
+
                     propInfo = null;
 
                     var baseType = item.DeclaringType.GetTypeInfo().BaseType;
@@ -402,16 +405,14 @@ namespace ZeroFormatter.Formatters
                 {
                     il.MarkLabel(labelA);
 
-                    il.Emit(OpCodes.Ldloca_S, (byte)0);
+                    il.Emit(OpCodes.Ldarg_3);
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldind_Ref);
                     il.Emit(OpCodes.Ldarg_2);
                     il.Emit(OpCodes.Ldarg_S, (byte)4);
                     il.Emit(OpCodes.Ldind_I4);
-                    il.Emit(OpCodes.Call, typeof(ArraySegment<byte>).GetTypeInfo().GetConstructor(new[] { typeof(byte[]), typeof(int), typeof(int) }));
+                    il.Emit(OpCodes.Newobj, typeof(ArraySegment<byte>).GetTypeInfo().GetConstructor(new[] { typeof(byte[]), typeof(int), typeof(int) }));
 
-                    il.Emit(OpCodes.Ldarg_3);
-                    il.Emit(OpCodes.Ldloc_0);
                     var ti = typeof(DynamicObjectSegmentBuilder<,>).MakeGenericType(resolverType, elementType).GetTypeInfo().GetMethod("GetProxyType").Invoke(null, null) as TypeInfo;
                     il.Emit(OpCodes.Newobj, ti.GetConstructor(new[] { typeof(DirtyTracker), typeof(ArraySegment<byte>) }));
                     il.Emit(OpCodes.Ret);
@@ -936,7 +937,7 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldarg_3);
                     il.Emit(OpCodes.Callvirt, typeof(Object).GetTypeInfo().GetMethod("GetType"));
                     il.Emit(OpCodes.Callvirt, typeof(Type).GetTypeInfo().GetProperty("FullName").GetGetMethod());
-                    il.Emit(OpCodes.Call, typeof(string).GetTypeInfo().GetMethods().First(x => x.GetParameters().Length == 2 && x.GetParameters().All(y => y.ParameterType == typeof(string))));
+                    il.Emit(OpCodes.Call, typeof(string).GetTypeInfo().GetMethod("Concat", new[] {typeof(string), typeof(string)}));
                     il.Emit(OpCodes.Newobj, typeof(Exception).GetTypeInfo().GetConstructors().First(x => x.GetParameters().Length == 1));
                     il.Emit(OpCodes.Throw);
                 }
