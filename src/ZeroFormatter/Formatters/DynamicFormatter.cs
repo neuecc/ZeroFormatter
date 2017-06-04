@@ -117,6 +117,9 @@ namespace ZeroFormatter.Formatters
                         foundUnionKey = true;
                         break;
                     }
+
+                    if (propInfo.GetCustomAttributes(typeof(IgnoreFormatAttribute), true).Any()) break;
+
                     propInfo = null;
 
                     var baseType = item.DeclaringType.GetTypeInfo().BaseType;
