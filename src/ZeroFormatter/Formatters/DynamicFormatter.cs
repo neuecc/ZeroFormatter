@@ -937,7 +937,7 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldarg_3);
                     il.Emit(OpCodes.Callvirt, typeof(Object).GetTypeInfo().GetMethod("GetType"));
                     il.Emit(OpCodes.Callvirt, typeof(Type).GetTypeInfo().GetProperty("FullName").GetGetMethod());
-                    il.Emit(OpCodes.Call, typeof(string).GetTypeInfo().GetMethods().First(x => x.GetParameters().Length == 2 && x.GetParameters().All(y => y.ParameterType == typeof(string))));
+                    il.Emit(OpCodes.Call, typeof(string).GetTypeInfo().GetMethod("Concat", new[] {typeof(string), typeof(string)}));
                     il.Emit(OpCodes.Newobj, typeof(Exception).GetTypeInfo().GetConstructors().First(x => x.GetParameters().Length == 1));
                     il.Emit(OpCodes.Throw);
                 }
