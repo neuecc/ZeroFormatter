@@ -23,6 +23,8 @@ namespace ZeroFormatter.Analyzer
         internal const string UnionAttributeShortName = "UnionAttribute";
         internal const string DynamicUnionAttributeShortName = "DynamicUnionAttribute";
         internal const string UnionKeyAttributeShortName = "UnionKeyAttribute";
+        internal const string ZeroFormattableFormatterProperty = "FormatterType";
+        internal const string FormatterTypeName = "Formatter";
 
         internal static readonly DiagnosticDescriptor TypeMustBeZeroFormattable = new DiagnosticDescriptor(
             id: DiagnosticIdBase + "_" + nameof(TypeMustBeZeroFormattable), title: Title, category: Category,
@@ -102,6 +104,12 @@ namespace ZeroFormatter.Analyzer
             description: "All Union subTypes must be inherited type.",
             defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 
+        internal static readonly DiagnosticDescriptor ExplicitFormatterMustInheritFormatter = new DiagnosticDescriptor(
+            id: DiagnosticIdBase + "_" + nameof(ExplicitFormatterMustInheritFormatter), title: Title, category: Category,
+            messageFormat: "Explicit Formatter type must inherit from Formatter<>. Type: {0}, Formatter: {1}", //  type.Name subType.Name
+            description: "Explicit Formatter type must inherit from Formatter<>.",
+            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+
         static readonly ImmutableArray<DiagnosticDescriptor> supportedDiagnostics = ImmutableArray.Create(
             TypeMustBeZeroFormattable,
             PublicPropertyNeedsIndex,
@@ -164,9 +172,9 @@ namespace ZeroFormatter.Analyzer
             if (declaredSymbol == null) return;
 
             var isUnion = declaredSymbol.GetAttributes().FindAttributeShortName(UnionAttributeShortName) != null;
-            var isZeroFormattable = declaredSymbol.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName) != null;
+            var zeroFormattableAttribute = declaredSymbol.GetAttributes().FindAttributeShortName(ZeroFormattableAttributeShortName);
 
-            if (!isUnion && !isZeroFormattable)
+            if (!isUnion && zeroFormattableAttribute == null)
             {
                 return;
             }
@@ -176,8 +184,21 @@ namespace ZeroFormatter.Analyzer
             {
                 VerifyUnion(reportContext, typeDeclaration.GetLocation(), declaredSymbol);
             }
-            if (isZeroFormattable)
+            if (zeroFormattableAttribute != null)
             {
+                var explicitFormatter =
+                    zeroFormattableAttribute.NamedArguments.Where(
+                        x => x.Key == ZeroFormattableFormatterProperty);
+                if (explicitFormatter.Any())
+                {
+                    if (explicitFormatter.First().Value.Type.BaseType.Name != FormatterTypeName)
+                        reportContext.Add(Diagnostic.Create(ExplicitFormatterMustInheritFormatter,
+                            typeDeclaration.GetLocation(), typeDeclaration.GetLocation(),
+                            explicitFormatter.First().Value.Type));
+
+                    return;
+                }
+
                 VerifyType(reportContext, typeDeclaration.GetLocation(), declaredSymbol, new HashSet<ITypeSymbol>(), null);
             }
 

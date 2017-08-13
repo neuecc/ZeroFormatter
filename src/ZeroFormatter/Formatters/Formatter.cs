@@ -105,7 +105,33 @@ namespace ZeroFormatter.Formatters
             var resolver = ResolverCache<TTypeResolver>.Default;
             try
             {
-                formatter = resolver.ResolveFormatter(t);
+
+#if NET_CORE
+                var ti = t.GetTypeInfo();
+#else
+                var ti = t;
+#endif
+                var attribute = (ZeroFormattableAttribute) ti.GetCustomAttributes(typeof(ZeroFormattableAttribute))
+                    .FirstOrDefault();
+                if (attribute != null && attribute.FormatterType != null)
+                {
+                    Type[] genericArguments;
+                    if (ti.IsGenericType)
+                    {
+                        var classTypes = ti.GetGenericArguments();
+                        genericArguments = new Type[1 + classTypes.Length];
+                        genericArguments[0] = typeof(TTypeResolver);
+                        Array.Copy(classTypes, 0, genericArguments, 1, classTypes.Length);
+                    }
+                    else
+                        genericArguments = new[] {typeof(TTypeResolver)};
+
+                    formatter = Activator.CreateInstance(
+                        attribute.FormatterType.MakeGenericType(genericArguments));
+                }
+
+                if (formatter == null)
+                    formatter = resolver.ResolveFormatter(t);
 
                 // If Unity, should avoid long static constructor and <T> code because IL2CPP generate every <T>.
                 if (formatter == null && resolver.IsUseBuiltinSerializer)
