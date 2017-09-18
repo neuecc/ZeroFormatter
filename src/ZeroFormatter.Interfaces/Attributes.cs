@@ -5,6 +5,7 @@ namespace ZeroFormatter
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
     public class ZeroFormattableAttribute : Attribute
     {
+        public Type FormatterType { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
