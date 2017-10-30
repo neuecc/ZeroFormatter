@@ -702,6 +702,11 @@ namespace ZeroFormatter.Formatters
                 {
                     formatter = DynamicStructFormatter.Create<TTypeResolver, T>();
                 }
+
+                else if (HasZeroFormattableAttribute(ti))
+                {
+                    formatter = CreateDynamicFormatter<TTypeResolver, T>(ti);
+                }
             }
 
             else if (ti.GetCustomAttributes(typeof(UnionAttribute), false).FirstOrDefault() != null)
@@ -719,16 +724,9 @@ namespace ZeroFormatter.Formatters
                 }
             }
 
-            else if (ti.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() != null)
+            else if (HasZeroFormattableAttribute(ti))
             {
-                if (ti.IsValueType)
-                {
-                    formatter = DynamicStructFormatter.Create<TTypeResolver, T>();
-                }
-                else
-                {
-                    formatter = DynamicFormatter.Create<TTypeResolver, T>();
-                }
+                formatter = CreateDynamicFormatter<TTypeResolver, T>(ti);
             }
 
 #endif
@@ -736,7 +734,27 @@ namespace ZeroFormatter.Formatters
             return formatter;
         }
 
+
 #if !UNITY
+
+        static bool HasZeroFormattableAttribute(TypeInfo ti)
+        {
+            return ti.GetCustomAttributes(typeof(ZeroFormattableAttribute), true).FirstOrDefault() != null;
+        }
+
+        static object CreateDynamicFormatter<TTypeResolver, T>(TypeInfo ti)
+            where TTypeResolver : ITypeResolver, new()
+        {
+            if (ti.IsValueType)
+            {
+                return DynamicStructFormatter.Create<TTypeResolver, T>();
+            }
+            else
+            {
+                return DynamicFormatter.Create<TTypeResolver, T>();
+            }
+        }
+
 
         internal static void ResolveDynamicUnion(Type unionType, DynamicUnionResolver resolver)
         {
