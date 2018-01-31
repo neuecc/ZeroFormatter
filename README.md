@@ -17,7 +17,7 @@ Why use ZeroFormatter?
 * Full set of general purpose, multifunctional serializer, supports Union(Polymorphism) and native support of Dictionary, MultiDictionary&nbsp;(ILookup)
 * First-class support to Unity&nbsp;(IL2CPP), it's faster than native JsonUtility
 
-ZeroFormatter is similar as [FlatBuffers](http://google.github.io/flatbuffers/) but ZeroFormatter has clean API&nbsp;(the&nbsp;FlatBuffers API is too ugly, [see: sample](https://github.com/google/flatbuffers/blob/master/samples/SampleBinary.cs); we can not use regularly) and C# specialized. If you need performance for Games, Distributed Computing, Microservices, etc..., ZeroFormatter will help you.
+ZeroFormatter is similar to [FlatBuffers](http://google.github.io/flatbuffers/) but ZeroFormatter has a clean API&nbsp;(the&nbsp;FlatBuffers API is too ugly, [see: sample](https://github.com/google/flatbuffers/blob/master/samples/SampleBinary.cs); we can not use regularly) and C# specialized. If you need performance for Games, Distributed Computing, Microservices, etc..., ZeroFormatter will help you.
 
 Install
 ---
