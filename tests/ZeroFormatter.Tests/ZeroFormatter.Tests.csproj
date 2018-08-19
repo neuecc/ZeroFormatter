@@ -65,6 +65,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CacheSegmentTest.cs" />
     <Compile Include="EnumArraySerialize.cs" />
     <Compile Include="MoreAdditionalCollectionTest.cs" />
     <Compile Include="RelativeTest.cs" />
