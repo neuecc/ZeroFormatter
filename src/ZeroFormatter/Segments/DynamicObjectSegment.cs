@@ -34,16 +34,28 @@ namespace ZeroFormatter.Segments
             return originalBytes.Offset + readOffset;
         }
 
-        public static ArraySegment<byte> GetSegment(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)
+        public static ArraySegment<byte> GetSegment(ArraySegment<byte> originalBytes, int index, int nextIndex, int lastIndex, DirtyTracker tracker)
         {
             var offset = GetOffset(originalBytes, index, lastIndex, tracker);
             if (offset == -1)
             {
                 return default(ArraySegment<byte>); // note:very very dangerous.
             }
-
-            var sliceLength = originalBytes.Offset + originalBytes.Count;
-            return new ArraySegment<byte>(originalBytes.Array, offset, (sliceLength - offset));
+            int count;
+            if (nextIndex == -1 || nextIndex > lastIndex)
+            {
+                count = originalBytes.Offset + originalBytes.Count - offset; // last index
+            }
+            else
+            {
+                var nextOffset = GetOffset(originalBytes, nextIndex, lastIndex, tracker);
+                if (nextOffset == -1)
+                {
+                    return default(ArraySegment<byte>); // note: precondition failed.
+                }
+                count = nextOffset - offset;
+            }
+            return new ArraySegment<byte>(originalBytes.Array, offset, count);
         }
 
         public static T DeserializeSegment<TTypeResolver, T>(ArraySegment<byte> originalBytes, int index, int lastIndex, DirtyTracker tracker)
@@ -430,13 +442,15 @@ namespace ZeroFormatter.Segments
             il.Emit(OpCodes.Call, typeof(ObjectSegmentHelper).GetTypeInfo().GetMethod("CreateExtraFixedBytes"));
             il.Emit(OpCodes.Stfld, extraFixedBytes);
 
-            foreach (var item in properties)
+            for (var i = 0; i < properties.Length; i++)
             {
+                var item = properties[i];
                 if (item.IsFixedSize) continue;
 
                 if (item.IsCacheSegment)
                 {
-                    AssignCacheSegment(il, item.Index, trackerField, lastIndexField, item.SegmentField);
+                    var nextIndex = i + 1 < properties.Length ? properties[i + 1].Index : -1;
+                    AssignCacheSegment(il, item.Index, nextIndex, trackerField, lastIndexField, item.SegmentField);
                 }
                 else
                 {
@@ -461,13 +475,14 @@ namespace ZeroFormatter.Segments
             }
         }
 
-        static void AssignCacheSegment(ILGenerator il, int index, FieldInfo tracker, FieldInfo lastIndex, FieldInfo field)
+        static void AssignCacheSegment(ILGenerator il, int index, int nextIndex, FieldInfo tracker, FieldInfo lastIndex, FieldInfo field)
         {
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, tracker);
             il.Emit(OpCodes.Ldarg_2);
             il.Emit(OpCodes.Ldc_I4, index);
+            il.Emit(OpCodes.Ldc_I4, nextIndex);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, lastIndex);
             il.Emit(OpCodes.Ldarg_0);
