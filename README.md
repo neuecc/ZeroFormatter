@@ -145,7 +145,7 @@ Struct index must be started with 0 and be sequential and needs full parameter c
 
 eager/lazy-evaluation
 ---
-ZeroFormatter has two types of evaluation, "eager-evaluation" and "lazy-evaluation". If the type is lazy-evaluation, deserialization will be infinitely fast because it does not parse. If the user-defined class or type is `IList<>`, `IReadOnlyList<>`, `ILazyLookup<>`, `ILazyDicitonary<>`, `ILazyReadOnlyDictionary<>`, deserialization of that type will be lazily evaluated.
+ZeroFormatter has two types of evaluation, "eager-evaluation" and "lazy-evaluation". If the type is lazy-evaluation, deserialization will be infinitely fast because it does not parse. If the user-defined class or type is `IList<>`, `IReadOnlyList<>`, `ILazyLookup<>`, `ILazyDictionary<>`, `ILazyReadOnlyDictionary<>`, deserialization of that type will be lazily evaluated.
 
 ```csharp
 // MyClass is lazy-evaluation, all properties are lazily
