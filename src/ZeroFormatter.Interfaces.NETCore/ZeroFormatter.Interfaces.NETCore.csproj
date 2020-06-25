@@ -5,7 +5,15 @@
     <TargetFramework>netstandard1.1</TargetFramework>
     <AssemblyName>ZeroFormatter.Interfaces</AssemblyName>
     <PackageId>ZeroFormatter.Interfaces.NETCore</PackageId>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <Compile Include="..\ZeroFormatter.Interfaces\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
