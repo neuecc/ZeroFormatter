@@ -2,11 +2,12 @@ ZeroFormatter
 ===
 Fastest C# Serializer and Infinitely Fast Deserializer for .NET, .NET Core and Unity.
 
-[![Gitter](https://badges.gitter.im/neuecc/ZeroFormatter.svg)](https://gitter.im/neuecc/ZeroFormatter?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
-![image](https://cloud.githubusercontent.com/assets/46207/20072942/ba760e70-a56d-11e6-918f-edf84f0187da.png)
-
-Note: this is **unfair** comparison, please see the [performance](https://github.com/neuecc/ZeroFormatter#performance) section for the details.
+## TrainerRoad Notes
+- Forked on 10/20/20 so that we could add support for .Net Core by targeting netstandard21
+- We changed the bare minimum to get the Personal Records app to run and updated some NuGets in the the test project
+- All of the tests in NetCore.Tests pass except UnionTest.Union. It fails with a System.InvalidProgramExcpetion.
+- Build manually, copy the Debug/Netstandard21 folder to the lib folder in TrainerRoadPersonalRecords repo. 
+  - Bump the version number in the NetCore project at least.
 
 Why use ZeroFormatter?
 ---

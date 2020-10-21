@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>1.6.4</VersionPrefix>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <VersionPrefix>1.6.5</VersionPrefix>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>ZeroFormatter</AssemblyName>

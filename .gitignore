@@ -120,3 +120,5 @@ nuget/*.zip
 nuget/*.nupkg
 nuget/zfc.exe
 nuget/zfc.exe.config
+/.vs/ZeroFormatter/DesignTimeBuild
+/.vs

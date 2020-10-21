@@ -298,7 +298,7 @@ namespace ZeroFormatter.Formatters
                     il.Emit(OpCodes.Ldloc_0);
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldarg_2);
-                    il.Emit(OpCodes.Call, typeof(IZeroFormatterSegment).GetTypeInfo().GetMethod("Serialize"));
+                    il.Emit(OpCodes.Callvirt, typeof(IZeroFormatterSegment).GetTypeInfo().GetMethod("Serialize"));
                     il.Emit(OpCodes.Ret);
                 }
                 // else if(value == null)
